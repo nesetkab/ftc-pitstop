@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Pitstop - FTC Pit Display",
-  description: "The One-Stop Shop for all of your FTC pit essentials"
+  description: "The One-Stop Shop for all of your FTC pit essentials :3"
 }
 
 export default function RootLayout({
