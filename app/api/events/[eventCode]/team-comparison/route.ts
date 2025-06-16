@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 
 const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
 
-export async function GET(request: NextRequest, { params }: { params: { eventCode: string } }) {
-  const { eventCode } = params
+export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
+  const { eventCode } = await params
   const searchParams = request.nextUrl.searchParams
   const teamNumber = searchParams.get("team")
 
@@ -36,8 +36,15 @@ export async function GET(request: NextRequest, { params }: { params: { eventCod
     let oprData = []
 
     if (rankingsResponse.ok) {
-      const rankingsResult = await rankingsResponse.json()
-      rankings = rankingsResult.Rankings || []
+      const rankingsData = await rankingsResponse.json()
+      console.log("Full rankings response:", JSON.stringify(rankingsData, null, 2))
+
+      if (rankingsData && Array.isArray(rankingsData.Rankings)) {
+        rankings = rankingsData.Rankings
+        console.log(`Found ${rankings.length} rankings`)
+      } else {
+        console.warn("Rankings data structure is unexpected:", rankingsData)
+      }
     }
 
     if (matchesResponse.ok) {
@@ -57,26 +64,78 @@ export async function GET(request: NextRequest, { params }: { params: { eventCod
 
     // Process rankings
     rankings.forEach((ranking: any) => {
+      const totalMatches = (ranking.wins || 0) + (ranking.losses || 0) + (ranking.ties || 0)
+      const winRate = totalMatches > 0
+        ? ((ranking.wins || 0) + (ranking.ties || 0) * 0.5) / totalMatches * 100
+        : 0
+
       teamStats.set(ranking.teamNumber, {
         teamNumber: ranking.teamNumber,
-        rank: ranking.rank,
-        rp: ranking.rp || 0,
-        tbp: ranking.tbp || 0,
+        rank: ranking.rank,  // Use the rank directly from the API
+        rp: ranking.rankingPoints || 0,
+        tbp: ranking.tieBreakerPoints || 0,
         wins: ranking.wins || 0,
         losses: ranking.losses || 0,
         ties: ranking.ties || 0,
-        played: (ranking.wins || 0) + (ranking.losses || 0) + (ranking.ties || 0),
-        winRate:
-          ranking.wins > 0
-            ? (ranking.wins / ((ranking.wins || 0) + (ranking.losses || 0) + (ranking.ties || 0))) * 100
-            : 0,
+        played: totalMatches,
+        winRate: winRate,
         opr: 0,
         dpr: 0,
         ccwm: 0,
         avgScore: 0,
         highScore: 0,
         avgMargin: 0,
-        matchesPlayed: 0,
+        matchesPlayed: totalMatches,
+      })
+    })
+
+    matches.forEach((match: any) => {
+      if (!match.teams) return
+
+      match.teams.forEach((teamInfo: any) => {
+        const teamNum = teamInfo.teamNumber
+        if (!teamStats.has(teamNum)) {
+          // Create initial stats for teams not in rankings
+          const teamMatches = matches.filter((m: any) =>
+            m.teams?.some((t: any) => t.teamNumber === teamNum)
+          )
+
+          let wins = 0, losses = 0, ties = 0
+          teamMatches.forEach((m: any) => {
+            if (m.scoreRedFinal === null || m.scoreBlueFinal === null) return
+            const isRed = m.teams.find((t: any) => t.teamNumber === teamNum).station.includes("Red")
+            const teamScore = isRed ? m.scoreRedFinal : m.scoreBlueFinal
+            const oppScore = isRed ? m.scoreBlueFinal : m.scoreRedFinal
+
+            if (teamScore > oppScore) wins++
+            else if (teamScore < oppScore) losses++
+            else ties++
+          })
+
+          const totalMatches = wins + losses + ties
+          const winRate = totalMatches > 0
+            ? (wins + ties * 0.5) / totalMatches * 100
+            : 0
+
+          teamStats.set(teamNum, {
+            teamNumber: teamNum,
+            rank: rankings.length + 1,  // Place unranked teams after ranked teams
+            rp: 0,
+            tbp: 0,
+            wins,
+            losses,
+            ties,
+            played: totalMatches,
+            winRate,
+            opr: 0,
+            dpr: 0,
+            ccwm: 0,
+            avgScore: 0,
+            highScore: 0,
+            avgMargin: 0,
+            matchesPlayed: totalMatches,
+          })
+        }
       })
     })
 
@@ -196,8 +255,8 @@ export async function GET(request: NextRequest, { params }: { params: { eventCod
     // Get similar teams (teams with similar rank)
     const similarTeams = targetTeam
       ? allTeams
-          .filter((t) => t.teamNumber !== targetTeam.teamNumber && Math.abs(t.rank - targetTeam.rank) <= 3)
-          .slice(0, 5)
+        .filter((t) => t.teamNumber !== targetTeam.teamNumber && Math.abs(t.rank - targetTeam.rank) <= 3)
+        .slice(0, 5)
       : []
 
     // Get top performers in each category
@@ -235,10 +294,10 @@ export async function GET(request: NextRequest, { params }: { params: { eventCod
         totalTeams: allTeams.length,
         avgOPR:
           allTeams.filter((t) => t.opr > 0).reduce((sum, t) => sum + t.opr, 0) /
-            allTeams.filter((t) => t.opr > 0).length || 0,
+          allTeams.filter((t) => t.opr > 0).length || 0,
         avgScore:
           allTeams.filter((t) => t.avgScore > 0).reduce((sum, t) => sum + t.avgScore, 0) /
-            allTeams.filter((t) => t.avgScore > 0).length || 0,
+          allTeams.filter((t) => t.avgScore > 0).length || 0,
         highestScore: Math.max(...allTeams.map((t) => t.highScore)),
       },
       oprCalculation: {

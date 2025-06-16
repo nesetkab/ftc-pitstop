@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 
 const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
 
-export async function GET(request: NextRequest, { params }: { params: { teamNumber: string; eventCode: string } }) {
-  const { teamNumber, eventCode } = params
+export async function GET(request: NextRequest, { params }: { params: Promise<{ teamNumber: string; eventCode: string }> }) {
+  const { teamNumber, eventCode } = await params
 
   try {
     const season = 2024
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest, { params }: { params: { teamNumb
     console.log("Fetching stats for team:", teamNumber, "at event:", eventCode)
 
     // Fetch team's matches and our custom OPR data
-    const [matchesResponse, oprResponse] = await Promise.all([
+    const [matchesResponse, oprResponse, rankingsResponse] = await Promise.all([
       fetch(`${FTC_API_BASE}/${season}/matches/${eventCode.toUpperCase()}?teamNumber=${teamNumber}`, {
         headers: {
           Authorization: `Basic ${auth}`,
@@ -21,6 +21,12 @@ export async function GET(request: NextRequest, { params }: { params: { teamNumb
       }),
       // Use our custom OPR calculation
       fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr`),
+      fetch(`${FTC_API_BASE}/${season}/rankings/${eventCode.toUpperCase()}`, {
+        headers: {
+          Authorization: `Basic ${auth}`,
+          Accept: "application/json",
+        },
+      }),
     ])
 
     let matches = []
@@ -90,6 +96,20 @@ export async function GET(request: NextRequest, { params }: { params: { teamNumb
       console.log("Custom OPR data not available")
     }
 
+    let teamRank = 0;
+    if (rankingsResponse.ok) {
+      const rankingsData = await rankingsResponse.json();
+      const teamRanking = rankingsData.Rankings?.find(
+        (r: any) => r.teamNumber === Number.parseInt(teamNumber)
+      );
+      if (teamRanking) {
+        teamRank = teamRanking.rank;
+        // Also update rp and tbp while we have the data
+        stats.rp = teamRanking.rp || 0;
+        stats.tbp = teamRanking.tbp || 0;
+      }
+    }
+
     const stats = {
       wins,
       losses,
@@ -97,7 +117,7 @@ export async function GET(request: NextRequest, { params }: { params: { teamNumb
       opr,
       dpr,
       ccwm,
-      rank: 0,
+      rank: teamRank,
       rp: 0,
       tbp: 0,
     }
