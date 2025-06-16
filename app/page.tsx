@@ -7,7 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { Search, Calendar, Trophy, Users, AlertCircle, TestTube, Clock, MapPin } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import Image from "next/image"
 import Link from "next/link"
+import pitstopLogoWhite from "../public/pitstop_white_logo.svg"
+import pitstopLogoBlack from "../public/pitstop_black_logo.svg"
 
 interface Event {
   code: string
@@ -120,11 +123,11 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-white dark:bg-black">
       <div className="absolute top-4 right-4 flex gap-2">
         <Link href="/test">
           <Button variant="outline" size="sm">
-            <TestTube className="h-4 w-4 mr-2" />
+            <TestTube className="h-5 w-4 mr-2" />
             API Test
           </Button>
         </Link>
@@ -134,16 +137,16 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="p-3 bg-blue-600 rounded-xl">
-              <Trophy className="h-8 w-8 text-white" />
+            <div className="p-3 rounded-xl">
+              <Image className="hidden dark:flex" src={pitstopLogoWhite} width={500} height={500} alt="logo" />
+              <Image className="dark:hidden" src={pitstopLogoBlack} width={500} height={500} alt="logo" />
             </div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-              Pitstop
-            </h1>
           </div>
-          <p className="text-xl text-muted-foreground mb-2">Your FTC Team's Pit Display Dashboard</p>
-          <p className="text-sm text-muted-foreground">
-            Real-time rankings, match schedules, and team performance analytics
+          <p className="text-xl font-bold  mb-2">
+            The <span className="text-purple-800 dark:text-purple-400">One-Stop</span> shop for all of your FTC pit essentials.
+          </p>
+          <p className="text-sm ">
+            Real-time rankings, match schedules, and team performance analytics — all on one display.
           </p>
         </div>
 
@@ -204,13 +207,12 @@ export default function HomePage() {
                       return (
                         <Card
                           key={event.code}
-                          className={`cursor-pointer hover:shadow-md transition-all ${
-                            isLive
-                              ? "border-green-300 bg-green-50 dark:bg-green-950 shadow-md"
-                              : isSoon
-                                ? "border-orange-300 bg-orange-50 dark:bg-orange-950"
-                                : "hover:border-gray-300"
-                          }`}
+                          className={`cursor-pointer hover:shadow-md transition-all ${isLive
+                            ? "border-green-300 bg-green-50 dark:bg-green-950 shadow-md"
+                            : isSoon
+                              ? "border-orange-300 bg-orange-50 dark:bg-orange-950"
+                              : "hover:border-gray-300"
+                            }`}
                           onClick={() => quickTestEvent(event.code)}
                         >
                           <CardContent className="p-4">
