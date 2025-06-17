@@ -60,8 +60,8 @@ export default function EventPage() {
   const filteredTeams = teams.filter(
     (team) =>
       team.teamNumber.toString().includes(searchTerm) ||
-      team.teamName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      team.schoolName.toLowerCase().includes(searchTerm.toLowerCase()),
+      (team.teamName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (team.schoolName?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
   )
 
   const handleTeamSelect = (team: Team) => {
