@@ -481,15 +481,16 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {rankings.slice(0, 10).map((ranking, index) => (
+                  {rankings.slice(0, rankings.length).map((ranking, index) => (
                     <div
                       key={ranking.team}
                       className={`flex items-center justify-between p-2 rounded ${ranking.team === teamNumber ? "bg-blue-100 dark:bg-blue-900" : ""
                         }`}
                     >
                       <div className="flex items-center gap-2">
-                        <Badge variant={index < 3 ? "default" : "secondary"}>#{ranking.rank}</Badge>
-                        <span className={ranking.team === teamNumber ? "font-bold" : ""}>{ranking.team}</span>
+                        <Badge variant={ranking.teamNumber === teamNumber ? "win" : index < 3 ? "default" : "secondary"} >#{ranking.rank}</Badge>
+                        <span className={ranking.teamNumber === teamNumber ? "font-bold" : ""}>{ranking.teamNumber} - {ranking.teamName}</span>
+
                       </div>
                       <div className="text-sm text-muted-foreground">
                         {ranking.wins}-{ranking.losses}-{ranking.ties}
