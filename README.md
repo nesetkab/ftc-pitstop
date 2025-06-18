@@ -54,9 +54,9 @@ Contributions are welcome! Please feel free to submit a Pull Request. Found bugs
 
 ## Contact 📧
 
-Join our [Discord](https://discord.gg/9Rdbdr2NAt)
-DM neset on Discord: @nerrdy_
-Project Link: [https://github.com/nesetkab/ftc-pitstop](https://github.com/nesetkab/ftc-pitstop)
+- Join our [Discord](https://discord.gg/9Rdbdr2NAt)
+- DM neset on Discord: @nerrdy_
+- Project Link: [https://github.com/nesetkab/ftc-pitstop](https://github.com/nesetkab/ftc-pitstop)
 
 ---
 Last Updated: 2025-06-18
