@@ -27,6 +27,7 @@ import { TournamentBracket } from "@/components/tournament-bracket"
 import { MatchPredictions } from "@/components/match-predictions"
 import { TeamComparison } from "@/components/team-comparison"
 import { OPRInsights } from "@/components/opr-insights"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 interface TeamStats {
   wins: number
@@ -220,8 +221,8 @@ export default function DashboardPage() {
             <Badge variant="outline">Match {match.matchNumber}</Badge>
             {match.played && (
               <Badge
-                variant={result === "win" ? "default" : result === "loss" ? "destructive" : "secondary"}
-                className="ml-2"
+                variant={result === "win" ? "win" : result === "loss" ? "destructive" : "tie"}
+                className="ml-2 "
               >
                 {result.toUpperCase()}
               </Badge>
@@ -237,10 +238,10 @@ export default function DashboardPage() {
             <div className="text-center">
               <div className="text-sm font-semibold text-red-700 dark:text-red-300 mb-2">Red Alliance</div>
               <div className="space-y-1">
-                <div className={`font-semibold ${match.red1 === teamNumber ? "text-blue-600 font-bold" : ""}`}>
+                <div className={`font-medium ${match.red1 === teamNumber ? "font-black" : ""}`}>
                   {match.red1}
                 </div>
-                <div className={`font-semibold ${match.red2 === teamNumber ? "text-blue-600 font-bold" : ""}`}>
+                <div className={`font-medium ${match.red2 === teamNumber ? "font-black" : ""}`}>
                   {match.red2}
                 </div>
               </div>
@@ -257,10 +258,10 @@ export default function DashboardPage() {
             <div className="text-center">
               <div className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2">Blue Alliance</div>
               <div className="space-y-1">
-                <div className={`font-semibold ${match.blue1 === teamNumber ? "text-red-600 font-bold" : ""}`}>
+                <div className={`font-medium ${match.blue1 === teamNumber ? "font-black" : ""}`}>
                   {match.blue1}
                 </div>
-                <div className={`font-semibold ${match.blue2 === teamNumber ? "text-red-600 font-bold" : ""}`}>
+                <div className={`font-medium ${match.blue2 === teamNumber ? "font-black" : ""}`}>
                   {match.blue2}
                 </div>
               </div>
@@ -282,27 +283,28 @@ export default function DashboardPage() {
       alliance.backup === teamNumber
 
     return (
-      <Card className={isTeamInAlliance ? "border-blue-300 bg-blue-50 dark:bg-blue-950" : ""}>
+      <Card className={isTeamInAlliance ? "border-purple-500 dark:border-purple-300 bg-white dark:bg-black" : ""}>
         <CardContent className="p-4">
           <div className="text-center">
             <Badge variant="outline" className="mb-3">
               Alliance {alliance.number}
             </Badge>
             <div className="space-y-2">
-              <div className={`font-bold ${alliance.captain === teamNumber ? "text-blue-600" : ""}`}>
+              <div className={`font-bold ${alliance.captain === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
                 <div className="text-xs text-muted-foreground">Captain</div>
                 <div>{alliance.captain}</div>
               </div>
-              <div className={`${alliance.round1 === teamNumber ? "text-blue-600 font-bold" : ""}`}>
+              <div className={`${alliance.round1 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
                 <div className="text-xs text-muted-foreground">Pick 1</div>
                 <div>{alliance.round1}</div>
               </div>
-              <div className={`${alliance.round2 === teamNumber ? "text-blue-600 font-bold" : ""}`}>
+              {alliance.round2 && (<div className={`${alliance.round2 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
                 <div className="text-xs text-muted-foreground">Pick 2</div>
                 <div>{alliance.round2}</div>
               </div>
+              )}
               {alliance.backup && (
-                <div className={`${alliance.backup === teamNumber ? "text-blue-600 font-bold" : ""}`}>
+                <div className={`${alliance.backup === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
                   <div className="text-xs text-muted-foreground">Backup</div>
                   <div>{alliance.backup}</div>
                 </div>
@@ -353,6 +355,8 @@ export default function DashboardPage() {
               Refresh
             </Button>
             <p className="text-xs text-muted-foreground">Last updated: {lastUpdate.toLocaleTimeString()}</p>
+            <ThemeToggle />
+
           </div>
         </div>
 
