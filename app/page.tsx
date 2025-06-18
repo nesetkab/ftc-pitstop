@@ -191,6 +191,69 @@ export default function HomePage() {
                 </Button>
               </div>
 
+              {error && (
+                <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                  <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                    <AlertCircle className="h-4 w-4" />
+                    <span className="text-sm">{error}</span>
+                  </div>
+                </div>
+              )}
+
+              {debugInfo && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
+                  <div className="text-xs text-blue-800 dark:text-blue-200">
+                    <p>
+                      Search: "{debugInfo.searchQuery}" | Total Events: {debugInfo.totalEvents} | Found:{" "}
+                      {debugInfo.foundEvents}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {events.length > 0 && (
+                <div className="space-y-2 max-h-96 overflow-y-auto">
+                  <h3 className="font-semibold text-sm text-muted-foreground">Search Results:</h3>
+                  {events.map((event) => (
+                    <Card
+                      key={event.code}
+                      className="cursor-pointer hover:shadow-md transition-shadow"
+                      onClick={() => handleEventSelect(event)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge variant="secondary">{event.code}</Badge>
+                              <span className="text-sm text-muted-foreground">
+                                {new Date(event.dateStart).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <h4 className="font-semibold">{event.name}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {event.venue} • {event.city}, {event.stateprov}
+                            </p>
+                          </div>
+                          <Calendar className="h-4 w-4 text-muted-foreground" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+
+              {!loading && !error && events.length === 0 && searchTerm && (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>Try searching for:</p>
+                  <ul className="mt-2 text-sm">
+                    <li>• "Championship" for championship events</li>
+                    <li>• "League Meet" for league tournaments</li>
+                    <li>• Your state name (e.g., "Washington", "California")</li>
+                    <li>• Specific event codes if you know them</li>
+                  </ul>
+                </div>
+              )}
+
               {/* Upcoming Events */}
               {!loadingUpcoming && upcomingEvents.length > 0 && (
                 <div className="space-y-3">
@@ -263,69 +326,6 @@ export default function HomePage() {
                 <div className="text-center py-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
                   <p className="text-sm text-muted-foreground">Loading upcoming events...</p>
-                </div>
-              )}
-
-              {error && (
-                <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
-                  <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
-                    <AlertCircle className="h-4 w-4" />
-                    <span className="text-sm">{error}</span>
-                  </div>
-                </div>
-              )}
-
-              {debugInfo && (
-                <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <div className="text-xs text-blue-800 dark:text-blue-200">
-                    <p>
-                      Search: "{debugInfo.searchQuery}" | Total Events: {debugInfo.totalEvents} | Found:{" "}
-                      {debugInfo.foundEvents}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {events.length > 0 && (
-                <div className="space-y-2 max-h-96 overflow-y-auto">
-                  <h3 className="font-semibold text-sm text-muted-foreground">Search Results:</h3>
-                  {events.map((event) => (
-                    <Card
-                      key={event.code}
-                      className="cursor-pointer hover:shadow-md transition-shadow"
-                      onClick={() => handleEventSelect(event)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Badge variant="secondary">{event.code}</Badge>
-                              <span className="text-sm text-muted-foreground">
-                                {new Date(event.dateStart).toLocaleDateString()}
-                              </span>
-                            </div>
-                            <h4 className="font-semibold">{event.name}</h4>
-                            <p className="text-sm text-muted-foreground">
-                              {event.venue} • {event.city}, {event.stateprov}
-                            </p>
-                          </div>
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-
-              {!loading && !error && events.length === 0 && searchTerm && (
-                <div className="text-center py-8 text-muted-foreground">
-                  <p>Try searching for:</p>
-                  <ul className="mt-2 text-sm">
-                    <li>• "Championship" for championship events</li>
-                    <li>• "League Meet" for league tournaments</li>
-                    <li>• Your state name (e.g., "Washington", "California")</li>
-                    <li>• Specific event codes if you know them</li>
-                  </ul>
                 </div>
               )}
             </CardContent>
