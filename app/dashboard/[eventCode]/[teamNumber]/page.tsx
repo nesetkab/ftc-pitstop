@@ -483,7 +483,7 @@ export default function DashboardPage() {
                 <div className="space-y-2 max-h-64 overflow-y-auto">
                   {rankings.slice(0, rankings.length).map((ranking, index) => (
                     <div
-                      key={ranking.team}
+                      key={ranking.teamNumber}
                       className={`flex items-center justify-between p-2 rounded ${ranking.team === teamNumber ? "bg-blue-100 dark:bg-blue-900" : ""
                         }`}
                     >
