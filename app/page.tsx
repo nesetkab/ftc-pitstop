@@ -272,9 +272,9 @@ export default function HomePage() {
                         <Card
                           key={event.code}
                           className={`cursor-pointer hover:shadow-md transition-all ${isLive
-                            ? "border-green-300 bg-green-50 dark:bg-green-950 shadow-md"
+                            ? "border-green-500 dark:border-green-300 hover:border-green-100 dark:hover:border-green-900 bg-white dark:bg-black shadow-md"
                             : isSoon
-                              ? "border-orange-300 bg-orange-50 dark:bg-orange-950"
+                              ? "border-purple-500 dark:border-purple-300 hover:border-purple-100 dark:hover:border-purple-900 bg-white dark:bg-black"
                               : "hover:border-gray-300"
                             }`}
                           onClick={() => quickTestEvent(event.code)}
@@ -287,13 +287,13 @@ export default function HomePage() {
                                     {event.code}
                                   </Badge>
                                   {isLive && (
-                                    <Badge variant="default" className="bg-green-600 text-white animate-pulse">
+                                    <Badge variant="default" className="bg-green-600 text-red-500 animate-pulse">
                                       <div className="w-2 h-2 bg-white rounded-full mr-1"></div>
                                       LIVE
                                     </Badge>
                                   )}
                                   {isSoon && !isLive && (
-                                    <Badge variant="outline" className="border-orange-400 text-orange-600">
+                                    <Badge variant="outline" className="border-purple-400 text-purple-600">
                                       <Clock className="h-3 w-3 mr-1" />
                                       Soon
                                     </Badge>
