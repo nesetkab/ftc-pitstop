@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { Analytics } from "@vercel/analytics/next"
+import Footer from "@/components/footer"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -23,6 +24,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="black" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
+        < Footer />
+
       </body>
       < Analytics />
     </html>

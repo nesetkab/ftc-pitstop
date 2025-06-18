@@ -63,7 +63,6 @@ export default function Footer() {
       </div>
 
       <div
-        className=""
       >
         v0.1 <span className="hidden md:inline">- expect bugs!</span>
       </div>
