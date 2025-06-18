@@ -69,7 +69,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ? ((ranking.wins || 0) + (ranking.ties || 0) * 0.5) / totalMatches * 100
         : 0
 
-      console.log("i think the ranking is!!", ranking.rank)
+      // console.log("i think the ranking is!!", ranking.rank)
       teamStats.set(ranking.teamNumber, {
         teamNumber: ranking.teamNumber,
         rank: ranking.rank,  // Use the rank directly from the API

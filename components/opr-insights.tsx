@@ -105,14 +105,13 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
 
     return (
       <div
-        className={`flex items-center justify-between p-3 rounded-lg border ${
-          isTarget ? "border-blue-300 bg-blue-50 dark:bg-blue-950" : "border-gray-200 hover:border-gray-300"
-        }`}
+        className={`flex items-center justify-between p-3 rounded-lg border ${isTarget ? "border-purple-500 bg-white dark:bg-black dark:border-purple-300" : "border-gray-200 hover:border-gray-300"
+          }`}
       >
         <div className="flex items-center gap-3">
           <Badge variant={rank <= 3 ? "default" : "outline"}>#{rank}</Badge>
           <div>
-            <div className={`font-semibold ${isTarget ? "text-blue-600" : ""}`}>Team {team.teamNumber}</div>
+            <div className={`font-semibold ${isTarget ? "text-purple-500 dark:text-purple-300" : ""}`}>Team {team.teamNumber}</div>
             <div className="text-sm text-muted-foreground">{team.matchesPlayed} matches</div>
           </div>
         </div>
@@ -127,7 +126,7 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 dark:border-purple-300 mx-auto mb-4"></div>
         <p>Calculating OPR statistics...</p>
       </div>
     )
@@ -176,19 +175,18 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={fetchOPRData}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            <RefreshCw className="h-4 w-4" />
           </Button>
           <p className="text-xs text-muted-foreground">Updated: {lastUpdate.toLocaleTimeString()}</p>
         </div>
       </div>
 
       {/* Calculation Info */}
-      <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
+      <Card className="bg-white dark:bg-black border-blue-200 dark:border-blue-800">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
             <Info className="h-5 w-5 text-blue-600 mt-0.5" />
-            <div className="text-sm text-blue-900 dark:text-blue-100">
+            <div className="text-sm ">
               <p className="font-semibold mb-1">Custom OPR Calculation:</p>
               <p>
                 Using matrix algebra to solve team contributions from {data.matchesProcessed} completed matches. OPR =

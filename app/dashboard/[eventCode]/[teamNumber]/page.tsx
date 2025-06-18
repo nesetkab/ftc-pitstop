@@ -80,7 +80,6 @@ export default function DashboardPage() {
   const params = useParams()
   const eventCode = params.eventCode as string
   const teamNumber = Number.parseInt(params.teamNumber as string)
-
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null)
   const [matches, setMatches] = useState<Match[]>([])
   const [rankings, setRankings] = useState<Ranking[]>([])
@@ -344,17 +343,10 @@ export default function DashboardPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link href={`/bracket/${eventCode}`}>
-              <Button variant="outline" size="sm">
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Full Bracket
-              </Button>
-            </Link>
-            <Button variant="outline" size="sm" onClick={fetchData}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
             <p className="text-xs text-muted-foreground">Last updated: {lastUpdate.toLocaleTimeString()}</p>
+            <Button variant="outline" size="sm" onClick={fetchData}>
+              <RefreshCw className="h-4 w-4" />
+            </Button>
             <ThemeToggle />
 
           </div>
