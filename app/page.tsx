@@ -16,8 +16,8 @@ import Footer from "@/components/footer"
 interface Event {
   code: string
   name: string
-  start: string
-  end: string
+  dateStart: string
+  dateEnd: string
   venue: string
   city: string
   stateprov: string
@@ -111,14 +111,14 @@ export default function HomePage() {
 
   const isEventUpcoming = (event: Event) => {
     const now = new Date()
-    const eventStart = new Date(event.start)
-    const eventEnd = new Date(event.end)
+    const eventStart = new Date(event.dateStart)
+    const eventEnd = new Date(event.dateEnd)
     return eventStart <= now && eventEnd >= now
   }
 
   const isEventSoon = (event: Event) => {
     const now = new Date()
-    const eventStart = new Date(event.start)
+    const eventStart = new Date(event.dateStart)
     const daysUntil = Math.ceil((eventStart.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     return daysUntil > 0 && daysUntil <= 14
   }
@@ -202,8 +202,8 @@ export default function HomePage() {
                     {upcomingEvents.map((event) => {
                       const isLive = isEventUpcoming(event)
                       const isSoon = isEventSoon(event)
-                      const eventStart = new Date(event.start)
-                      const eventEnd = new Date(event.end)
+                      const eventStart = new Date(event.dateStart)
+                      const eventEnd = new Date(event.dateEnd)
 
                       return (
                         <Card
@@ -301,7 +301,7 @@ export default function HomePage() {
                             <div className="flex items-center gap-2 mb-1">
                               <Badge variant="secondary">{event.code}</Badge>
                               <span className="text-sm text-muted-foreground">
-                                {new Date(event.start).toLocaleDateString()}
+                                {new Date(event.dateStart).toLocaleDateString()}
                               </span>
                             </div>
                             <h4 className="font-semibold">{event.name}</h4>

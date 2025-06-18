@@ -21,8 +21,8 @@ interface Team {
 interface Event {
   code: string
   name: string
-  start: string
-  end: string
+  dateStart: string
+  dateEnd: string
   venue: string
 }
 
@@ -98,7 +98,7 @@ export default function EventPage() {
               </Badge>
               <h1 className="text-3xl font-bold mb-2">{event.name}</h1>
               <p className="text-muted-foreground">
-                {new Date(event.start).toLocaleDateString()} - {new Date(event.end).toLocaleDateString()}
+                {new Date(event.dateStart).toLocaleDateString()} - {new Date(event.dateEnd).toLocaleDateString()}
               </p>
             </div>
           )}
