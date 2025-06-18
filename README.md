@@ -37,7 +37,7 @@ yarn install
 
 3. Duplicate `.env.local.example`, rename to `.env.local`. Fill in your API user & pass.
 
-```
+
 4. Start the development server
 
 ```bash
