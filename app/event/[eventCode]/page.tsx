@@ -11,7 +11,7 @@ import Link from "next/link"
 
 interface Team {
   teamNumber: number
-  teamName: string
+  nameShort: string
   schoolName: string
   city: string
   stateProv: string
@@ -60,7 +60,7 @@ export default function EventPage() {
   const filteredTeams = teams.filter(
     (team) =>
       team.teamNumber.toString().includes(searchTerm) ||
-      (team.teamName?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (team.nameShort?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
       (team.schoolName?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
   )
 
@@ -137,7 +137,7 @@ export default function EventPage() {
                       <div>
                         <div className="flex items-center gap-2 mb-1">
                           <Badge variant="outline">#{team.teamNumber}</Badge>
-                          <span className="font-semibold">{team.teamName}</span>
+                          <span className="font-semibold">{team.nameShort}</span>
                         </div>
                         <p className="text-sm text-muted-foreground">{team.schoolName}</p>
                         <p className="text-xs text-muted-foreground">
