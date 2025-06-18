@@ -11,6 +11,7 @@ import Image from "next/image"
 import Link from "next/link"
 import pitstopLogoWhite from "../public/pitstop_white_logo.svg"
 import pitstopLogoBlack from "../public/pitstop_black_logo.svg"
+import Footer from "@/components/footer"
 
 interface Event {
   code: string
@@ -123,7 +124,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-black">
       <div className="absolute top-4 right-4 flex gap-2">
         <Link href="/test">
           <Button variant="outline" size="sm">
@@ -134,7 +135,7 @@ export default function HomePage() {
         <ThemeToggle />
       </div>
 
-      <div className="container mx-auto px-4 py-16">
+      <div className="flex-grow container mx-auto px-4 py-16">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="p-3 rounded-xl">
@@ -357,6 +358,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+      < Footer />
     </div>
   )
 }

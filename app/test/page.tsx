@@ -6,11 +6,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { CheckCircle, XCircle, Loader2 } from "lucide-react"
+import Link from "next/link"
 
 export default function TestPage() {
   const [connectionResult, setConnectionResult] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const [testEventCode, setTestEventCode] = useState("USWABELL")
+  const [testEventCode, setTestEventCode] = useState("USUTCMP")
 
   const testConnection = async () => {
     setLoading(true)
@@ -133,7 +134,7 @@ export default function TestPage() {
           <CardContent className="space-y-4">
             <div className="flex gap-2">
               <Input
-                placeholder="Enter event code (e.g., USWABELL)"
+                placeholder="Enter event code (e.g., USWACMP)"
                 value={testEventCode}
                 onChange={(e) => setTestEventCode(e.target.value)}
               />
@@ -143,27 +144,22 @@ export default function TestPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={() => testEventAPI("USWABELL")}>
-                Test USWABELL
+              <Button variant="outline" onClick={() => testEventAPI("USWACMP")}>
+                Test USWACMP
               </Button>
-              <Button variant="outline" onClick={() => testEventAPI("USMIWAT")}>
-                Test USMIWAT
+              <Button variant="outline" onClick={() => testEventAPI("FTCCMP1")}>
+                Test FTCCMP1
               </Button>
               <Button variant="outline" onClick={() => testEventAPI("USUTCMP")}>
                 Test USUTCMP
               </Button>
-              <Button variant="outline" onClick={() => testEventAPI("USCASD")}>
-                Test USCASD
+              <Button variant="outline" onClick={() => testEventAPI("USCASDCMP")}>
+                Test USCASDCMP
               </Button>
             </div>
 
             <div className="text-sm text-muted-foreground">
-              <p>Try these common event patterns:</p>
-              <ul className="list-disc list-inside mt-1">
-                <li>US[STATE][CITY] - e.g., USWABELL (Washington Bellevue)</li>
-                <li>US[STATE]CMP - Championship events</li>
-                <li>Check the console for detailed API responses</li>
-              </ul>
+              <p>Find event codes at <Link href="https://ftc-events.firstinspires.org/" target="_blank" className="text-purple-600 underline">ftc-events</Link></p>
             </div>
           </CardContent>
         </Card>

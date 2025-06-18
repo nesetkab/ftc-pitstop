@@ -326,7 +326,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-white dark:bg-black">
       <div className="container mx-auto px-4 py-6">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
@@ -480,9 +480,8 @@ export default function DashboardPage() {
                   {rankings.slice(0, 10).map((ranking, index) => (
                     <div
                       key={ranking.team}
-                      className={`flex items-center justify-between p-2 rounded ${
-                        ranking.team === teamNumber ? "bg-blue-100 dark:bg-blue-900" : ""
-                      }`}
+                      className={`flex items-center justify-between p-2 rounded ${ranking.team === teamNumber ? "bg-blue-100 dark:bg-blue-900" : ""
+                        }`}
                     >
                       <div className="flex items-center gap-2">
                         <Badge variant={index < 3 ? "default" : "secondary"}>#{ranking.rank}</Badge>

@@ -53,12 +53,6 @@ export async function GET(
 
     console.log(`Transformed ${transformedRankings.length} rankings`)
 
-    // Log specific team data if available
-    const team3747 = transformedRankings.find(r => r.team === 3747)
-    if (team3747) {
-      console.log("Team 3747 ranking data:", team3747)
-    }
-
     return NextResponse.json({ rankings: transformedRankings })
   } catch (error) {
     console.error("Error fetching rankings:", error)
