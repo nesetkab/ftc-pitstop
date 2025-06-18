@@ -56,6 +56,17 @@ export default function Footer() {
           <span className="hidden sm:inline">Discord</span>
         </Link>
       </div>
+      <div
+        className="hidden text-muted-foreground/50 md:inline"
+      >
+        |
+      </div>
+
+      <div
+        className=""
+      >
+        v0.1 <span className="hidden md:inline">- expect bugs!</span>
+      </div>
 
     </div >
   );

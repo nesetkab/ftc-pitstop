@@ -7,53 +7,37 @@ export async function GET(
   { params }: { params: Promise<{ eventCode: string }> }
 ) {
   const { eventCode } = await params
+  const season = 2024
+  const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
 
   try {
-    const season = 2024
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
-    console.log("Fetching rankings for event:", eventCode)
-
-    // Make sure we're using the correct URL format
-    const response = await fetch(`https://ftc-api.firstinspires.org/v2.0/${season}/rankings/${eventCode.toUpperCase()}`, {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        Accept: "application/json",
-      },
-    })
-
-    console.log("Rankings API Response status:", response.status)
+    const teamNumberParam = request.nextUrl.searchParams.get("teamNumber")
+    const response = await fetch(
+      `${FTC_API_BASE}/${season}/rankings/${eventCode.toUpperCase()}`,
+      {
+        headers: {
+          Authorization: `Basic ${auth}`,
+          Accept: "application/json",
+        },
+      }
+    )
 
     if (!response.ok) {
       const errorText = await response.text()
       console.error("Rankings API Error:", errorText)
-      throw new Error(`Rankings API failed: ${response.status} ${errorText}`)
+      return NextResponse.json({ rankings: [] })
     }
 
     const data = await response.json()
+    let rankings = data.rankings || []
 
-    // Log the full response structure for debugging
-    // console.log("Full rankings response:", JSON.stringify(data, null, 2))
+    // If teamNumber provided, filter for that team
+    if (teamNumberParam) {
+      const teamNumber = parseInt(teamNumberParam, 10)
+      rankings = rankings.filter((r: any) => r.teamNumber === teamNumber)
+    }
 
-    // Make sure we're accessing the correct property
-    const rankings = data.Rankings || []
-
-    // Transform rankings to match our expected format
-    const transformedRankings = rankings.map((ranking: any) => ({
-      rank: ranking.rank,
-      team: ranking.teamNumber,
-      rp: ranking.rankingPoints || 0,
-      tbp: ranking.tieBreakerPoints || 0,
-      wins: ranking.wins || 0,
-      losses: ranking.losses || 0,
-      ties: ranking.ties || 0,
-      matches: (ranking.wins || 0) + (ranking.losses || 0) + (ranking.ties || 0),
-      qualifyingPoints: ranking.qualifyingPoints || 0,
-    }))
-
-    console.log(`Transformed ${transformedRankings.length} rankings`)
-
-    return NextResponse.json({ rankings: transformedRankings })
+    return NextResponse.json({ rankings })
   } catch (error) {
     console.error("Error fetching rankings:", error)
     return NextResponse.json({ rankings: [] })

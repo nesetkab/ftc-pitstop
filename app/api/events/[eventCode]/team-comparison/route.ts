@@ -39,8 +39,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       const rankingsData = await rankingsResponse.json()
       console.log("Full rankings response:", JSON.stringify(rankingsData, null, 2))
 
-      if (rankingsData && Array.isArray(rankingsData.Rankings)) {
-        rankings = rankingsData.Rankings
+      if (rankingsData && Array.isArray(rankingsData.rankings)) {
+        rankings = rankingsData.rankings
         console.log(`Found ${rankings.length} rankings`)
       } else {
         console.warn("Rankings data structure is unexpected:", rankingsData)
@@ -69,6 +69,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ? ((ranking.wins || 0) + (ranking.ties || 0) * 0.5) / totalMatches * 100
         : 0
 
+      console.log("i think the ranking is!!", ranking.rank)
       teamStats.set(ranking.teamNumber, {
         teamNumber: ranking.teamNumber,
         rank: ranking.rank,  // Use the rank directly from the API

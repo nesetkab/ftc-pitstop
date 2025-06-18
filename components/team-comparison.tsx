@@ -148,13 +148,12 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
 
     return (
       <Card
-        className={`${
-          highlight || isTarget
-            ? "border-blue-300 bg-blue-50 dark:bg-blue-950"
-            : isCompare
-              ? "border-green-300 bg-green-50 dark:bg-green-950"
-              : ""
-        } ${showComparison ? "cursor-pointer hover:shadow-md" : ""}`}
+        className={`${highlight || isTarget
+          ? "border-blue-300 bg-blue-50 dark:bg-blue-950"
+          : isCompare
+            ? "border-green-300 bg-green-50 dark:bg-green-950"
+            : ""
+          } ${showComparison ? "cursor-pointer hover:shadow-md" : ""}`}
         onClick={showComparison ? () => setCompareTeam(team.teamNumber) : undefined}
       >
         <CardContent className="p-4">
@@ -347,7 +346,7 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
       </div>
 
       {/* Event Overview */}
-      <Card className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950">
+      <Card className="bg-slate-300 border-black dark:bg-black dark:border-gray-500">
         <CardContent className="p-6">
           <h3 className="font-semibold mb-4">Event Overview</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">

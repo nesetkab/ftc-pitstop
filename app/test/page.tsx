@@ -170,8 +170,8 @@ export default function TestPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={() => (window.location.href = "/dashboard/USWABELL/3747")}>
-                USWABELL Team 3747
+              <Button variant="outline" onClick={() => (window.location.href = "/dashboard/USUTCMP/3747")}>
+                USUTCMP Team 3747
               </Button>
               <Button variant="outline" onClick={() => (window.location.href = "/dashboard/USMIWAT/1234")}>
                 USMIWAT Team 1234

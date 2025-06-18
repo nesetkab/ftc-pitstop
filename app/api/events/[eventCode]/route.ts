@@ -2,8 +2,8 @@ import { type NextRequest, NextResponse } from "next/server"
 
 const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
 
-export async function GET(request: NextRequest, { params }: { params: { eventCode: string } }) {
-  const { eventCode } = params
+export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
+  const { eventCode } = await params
 
   try {
     // Use 2024 season for now (adjust as needed)
