@@ -344,6 +344,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex items-center gap-2">
             <p className="text-xs text-muted-foreground">Last updated: {lastUpdate.toLocaleTimeString()}</p>
+
             <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -628,7 +629,7 @@ export default function DashboardPage() {
                   <CardContent>
                     <div className="space-y-4">
                       {playedPlayoffMatches.reverse().map((match) => (
-                        <MatchCard key={match.matchNumber} match={match} showAlliance />
+                        <MatchCard key={match.description} match={match} showAlliance />
                       ))}
                       {playedPlayoffMatches.length === 0 && (
                         <p className="text-center text-muted-foreground py-4">
