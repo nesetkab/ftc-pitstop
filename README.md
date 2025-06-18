@@ -52,12 +52,6 @@ yarn dev
 
 Contributions are welcome! Please feel free to submit a Pull Request. Found bugs? Feel free to open an issue.
 
-## Special Thanks to Our Contributors ❤️
-
-A heartfelt thank you to everyone who has contributed to making FTC Pitstop better! Your time, effort, and expertise have been invaluable in creating a tool that helps FIRST Tech Challenge teams worldwide.
-
-[//]: # (Contributors will be automatically listed here by All-Contributors bot)
-
 ## Contact 📧
 
 Join our [Discord](https://discord.gg/9Rdbdr2NAt)
