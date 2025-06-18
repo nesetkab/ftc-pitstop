@@ -36,8 +36,8 @@ interface Alliance {
 interface Event {
   code: string
   name: string
-  start: string
-  end: string
+  dateStart: string
+  dateEnd: string
   venue: string
 }
 

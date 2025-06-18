@@ -34,8 +34,8 @@ export async function GET() {
 
     const upcomingEvents = allEvents
       .filter((event: any) => {
-        const eventStart = new Date(event.start)
-        const eventEnd = new Date(event.end)
+        const eventStart = new Date(event.dateStart)
+        const eventEnd = new Date(event.dateEnd)
         // Include events that are currently happening or starting within 2 weeks
         return eventEnd >= now && eventStart <= twoWeeksFromNow
       })
