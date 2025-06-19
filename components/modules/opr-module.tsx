@@ -121,10 +121,10 @@ export function OPRModule({ eventCode, teamNumber }: OPRInsightsProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full">
       {/* Target Team Stats */}
       {targetTeam && (
-        <Card>
+        <Card className="h-full flex flex-col">
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="flex items-center gap-2">
@@ -139,23 +139,23 @@ export function OPRModule({ eventCode, teamNumber }: OPRInsightsProps) {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
+          <CardContent className="flex flex-col h-full">
+            <div className="grid grid-cols-3 gap-6 h-full">
+              <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg flex flex-col justify-center">
                 <TrendingUp className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                <div className="text-3xl font-bold text-green-600">{targetTeam.opr.toFixed(1)}</div>
+                <div className="text-3xl font-bold mb-2 text-green-600">{targetTeam.opr.toFixed(1)}</div>
                 <div className="text-sm text-muted-foreground">Offensive Power Rating</div>
                 <div className="text-xs text-muted-foreground mt-1">Points contributed per match</div>
               </div>
-              <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+              <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg flex flex-col justify-center">
                 <Shield className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                <div className="text-3xl font-bold text-blue-600">{targetTeam.dpr.toFixed(1)}</div>
+                <div className="text-3xl font-bold mb-2 text-blue-600">{targetTeam.dpr.toFixed(1)}</div>
                 <div className="text-sm text-muted-foreground">Defensive Power Rating</div>
                 <div className="text-xs text-muted-foreground mt-1">Opponent points allowed</div>
               </div>
-              <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
+              <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg flex flex-col justify-center">
                 <Target className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                <div className="text-3xl font-bold text-purple-600">{targetTeam.ccwm.toFixed(1)}</div>
+                <div className="text-3xl font-bold mb-2 text-purple-600">{targetTeam.ccwm.toFixed(1)}</div>
                 <div className="text-sm text-muted-foreground">CCWM</div>
                 <div className="text-xs text-muted-foreground mt-1">Contribution to winning margin</div>
               </div>
@@ -253,10 +253,10 @@ export function OPRSmallModule({ eventCode, teamNumber }: OPRInsightsProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 h-full">
       {/* Target Team Stats */}
       {targetTeam && (
-        <Card>
+        <Card className="h-full flex flex-col">
           <CardHeader>
             <div className="flex justify-between items-center">
               <CardTitle className="flex items-center gap-2">
@@ -271,8 +271,8 @@ export function OPRSmallModule({ eventCode, teamNumber }: OPRInsightsProps) {
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-4">
+          <CardContent className="h-full flex flex-col">
+            <div className="grid md:grid-cols-2 gap-4 h-full">
               <div className="flex justify-between col-span-2 items-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
                 <div className="flex">
                   <TrendingUp className="h-8 w-8 mr-2 text-green-600" />
