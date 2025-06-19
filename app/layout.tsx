@@ -5,7 +5,7 @@ import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { Analytics } from "@vercel/analytics/next"
 import Footer from "@/components/footer"
-
+import { BetaBanner } from "@/components/beta-banner"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -21,6 +21,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="__className_e8ce0c" suppressHydrationWarning>
+        <BetaBanner />
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
