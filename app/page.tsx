@@ -123,6 +123,14 @@ export default function HomePage() {
     return daysUntil > 0 && daysUntil <= 14
   }
 
+  // Allows for searching events on type, INSANELY LAGGY
+  /*
+  useEffect(() => {
+    if (searchTerm.length >= 4) {
+      searchEvents(searchTerm);
+    }
+  }, [searchTerm]);
+*/
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-black">
       <div className="absolute top-4 right-4 flex gap-2">
@@ -164,6 +172,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex gap-2">
+
                 <Input
                   placeholder="Try: Championship, League Meet, or event code"
                   value={searchTerm}

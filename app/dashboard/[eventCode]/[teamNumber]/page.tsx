@@ -28,6 +28,7 @@ import { MatchPredictions } from "@/components/match-predictions"
 import { TeamComparison } from "@/components/team-comparison"
 import { OPRInsights } from "@/components/opr-insights"
 import { ThemeToggle } from "@/components/theme-toggle"
+import AllianceTeamName from "@/components/alliance-team-name"
 
 interface TeamStats {
   wins: number
@@ -70,11 +71,17 @@ interface Ranking {
 interface Alliance {
   number: number
   captain: number
+  captainDisplay?: string
   round1: number
+  round1Display?: string
   round2: number
+  round2Display?: string
+  round3?: number
   backup?: number
   name?: string
 }
+
+
 
 export default function DashboardPage() {
   const params = useParams()
@@ -208,69 +215,71 @@ export default function DashboardPage() {
     const isBlue = match.blue1 === teamNumber || match.blue2 === teamNumber
 
     return (
-      <div className="border rounded-lg p-4 space-y-3">
-        <div className="flex justify-between items-start">
-          <div>
-            <div className="font-semibold">{match.description}</div>
-            {match.startTime && (
-              <div className="text-sm text-muted-foreground">{new Date(match.startTime).toLocaleTimeString()}</div>
-            )}
-          </div>
-          <div className="text-right">
-            <Badge variant="outline">Match {match.matchNumber}</Badge>
-            {match.played && (
-              <Badge
-                variant={result === "win" ? "win" : result === "loss" ? "destructive" : "tie"}
-                className="ml-2 "
-              >
-                {result.toUpperCase()}
-              </Badge>
-            )}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          {/* Red Alliance */}
-          <div
-            className={`p-3 rounded-lg ${isRed ? "bg-red-100 dark:bg-red-900 border-2 border-red-300" : "bg-red-50 dark:bg-red-950"}`}
-          >
-            <div className="text-center">
-              <div className="text-sm font-semibold text-red-700 dark:text-red-300 mb-2">Red Alliance</div>
-              <div className="space-y-1">
-                <div className={`font-medium ${match.red1 === teamNumber ? "font-black" : ""}`}>
-                  {match.red1}
-                </div>
-                <div className={`font-medium ${match.red2 === teamNumber ? "font-black" : ""}`}>
-                  {match.red2}
-                </div>
-              </div>
+      <Link className="" href={match.played ? `https://ftcscout.org/events/2024/${eventCode}/matches?scores=${eventCode}-${match.tournamentLevel == "PLAYOFF" && match.series ? (20 + match.series).toString().concat("001") : match.matchNumber}` : ""} target={match.played ? "_blank" : ""}>
+        <div className={match.played ? "mt-2 mb-2 rounded-lg p-4 space-y-3 border hover:border-purple-400" : "mt-2 mb-2 rounded-lg p-4 space-y-3"}>
+          <div className="flex justify-between items-start">
+            <div>
+              <div className="font-semibold">{match.description}</div>
+              {match.startTime && (
+                <div className="text-sm text-muted-foreground">{new Date(match.startTime).toLocaleTimeString()}</div>
+              )}
+            </div>
+            <div className="text-right">
+              <Badge variant="outline">Match {match.tournamentLevel == "PLAYOFF" && match.series ? match.series : match.matchNumber}</Badge>
               {match.played && (
-                <div className="text-2xl font-bold text-red-700 dark:text-red-300 mt-2">{match.redScore}</div>
+                <Badge
+                  variant={result === "win" ? "win" : result === "loss" ? "destructive" : "tie"}
+                  className="ml-2 "
+                >
+                  {result.toUpperCase()}
+                </Badge>
               )}
             </div>
           </div>
 
-          {/* Blue Alliance */}
-          <div
-            className={`p-3 rounded-lg ${isBlue ? "bg-blue-100 dark:bg-blue-900 border-2 border-blue-300" : "bg-blue-50 dark:bg-blue-950"}`}
-          >
-            <div className="text-center">
-              <div className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2">Blue Alliance</div>
-              <div className="space-y-1">
-                <div className={`font-medium ${match.blue1 === teamNumber ? "font-black" : ""}`}>
-                  {match.blue1}
+          <div className="grid grid-cols-2 gap-4">
+            {/* Red Alliance */}
+            <div
+              className={`p-3 rounded-lg ${isRed ? "bg-red-100 dark:bg-red-900 border-2 border-red-300" : "bg-red-50 dark:bg-red-950"}`}
+            >
+              <div className="text-center">
+                <div className="text-sm font-semibold text-red-700 dark:text-red-300 mb-2">Red Alliance</div>
+                <div className="space-y-1">
+                  <div className={`${match.red1 === teamNumber ? "font-black" : "font-medium"}`}>
+                    {match.red1}
+                  </div>
+                  <div className={`${match.red2 === teamNumber ? "font-black" : "font-medium"}`}>
+                    {match.red2}
+                  </div>
                 </div>
-                <div className={`font-medium ${match.blue2 === teamNumber ? "font-black" : ""}`}>
-                  {match.blue2}
-                </div>
+                {match.played && (
+                  <div className="text-2xl font-bold text-red-700 dark:text-red-300 mt-2">{match.redScore}</div>
+                )}
               </div>
-              {match.played && (
-                <div className="text-2xl font-bold text-blue-700 dark:text-blue-300 mt-2">{match.blueScore}</div>
-              )}
+            </div>
+
+            {/* Blue Alliance */}
+            <div
+              className={`p-3 rounded-lg ${isBlue ? "bg-blue-100 dark:bg-blue-900 border-2 border-blue-300" : "bg-blue-50 dark:bg-blue-950"}`}
+            >
+              <div className="text-center">
+                <div className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2">Blue Alliance</div>
+                <div className="space-y-1">
+                  <div className={`${match.blue1 === teamNumber ? "font-black" : "font-medium"}`}>
+                    {match.blue1}
+                  </div>
+                  <div className={`${match.blue2 === teamNumber ? "font-black" : "font-medium"}`}>
+                    {match.blue2}
+                  </div>
+                </div>
+                {match.played && (
+                  <div className="text-2xl font-bold text-blue-700 dark:text-blue-300 mt-2">{match.blueScore}</div>
+                )}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </Link>
     )
   }
 
@@ -291,7 +300,7 @@ export default function DashboardPage() {
             <div className="space-y-2">
               <div className={`font-bold ${alliance.captain === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
                 <div className="text-xs text-muted-foreground">Captain</div>
-                <div>{alliance.captain}</div>
+                <div>{alliance.captain}{alliance.captainDisplay}</div>
               </div>
               <div className={`${alliance.round1 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
                 <div className="text-xs text-muted-foreground">Pick 1</div>
