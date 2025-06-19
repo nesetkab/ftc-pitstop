@@ -342,8 +342,8 @@ export default function DashboardPage() {
           <div className="flex items-center gap-4">
             <Link href={`/event/${eventCode}`}>
               <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
+                <ArrowLeft className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">Back</span>
               </Button>
             </Link>
             <div>
