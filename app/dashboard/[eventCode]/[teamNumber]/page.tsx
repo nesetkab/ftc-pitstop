@@ -28,6 +28,7 @@ import { MatchPredictions } from "@/components/match-predictions"
 import { TeamComparison } from "@/components/team-comparison"
 import { OPRInsights } from "@/components/opr-insights"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { ModularDashboard } from "@/components/dashboard"
 
 interface TeamStats {
   wins: number
