@@ -504,6 +504,10 @@ export default function DashboardPage() {
           <div className="lg:col-span-3">
             <Tabs defaultValue="qualification" className="space-y-6">
               <TabsList className="grid w-full grid-cols-7">
+                <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                  <Target className="h-4 w-4" />
+                  Dashboard
+                </TabsTrigger>
                 <TabsTrigger value="qualification" className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   Quals ({qualificationMatches.length})
@@ -533,6 +537,10 @@ export default function DashboardPage() {
                   Alliances ({alliances.length})
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="dashboard" className="space-y-6">
+                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} />
+              </TabsContent>
 
               <TabsContent value="qualification" className="space-y-6">
                 {/* Upcoming Qualification Matches */}

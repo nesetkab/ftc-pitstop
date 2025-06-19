@@ -2,5 +2,5 @@
 import { ModularDashboard } from "@/components/dashboard";
 
 export default function ModularDashboardPage() {
-  return <ModularDashboard />
+  return <ModularDashboard eventCode={"USUTCMP"} teamNumber={3747} />
 }

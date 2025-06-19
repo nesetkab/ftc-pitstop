@@ -3,7 +3,12 @@ import GridLayout from "react-grid-layout"
 import { OPRModule, OPRSmallModule } from "@/components/modules/opr-module"
 import 'react-grid-layout/css/styles.css'
 
-export function ModularDashboard() {
+interface ModularDashboardProps {
+  eventCode: string,
+  teamNumber: number
+}
+
+export function ModularDashboard({ eventCode, teamNumber }: ModularDashboardProps) {
   const layout = [
     { i: "a", x: 0, y: 0, w: 6, h: 8, isResizable: false },
     { i: "b", x: 0, y: 0, w: 6, h: 8, isResizable: false },
@@ -22,22 +27,22 @@ export function ModularDashboard() {
       width={1800}
     >
       <div key="a">
-        <OPRModule eventCode={"USUTCMP"} teamNumber={3747} />
+        <OPRModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
       <div key="b">
-        <OPRModule eventCode={"USUTCMP"} teamNumber={3747} />
+        <OPRModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
       <div key="c">
-        <OPRModule eventCode={"USUTCMP"} teamNumber={3747} />
+        <OPRModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
       <div key="d">
-        <OPRSmallModule eventCode={"USUTCMP"} teamNumber={3747} />
+        <OPRSmallModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
       <div key="e">
-        <OPRSmallModule eventCode={"USUTCMP"} teamNumber={3747} />
+        <OPRSmallModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
       <div key="f">
-        <OPRSmallModule eventCode={"USUTCMP"} teamNumber={3747} />
+        <OPRSmallModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
     </GridLayout >
   );
