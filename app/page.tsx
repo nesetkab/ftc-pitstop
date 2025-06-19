@@ -281,7 +281,7 @@ export default function HomePage() {
                         <Card
                           key={event.code}
                           className={`cursor-pointer hover:shadow-md transition-all ${isLive
-                            ? "border-green-500 dark:border-green-300 hover:border-green-100 dark:hover:border-green-900 bg-white dark:bg-black shadow-md"
+                            ? "border-red-500 dark:border-red-300 hover:border-red-100 dark:hover:border-red-900 bg-white dark:bg-black shadow-md"
                             : isSoon
                               ? "border-purple-500 dark:border-purple-300 hover:border-purple-100 dark:hover:border-purple-900 bg-white dark:bg-black"
                               : "hover:border-gray-300"
@@ -296,7 +296,7 @@ export default function HomePage() {
                                     {event.code}
                                   </Badge>
                                   {isLive && (
-                                    <Badge variant="default" className="bg-green-600 text-red-500 animate-pulse">
+                                    <Badge variant="default" className="bg-red-500 text-white animate-pulse">
                                       <div className="w-2 h-2 bg-white rounded-full mr-1"></div>
                                       LIVE
                                     </Badge>

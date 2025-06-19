@@ -515,31 +515,31 @@ export default function DashboardPage() {
               <TabsList className="grid w-full grid-cols-7">
                 <TabsTrigger value="qualification" className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
-                  Quals ({qualificationMatches.length})
+                  <span className="hidden md:inline">Quals ({qualificationMatches.length})</span>
                 </TabsTrigger>
                 <TabsTrigger value="predictions" className="flex items-center gap-2">
                   <TrendingUp className="h-4 w-4" />
-                  Predictions
+                  <span className="hidden md:inline">Predictions</span>
                 </TabsTrigger>
                 <TabsTrigger value="comparison" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
-                  Compare
+                  <span className="hidden md:inline">Compare</span>
                 </TabsTrigger>
                 <TabsTrigger value="opr" className="flex items-center gap-2">
                   <Calculator className="h-4 w-4" />
-                  OPR
+                  <span className="hidden md:inline">PR</span>
                 </TabsTrigger>
                 <TabsTrigger value="bracket" className="flex items-center gap-2">
                   <Zap className="h-4 w-4" />
-                  Bracket
+                  <span className="hidden md:inline">Bracket</span>
                 </TabsTrigger>
                 <TabsTrigger value="playoffs" className="flex items-center gap-2">
                   <Trophy className="h-4 w-4" />
-                  Playoffs ({playoffMatches.length})
+                  <span className="hidden md:inline">Playoffs ({playoffMatches.length})</span>
                 </TabsTrigger>
                 <TabsTrigger value="alliances" className="flex items-center gap-2">
                   <Users className="h-4 w-4" />
-                  Alliances ({alliances.length})
+                  <span className="hidden md:inline">Alliances ({alliances.length})</span>
                 </TabsTrigger>
               </TabsList>
 
