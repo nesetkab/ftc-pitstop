@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Responsive, WidthProvider, } from "react-grid-layout"
+import { Responsive, WidthProvider, Layout } from "react-grid-layout"
 import { OPRModule, OPRSmallModule } from "@/components/modules/opr-module"
 import { PerformanceModule } from "./modules/performance-module"
 import { RankingsModule } from "./modules/rankings-module"
@@ -60,21 +60,11 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
     fetchComparison()
 
     // Refresh every 2 minutes
-    const interval = setInterval(fetchComparison, 120000)
+    const interval = setInterval(fetchComparison, 240000)
     return () => clearInterval(interval)
   }, [eventCode, teamNumber])
 
-  const layout = [
-    { i: "a", x: 4, y: 0, w: 4, h: 8 },
-    { i: "b", x: 0, y: 0, w: 4, h: 24 },
-    { i: "c", x: 4, y: 6, w: 8, h: 8 },
-    { i: "d", x: 8, y: 6, w: 4, h: 8 },
-    { i: "e", x: 4, y: 12, w: 4, h: 8 },
-    { i: "f", x: 8, y: 0, w: 4, h: 8 },
-    { i: "g", x: 0, y: 12, w: 4, h: 5 },
-    { i: "h", x: 4, y: 12, w: 4, h: 5 },
-    { i: "j", x: 8, y: 12, w: 4, h: 5 }
-  ]
+  const layout = loadLayout()
 
   const ResponsiveGridLayout = WidthProvider(Responsive)
 
@@ -86,6 +76,7 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
       rowHeight={30}
       isBounded={true}
       containerPadding={[0, 0]}
+      onLayoutChange={saveLayout}
     >
       <div key="a">
         <PerformanceModule teamRanking={ranking} teamStats={teamStats} />
@@ -117,4 +108,39 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
 
     </ResponsiveGridLayout >
   );
+}
+
+const defaultLayout = [
+  { i: "a", x: 4, y: 0, w: 4, h: 8 },
+  { i: "b", x: 0, y: 0, w: 4, h: 24 },
+  { i: "c", x: 4, y: 6, w: 8, h: 8 },
+  { i: "d", x: 8, y: 6, w: 4, h: 8 },
+  { i: "e", x: 4, y: 12, w: 4, h: 8 },
+  { i: "f", x: 8, y: 0, w: 4, h: 8 },
+  { i: "g", x: 0, y: 12, w: 4, h: 5 },
+  { i: "h", x: 4, y: 12, w: 4, h: 5 },
+  { i: "j", x: 8, y: 12, w: 4, h: 5 }
+]
+
+const saveLayout = (layout: Layout) => {
+  setClientSideCookie('layout', JSON.stringify(layout))
+}
+
+const loadLayout = () => {
+  const cookie = getClientSideCookie('layout')
+  if (!cookie) return defaultLayout
+  return JSON.parse(cookie)
+}
+
+const getClientSideCookie = (name: string): string | undefined => {
+  const cookieValue = document.cookie
+    .split('; ')
+    .find((row) => row.startsWith(`${name}=`))
+    ?.split('=')[1];
+
+  return cookieValue;
+};
+
+const setClientSideCookie = (name: string, value: string) => {
+  document.cookie = name + "=" + value
 }
