@@ -45,7 +45,7 @@ interface TeamComparisonProps {
   teamNumber?: number
 }
 
-interface ComparisonData {
+export interface ComparisonData {
   targetTeam: TeamStats | null
   allTeams: TeamStats[]
   similarTeams: TeamStats[]

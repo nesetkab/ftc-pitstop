@@ -1,3 +1,5 @@
+'use client'
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alliance } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 import { AllianceCard } from "@/components/alliance-card"
