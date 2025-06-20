@@ -30,7 +30,7 @@ import { OPRInsights } from "@/components/opr-insights"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ModularDashboard } from "@/components/dashboard"
 
-interface TeamStats {
+export interface TeamStats {
   wins: number
   losses: number
   ties: number
@@ -42,7 +42,7 @@ interface TeamStats {
   tbp: number
 }
 
-interface Match {
+export interface Match {
   matchNumber: number
   description: string
   startTime: string
@@ -58,7 +58,7 @@ interface Match {
   matchInSeries?: number
 }
 
-interface Ranking {
+export interface Ranking {
   rank: number
   team: number
   rp: number
@@ -68,7 +68,7 @@ interface Ranking {
   ties: number
 }
 
-interface Alliance {
+export interface Alliance {
   number: number
   captain: number
   round1: number
@@ -163,6 +163,7 @@ export default function DashboardPage() {
     fetchData()
 
     // Auto-refresh every 30 seconds
+    return
     const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [eventCode, teamNumber])
@@ -539,7 +540,7 @@ export default function DashboardPage() {
               </TabsList>
 
               <TabsContent value="dashboard" className="space-y-6">
-                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} />
+                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} teamStats={teamStats} />
               </TabsContent>
 
               <TabsContent value="qualification" className="space-y-6">
