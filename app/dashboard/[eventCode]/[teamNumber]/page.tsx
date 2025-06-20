@@ -389,7 +389,7 @@ export default function DashboardPage() {
 
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Team Stats - Left Column */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 hidden">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -501,9 +501,9 @@ export default function DashboardPage() {
           </div>
 
           {/* Matches - Right Columns */}
-          <div className="lg:col-span-3">
-            <Tabs defaultValue="qualification" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-7">
+          <div className="lg:col-span-4">
+            <Tabs defaultValue="dashboard" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="dashboard" className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   Dashboard

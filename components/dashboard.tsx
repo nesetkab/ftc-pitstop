@@ -1,5 +1,5 @@
 'use client'
-import GridLayout from "react-grid-layout"
+import { Responsive, WidthProvider, } from "react-grid-layout"
 import { OPRModule, OPRSmallModule } from "@/components/modules/opr-module"
 import 'react-grid-layout/css/styles.css'
 
@@ -18,13 +18,14 @@ export function ModularDashboard({ eventCode, teamNumber }: ModularDashboardProp
     { i: "f", x: 9, y: 0, w: 3, h: 8 },
   ]
 
+  const ResponsiveGridLayout = WidthProvider(Responsive)
+
   return (
-    <GridLayout
+    <ResponsiveGridLayout
       className="layout"
-      layout={layout}
-      cols={12}
+      layouts={{ lg: layout }}
+      cols={{ lg: 12 }}
       rowHeight={30}
-      width={1800}
       isBounded={true}
       containerPadding={[0, 0]}
     >
@@ -46,6 +47,6 @@ export function ModularDashboard({ eventCode, teamNumber }: ModularDashboardProp
       <div key="f">
         <OPRSmallModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
-    </GridLayout >
+    </ResponsiveGridLayout >
   );
 }
