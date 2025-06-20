@@ -1,4 +1,4 @@
-
+'use client'
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -10,46 +10,7 @@ import {
 } from "lucide-react"
 import { ComparisonData } from "../team-comparison"
 
-export function EventOverviewModule({ eventCode, teamNumber }: { eventCode: string, teamNumber: number }) {
-  const [data, setData] = useState<ComparisonData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
-
-  const fetchComparison = async () => {
-    try {
-      setError(null)
-      console.log("Fetching team comparison for event:", eventCode)
-
-      const url = teamNumber
-        ? `/api/events/${eventCode}/team-comparison?team=${teamNumber}`
-        : `/api/events/${eventCode}/team-comparison`
-
-      const response = await fetch(url)
-      const result = await response.json()
-
-      if (response.ok) {
-        setData(result)
-        setLastUpdate(new Date())
-        console.log(`Loaded comparison data for ${result.allTeams?.length || 0} teams`)
-      } else {
-        setError("Unable to load team comparison data")
-      }
-    } catch (error) {
-      console.error("Error fetching comparison:", error)
-      setError("Failed to load comparison data")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    fetchComparison()
-
-    // Refresh every 2 minutes
-    const interval = setInterval(fetchComparison, 120000)
-    return () => clearInterval(interval)
-  }, [eventCode, teamNumber])
+export function EventOverviewModule({ data, teamNumber, error, loading }: { data: ComparisonData | null, teamNumber: number, error: string | null, loading: boolean }) {
 
   if (loading) {
     return (
@@ -66,10 +27,6 @@ export function EventOverviewModule({ eventCode, teamNumber }: { eventCode: stri
         <CardContent className="p-6 text-center">
           <AlertTriangle className="h-8 w-8 text-yellow-600 mx-auto mb-4" />
           <p className="text-yellow-900 dark:text-yellow-100">{error}</p>
-          <Button variant="outline" onClick={fetchComparison} className="mt-4">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Retry
-          </Button>
         </CardContent>
       </Card>
     )
@@ -77,7 +34,7 @@ export function EventOverviewModule({ eventCode, teamNumber }: { eventCode: stri
 
   if (!data || data.allTeams.length === 0) {
     return (
-      <Card>
+      <Card className="h-full flex flex-col justify-center">
         <CardContent className="p-8 text-center">
           <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">No Comparison Data Available</h3>
