@@ -29,6 +29,7 @@ import { TeamComparison } from "@/components/team-comparison"
 import { OPRInsights } from "@/components/opr-insights"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ModularDashboard } from "@/components/dashboard"
+import { AllianceCard } from "@/components/alliance-card"
 import AllianceTeamName from "@/components/alliance-team-name"
 
 export interface TeamStats {
@@ -285,47 +286,6 @@ export default function DashboardPage() {
     )
   }
 
-  const AllianceCard = ({ alliance }: { alliance: Alliance }) => {
-    const isTeamInAlliance =
-      alliance.captain === teamNumber ||
-      alliance.round1 === teamNumber ||
-      alliance.round2 === teamNumber ||
-      alliance.backup === teamNumber
-
-    return (
-      <Card className={isTeamInAlliance ? "border-purple-500 dark:border-purple-300 bg-white dark:bg-black" : ""}>
-        <CardContent className="p-4">
-          <div className="text-center">
-            <Badge variant="outline" className="mb-3">
-              Alliance {alliance.number}
-            </Badge>
-            <div className="space-y-2">
-              <div className={`font-bold ${alliance.captain === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Captain</div>
-                <div>{alliance.captain}{alliance.captainDisplay}</div>
-              </div>
-              <div className={`${alliance.round1 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Pick 1</div>
-                <div>{alliance.round1}</div>
-              </div>
-              {alliance.round2 && (<div className={`${alliance.round2 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Pick 2</div>
-                <div>{alliance.round2}</div>
-              </div>
-              )}
-              {alliance.backup && (
-                <div className={`${alliance.backup === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                  <div className="text-xs text-muted-foreground">Backup</div>
-                  <div>{alliance.backup}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -470,7 +430,7 @@ export default function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <AllianceCard alliance={teamAlliance} />
+                  <AllianceCard alliance={teamAlliance} teamNumber={teamNumber} />
                 </CardContent>
               </Card>
             )}
@@ -550,7 +510,7 @@ export default function DashboardPage() {
               </TabsList>
 
               <TabsContent value="dashboard" className="space-y-6">
-                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} teamStats={teamStats} />
+                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
               </TabsContent>
 
               <TabsContent value="qualification" className="space-y-6">

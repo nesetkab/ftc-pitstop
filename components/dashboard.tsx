@@ -3,7 +3,8 @@ import { Responsive, WidthProvider, } from "react-grid-layout"
 import { OPRModule, OPRSmallModule } from "@/components/modules/opr-module"
 import { PerformanceModule } from "./modules/performance-module"
 import { RankingsModule } from "./modules/rankings-module"
-import { TeamStats, Ranking } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
+import { AllianceModule } from "./modules/alliance-module"
+import { TeamStats, Ranking, Alliance } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 import 'react-grid-layout/css/styles.css'
 
 interface ModularDashboardProps {
@@ -11,10 +12,11 @@ interface ModularDashboardProps {
   teamNumber: number,
   ranking: Ranking,
   rankings: Ranking[],
-  teamStats: TeamStats
+  teamStats: TeamStats,
+  alliance: Alliance
 }
 
-export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, teamStats }: ModularDashboardProps) {
+export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, teamStats, alliance }: ModularDashboardProps) {
   const layout = [
     { i: "a", x: 0, y: 0, w: 4, h: 8 },
     { i: "b", x: 7, y: 0, w: 6, h: 8 },
@@ -45,7 +47,7 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
         <OPRModule eventCode={eventCode} teamNumber={teamNumber} />
       </div>
       <div key="d">
-        <OPRSmallModule eventCode={eventCode} teamNumber={teamNumber} />
+        <AllianceModule alliance={alliance} teamNumber={teamNumber} />
       </div>
       <div key="e">
         <OPRSmallModule eventCode={eventCode} teamNumber={teamNumber} />
