@@ -2,6 +2,7 @@
 import { Responsive, WidthProvider, } from "react-grid-layout"
 import { OPRModule, OPRSmallModule } from "@/components/modules/opr-module"
 import { PerformanceModule } from "./modules/performance-module"
+import { RankingsModule } from "./modules/rankings-module"
 import { TeamStats, Ranking } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 import 'react-grid-layout/css/styles.css'
 
@@ -9,10 +10,11 @@ interface ModularDashboardProps {
   eventCode: string,
   teamNumber: number,
   ranking: Ranking,
+  rankings: Ranking[],
   teamStats: TeamStats
 }
 
-export function ModularDashboard({ eventCode, teamNumber, ranking, teamStats }: ModularDashboardProps) {
+export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, teamStats }: ModularDashboardProps) {
   const layout = [
     { i: "a", x: 0, y: 0, w: 4, h: 8 },
     { i: "b", x: 7, y: 0, w: 6, h: 8 },
@@ -37,7 +39,7 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, teamStats }: 
         <PerformanceModule teamRanking={ranking} teamStats={teamStats} />
       </div>
       <div key="b">
-        <OPRModule eventCode={eventCode} teamNumber={teamNumber} />
+        <RankingsModule rankings={rankings} teamNumber={teamNumber} />
       </div>
       <div key="c">
         <OPRModule eventCode={eventCode} teamNumber={teamNumber} />

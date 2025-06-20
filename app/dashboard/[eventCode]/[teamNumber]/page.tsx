@@ -550,7 +550,7 @@ export default function DashboardPage() {
               </TabsList>
 
               <TabsContent value="dashboard" className="space-y-6">
-                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} teamStats={teamStats} />
+                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} teamStats={teamStats} />
               </TabsContent>
 
               <TabsContent value="qualification" className="space-y-6">
