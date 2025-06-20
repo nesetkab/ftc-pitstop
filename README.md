@@ -1,6 +1,7 @@
 # FTC Pitstop 🏎️
+[https://ftcpitstop.com/](https://ftcpitstop.com/)
 
-FTC Pitstop is a web application designed to help FIRST Tech Challenge teams analyze competition data and improve their strategy. It provides team comparison tools, match analysis, and ranking insights.
+FTC Pitstop is a web application designed to help FIRST Tech Challenge teams analyze competition data and improve their strategy by providing a centralized display for their pit. It provides team comparison tools, match analysis, and ranking insights.
 
 ## Features 🌟
 
@@ -10,7 +11,7 @@ FTC Pitstop is a web application designed to help FIRST Tech Challenge teams ana
 - OPR/DPR calculations
 - Historical performance tracking
 
-## Getting Started 🚀
+## Running Locally 🚀
 
 ### Prerequisites
 
