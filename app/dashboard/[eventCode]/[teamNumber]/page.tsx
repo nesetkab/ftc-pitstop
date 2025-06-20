@@ -21,6 +21,7 @@ import {
   ExternalLink,
   BarChart3,
   Calculator,
+  Layout
 } from "lucide-react"
 import Link from "next/link"
 import { TournamentBracket } from "@/components/tournament-bracket"
@@ -476,7 +477,7 @@ export default function DashboardPage() {
             <Tabs defaultValue="dashboard" className="space-y-6">
               <TabsList className="grid w-full grid-cols-8">
                 <TabsTrigger value="dashboard" className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
+                  <Layout className="h-4 w-4" />
                   Dashboard
                 </TabsTrigger>
                 <TabsTrigger value="qualification" className="flex items-center gap-2">
