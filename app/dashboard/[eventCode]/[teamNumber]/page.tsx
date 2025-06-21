@@ -172,7 +172,6 @@ export default function DashboardPage() {
     fetchData()
 
     // Auto-refresh every 30 seconds
-    return
     const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [eventCode, teamNumber])
@@ -360,119 +359,7 @@ export default function DashboardPage() {
         )}
 
         <div className="grid lg:grid-cols-4 gap-6">
-          {/* Team Stats - Left Column */}
-          <div className="lg:col-span-1 space-y-6 hidden">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5" />
-                  Performance
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {teamRanking && (
-                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                    <div className="text-3xl font-bold text-blue-600">#{teamRanking.rank}</div>
-                    <div className="text-sm text-muted-foreground">Current Rank</div>
-                  </div>
-                )}
-
-                {teamStats && (
-                  <>
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div className="text-2xl font-bold text-green-600">{teamStats.wins}</div>
-                        <div className="text-xs text-muted-foreground">Wins</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-red-600">{teamStats.losses}</div>
-                        <div className="text-xs text-muted-foreground">Losses</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-yellow-600">{teamStats.ties}</div>
-                        <div className="text-xs text-muted-foreground">Ties</div>
-                      </div>
-                    </div>
-
-                    {(teamStats.opr > 0 || teamStats.dpr > 0 || teamStats.ccwm > 0) && (
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm">OPR</span>
-                          <span className="font-semibold">{teamStats.opr.toFixed(1)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">DPR</span>
-                          <span className="font-semibold">{teamStats.dpr.toFixed(1)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">CCWM</span>
-                          <span className="font-semibold">{teamStats.ccwm.toFixed(1)}</span>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {!teamStats && (
-                  <div className="text-center text-muted-foreground py-4">
-                    <p>Statistics will appear here once matches begin.</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Alliance Information */}
-            {teamAlliance && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Your Alliance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <AllianceCard alliance={teamAlliance} teamNumber={teamNumber} />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Rankings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Rankings
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {rankings.slice(0, rankings.length).map((ranking, index) => (
-                    <div
-                      key={ranking.teamNumber}
-                      className={`flex items-center justify-between p-2 rounded ${ranking.team === teamNumber ? "bg-blue-100 dark:bg-blue-900" : ""
-                        }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Badge variant={ranking.teamNumber === teamNumber ? "win" : index < 3 ? "default" : "secondary"} >#{ranking.rank}</Badge>
-                        <span className={ranking.teamNumber === teamNumber ? "font-bold" : ""}>{ranking.teamNumber} - {ranking.teamName}</span>
-
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {ranking.wins}-{ranking.losses}-{ranking.ties}
-                      </div>
-                    </div>
-                  ))}
-                  {rankings.length === 0 && (
-                    <p className="text-center text-muted-foreground py-4">
-                      Rankings will appear here during the event.
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Matches - Right Columns */}
+          {/* Tabs */}
           <div className="lg:col-span-4">
             <Tabs defaultValue="dashboard" className="space-y-6">
               <TabsList className="grid w-full grid-cols-8">
