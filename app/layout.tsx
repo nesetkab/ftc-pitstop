@@ -7,6 +7,8 @@ import { Analytics } from "@vercel/analytics/next"
 import Footer from "@/components/footer"
 import { BetaBanner } from "@/components/beta-banner"
 const inter = Inter({ subsets: ["latin"] })
+import "@radix-ui/themes/styles.css";
+import { Theme } from '@radix-ui/themes'
 
 export const metadata: Metadata = {
   title: "Pitstop - FTC Pit Display",
@@ -21,11 +23,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="__className_e8ce0c" suppressHydrationWarning>
-        <BetaBanner />
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-          {children}
-        </ThemeProvider>
-        < Footer />
+        <Theme>
+          <BetaBanner />
+          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+            {children}
+          </ThemeProvider>
+          < Footer />
+        </Theme>
 
       </body>
       < Analytics />
