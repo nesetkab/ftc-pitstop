@@ -77,8 +77,9 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
     <div className="flex flex-col justify-center w-full h-full">
       <ResponsiveGridLayout
         className="layout"
-        layouts={{ xxs: layout, lg: layout }}
-        cols={{ xxs: 1, lg: 12 }}
+        breakpoints={{ xxs: 0, sm: 768 }}
+        layouts={{ xxs: layout, sm: layout }}
+        cols={{ xxs: 1, sm: 12 }}
         rowHeight={30}
         isBounded={true}
         containerPadding={[0, 0]}
