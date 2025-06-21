@@ -21,6 +21,7 @@ import {
   ExternalLink,
   BarChart3,
   Calculator,
+  Layout
 } from "lucide-react"
 import Link from "next/link"
 import { TournamentBracket } from "@/components/tournament-bracket"
@@ -28,9 +29,11 @@ import { MatchPredictions } from "@/components/match-predictions"
 import { TeamComparison } from "@/components/team-comparison"
 import { OPRInsights } from "@/components/opr-insights"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { ModularDashboard } from "@/components/dashboard"
+import { AllianceCard } from "@/components/alliance-card"
 import AllianceTeamName from "@/components/alliance-team-name"
 
-interface TeamStats {
+export interface TeamStats {
   wins: number
   losses: number
   ties: number
@@ -42,7 +45,7 @@ interface TeamStats {
   tbp: number
 }
 
-interface Match {
+export interface Match {
   matchNumber: number
   description: string
   startTime: string
@@ -58,7 +61,7 @@ interface Match {
   matchInSeries?: number
 }
 
-interface Ranking {
+export interface Ranking {
   rank: number
   team: number
   rp: number
@@ -68,7 +71,7 @@ interface Ranking {
   ties: number
 }
 
-interface Alliance {
+export interface Alliance {
   number: number
   captain: number
   captainDisplay?: string
@@ -169,6 +172,7 @@ export default function DashboardPage() {
     fetchData()
 
     // Auto-refresh every 30 seconds
+    return
     const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [eventCode, teamNumber])
@@ -283,47 +287,6 @@ export default function DashboardPage() {
     )
   }
 
-  const AllianceCard = ({ alliance }: { alliance: Alliance }) => {
-    const isTeamInAlliance =
-      alliance.captain === teamNumber ||
-      alliance.round1 === teamNumber ||
-      alliance.round2 === teamNumber ||
-      alliance.backup === teamNumber
-
-    return (
-      <Card className={isTeamInAlliance ? "border-purple-500 dark:border-purple-300 bg-white dark:bg-black" : ""}>
-        <CardContent className="p-4">
-          <div className="text-center">
-            <Badge variant="outline" className="mb-3">
-              Alliance {alliance.number}
-            </Badge>
-            <div className="space-y-2">
-              <div className={`font-bold ${alliance.captain === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Captain</div>
-                <div>{alliance.captain}{alliance.captainDisplay}</div>
-              </div>
-              <div className={`${alliance.round1 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Pick 1</div>
-                <div>{alliance.round1}</div>
-              </div>
-              {alliance.round2 && (<div className={`${alliance.round2 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Pick 2</div>
-                <div>{alliance.round2}</div>
-              </div>
-              )}
-              {alliance.backup && (
-                <div className={`${alliance.backup === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                  <div className="text-xs text-muted-foreground">Backup</div>
-                  <div>{alliance.backup}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -398,7 +361,7 @@ export default function DashboardPage() {
 
         <div className="grid lg:grid-cols-4 gap-6">
           {/* Team Stats - Left Column */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-6 hidden">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -468,7 +431,7 @@ export default function DashboardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <AllianceCard alliance={teamAlliance} />
+                  <AllianceCard alliance={teamAlliance} teamNumber={teamNumber} />
                 </CardContent>
               </Card>
             )}
@@ -510,9 +473,13 @@ export default function DashboardPage() {
           </div>
 
           {/* Matches - Right Columns */}
-          <div className="lg:col-span-3">
-            <Tabs defaultValue="qualification" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-7">
+          <div className="lg:col-span-4">
+            <Tabs defaultValue="dashboard" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-8">
+                <TabsTrigger value="dashboard" className="flex items-center gap-2">
+                  <Layout className="h-4 w-4" />
+                  Dashboard
+                </TabsTrigger>
                 <TabsTrigger value="qualification" className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   <span className="hidden md:inline">Quals ({qualificationMatches.length})</span>
@@ -542,6 +509,10 @@ export default function DashboardPage() {
                   <span className="hidden md:inline">Alliances ({alliances.length})</span>
                 </TabsTrigger>
               </TabsList>
+
+              <TabsContent value="dashboard" className="space-y-6">
+                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
+              </TabsContent>
 
               <TabsContent value="qualification" className="space-y-6">
                 {/* Upcoming Qualification Matches */}
