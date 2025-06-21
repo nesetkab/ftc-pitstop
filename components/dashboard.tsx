@@ -91,13 +91,13 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
           <RankingsModule rankings={rankings} teamNumber={teamNumber} />
         </div>)}
         {modules.includes("OPR") && (<div key="OPR">
-          <OPRModule opr={data.targetTeam.opr} dpr={data.targetTeam.dpr} ccwm={data.targetTeam.ccwm} matchesPlayed={data.targetTeam.played} loading={loading} error={error} />
+          <OPRModule opr={data?.targetTeam?.opr} dpr={data?.targetTeam?.dpr} ccwm={data?.targetTeam?.ccwm} matchesPlayed={data?.targetTeam?.played} loading={loading} error={error} />
         </div>)}
         {modules.includes("Alliance") && (<div key="Alliance">
           <AllianceModule alliance={alliance} teamNumber={teamNumber} />
         </div>)}
         {modules.includes("OPR (Small)") && (<div key="OPR (Small)">
-          <OPRSmallModule opr={data.targetTeam.opr} dpr={data.targetTeam.dpr} ccwm={data.targetTeam.ccwm} matchesPlayed={data.targetTeam.played} loading={loading} error={error} />
+          <OPRSmallModule opr={data?.targetTeam?.opr} dpr={data?.targetTeam?.dpr} ccwm={data?.targetTeam?.ccwm} matchesPlayed={data?.targetTeam?.played} loading={loading} error={error} />
         </div>)}
         {modules.includes("Event Overview") && (<div key="Event Overview">
           <EventOverviewModule data={data} teamNumber={teamNumber} error={error} loading={loading} />

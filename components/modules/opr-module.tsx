@@ -35,7 +35,7 @@ interface OPRData {
   lastUpdated: string
 }
 
-export function OPRModule({ opr, dpr, ccwm, matchesPlayed, loading, error }: { opr: number, dpr: number, matchesPlayed: number, ccwm: number, loading: boolean, error: string | null }) {
+export function OPRModule({ opr, dpr, ccwm, matchesPlayed, loading, error }: { opr: number | undefined, dpr: number | undefined, matchesPlayed: number | undefined, ccwm: number | undefined, loading: boolean, error: string | null }) {
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -115,7 +115,7 @@ export function OPRModule({ opr, dpr, ccwm, matchesPlayed, loading, error }: { o
   )
 }
 
-export function OPRSmallModule({ opr, dpr, ccwm, matchesPlayed, loading, error }: { opr: number, dpr: number, matchesPlayed: number, ccwm: number, loading: boolean, error: string | null }) {
+export function OPRSmallModule({ opr, dpr, ccwm, matchesPlayed, loading, error }: { opr: number | undefined, dpr: number | undefined, matchesPlayed: number | undefined, ccwm: number | undefined, loading: boolean, error: string | null }) {
   if (loading) {
     return (
       <div className="text-center py-8">
