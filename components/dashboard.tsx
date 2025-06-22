@@ -66,12 +66,12 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
     return () => clearInterval(interval)
   }, [eventCode, teamNumber])
 
-  const layout = loadLayout()
+  let layout = loadLayout()
   const modules = loadEnabledModules()
 
+  console.log('we are here')
+  layout = fixLayout(layout, modules)
   const ResponsiveGridLayout = WidthProvider(Responsive)
-
-  console.log(data)
 
   return (
     <div className="flex flex-col justify-center w-full h-full">
@@ -114,7 +114,7 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
         </div>)}
 
       </ResponsiveGridLayout >
-      <ModuleSelectionDialog modules={modules} />
+      <ModuleSelectionDialog modules={modules} layout={layout} />
     </div>
   );
 }
@@ -144,7 +144,7 @@ const defaultModules = [ // this is used as the list of all modules
 ]
 
 
-const ModuleSelectionDialog = ({ modules }: { modules: string[] }) => {
+const ModuleSelectionDialog = ({ modules, layout }: { modules: string[], layout: any }) => {
   const router = useRouter()
 
   return (<Dialog.Root>
@@ -176,7 +176,7 @@ const ModuleSelectionDialog = ({ modules }: { modules: string[] }) => {
       </div>
       <div className="pt-4 flex justify-end">
         <Dialog.Close>
-          <Button size="4" color="gray" variant="soft" highContrast onClick={() => { saveEnabledModules(modules); router.refresh() }}>Save</Button>
+          <Button size="4" color="gray" variant="soft" highContrast onClick={() => { saveEnabledModules(modules); router.refresh(); }}>Save</Button>
         </Dialog.Close>
       </div>
     </Dialog.Content>
@@ -190,11 +190,42 @@ const saveLayout = (layout: Layout) => {
 const loadLayout = () => {
   const cookie = getClientSideCookie('layout')
   if (!cookie) return defaultLayout
+
   return JSON.parse(cookie)
 }
 
+const fixLayout = (layout: any, modules: string[]) => {
+  // Add minimums to any layout entries without them
+  const fixed = layout.map((item: any) => {
+    if (!item.minW) {
+      const ref = defaultLayout.filter(x => x.i == item.i)[0]
+      item.minW = ref.minW
+      item.minH = ref.minH
+      item.w = ref.minW
+      item.h = ref.minH
+    }
+
+    if (item.w < item.minW || item.h < item.minH) {
+      item.w = item.minW
+      item.h = item.minH
+    }
+    return item
+  })
+
+  // Add layout entries for any modules without one
+  if (modules.length > layout.length) {
+    const layoutKeys = layout.map((x: any) => x.i)
+    const missing = modules.filter(x => !layoutKeys.includes(x))
+    missing.forEach(m => {
+      const ref = defaultLayout.filter(x => x.i == m)[0]
+      fixed.push(ref)
+    })
+  }
+
+  return fixed
+}
+
 const saveEnabledModules = (modules: string[]) => {
-  console.log(modules)
   setClientSideCookie('enabledModules', JSON.stringify(modules))
 }
 
