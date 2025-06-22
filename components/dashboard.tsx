@@ -82,7 +82,7 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
         cols={{ xxs: 1, sm: 12 }}
         rowHeight={30}
         isBounded={true}
-        containerPadding={[0, 0]}
+        containerPadding={[0, 0]} // must be zero to prevent a bug
         onLayoutChange={saveLayout}
       >
         {modules.includes("Performance") && (<div key="Performance">
@@ -120,15 +120,15 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
 }
 
 const defaultLayout = [
-  { i: "Performance", x: 4, y: 0, w: 4, h: 8 },
-  { i: "Rankings", x: 0, y: 0, w: 4, h: 24 },
-  { i: "OPR", x: 4, y: 6, w: 8, h: 8 },
-  { i: "Alliance", x: 8, y: 6, w: 4, h: 8 },
-  { i: "OPR (Small)", x: 4, y: 12, w: 4, h: 8 },
-  { i: "Event Overview", x: 8, y: 0, w: 4, h: 8 },
-  { i: "Rank Percentile", x: 0, y: 12, w: 4, h: 5 },
-  { i: "Win Rate", x: 4, y: 12, w: 4, h: 5 },
-  { i: "Average Score", x: 8, y: 12, w: 4, h: 5 }
+  { i: "Performance", x: 4, y: 0, w: 4, h: 8, minW: 2, minH: 6 },
+  { i: "Rankings", x: 0, y: 0, w: 4, h: 24, minW: 2, minH: 4 },
+  { i: "OPR", x: 4, y: 6, w: 8, h: 8, minW: 6, minH: 8 },
+  { i: "Alliance", x: 8, y: 6, w: 4, h: 8, minW: 2, minH: 6 },
+  { i: "OPR (Small)", x: 4, y: 12, w: 4, h: 8, minW: 4, minH: 7 },
+  { i: "Event Overview", x: 8, y: 0, w: 4, h: 8, minW: 3, minH: 6 },
+  { i: "Rank Percentile", x: 0, y: 12, w: 4, h: 5, minW: 3, minH: 4 },
+  { i: "Win Rate", x: 4, y: 12, w: 4, h: 5, minW: 3, minH: 4 },
+  { i: "Average Score", x: 8, y: 12, w: 4, h: 5, minW: 3, minH: 4 }
 ]
 
 const defaultModules = [ // this is used as the list of all modules
@@ -182,8 +182,6 @@ const ModuleSelectionDialog = ({ modules }: { modules: string[] }) => {
     </Dialog.Content>
   </Dialog.Root>)
 };
-
-
 
 const saveLayout = (layout: Layout) => {
   setClientSideCookie('layout', JSON.stringify(layout))
