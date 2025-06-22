@@ -68,9 +68,8 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
 
   let layout = loadLayout()
   const modules = loadEnabledModules()
-
-  console.log('we are here')
   layout = fixLayout(layout, modules)
+
   const ResponsiveGridLayout = WidthProvider(Responsive)
 
   return (
@@ -144,7 +143,7 @@ const defaultModules = [ // this is used as the list of all modules
 ]
 
 
-const ModuleSelectionDialog = ({ modules, layout }: { modules: string[], layout: any }) => {
+const ModuleSelectionDialog = ({ modules }: { modules: string[] }) => {
   const router = useRouter()
 
   return (<Dialog.Root>
