@@ -167,7 +167,7 @@ export default function HomePage() {
                 Find Your Event
               </CardTitle>
               <CardDescription>
-                Search for your FTC event by name, location, or enter the event code directly
+                Search for your FTC event by name, location, or enter the event code directly...
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
