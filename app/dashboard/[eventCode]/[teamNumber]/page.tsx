@@ -21,7 +21,8 @@ import {
   ExternalLink,
   BarChart3,
   Calculator,
-  Layout
+  Layout,
+  Settings
 } from "lucide-react"
 import Link from "next/link"
 import { TournamentBracket } from "@/components/tournament-bracket"
@@ -31,7 +32,38 @@ import { OPRInsights } from "@/components/opr-insights"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ModularDashboard } from "@/components/dashboard"
 import { AllianceCard } from "@/components/alliance-card"
-import AllianceTeamName from "@/components/alliance-team-name"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuCheckboxItem,
+  DropdownMenuCheckboxItemProps,
+} from "@/components/ui/dropdown-menu"
+import * as React from "react"
+
+
+type Checked = DropdownMenuCheckboxItemProps["checked"]
+
+interface TeamData {
+  teamNumber: number;
+  displayTeamNumber: string;
+  nameFull: string;
+  nameShort: string;
+  schoolName: string | null;
+  city: string;
+  stateProv: string;
+  country: string;
+  website: string | null;
+  rookieYear: number;
+  robotName: string | null;
+  districtCode: string | null;
+  homeCMP: string | null;
+  homeRegion: string;
+  displayLocation: string;
+}
 
 export interface TeamStats {
   wins: number
@@ -98,6 +130,86 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [nextMatch, setNextMatch] = useState<Match | null>(null)
+
+  const [teamName, setTeamName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedDataString = localStorage.getItem('selectedTeam');
+
+    if (storedDataString) {
+      try {
+        const storedDataObject: TeamData = JSON.parse(storedDataString);
+
+        if (storedDataObject && storedDataObject.nameShort) {
+          setTeamName(storedDataObject.nameShort);
+        }
+      } catch (error) {
+        console.error("Failed to parse team data from local storage:", error);
+      }
+    }
+  }, []);
+
+
+
+  const getRelativeTime = (date: Date): string => {
+    const now = new Date();
+    // Difference in seconds
+    const diffSeconds = (date.getTime() - now.getTime()) / 1000;
+
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+
+    // Define time units in seconds
+    const units: { [key: string]: number } = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60,
+      second: 1
+    };
+
+    for (const unit in units) {
+      if (Math.abs(diffSeconds) > units[unit]) {
+        const value = Math.round(diffSeconds / units[unit]);
+        return rtf.format(value, unit as Intl.RelativeTimeFormatUnit);
+      }
+    }
+    return rtf.format(Math.round(diffSeconds), 'second');
+  };
+
+  const TimeAgoDisplay: React.FC<TimeAgoProps> = ({ lastUpdate }) => {
+    const [timeAgo, setTimeAgo] = useState<string>('');
+
+    useEffect(() => {
+      // Don't run if the date is not set yet
+      if (!lastUpdate) return;
+
+      // Set the initial value immediately on mount
+      setTimeAgo(getRelativeTime(lastUpdate));
+
+      // Set up an interval to update the time every 5 seconds
+      const intervalId = setInterval(() => {
+        setTimeAgo(getRelativeTime(lastUpdate));
+      }, 5000); // 5000 milliseconds = 5 seconds
+
+      // This is the cleanup function.
+      // React runs this when the component unmounts or `lastUpdate` changes.
+      return () => {
+        clearInterval(intervalId);
+      };
+    }, [lastUpdate]); // Rerun the effect if lastUpdate ever changes
+
+    if (!lastUpdate) {
+      return null; // Or return a loading/placeholder state
+    }
+
+    return (
+      <span>{timeAgo}</span>
+    );
+  };
+
+  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
 
   const fetchData = async () => {
     try {
@@ -299,27 +411,36 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-black">
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto self-center ">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
-            <Link href={`/event/${eventCode}`}>
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 md:mr-2" />
-                <span className="hidden md:inline">Back</span>
-              </Button>
-            </Link>
-            <div>
-              <h1 className="text-3xl font-bold">Team {teamNumber}</h1>
-              <p className="text-muted-foreground">Event: {eventCode}</p>
-            </div>
+            <h1 className="text-3xl font-black">{teamNumber} - {teamName ? teamName : ""} <span className="text-xl font-extralight">{eventCode.toUpperCase()}</span></h1>
           </div>
           <div className="flex items-center gap-2">
-            <p className="text-xs text-muted-foreground">Last updated: {lastUpdate.toLocaleTimeString()}</p>
+            <p className="text-xs text-muted-foreground">last update: <TimeAgoDisplay lastUpdate={lastUpdate} /> </p>
 
             <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4" />
             </Button>
-            <ThemeToggle />
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3" >
+                  <Settings className="h-4 w-4" />
+                </div>
+
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem>Theme</DropdownMenuItem>
+                <DropdownMenuItem>Change Team</DropdownMenuItem>
+                <DropdownMenuItem>Go Home</DropdownMenuItem>
+                <DropdownMenuItem>Change Auto-Refresh Delay</DropdownMenuItem>
+                <DropdownMenuCheckboxItem
+                  checked={showStatusBar}
+                  onCheckedChange={setShowStatusBar}
+                >
+                  Status Bar
+                </DropdownMenuCheckboxItem>              </DropdownMenuContent>
+            </DropdownMenu>
 
           </div>
         </div>

@@ -24,7 +24,6 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className="__className_e8ce0c" suppressHydrationWarning>
         <Theme>
-          <BetaBanner />
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             {children}
           </ThemeProvider>
