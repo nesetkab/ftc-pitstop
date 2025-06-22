@@ -217,7 +217,15 @@ const fixLayout = (layout: any, modules: string[]) => {
     const missing = modules.filter(x => !layoutKeys.includes(x))
     missing.forEach(m => {
       const ref = defaultLayout.filter(x => x.i == m)[0]
-      fixed.push(ref)
+      fixed.push({
+        i: m,
+        x: 0,
+        y: Infinity,
+        w: ref.w,
+        h: ref.h,
+        minW: ref.minW,
+        minH: ref.minH
+      })
     })
   }
 
