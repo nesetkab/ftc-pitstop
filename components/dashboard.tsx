@@ -113,7 +113,7 @@ export function ModularDashboard({ eventCode, teamNumber, ranking, rankings, tea
         </div>)}
 
       </ResponsiveGridLayout >
-      <ModuleSelectionDialog modules={modules} layout={layout} />
+      {/* <ModuleSelectionDialog modules={modules} layout={layout} /> */}
     </div>
   );
 }
@@ -143,7 +143,7 @@ const defaultModules = [ // this is used as the list of all modules
 ]
 
 
-const ModuleSelectionDialog = ({ modules }: { modules: string[] }) => {
+export const ModuleSelectionDialog = ({ modules }: { modules: string[] }) => {
   const router = useRouter()
 
   return (<Dialog.Root>

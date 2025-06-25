@@ -5,33 +5,16 @@ import { useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  Trophy,
-  Calendar,
-  Clock,
-  TrendingUp,
   ArrowLeft,
   Bell,
   RefreshCw,
   AlertCircle,
-  Users,
-  Target,
-  Zap,
-  ExternalLink,
-  BarChart3,
-  Calculator,
-  Layout,
   Settings
 } from "lucide-react"
 import Link from "next/link"
-import { TournamentBracket } from "@/components/tournament-bracket"
-import { MatchPredictions } from "@/components/match-predictions"
-import { TeamComparison } from "@/components/team-comparison"
-import { OPRInsights } from "@/components/opr-insights"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ModularDashboard } from "@/components/dashboard"
-import { AllianceCard } from "@/components/alliance-card"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -43,6 +26,7 @@ import {
   DropdownMenuCheckboxItemProps,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
+import { ModuleSelectionDialog } from "@/components/dashboard"
 
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
@@ -410,15 +394,19 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <div className="container mx-auto self-center ">
+    <div className=" h-screen bg-white dark:bg-black">
+      <div className="container mt-4 mx-auto self-center ">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
+            <Link href={`/event/${eventCode}`}>
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="h-4 w-4 " />
+              </Button>
+            </Link>
             <h1 className="text-3xl font-black">{teamNumber} - {teamName ? teamName : ""} <span className="text-xl font-extralight">{eventCode.toUpperCase()}</span></h1>
           </div>
           <div className="flex items-center gap-2">
             <p className="text-xs text-muted-foreground">last update: <TimeAgoDisplay lastUpdate={lastUpdate} /> </p>
-
             <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4" />
             </Button>
@@ -441,6 +429,7 @@ export default function DashboardPage() {
                   Status Bar
                 </DropdownMenuCheckboxItem>              </DropdownMenuContent>
             </DropdownMenu>
+            <ModuleSelectionDialog modules={modules} layout={layout} />
 
           </div>
         </div>
@@ -478,185 +467,9 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         )}
+        <ModularDashboard className="max-w-screen" eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
 
-        <div className="grid lg:grid-cols-4 gap-6">
-          {/* Tabs */}
-          <div className="lg:col-span-4">
-            <Tabs defaultValue="dashboard" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-8">
-                <TabsTrigger value="dashboard" className="flex items-center gap-2">
-                  <Layout className="h-4 w-4" />
-                  Dashboard
-                </TabsTrigger>
-                <TabsTrigger value="qualification" className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  <span className="hidden md:inline">Quals ({qualificationMatches.length})</span>
-                </TabsTrigger>
-                <TabsTrigger value="predictions" className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="hidden md:inline">Predictions</span>
-                </TabsTrigger>
-                <TabsTrigger value="comparison" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden md:inline">Compare</span>
-                </TabsTrigger>
-                <TabsTrigger value="opr" className="flex items-center gap-2">
-                  <Calculator className="h-4 w-4" />
-                  <span className="hidden md:inline">PR</span>
-                </TabsTrigger>
-                <TabsTrigger value="bracket" className="flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  <span className="hidden md:inline">Bracket</span>
-                </TabsTrigger>
-                <TabsTrigger value="playoffs" className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4" />
-                  <span className="hidden md:inline">Playoffs ({playoffMatches.length})</span>
-                </TabsTrigger>
-                <TabsTrigger value="alliances" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden md:inline">Alliances ({alliances.length})</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="dashboard" className="space-y-6">
-                <ModularDashboard eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
-              </TabsContent>
-
-              <TabsContent value="qualification" className="space-y-6">
-                {/* Upcoming Qualification Matches */}
-                {upcomingQualMatches.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5" />
-                        Upcoming Qualification Matches
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {upcomingQualMatches.slice(0, 5).map((match) => (
-                          <MatchCard key={match.matchNumber} match={match} />
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Played Qualification Matches */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
-                      Qualification Match History
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {playedQualMatches
-                        .slice(-10)
-                        .reverse()
-                        .map((match) => (
-                          <MatchCard key={match.matchNumber} match={match} />
-                        ))}
-                      {playedQualMatches.length === 0 && (
-                        <p className="text-center text-muted-foreground py-4">No qualification matches played yet</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="predictions" className="space-y-6">
-                <MatchPredictions eventCode={eventCode} teamNumber={teamNumber} />
-              </TabsContent>
-
-              <TabsContent value="comparison" className="space-y-6">
-                <TeamComparison eventCode={eventCode} teamNumber={teamNumber} />
-              </TabsContent>
-
-              <TabsContent value="opr" className="space-y-6">
-                <OPRInsights eventCode={eventCode} teamNumber={teamNumber} />
-              </TabsContent>
-
-              <TabsContent value="bracket" className="space-y-6">
-                <Card>
-                  <CardContent className="p-6">
-                    <TournamentBracket matches={matches} alliances={alliances} teamNumber={teamNumber} />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="playoffs" className="space-y-6">
-                {/* Upcoming Playoff Matches */}
-                {upcomingPlayoffMatches.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5" />
-                        Upcoming Playoff Matches
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {upcomingPlayoffMatches.map((match) => (
-                          <MatchCard key={match.matchNumber} match={match} showAlliance />
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Played Playoff Matches */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
-                      Playoff Match History
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {playedPlayoffMatches.reverse().map((match) => (
-                        <MatchCard key={match.description} match={match} showAlliance />
-                      ))}
-                      {playedPlayoffMatches.length === 0 && (
-                        <p className="text-center text-muted-foreground py-4">
-                          Playoff matches will appear here after alliance selection
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="alliances" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Alliance Selection
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {alliances.length > 0 ? (
-                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {alliances.map((alliance) => (
-                          <AllianceCard key={alliance.number} alliance={alliance} />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-center text-muted-foreground py-8">
-                        Alliance selection has not occurred yet. Alliances will be displayed here after qualification
-                        matches are complete.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
-      </div>
-    </div>
+      </div >
+    </div >
   )
 }
