@@ -512,14 +512,10 @@ export default function DashboardPage() {
           {/* Matches - Right Columns */}
           <div className="lg:col-span-3">
             <Tabs defaultValue="qualification" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-7">
+              <TabsList className="grid w-full grid-cols-6">
                 <TabsTrigger value="qualification" className="flex items-center gap-2">
                   <Target className="h-4 w-4" />
                   <span className="hidden md:inline">Quals ({qualificationMatches.length})</span>
-                </TabsTrigger>
-                <TabsTrigger value="predictions" className="flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4" />
-                  <span className="hidden md:inline">Predictions</span>
                 </TabsTrigger>
                 <TabsTrigger value="comparison" className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4" />
@@ -587,9 +583,6 @@ export default function DashboardPage() {
                 </Card>
               </TabsContent>
 
-              <TabsContent value="predictions" className="space-y-6">
-                <MatchPredictions eventCode={eventCode} teamNumber={teamNumber} />
-              </TabsContent>
 
               <TabsContent value="comparison" className="space-y-6">
                 <TeamComparison eventCode={eventCode} teamNumber={teamNumber} />
