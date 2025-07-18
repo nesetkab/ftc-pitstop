@@ -26,7 +26,6 @@ import {
   DropdownMenuCheckboxItemProps,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
-import { ModuleSelectionDialog } from "@/components/dashboard"
 
 
 type Checked = DropdownMenuCheckboxItemProps["checked"]
@@ -429,8 +428,7 @@ export default function DashboardPage() {
                   Status Bar
                 </DropdownMenuCheckboxItem>              </DropdownMenuContent>
             </DropdownMenu>
-            <ModuleSelectionDialog modules={modules} layout={layout} />
-
+            
           </div>
         </div>
 
