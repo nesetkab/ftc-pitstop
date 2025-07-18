@@ -394,7 +394,7 @@ export default function DashboardPage() {
 
   return (
     <div className=" h-screen bg-white dark:bg-black">
-      <div className="pt-4 container mt-4 mx-auto self-center ">
+      <div className="pt-4 container mx-auto self-center ">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <Link href={`/event/${eventCode}`}>
