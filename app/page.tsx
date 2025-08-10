@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, Calendar, Trophy, Users, AlertCircle, TestTube, Clock, MapPin } from "lucide-react"
+import { Monitor, Calculator, ClipboardPen, TestTube } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Image from "next/image"
 import Link from "next/link"
@@ -31,7 +31,7 @@ export default function HomePage() {
             </div>
           </div>
           <p className="text-xl font-bold  mb-2">
-            All of your FTC-pit essentials - on just one display.
+            The All-in-One website for FIRST Tech Challenge competitions.
           </p>
           <p className="text-sm ">
             Real-time rankings, match schedules, and team performance analytics, all personalized for your needs.
@@ -43,8 +43,13 @@ export default function HomePage() {
           <Link href="/dashboard">
             <Card className="hover:bg-border transition-colors">
               <CardContent className="p-6 text-center">
-                <Trophy className="h-8 w-8 mx-auto mb-3 text-blue-600" />
-                <h3 className="font-semibold mb-2">Live Rankings</h3>
+                <div className="bg-green-600 rounded-sm w-fit justify-self-center mb-3">
+                  <h3 className="font-semibold mx-2">
+                    Public Beta!
+                  </h3>
+                </div>
+                <Monitor className="h-8 w-8 mx-auto mb-3 text-blue-600" />
+                <h3 className="font-semibold mb-2">Dashboard</h3>
                 <p className="text-sm text-muted-foreground">Real-time tournament rankings and standings</p>
               </CardContent>
             </Card>
@@ -52,19 +57,31 @@ export default function HomePage() {
           <Link href="" className="hover:cursor-not-allowed">
             <Card className="hover:bg-border transition-colors hover:text-muted-foreground">
               <CardContent className="p-6 text-center">
-                <Calendar className="h-8 w-8 mx-auto mb-3 text-green-600" />
-                <h3 className="font-semibold mb-2">Match Schedule</h3>
+                <div className="bg-red-600 rounded-sm w-fit justify-self-center mb-3">
+                  <h3 className="font-semibold mx-2">
+                    Unreleased :(
+                  </h3>
+                </div>
+                <ClipboardPen className="h-8 w-8 mx-auto mb-3 text-green-600" />
+                <h3 className="font-semibold mb-2">Scouting Client</h3>
                 <p className="text-sm text-muted-foreground">Upcoming matches with smart notifications</p>
               </CardContent>
             </Card>
           </Link>
-          <Card className="hover:bg-border transition-colors">
-            <CardContent className="p-6 text-center">
-              <Users className="h-8 w-8 mx-auto mb-3 text-purple-600" />
-              <h3 className="font-semibold mb-2">Team Analytics</h3>
-              <p className="text-sm text-muted-foreground">Performance stats, OPR, and match history</p>
-            </CardContent>
-          </Card>
+          <Link href="" className="hover:cursor-not-allowed">
+            <Card className="hover:bg-border transition-colors">
+              <CardContent className="p-6 text-center">
+                <div className="bg-red-600 rounded-sm w-fit justify-self-center mb-3">
+                  <h3 className="font-semibold mx-2">
+                    Unreleased :(
+                  </h3>
+                </div>
+                <Calculator className="h-8 w-8 mx-auto mb-3 text-purple-600" />
+                <h3 className="font-semibold mb-2">Advancement Calculator</h3>
+                <p className="text-sm text-muted-foreground">Performance stats, OPR, and match history</p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </div>
     </div>

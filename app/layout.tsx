@@ -12,8 +12,34 @@ import { Theme } from '@radix-ui/themes'
 
 export const metadata: Metadata = {
   title: "Pitstop - FTC Pit Display",
-  description: "The One-Stop Shop for all of your FTC pit essentials :3"
-}
+  description: "The All-in-One website for FIRST Tech Challenge competitions.",
+  keywords: ["FTC", "FIRST Tech Challenge", "robotics", "scouting", "pit display", "FTC Pitstop"],
+  openGraph: {
+    title: "Pitstop - FTC Pit Display",
+    description: "The All-in-One website for FIRST Tech Challenge competitions.",
+    url: "https://ftcpitstop.com/",
+    siteName: "FTC Pitstop",
+    images: [
+      {
+        url: "/pitstop_banner.png",
+        width: 1200,
+        height: 630,
+        alt: "FTC Pitstop Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pitstop - FTC Pit Display",
+    description: "The All-in-One website for FIRST Tech Challenge competitions.",
+    images: ["/pitstop_banner.png"],
+  },
+  icons: {
+    icon: "/favicon.ico"
+  },
+};
 
 export default function RootLayout({
   children,
