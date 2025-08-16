@@ -161,6 +161,10 @@ export default function DashboardPage() {
     return rtf.format(Math.round(diffSeconds), 'second');
   };
 
+  interface TimeAgoProps {
+    lastUpdate: Date;
+  }
+
   const TimeAgoDisplay: React.FC<TimeAgoProps> = ({ lastUpdate }) => {
     const [timeAgo, setTimeAgo] = useState<string>('');
 
@@ -174,7 +178,7 @@ export default function DashboardPage() {
       // Set up an interval to update the time every 5 seconds
       const intervalId = setInterval(() => {
         setTimeAgo(getRelativeTime(lastUpdate));
-      }, 5000); // 5000 milliseconds = 5 seconds
+      }, 1000); // 1000 ms = 1 second
 
       // This is the cleanup function.
       // React runs this when the component unmounts or `lastUpdate` changes.
@@ -193,6 +197,9 @@ export default function DashboardPage() {
   };
 
   const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
+  const [showIntervalModal, setShowIntervalModal] = useState(false);
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(30000); // default 30s
+  const [pendingInterval, setPendingInterval] = useState<number>(30000);
 
   const fetchData = async () => {
     try {
@@ -264,12 +271,10 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    fetchData()
-
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000)
-    return () => clearInterval(interval)
-  }, [eventCode, teamNumber])
+    fetchData();
+    const interval = setInterval(fetchData, autoRefreshInterval);
+    return () => clearInterval(interval);
+  }, [eventCode, teamNumber, autoRefreshInterval]);
 
   const teamRanking = rankings.find((r) => r.team === teamNumber)
   const teamAlliance = alliances.find(
@@ -411,16 +416,22 @@ export default function DashboardPage() {
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3" >
+                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" >
                   <Settings className="h-4 w-4" />
                 </div>
 
               </DropdownMenuTrigger>
               <DropdownMenuContent>
+                {/* no clue what theme or status bar is supposed to do, home should be in a navbar*/}
                 <DropdownMenuItem>Theme</DropdownMenuItem>
                 <DropdownMenuItem>Change Team</DropdownMenuItem>
                 <DropdownMenuItem>Go Home</DropdownMenuItem>
-                <DropdownMenuItem>Change Auto-Refresh Delay</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => {
+                  setPendingInterval(autoRefreshInterval);
+                  setShowIntervalModal(true);
+                }}>
+                  Change Auto-Refresh Delay
+                </DropdownMenuItem>
                 <DropdownMenuCheckboxItem
                   checked={showStatusBar}
                   onCheckedChange={setShowStatusBar}
@@ -466,6 +477,45 @@ export default function DashboardPage() {
           </Card>
         )}
         <ModularDashboard className="max-w-screen" eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
+
+        {/* Auto-Refresh Interval Modal */}
+        {showIntervalModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-6 w-full max-w-xs">
+              <h2 className="text-lg font-bold mb-2">Change Auto-Refresh Interval</h2>
+              <label className="block mb-4">
+                <span className="text-sm text-muted-foreground">Interval (seconds):</span>
+                <input
+                  type="number"
+                  min={5}
+                  max={600}
+                  // When there is no input, it removes the 0 by default
+                  value={pendingInterval ? pendingInterval / 1000 : ""}
+                  onChange={e => {
+                    const val = e.target.value;
+                    if (val === "" || isNaN(Number(val))) {
+                      setPendingInterval(0);
+                    } else {
+                      setPendingInterval(Number(val) * 1000);
+                    }
+                  }}
+                  className="mt-1 block w-full rounded border border-gray-300 dark:border-gray-700 px-2 py-1 bg-background"
+                />
+              </label>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" size="sm" onClick={() => setShowIntervalModal(false)}>
+                  Cancel
+                </Button>
+                <Button size="sm" onClick={() => {
+                  setAutoRefreshInterval(pendingInterval);
+                  setShowIntervalModal(false);
+                }}>
+                  Save
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div >
     </div >
