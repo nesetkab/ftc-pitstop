@@ -6,7 +6,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const { teamNumber, eventCode } = await params
 
   try {
-    const season = 2024
+    const season = process.env.FTC_SEASON
     const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
 
     console.log("Fetching stats for team:", teamNumber, "at event:", eventCode)

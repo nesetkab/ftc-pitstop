@@ -7,7 +7,7 @@ export async function GET(
   { params }: { params: Promise<{ eventCode: string }> }
 ) {
   const { eventCode } = await params
-  const season = 2024
+  const season = process.env.FTC_SEASON
   const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
 
   try {

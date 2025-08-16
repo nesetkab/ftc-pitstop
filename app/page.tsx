@@ -49,21 +49,28 @@ export default function HomePage() {
                   </h3>
                 </div>
                 <Monitor className="h-8 w-8 mx-auto mb-3 text-blue-600" />
-                <h3 className="font-semibold mb-2">Dashboard</h3>
                 <p className="text-sm text-muted-foreground">Real-time tournament rankings and standings</p>
               </CardContent>
             </Card>
           </Link>
           <Link href="" className="hover:cursor-not-allowed">
             <Card className="hover:bg-border transition-colors hover:text-muted-foreground">
-              <CardContent className="p-6 text-center">
-                <div className="bg-red-600 rounded-sm w-fit justify-self-center mb-3">
+              <CardTitle className="py-2 text-center items-center">
+
+                <div className="font-black flex flex-row gap-2 items-center justify-self-center max-w-fit">
+                  <ClipboardPen className="h-8 w-8 text-green-600" />
+                  Scouting Client
+                </div>
+              </CardTitle>
+              <CardHeader className="text-center items-center">
+                <div className="bg-red-600 rounded-sm w-fit justify-self-center ">
                   <h3 className="font-semibold mx-2">
                     Unreleased :(
                   </h3>
                 </div>
-                <ClipboardPen className="h-8 w-8 mx-auto mb-3 text-green-600" />
-                <h3 className="font-semibold mb-2">Scouting Client</h3>
+              </CardHeader>
+              <CardContent className="text-center">
+
                 <p className="text-sm text-muted-foreground">Upcoming matches with smart notifications</p>
               </CardContent>
             </Card>
@@ -84,6 +91,6 @@ export default function HomePage() {
           </Link>
         </div>
       </div>
-    </div>
+    </div >
   )
 }
