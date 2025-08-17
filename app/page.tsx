@@ -57,7 +57,7 @@ export default function HomePage() {
             <Card className="hover:bg-border transition-colors hover:text-muted-foreground">
               <CardTitle className="py-2 text-center items-center">
 
-                <div className="font-black flex flex-row gap-2 items-center justify-self-center max-w-fit">
+                <div className="font-black text-2xl flex flex-row gap-2 items-center justify-self-center max-w-fit">
                   <ClipboardPen className="h-8 w-8 text-green-600" />
                   Scouting Client
                 </div>
