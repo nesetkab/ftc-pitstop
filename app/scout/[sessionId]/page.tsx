@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -471,10 +470,10 @@ export default function ScoutSession() {
                   <div
                     key={index}
                     className={`w-3 h-3 rounded-full ${index === currentQuestionIndex
-                        ? "bg-blue-500"
-                        : getCurrentAnswer(questions[index].id)
-                          ? "bg-green-500"
-                          : "bg-gray-300"
+                      ? "bg-blue-500"
+                      : getCurrentAnswer(questions[index].id)
+                        ? "bg-green-500"
+                        : "bg-gray-300"
                       }`}
                   />
                 ))}

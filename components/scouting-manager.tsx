@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useEffect } from "react"
@@ -6,11 +5,12 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { Plus, Copy, Check, Users, ClipboardList, BarChart3, Download, RefreshCw } from "lucide-react"
+import { Plus, Copy, Check, Users, ClipboardList, BarChart3, Download, RefreshCw, Search, AlertCircle, Calendar } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 
 interface ScoutingManagerProps {
@@ -20,12 +20,25 @@ interface ScoutingManagerProps {
   onSessionCreate?: (sessionCode: string) => void
 }
 
+// Original Event interface for data from /api/scouting/events
 interface Event {
   id: number
   name: string
   location: string
   date: string
   code: string
+}
+
+// New interface for richer data from the event search API /api/events/search
+interface SearchedEvent {
+  code: string
+  name: string
+  dateStart: string
+  dateEnd: string
+  venue: string
+  city: string
+  stateprov: string
+  country: string
 }
 
 interface Team {
@@ -83,6 +96,7 @@ export default function ScoutingManager({
 }: ScoutingManagerProps) {
   const { toast } = useToast()
 
+  // State for existing event list (used to display name after session creation)
   const [events, setEvents] = useState<Event[]>([])
   const [teams, setTeams] = useState<Team[]>([])
   const [session, setSession] = useState<ScoutingSession | null>(null)
@@ -99,22 +113,29 @@ export default function ScoutingManager({
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
 
+  // State for session creation form
   const [selectedEvent, setSelectedEvent] = useState(initialEventCode || "")
   const [managerName, setManagerName] = useState(initialManagerName || "")
   const [isCreatingSession, setIsCreatingSession] = useState(false)
+
+  // New state for event search functionality
+  const [searchTerm, setSearchTerm] = useState("")
+  const [searchedEvents, setSearchedEvents] = useState<SearchedEvent[]>([])
+  const [isSearching, setIsSearching] = useState(false)
+  const [searchError, setSearchError] = useState<string | null>(null)
 
   useEffect(() => {
     if (sessionId) {
       fetchSessionById(sessionId)
     } else {
-      fetchEvents()
+      // We no longer need to pre-load all events, search is now user-initiated.
       setLoading(false)
     }
   }, [sessionId])
 
   useEffect(() => {
     if (session) {
-      fetchEvents()
+      fetchEvents() // Still needed to get event name from code
       fetchTeamsForEvent(session.event_code || "")
       fetchQuestions()
       fetchAnswers()
@@ -125,6 +146,7 @@ export default function ScoutingManager({
 
   const fetchSessionById = async (sessionCode: string) => {
     try {
+      setLoading(true)
       const response = await fetch(`/api/scouting/sessions?code=${sessionCode}`)
       if (response.ok) {
         const sessionData = await response.json()
@@ -141,7 +163,7 @@ export default function ScoutingManager({
 
   const createSession = async () => {
     if (!managerName.trim() || !selectedEvent) {
-      toast({ title: "Error", description: "Please fill in all fields", variant: "destructive" })
+      toast({ title: "Error", description: "Please enter your name and select an event.", variant: "destructive" })
       return
     }
 
@@ -168,6 +190,7 @@ export default function ScoutingManager({
     }
   }
 
+  // This function now primarily serves to find an event's name from its code after a session is loaded.
   const fetchEvents = async () => {
     try {
       const response = await fetch("/api/scouting/events")
@@ -177,6 +200,32 @@ export default function ScoutingManager({
       }
     } catch (error) {
       console.error("Failed to fetch events:", error)
+    }
+  }
+
+  // New function to search for events, adapted from page.tsx
+  const searchEvents = async () => {
+    if (!searchTerm.trim()) return
+    setIsSearching(true)
+    setSearchError(null)
+    try {
+      const response = await fetch(`/api/events/search?q=${encodeURIComponent(searchTerm)}`)
+      const data = await response.json()
+      if (!response.ok) {
+        setSearchError(`Error: ${data.error || "Failed to search events"}`)
+        setSearchedEvents([])
+      } else {
+        const eventsData = data.events || []
+        setSearchedEvents(eventsData)
+        if (eventsData.length === 0) {
+          setSearchError(`No events found matching "${searchTerm}". Try a different query.`)
+        }
+      }
+    } catch (error) {
+      setSearchError("Failed to search events. Please check your connection and try again.")
+      setSearchedEvents([])
+    } finally {
+      setIsSearching(false)
     }
   }
 
@@ -381,27 +430,72 @@ export default function ScoutingManager({
                 onChange={(e) => setManagerName(e.target.value)}
               />
             </div>
+
+            {/* --- New Event Search UI --- */}
             <div className="space-y-2">
-              <Label htmlFor="event-select">Select Event</Label>
-              <Select value={selectedEvent} onValueChange={setSelectedEvent}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Choose an event" />
-                </SelectTrigger>
-                <SelectContent>
-                  {(events || []).length === 0 ? (
-                    <SelectItem value="no-events" disabled>
-                      No events available - Configure FTC API credentials
-                    </SelectItem>
+              <Label htmlFor="event-search">Search for Event</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="event-search"
+                  placeholder="Try: Championship, League Meet, or state"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && searchEvents()}
+                />
+                <Button onClick={searchEvents} disabled={isSearching}>
+                  {isSearching ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   ) : (
-                    (events || []).map((event) => (
-                      <SelectItem key={event.id} value={event.code}>
-                        {event.name} - {event.location}
-                      </SelectItem>
-                    ))
+                    <Search className="h-4 w-4" />
                   )}
-                </SelectContent>
-              </Select>
+                </Button>
+              </div>
             </div>
+
+            {searchError && (
+              <div className="p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
+                <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm">{searchError}</span>
+                </div>
+              </div>
+            )}
+
+            {searchedEvents.length > 0 && (
+              <div className="space-y-2 max-h-64 overflow-y-auto p-1">
+                <Label>Select an Event:</Label>
+                {searchedEvents.map((event) => (
+                  <Card
+                    key={event.code}
+                    className={`cursor-pointer hover:shadow-md transition-all ${selectedEvent === event.code
+                        ? "border-blue-500 ring-2 ring-blue-500"
+                        : "border-transparent"
+                      }`}
+                    onClick={() => setSelectedEvent(event.code)}
+                  >
+                    <CardContent className="p-3">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="secondary">{event.code}</Badge>
+                            <span className="text-xs text-muted-foreground">
+                              {new Date(event.dateStart).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <h4 className="font-semibold text-sm">{event.name}</h4>
+                          <p className="text-xs text-muted-foreground">
+                            {event.venue} • {event.city}, {event.stateprov}
+                          </p>
+                        </div>
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+            {/* --- End Event Search UI --- */}
+
             <Button
               onClick={createSession}
               disabled={!managerName.trim() || !selectedEvent || isCreatingSession}
@@ -586,7 +680,9 @@ export default function ScoutingManager({
                 <Label htmlFor="question-type">Question Type</Label>
                 <Select
                   value={newQuestion.type}
-                  onValueChange={(value: any) => setNewQuestion((prev) => ({ ...prev, type: value }))}
+                  onValueChange={(value: "text" | "number" | "boolean" | "select") =>
+                    setNewQuestion((prev) => ({ ...prev, type: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -720,9 +816,9 @@ export default function ScoutingManager({
                         </AccordionTrigger>
                         <AccordionContent>
                           <div className="space-y-3 pt-2">
-                            {teamAnswers.map((answer) => (
+                            {teamAnswers.map((answer, index) => (
                               <div
-                                key={`${answer.question_id}-${answer.team_id}`}
+                                key={`${answer.question_id}-${answer.team_id}-${index}`}
                                 className="border-l-4 border-blue-200 pl-4"
                               >
                                 <div className="font-medium">{answer.question_text}</div>
