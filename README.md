@@ -1,4 +1,5 @@
 # FTC Pitstop 🏎️
+
 [https://ftcpitstop.com/](https://ftcpitstop.com/)
 
 FTC Pitstop is a web application designed to help FIRST Tech Challenge teams analyze competition data and improve their strategy by providing a centralized display for their pit. It provides team comparison tools, match analysis, and ranking insights.
@@ -36,8 +37,15 @@ npm install
 yarn install
 ```
 
-3. Duplicate `.env.local.example`, rename to `.env.local`. Fill in your API user & pass.
+3. Duplicate `.env.local.example`, rename to `.env.local`. Fill in:
 
+```
+FTC_SEASON
+FTC_API_KEY
+FTC_USERNAME
+KV_REST_API_URL
+KV_REST_API_TOKEN
+```
 
 4. Start the development server
 

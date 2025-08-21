@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Monitor, Calculator, ClipboardPen, TestTube } from "lucide-react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Image from "next/image"
@@ -55,24 +55,22 @@ export default function HomePage() {
           </Link>
           <Link href="" className="hover:cursor-not-allowed">
             <Card className="hover:bg-border transition-colors hover:text-muted-foreground">
-              <CardTitle className="py-2 text-center items-center">
-
-                <div className="font-black text-2xl flex flex-row gap-2 items-center justify-self-center max-w-fit">
+              <CardTitle className="text-center items-center">
+                <div className="py-4 font-black text-2xl flex flex-row gap-2 items-center justify-self-center max-w-fit">
                   <ClipboardPen className="h-8 w-8 text-green-600" />
                   Scouting Client
                 </div>
               </CardTitle>
-              <CardHeader className="text-center items-center">
-                <div className="bg-red-600 rounded-sm w-fit justify-self-center ">
+              <CardContent className="text-center items-center">
+                <div className="bg-orange-600 rounded-sm w-fit justify-self-center ">
                   <h3 className="font-semibold mx-2">
-                    Unreleased :(
+                    Public Beta
                   </h3>
                 </div>
-              </CardHeader>
-              <CardContent className="text-center">
-
-                <p className="text-sm text-muted-foreground">Upcoming matches with smart notifications</p>
               </CardContent>
+              <CardDescription className="text-center">
+                <p className="text-sm text-muted-foreground">Upcoming matches with smart notifications</p>
+              </CardDescription>
             </Card>
           </Link>
           <Link href="" className="hover:cursor-not-allowed">
