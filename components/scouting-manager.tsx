@@ -150,7 +150,7 @@ export default function ScoutingManager({
         const sessionData = await response.json()
         setSession(sessionData)
       } else {
-        toast.error("Error", { description: "Session not found" })
+        toast.error("Session not found")
       }
     } catch (error) {
       toast.error("Failed to load session")
@@ -161,7 +161,7 @@ export default function ScoutingManager({
 
   const createSession = async () => {
     if (!managerName.trim() || !selectedEvent) {
-      toast({ title: "Error", description: "Please enter your name and select an event.", variant: "destructive" })
+      toast.error("Please enter your name and select an event.")
       return
     }
 
@@ -177,12 +177,12 @@ export default function ScoutingManager({
         const data = await response.json()
         setSession(data)
         onSessionCreate?.(data.session_code)
-        toast({ title: "Success!", description: `Session created with code: ${data.session_code}` })
+        toast.success("Success!", { description: `Session created with code: ${data.session_code}` })
       } else {
-        toast({ title: "Error", description: "Failed to create session", variant: "destructive" })
+        toast.error("Failed to create session")
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to create session", variant: "destructive" })
+      toast.error("Failed to create session")
     } finally {
       setIsCreatingSession(false)
     }
@@ -246,7 +246,7 @@ export default function ScoutingManager({
       const data = await response.json()
       setQuestions(data)
     } catch (error) {
-      toast({ title: "Error", description: "Failed to fetch questions", variant: "destructive" })
+      toast.error("Failed to fetch questions")
     }
   }
 
@@ -259,7 +259,7 @@ export default function ScoutingManager({
     } catch (error) {
       console.error("Failed to fetch answers:", error)
       setAnswers([])
-      toast({ title: "Error", description: "Failed to fetch answers", variant: "destructive" })
+      toast.error("Failed to fetch answers")
     }
   }
 
@@ -289,7 +289,7 @@ export default function ScoutingManager({
     setIsRefreshing(true)
     await Promise.all([fetchAnswers(), fetchConnectedScouts(), fetchAnalytics()])
     setIsRefreshing(false)
-    toast({ title: "Refreshed", description: "Data updated successfully" })
+    toast.info("Refreshed", { description: "Data updated successfully" })
   }
 
   const exportData = async (format: "json" | "csv") => {
@@ -321,9 +321,9 @@ export default function ScoutingManager({
         document.body.removeChild(a)
       }
 
-      toast({ title: "Exported", description: `Data exported as ${format.toUpperCase()}` })
+      toast.success("Exported", { description: `Data exported as ${format.toUpperCase()}` })
     } catch (error) {
-      toast({ title: "Error", description: "Failed to export data", variant: "destructive" })
+      toast.error("Failed to export data")
     }
   }
 
@@ -345,12 +345,12 @@ export default function ScoutingManager({
       if (response.ok) {
         setNewQuestion({ text: "", type: "text", options: [""] })
         fetchQuestions()
-        toast({ title: "Success", description: "Question added!" })
+        toast.success("Question added!")
       } else {
-        toast({ title: "Error", description: "Failed to add question", variant: "destructive" })
+        toast.error("Failed to add question")
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to add question", variant: "destructive" })
+      toast.error("Failed to add question")
     }
   }
 
@@ -359,14 +359,14 @@ export default function ScoutingManager({
       navigator.clipboard.writeText(session.session_code)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-      toast({ title: "Copied!", description: "Session code copied to clipboard" })
+      toast.success("Copied!", { description: "Session code copied to clipboard" })
     }
   }
 
   const copySessionUrl = () => {
     const url = `${window.location.origin}/scout/${session?.session_code}`
     navigator.clipboard.writeText(url)
-    toast({ title: "Copied!", description: "Scout URL copied to clipboard" })
+    toast.success("Copied!", { description: "Scout URL copied to clipboard" })
   }
 
   const addOption = () => {
@@ -648,7 +648,7 @@ export default function ScoutingManager({
                     })
                   }
                   fetchQuestions()
-                  toast({ title: "Success", description: "Default questions added!" })
+                  toast.success("Default questions added!")
                 }}
                 variant="outline"
                 className="w-full"
