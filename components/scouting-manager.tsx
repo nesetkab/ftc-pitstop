@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import { Plus, Copy, Check, Users, ClipboardList, BarChart3, Download, RefreshCw, Search, AlertCircle, Calendar } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { toast } from "sonner"
 
 interface ScoutingManagerProps {
   sessionId?: string
@@ -94,8 +94,6 @@ export default function ScoutingManager({
   managerName: initialManagerName,
   onSessionCreate,
 }: ScoutingManagerProps) {
-  const { toast } = useToast()
-
   // State for existing event list (used to display name after session creation)
   const [events, setEvents] = useState<Event[]>([])
   const [teams, setTeams] = useState<Team[]>([])
@@ -152,10 +150,10 @@ export default function ScoutingManager({
         const sessionData = await response.json()
         setSession(sessionData)
       } else {
-        toast({ title: "Error", description: "Session not found", variant: "destructive" })
+        toast.error("Error", { description: "Session not found" })
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to load session", variant: "destructive" })
+      toast.error("Failed to load session")
     } finally {
       setLoading(false)
     }
@@ -468,8 +466,8 @@ export default function ScoutingManager({
                   <Card
                     key={event.code}
                     className={`cursor-pointer hover:shadow-md transition-all ${selectedEvent === event.code
-                        ? "border-blue-500 ring-2 ring-blue-500"
-                        : "border-transparent"
+                      ? "border-blue-500 ring-2 ring-blue-500"
+                      : "border-transparent"
                       }`}
                     onClick={() => setSelectedEvent(event.code)}
                   >

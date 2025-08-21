@@ -10,7 +10,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ArrowLeft, Send, Smartphone, CheckCircle } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
 
 interface ScoutingSession {
   id: number

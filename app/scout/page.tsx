@@ -18,7 +18,7 @@ interface ScoutingSession {
   event_id: number
   manager_name: string
   is_active: boolean
-  event_code: string // Added event_code to ScoutingSession interface
+  event_code: string
 }
 
 interface Team {
@@ -50,7 +50,6 @@ export default function ScoutingClient() {
   const [sessionCode, setSessionCode] = useState("")
   const [scoutName, setScoutName] = useState("")
   const [session, setSession] = useState<ScoutingSession | null>(null)
-  const [activeSessions, setActiveSessions] = useState<ScoutingSession[]>([])
   const [teams, setTeams] = useState<Team[]>([])
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
@@ -140,7 +139,7 @@ export default function ScoutingClient() {
     } catch (error) {
       console.error("❌ Teams fetch error:", error)
       setTeams([])
-      toast.error("Error", { description: "Failed to fetch teams" })
+      toast.error("Failed to fetch teams")
     }
   }
 
@@ -160,7 +159,7 @@ export default function ScoutingClient() {
     } catch (error) {
       console.error("❌ Questions fetch error:", error)
       setQuestions([])
-      toast.error("Error", { description: "Failed to fetch questions" })
+      toast.error("Failed to fetch questions")
     }
   }
 
@@ -170,7 +169,7 @@ export default function ScoutingClient() {
 
     if (!sessionCode.trim() || !scoutName.trim()) {
       console.log("❌ Validation failed - missing session code or name")
-      toast.error("Error", { description: "Please enter both session code and your name" })
+      toast.error("Please enter both session code and your name")
       return
     }
 
@@ -186,13 +185,13 @@ export default function ScoutingClient() {
         router.push(`/scout/${sessionData.session_code}`)
       } else {
         const errorText = await response.text()
-        toast.error("Error", { description: "Invalid session code" })
+        toast.error("Invalid session code")
 
         console.log("❌ Session lookup failed:", response.status, errorText)
       }
     } catch (error) {
       console.error("❌ Connection error:", error)
-      toast.error("Error", { description: "Failed to connect to session" })
+      toast.error("Failed to connect to session")
     }
   }
 
@@ -243,9 +242,9 @@ export default function ScoutingClient() {
       }
 
       setStep("complete")
-      toast.success("Success!", { description: "Your scouting data has been submitted" })
+      toast.success("Your scouting data has been submitted")
     } catch (error) {
-      toast.error("Error", { description: "Failed to submit answers" })
+      toast.error("Failed to submit answers")
     } finally {
       setIsSubmitting(false)
     }
@@ -264,7 +263,6 @@ export default function ScoutingClient() {
     setSelectedTeam(null)
     setStep("connect")
     setSessionCode("")
-    setActiveSessions([])
     setTeams([])
     setQuestions([])
     setAnswers([])
