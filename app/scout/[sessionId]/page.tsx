@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { ArrowLeft, Send, Smartphone, CheckCircle } from "lucide-react"
+import { toast } from "sonner"
 
 interface ScoutingSession {
   id: number
@@ -48,7 +49,6 @@ export default function ScoutSession() {
   const params = useParams()
   const router = useRouter()
   const sessionId = params.sessionId as string
-  const { toast } = useToast()
 
   const [step, setStep] = useState<Step>("connect")
   const [scoutName, setScoutName] = useState("")
@@ -88,11 +88,11 @@ export default function ScoutSession() {
         setSession(sessionData)
         setStep("connect")
       } else {
-        toast({ title: "Error", description: "Session not found", variant: "destructive" })
+        toast.error("Session not found")
         router.push("/scout")
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to load session", variant: "destructive" })
+      toast.error("Failed to load session")
       router.push("/scout")
     } finally {
       setLoading(false)
@@ -109,11 +109,11 @@ export default function ScoutSession() {
         setTeams(Array.isArray(data) ? data : [])
       } else {
         setTeams([])
-        toast({ title: "Warning", description: "Failed to fetch teams", variant: "destructive" })
+        toast.warning("Failed to fetch teams")
       }
     } catch (error) {
       setTeams([])
-      toast({ title: "Error", description: "Failed to fetch teams", variant: "destructive" })
+      toast.error("Failed to fetch teams")
     }
   }
 
@@ -129,13 +129,13 @@ export default function ScoutSession() {
       }
     } catch (error) {
       setQuestions([])
-      toast({ title: "Error", description: "Failed to fetch questions", variant: "destructive" })
+      toast.error("Failed to fetch questions")
     }
   }
 
   const joinSession = async () => {
     if (!scoutName.trim() || !session) {
-      toast({ title: "Error", description: "Please enter your name", variant: "destructive" })
+      toast.error("Please enter your name")
       return
     }
 
@@ -148,12 +148,12 @@ export default function ScoutSession() {
 
       if (scoutResponse.ok) {
         setStep("team-select")
-        toast({ title: "Connected!", description: `Connected to ${session.manager_name}'s session` })
+        toast.success("Connected!", { description: `Connected to ${session.manager_name}'s session` })
       } else {
-        toast({ title: "Error", description: "Failed to join session", variant: "destructive" })
+        toast.error("Failed to join session")
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to join session", variant: "destructive" })
+      toast.error("Failed to join session")
     }
   }
 
@@ -204,9 +204,9 @@ export default function ScoutSession() {
       }
 
       setStep("complete")
-      toast({ title: "Success!", description: "Your scouting data has been submitted" })
+      toast.success("Your scouting data has been submitted")
     } catch (error) {
-      toast({ title: "Error", description: "Failed to submit answers", variant: "destructive" })
+      toast.error("Failed to submit answers")
     } finally {
       setIsSubmitting(false)
     }
