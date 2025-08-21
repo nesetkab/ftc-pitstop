@@ -229,7 +229,7 @@ export default function ScoutingManager({
 
   const fetchTeamsForEvent = async (eventCode: string) => {
     try {
-      const response = await fetch(`/api/scouting/teams?eventCode=${eventCode}`)
+      const response = await fetch(`/api/events/${eventCode}/teams`)
       if (response.ok) {
         const data = await response.json()
         setTeams(Array.isArray(data) ? data : [])

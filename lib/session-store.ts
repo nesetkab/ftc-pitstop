@@ -241,37 +241,7 @@ class SessionStore {
     })
   }
 
-  async getEvents(): Promise<Event[]> {
-    const cached = (await redis.get(REDIS_KEYS.EVENTS)) as { events: Event[]; timestamp: number } | null
-    const now = Date.now()
-    const cacheTimeout = 5 * 60 * 1000 // 5 minutes
 
-    if (!cached || now - cached.timestamp > cacheTimeout) {
-      try {
-        const { ftcAPI } = await import("./ftc-api")
-        const ftcEvents = await ftcAPI.getEvents(2024)
-
-        const events: Event[] = ftcEvents.map((event) => ({
-          id: event.code,
-          code: event.code,
-          name: event.name,
-          location: `${event.city}, ${event.stateprov}`,
-          venue: event.venue || event.address,
-          date: event.dateStart,
-          city: event.city,
-          state: event.stateprov,
-        }))
-
-        await redis.set(REDIS_KEYS.EVENTS, { events, timestamp: now })
-        return events
-      } catch (error) {
-        console.error("Failed to fetch events from FTC API:", error)
-        return cached?.events || []
-      }
-    }
-
-    return cached.events
-  }
 
   async getTeams(eventCode?: string): Promise<Team[]> {
     if (!eventCode) {
@@ -285,18 +255,25 @@ class SessionStore {
 
     if (!cached || now - cached.timestamp > cacheTimeout) {
       try {
-        const { ftcAPI } = await import("./ftc-api")
-        const ftcTeams = await ftcAPI.getTeams(2024, eventCode)
+        const response = await fetch(`/api/events/${eventCode}/teams`);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.details || `API failed with status ${response.status}`);
+        }
+
+        const data: { teams: Team[] } = await response.json();
+        const ftcTeams = data.teams || [];
 
         const teams: Team[] = ftcTeams.map((team) => ({
-          id: team.teamNumber,
-          team_number: team.teamNumber,
-          team_name: team.nameFull,
-          name_short: team.nameShort,
-          school: team.schoolName,
+          id: team.team_number,
+          team_number: team.team_number,
+          team_name: team.name_short,
+          name_short: team.team_name,
+          school: team.school,
           city: team.city,
-          state: team.stateProv,
-        }))
+          state: team.state,
+        }));
 
         await redis.set(REDIS_KEYS.TEAMS(eventCode), { teams, timestamp: now })
         return teams
