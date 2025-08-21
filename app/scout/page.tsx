@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useParams, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -9,8 +9,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { ArrowLeft, Send, Smartphone, CheckCircle } from "lucide-react"
-import { useToast } from "@/hooks/use-toast"
+import { ArrowLeft, Send, Smartphone, Users, CheckCircle } from "lucide-react"
+import { toast } from "sonner"
 
 interface ScoutingSession {
   id: number
@@ -18,7 +18,7 @@ interface ScoutingSession {
   event_id: number
   manager_name: string
   is_active: boolean
-  event_code: string
+  event_code: string // Added event_code to ScoutingSession interface
 }
 
 interface Team {
@@ -43,30 +43,55 @@ interface Answer {
   value: string
 }
 
-type Step = "connect" | "team-select" | "scouting" | "complete"
+type Step = "connect" | "session-list" | "team-select" | "scouting" | "complete"
 
-export default function ScoutSession() {
-  const params = useParams()
-  const router = useRouter()
-  const sessionId = params.sessionId as string
-  const { toast } = useToast()
-
+export default function ScoutingClient() {
   const [step, setStep] = useState<Step>("connect")
+  const [sessionCode, setSessionCode] = useState("")
   const [scoutName, setScoutName] = useState("")
   const [session, setSession] = useState<ScoutingSession | null>(null)
+  const [activeSessions, setActiveSessions] = useState<ScoutingSession[]>([])
   const [teams, setTeams] = useState<Team[]>([])
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
   const [answers, setAnswers] = useState<Answer[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
-    if (sessionId) {
-      fetchSessionByCode(sessionId)
+    // Load session from localStorage on page load
+    const savedSession = localStorage.getItem("ftc-scout-session")
+    const savedScoutName = localStorage.getItem("ftc-scout-name")
+    const savedTeam = localStorage.getItem("ftc-scout-team")
+    const savedStep = localStorage.getItem("ftc-scout-step")
+
+    if (savedSession && savedScoutName) {
+      try {
+        const sessionData = JSON.parse(savedSession)
+        const teamData = savedTeam ? JSON.parse(savedTeam) : null
+
+        setSession(sessionData)
+        setScoutName(savedScoutName)
+        if (teamData) {
+          setSelectedTeam(teamData)
+        }
+        if (savedStep) {
+          setStep(savedStep as Step)
+        } else if (teamData) {
+          setStep("scouting")
+        } else {
+          setStep("team-select")
+        }
+      } catch (error) {
+        console.error("Failed to restore scout session from localStorage:", error)
+        localStorage.removeItem("ftc-scout-session")
+        localStorage.removeItem("ftc-scout-name")
+        localStorage.removeItem("ftc-scout-team")
+        localStorage.removeItem("ftc-scout-step")
+      }
     }
-  }, [sessionId])
+  }, [])
 
   useEffect(() => {
     if (session) {
@@ -81,80 +106,93 @@ export default function ScoutSession() {
     }
   }, [questions])
 
-  const fetchSessionByCode = async (code: string) => {
-    try {
-      const response = await fetch(`/api/scouting/sessions?code=${code.toUpperCase()}`)
-      if (response.ok) {
-        const sessionData = await response.json()
-        setSession(sessionData)
-        setStep("connect")
-      } else {
-        toast({ title: "Error", description: "Session not found", variant: "destructive" })
-        router.push("/scout")
-      }
-    } catch (error) {
-      toast({ title: "Error", description: "Failed to load session", variant: "destructive" })
-      router.push("/scout")
-    } finally {
-      setLoading(false)
+  useEffect(() => {
+    if (session && scoutName) {
+      localStorage.setItem("ftc-scout-session", JSON.stringify(session))
+      localStorage.setItem("ftc-scout-name", scoutName)
+      localStorage.setItem("ftc-scout-step", step)
     }
-  }
+  }, [session, scoutName, step])
+
+  useEffect(() => {
+    if (selectedTeam) {
+      localStorage.setItem("ftc-scout-team", JSON.stringify(selectedTeam))
+    } else {
+      localStorage.removeItem("ftc-scout-team")
+    }
+  }, [selectedTeam])
 
   const fetchTeams = async () => {
     if (!session) return
 
     try {
-      const response = await fetch(`/api/events/${session.event_code}/teams`)
+      console.log("📡 Fetching teams for event:", session.event_code)
+      const response = await fetch(`/api/teams?eventCode=${session.event_code}`)
       if (response.ok) {
         const data = await response.json()
+        console.log("📡 Teams data received:", data)
         setTeams(Array.isArray(data) ? data : [])
       } else {
+        console.error("❌ Teams API error:", response.status)
         setTeams([])
-        toast({ title: "Warning", description: "Failed to fetch teams", variant: "destructive" })
+        toast.warning("Warning", { description: "Failed to fetch teams" })
       }
     } catch (error) {
+      console.error("❌ Teams fetch error:", error)
       setTeams([])
-      toast({ title: "Error", description: "Failed to fetch teams", variant: "destructive" })
+      toast.error("Error", { description: "Failed to fetch teams" })
     }
   }
 
   const fetchQuestions = async () => {
     if (!session) return
     try {
-      const response = await fetch(`/api/scouting/questions?sessionId=${session.id}`)
+      console.log("📡 Fetching questions for session:", session.id)
+      const response = await fetch(`/api/questions?sessionId=${session.id}`)
       if (response.ok) {
         const data = await response.json()
+        console.log("📡 Questions data received:", data)
         setQuestions(Array.isArray(data) ? data : [])
       } else {
+        console.error("❌ Questions API error:", response.status)
         setQuestions([])
       }
     } catch (error) {
+      console.error("❌ Questions fetch error:", error)
       setQuestions([])
-      toast({ title: "Error", description: "Failed to fetch questions", variant: "destructive" })
+      toast.error("Error", { description: "Failed to fetch questions" })
     }
   }
 
-  const joinSession = async () => {
-    if (!scoutName.trim() || !session) {
-      toast({ title: "Error", description: "Please enter your name", variant: "destructive" })
+  const connectToSession = async () => {
+    console.log("🔗 Connect button clicked!")
+    console.log("📝 Session code:", sessionCode, "Scout name:", scoutName)
+
+    if (!sessionCode.trim() || !scoutName.trim()) {
+      console.log("❌ Validation failed - missing session code or name")
+      toast.error("Error", { description: "Please enter both session code and your name" })
       return
     }
 
     try {
-      const scoutResponse = await fetch("/api/scouting/scouts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionCode: session.session_code, scoutName }),
-      })
+      console.log("📡 Attempting to connect to session:", sessionCode.toUpperCase())
+      const response = await fetch(`/api/sessions?code=${sessionCode.toUpperCase()}`)
+      console.log("📡 Session response status:", response.status)
 
-      if (scoutResponse.ok) {
-        setStep("team-select")
-        toast({ title: "Connected!", description: `Connected to ${session.manager_name}'s session` })
+      if (response.ok) {
+        const sessionData = await response.json()
+        console.log("📡 Session data received:", sessionData)
+
+        router.push(`/scout/${sessionData.session_code}`)
       } else {
-        toast({ title: "Error", description: "Failed to join session", variant: "destructive" })
+        const errorText = await response.text()
+        toast.error("Error", { description: "Invalid session code" })
+
+        console.log("❌ Session lookup failed:", response.status, errorText)
       }
     } catch (error) {
-      toast({ title: "Error", description: "Failed to join session", variant: "destructive" })
+      console.error("❌ Connection error:", error)
+      toast.error("Error", { description: "Failed to connect to session" })
     }
   }
 
@@ -190,7 +228,7 @@ export default function ScoutSession() {
     try {
       for (const answer of answers) {
         if (answer.value.trim()) {
-          await fetch("/api/scouting/answers", {
+          await fetch("/api/answers", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -205,9 +243,9 @@ export default function ScoutSession() {
       }
 
       setStep("complete")
-      toast({ title: "Success!", description: "Your scouting data has been submitted" })
+      toast.success("Success!", { description: "Your scouting data has been submitted" })
     } catch (error) {
-      toast({ title: "Error", description: "Failed to submit answers", variant: "destructive" })
+      toast.error("Error", { description: "Failed to submit answers" })
     } finally {
       setIsSubmitting(false)
     }
@@ -218,6 +256,24 @@ export default function ScoutSession() {
     setCurrentQuestionIndex(0)
     setAnswers(questions.map((q) => ({ questionId: q.id, value: "" })))
     setStep("team-select")
+  }
+
+  const clearSession = () => {
+    setSession(null)
+    setScoutName("")
+    setSelectedTeam(null)
+    setStep("connect")
+    setSessionCode("")
+    setActiveSessions([])
+    setTeams([])
+    setQuestions([])
+    setAnswers([])
+    setCurrentQuestionIndex(0)
+    localStorage.removeItem("ftc-scout-session")
+    localStorage.removeItem("ftc-scout-name")
+    localStorage.removeItem("ftc-scout-team")
+    localStorage.removeItem("ftc-scout-step")
+    toast.info("Session Cleared", { description: "Disconnected from session" })
   }
 
   const renderQuestion = (question: Question) => {
@@ -284,46 +340,19 @@ export default function ScoutSession() {
     }
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-4 flex items-center justify-center">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <div className="text-lg">Loading session...</div>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-4 flex items-center justify-center">
-        <Card>
-          <CardContent className="p-8 text-center space-y-4">
-            <div className="text-lg">Session not found</div>
-            <Button onClick={() => router.push("/scout")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Scout
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-md mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
             <Smartphone className="h-8 w-8 text-blue-600" />
-            <h1 className="text-3xl font-bold text-gray-900">FTC Scout</h1>
-            <Button variant="ghost" size="sm" onClick={() => router.push("/scout")} className="ml-2">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
+            <h1 className="text-3xl font-bold text-white">scouter client</h1>
+            {session && (
+              <Button variant="ghost" size="sm" onClick={clearSession} className="ml-2">
+                Disconnect
+              </Button>
+            )}
           </div>
           <p className="text-gray-600">Mobile scouting client</p>
         </div>
@@ -332,10 +361,11 @@ export default function ScoutSession() {
         {step === "connect" && (
           <Card>
             <CardHeader>
-              <CardTitle>Join Session</CardTitle>
-              <CardDescription>
-                Session: {session.session_code} - {session.manager_name}
-              </CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Connect to Session
+              </CardTitle>
+              <CardDescription>Enter your name and session code</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -348,8 +378,26 @@ export default function ScoutSession() {
                   className="text-lg"
                 />
               </div>
-              <Button onClick={joinSession} className="w-full text-lg py-6" disabled={!scoutName.trim()}>
-                Join Session
+
+
+
+              <div className="space-y-2">
+                <Label htmlFor="session-code">Session Code</Label>
+                <Input
+                  id="session-code"
+                  placeholder="Enter 6-character code"
+                  value={sessionCode}
+                  onChange={(e) => setSessionCode(e.target.value.toUpperCase())}
+                  maxLength={6}
+                  className="text-lg text-center font-mono tracking-wider"
+                />
+              </div>
+              <Button
+                onClick={connectToSession}
+                className="w-full text-lg py-6"
+                disabled={!scoutName.trim() || !sessionCode.trim()}
+              >
+                Connect to Session
               </Button>
             </CardContent>
           </Card>
@@ -496,7 +544,7 @@ export default function ScoutSession() {
                 <Button onClick={startNewScouting} className="w-full py-6">
                   Scout Another Team
                 </Button>
-                <Button variant="outline" onClick={() => router.push("/scout")} className="w-full">
+                <Button variant="outline" onClick={() => setStep("connect")} className="w-full">
                   Join Different Session
                 </Button>
               </div>

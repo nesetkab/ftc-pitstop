@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     }
 
     const season = process.env.FTC_SEASON || "2024"
-    const username = process.env.FTC_API_USERNAME
+    const username = process.env.FTC_USERNAME
     const apiKey = process.env.FTC_API_KEY
 
     if (!username || !apiKey) {

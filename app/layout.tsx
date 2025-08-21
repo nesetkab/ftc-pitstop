@@ -1,14 +1,11 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { Analytics } from "@vercel/analytics/next"
-import Footer from "@/components/footer"
-import { BetaBanner } from "@/components/beta-banner"
-const inter = Inter({ subsets: ["latin"] })
 import "@radix-ui/themes/styles.css";
 import { Theme } from '@radix-ui/themes'
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: "Pitstop - FTC Pit Display",
@@ -54,7 +51,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </Theme>
-
+        <Toaster position="top-center" />
       </body>
       < Analytics />
     </html>

@@ -94,11 +94,11 @@ class SessionStore {
   async createSession(eventCode: string, managerName: string): Promise<ScoutingSession> {
     await this.initializeCounters()
 
-    console.log("[v0] 🏗️ Creating session in Redis:", { eventCode, managerName })
+    console.log("🏗️ Creating session in Redis:", { eventCode, managerName })
 
     const sessionCode = await this.generateSessionCode()
     const sessionId = await this.getNextId("sessionId")
-    console.log("[v0] 🎲 Generated session code:", sessionCode)
+    console.log("🎲 Generated session code:", sessionCode)
 
     const now = new Date().toISOString()
     const newSession: ScoutingSession = {
@@ -115,23 +115,25 @@ class SessionStore {
     await redis.set(REDIS_KEYS.SESSION(sessionCode), newSession)
     await redis.sadd(REDIS_KEYS.SESSIONS_LIST, sessionCode)
 
-    console.log("[v0] ✅ Session created and stored in Redis:", newSession)
+    console.log("✅ Session created and stored in Redis:", newSession)
 
     return newSession
   }
 
   async getSessionByCode(code: string): Promise<ScoutingSession | null> {
-    console.log("[v0] 🔍 Looking for session with code in Redis:", code)
+    console.log("🔍 Looking for session with code in Redis:", code)
 
-    const session = (await redis.get(REDIS_KEYS.SESSION(code))) as ScoutingSession | null
+    const session = await redis.hgetall(
+      REDIS_KEYS.SESSION(code)
+    ) as ScoutingSession | null;
 
     if (session && session.is_active) {
-      console.log("[v0] ✅ Session found in Redis:", session)
+      console.log("✅ Session found in Redis:", session)
       session.last_activity = new Date().toISOString()
       await redis.set(REDIS_KEYS.SESSION(code), session)
       return session
     } else {
-      console.log("[v0] ❌ Session not found or inactive in Redis")
+      console.log("❌ Session not found or inactive in Redis")
       return null
     }
   }
@@ -148,7 +150,7 @@ class SessionStore {
   }
 
   async getAllActiveSessions(): Promise<ScoutingSession[]> {
-    console.log("[v0] 📋 Getting all active sessions from Redis")
+    console.log("📋 Getting all active sessions from Redis")
 
     const sessionCodes = (await redis.smembers(REDIS_KEYS.SESSIONS_LIST)) as string[]
     const sessions: ScoutingSession[] = []
@@ -162,7 +164,7 @@ class SessionStore {
       }
     }
 
-    console.log("[v0] 📊 Active sessions from Redis:", sessions.length)
+    console.log("📊 Active sessions from Redis:", sessions.length)
     return sessions
   }
 

@@ -1,4 +1,3 @@
-
 import { type NextRequest, NextResponse } from "next/server"
 import { Redis } from "@upstash/redis"
 
@@ -48,7 +47,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Session code required" }, { status: 400 })
     }
 
-    const session = await redis.hgetall(`session:${sessionCode.toUpperCase()}`)
+    const session = await redis.get(`session:${sessionCode.toUpperCase()}`)
 
     if (!session || Object.keys(session).length === 0) {
       return NextResponse.json({ error: "Session not found or inactive" }, { status: 404 })
