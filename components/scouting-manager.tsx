@@ -20,7 +20,6 @@ interface ScoutingManagerProps {
   onSessionCreate?: (sessionCode: string) => void
 }
 
-// Original Event interface for data from /api/scouting/events
 interface Event {
   id: number
   name: string
@@ -29,7 +28,6 @@ interface Event {
   code: string
 }
 
-// New interface for richer data from the event search API /api/events/search
 interface SearchedEvent {
   code: string
   name: string
@@ -42,12 +40,10 @@ interface SearchedEvent {
 }
 
 interface Team {
-  id: number
-  team_number: number
-  team_name: string
-  school: string
-  city: string
-  state: string
+  teamNumber: number
+  nameShort: string
+  nameFull: string
+  displayLocation: string
 }
 
 interface Question {
@@ -232,7 +228,11 @@ export default function ScoutingManager({
       const response = await fetch(`/api/events/${eventCode}/teams`)
       if (response.ok) {
         const data = await response.json()
-        setTeams(Array.isArray(data) ? data : [])
+        setTeams(data.teams || [])
+        console.log(data.teams)
+      } else {
+        const errorText = await response.text()
+        throw new Error(`API Error: ${response.status} - ${errorText}`)
       }
     } catch (error) {
       console.error("Failed to fetch teams:", error)
@@ -397,7 +397,7 @@ export default function ScoutingManager({
   const getAnsweredTeams = () => {
     const safeAnswers = Array.isArray(answers) ? answers : []
     const teamIds = [...new Set(safeAnswers.map((a) => a.team_id))]
-    return Array.isArray(teams) ? teams.filter((team) => teamIds.includes(team.id)) : []
+    return Array.isArray(teams) ? teams.filter((team) => teamIds.includes(team.teamNumber)) : []
   }
 
   if (loading) {
@@ -758,8 +758,8 @@ export default function ScoutingManager({
         <TabsContent value="teams">
           <Card>
             <CardHeader>
-              <CardTitle>Registered Teams ({(teams || []).length})</CardTitle>
-              <CardDescription>Teams available for scouting</CardDescription>
+              <CardTitle>Teams ({(teams || []).length})</CardTitle>
+              <CardDescription>Teams at this event</CardDescription>
             </CardHeader>
             <CardContent>
               {(teams || []).length === 0 ? (
@@ -770,13 +770,13 @@ export default function ScoutingManager({
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(teams || []).map((team) => (
-                    <div key={team.id} className="p-4 border rounded-lg">
-                      <div className="font-bold text-lg">#{team.team_number}</div>
-                      <div className="font-medium">{team.team_name}</div>
-                      <div className="text-sm text-gray-600">{team.school}</div>
+                  {(teams || []).map((team: Team) => (
+                    <div key={team.teamNumber} className="p-4 border rounded-lg">
+                      <div className="font-bold text-lg">#{team.teamNumber}</div>
+                      <div className="font-medium">{team.nameShort}</div>
+                      <div className="text-sm text-gray-600">{team.nameFull}</div>
                       <div className="text-sm text-gray-500">
-                        {team.city}, {team.state}
+                        {team.displayLocation}
                       </div>
                     </div>
                   ))}
@@ -801,13 +801,13 @@ export default function ScoutingManager({
               ) : (
                 <Accordion type="single" collapsible className="space-y-2">
                   {getAnsweredTeams().map((team) => {
-                    const teamAnswers = getTeamAnswers(team.id)
+                    const teamAnswers = getTeamAnswers(team.teamNumber)
                     return (
-                      <AccordionItem key={team.id} value={team.id.toString()}>
+                      <AccordionItem key={team.teamNumber} value={team.teamNumber.toString()}>
                         <AccordionTrigger className="text-left">
                           <div>
                             <div className="font-bold">
-                              #{team.team_number} - {team.team_name}
+                              #{team.teamNumber} - {team.nameShort}
                             </div>
                             <div className="text-sm text-gray-600">{teamAnswers.length} responses</div>
                           </div>

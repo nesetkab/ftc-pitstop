@@ -152,15 +152,14 @@ class SessionStore {
   async getAllActiveSessions(): Promise<ScoutingSession[]> {
     console.log("📋 Getting all active sessions from Redis")
 
-    const sessionCodes = (await redis.smembers(REDIS_KEYS.SESSIONS_LIST)) as string[]
+    const sessionCodes = await redis.smembers(REDIS_KEYS.SESSIONS_LIST);
+    console.log(sessionCodes)
     const sessions: ScoutingSession[] = []
 
     for (const code of sessionCodes) {
-      const session = (await redis.get(REDIS_KEYS.SESSION(code))) as ScoutingSession | null
-      if (session && session.is_active) {
+      const session = await redis.get(code) as ScoutingSession | null
+      if (session) {
         sessions.push(session)
-      } else if (session && !session.is_active) {
-        await redis.srem(REDIS_KEYS.SESSIONS_LIST, code)
       }
     }
 
@@ -325,9 +324,8 @@ class SessionStore {
     }
   }
 
-  async getConnectedScouts(sessionId: number): Promise<string[]> {
-    const allSessions = await this.getAllActiveSessions()
-    const session = allSessions.find((s) => s.id === sessionId)
+  async getConnectedScouts(code: string): Promise<string[]> {
+    const session = await redis.hgetall(REDIS_KEYS.SESSION(code)) as ScoutingSession | null
     return session?.connected_scouts || []
   }
 }

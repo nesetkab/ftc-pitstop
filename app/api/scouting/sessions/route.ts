@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
     // Store session in Redis
     await redis.hset(`session:${sessionCode}`, session)
-    await redis.sadd("active_sessions", sessionCode)
+    await redis.sadd("sessions:active", `session:${sessionCode}`)
     return NextResponse.json(session)
   } catch (error) {
     console.error("Session creation error:", error)
