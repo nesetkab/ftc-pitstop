@@ -518,26 +518,26 @@ export default function ScoutingManager({
                 onChange={(e) => setManagerName(e.target.value)}
               />
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="event-search">Search for Event</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="event-search"
-                  placeholder="Try: Championship, League Meet, or state"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                />
-                <Button onClick={searchEvents} disabled={isSearching || !searchTerm.trim()}>
-                  {isSearching ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  ) : (
-                    <Search className="h-4 w-4" />
-                  )}
-                </Button>
-              </div>
-            </div>
+            {!initialEventCode &&
+              <div className="space-y-2">
+                <Label htmlFor="event-search">Search for Event</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="event-search"
+                    placeholder="Try: Championship, League Meet, or state"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                  />
+                  <Button onClick={searchEvents} disabled={isSearching || !searchTerm.trim()}>
+                    {isSearching ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    ) : (
+                      <Search className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>}
 
             {searchError && (
               <div className="p-3 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">

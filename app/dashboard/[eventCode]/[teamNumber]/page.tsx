@@ -10,7 +10,9 @@ import {
   Bell,
   RefreshCw,
   AlertCircle,
-  Settings
+  Settings,
+  Monitor,
+  ClipboardPen,
 } from "lucide-react"
 import Link from "next/link"
 import { ModularDashboard } from "@/components/dashboard"
@@ -21,8 +23,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import ScoutingManager from "@/components/scouting-manager"
+import IconSwitch from "@/components/ui/icon_switch"
 import { useSearchParams } from 'next/navigation'
 
 interface TeamData {
@@ -94,14 +96,12 @@ export interface Alliance {
   name?: string
 }
 
-
-
 export default function DashboardPage() {
   const params = useParams()
   const eventCode = params.eventCode as string
   const teamNumber = Number.parseInt(params.teamNumber as string)
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null)
-  const [matches, setMatches] = useState<Match[]>([])
+  const [selectedView, setSelectedView] = useState<string>('dashboard');
   const [rankings, setRankings] = useState<Ranking[]>([])
   const [alliances, setAlliances] = useState<Alliance[]>([])
   const [loading, setLoading] = useState(true)
@@ -111,6 +111,7 @@ export default function DashboardPage() {
   const [teamName, setTeamName] = useState<string | null>(null);
   const searchParams = useSearchParams()
   const sessionId = searchParams.get('sessionId')
+
 
   useEffect(() => {
     const storedDataString = localStorage.getItem('selectedTeam');
@@ -247,7 +248,6 @@ export default function DashboardPage() {
       }
 
       setTeamStats(statsData.stats)
-      setMatches(matchesData.matches || [])
       setRankings(rankingsData.rankings || [])
       setAlliances(alliancesData.alliances || [])
 
@@ -276,110 +276,6 @@ export default function DashboardPage() {
     (a) => a.captain === teamNumber || a.round1 === teamNumber || a.round2 === teamNumber || a.backup === teamNumber,
   )
 
-  // Separate matches by type
-  const qualificationMatches = matches.filter(
-    (m) => m.tournamentLevel === "Qualification" || m.description.toLowerCase().includes("qual"),
-  )
-  const playoffMatches = matches.filter(
-    (m) => m.tournamentLevel !== "Qualification" && !m.description.toLowerCase().includes("qual"),
-  )
-
-  const playedQualMatches = qualificationMatches.filter((m) => m.played)
-  const upcomingQualMatches = qualificationMatches.filter((m) => !m.played)
-  const playedPlayoffMatches = playoffMatches.filter((m) => m.played)
-  const upcomingPlayoffMatches = playoffMatches.filter((m) => !m.played)
-
-  const getMatchResult = (match: Match) => {
-    const isRed = match.red1 === teamNumber || match.red2 === teamNumber
-    const isBlue = match.blue1 === teamNumber || match.blue2 === teamNumber
-
-    if (!match.played) return "upcoming"
-
-    if (isRed) {
-      if (match.redScore > match.blueScore) return "win"
-      if (match.redScore < match.blueScore) return "loss"
-      return "tie"
-    } else if (isBlue) {
-      if (match.blueScore > match.redScore) return "win"
-      if (match.blueScore < match.redScore) return "loss"
-      return "tie"
-    }
-    return "unknown"
-  }
-
-  const MatchCard = ({ match, showAlliance = false }: { match: Match; showAlliance?: boolean }) => {
-    const result = getMatchResult(match)
-    const isRed = match.red1 === teamNumber || match.red2 === teamNumber
-    const isBlue = match.blue1 === teamNumber || match.blue2 === teamNumber
-
-    return (
-      <Link className="" href={match.played ? `https://ftcscout.org/events/2024/${eventCode}/matches?scores=${eventCode}-${match.tournamentLevel == "PLAYOFF" && match.series ? (20 + match.series).toString().concat("001") : match.matchNumber}` : ""} target={match.played ? "_blank" : ""}>
-        <div className={match.played ? "mt-2 mb-2 rounded-lg p-4 space-y-3 border hover:border-purple-400" : "mt-2 mb-2 rounded-lg p-4 space-y-3"}>
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="font-semibold">{match.description}</div>
-              {match.startTime && (
-                <div className="text-sm text-muted-foreground">{new Date(match.startTime).toLocaleTimeString()}</div>
-              )}
-            </div>
-            <div className="text-right">
-              <Badge variant="outline">Match {match.tournamentLevel == "PLAYOFF" && match.series ? match.series : match.matchNumber}</Badge>
-              {match.played && (
-                <Badge
-                  variant={result === "win" ? "win" : result === "loss" ? "destructive" : "tie"}
-                  className="ml-2 "
-                >
-                  {result.toUpperCase()}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {/* Red Alliance */}
-            <div
-              className={`p-3 rounded-lg ${isRed ? "bg-red-100 dark:bg-red-900 border-2 border-red-300" : "bg-red-50 dark:bg-red-950"}`}
-            >
-              <div className="text-center">
-                <div className="text-sm font-semibold text-red-700 dark:text-red-300 mb-2">Red Alliance</div>
-                <div className="space-y-1">
-                  <div className={`${match.red1 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.red1}
-                  </div>
-                  <div className={`${match.red2 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.red2}
-                  </div>
-                </div>
-                {match.played && (
-                  <div className="text-2xl font-bold text-red-700 dark:text-red-300 mt-2">{match.redScore}</div>
-                )}
-              </div>
-            </div>
-
-            {/* Blue Alliance */}
-            <div
-              className={`p-3 rounded-lg ${isBlue ? "bg-blue-100 dark:bg-blue-900 border-2 border-blue-300" : "bg-blue-50 dark:bg-blue-950"}`}
-            >
-              <div className="text-center">
-                <div className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2">Blue Alliance</div>
-                <div className="space-y-1">
-                  <div className={`${match.blue1 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.blue1}
-                  </div>
-                  <div className={`${match.blue2 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.blue2}
-                  </div>
-                </div>
-                {match.played && (
-                  <div className="text-2xl font-bold text-blue-700 dark:text-blue-300 mt-2">{match.blueScore}</div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </Link>
-    )
-  }
 
   if (loading) {
     return (
@@ -391,6 +287,33 @@ export default function DashboardPage() {
       </div>
     )
   }
+  const menuOptions = [
+    {
+      id: 'dash',
+      icon: <Monitor size={18} />,
+      label: 'Dashboard',
+      component: <ModularDashboard className="max-w-screen" eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
+    },
+    {
+      id: 'scout',
+      icon: <ClipboardPen size={18} />,
+      label: 'Scouting',
+      component: <ScoutingManager
+        sessionId={sessionId ? sessionId : ""}
+        eventCode={eventCode ? eventCode : ""}
+        onSessionCreate={(sessionCode) => {
+          console.log('Session created:', sessionCode)
+        }}
+      />
+    },
+    {
+      id: 'idk',
+      icon: <Bell size={18} />,
+      label: 'what ot put here',
+      component: <div>idk</div>
+    }
+  ];
+  const selectedComponent = menuOptions.find(option => option.id === selectedView)?.component;
 
   return (
     <div className=" h-screen bg-white dark:bg-black">
@@ -403,6 +326,13 @@ export default function DashboardPage() {
               </Button>
             </Link>
             <h1 className="text-3xl font-black">{teamNumber} - {teamName ? teamName : ""} <span className="text-xl font-extralight">{eventCode.toUpperCase()}</span></h1>
+          </div>
+          <div>
+            <IconSwitch
+              options={menuOptions}
+              defaultSelected="dash"
+              onSelectionChange={setSelectedView}
+            />
           </div>
           <div className="flex items-center gap-2">
             <p className="text-xs text-muted-foreground">last update: <TimeAgoDisplay lastUpdate={lastUpdate} /> </p>
@@ -420,7 +350,6 @@ export default function DashboardPage() {
                 {/* no clue what theme or status bar is supposed to do, home should be in a navbar*/}
                 <DropdownMenuItem>Theme</DropdownMenuItem>
                 <DropdownMenuItem>Change Team</DropdownMenuItem>
-                <DropdownMenuItem>Go Home</DropdownMenuItem>
                 <DropdownMenuItem onClick={() => {
                   setPendingInterval(autoRefreshInterval);
                   setShowIntervalModal(true);
@@ -432,6 +361,11 @@ export default function DashboardPage() {
 
           </div>
         </div>
+        {selectedComponent && (
+          <div className="transition-all duration-300 ease-in-out">
+            {selectedComponent}
+          </div>
+        )}
 
         {error && (
           <Card className="mb-6 border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
@@ -467,41 +401,11 @@ export default function DashboardPage() {
           </Card>
         )}
 
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dashboard" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden md:inline">Dashboard</span>
-            </TabsTrigger>
-            <TabsTrigger value="scout" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden md:inline">Scout</span>
-            </TabsTrigger>
-            <TabsTrigger value="advancement" className="flex items-center gap-2">
-              <Bell className="h-4 w-4" />
-              <span className="hidden md:inline">Advancement</span>
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="dashboard">
-            <ModularDashboard className="max-w-screen" eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
-          </TabsContent>
-          <TabsContent value="scout">
-            <ScoutingManager
-              sessionId={sessionId ? sessionId : ""}
-              eventCode={eventCode ? eventCode : ""}
-              onSessionCreate={(sessionCode) => {
-                console.log('Session created:', sessionCode)
-              }}
-            />
-          </TabsContent>
-          <TabsContent value="advancement">
-            advancement
-          </TabsContent>
-        </Tabs>
+
 
         {showIntervalModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-6 w-full max-w-xs">
+            <div className="bg-white dark:bg-black border-black dark:border-white border rounded-lg shadow-lg p-6 w-full max-w-xs">
               <h2 className="text-lg font-bold mb-2">Change Auto-Refresh Interval</h2>
               <label className="block mb-4">
                 <span className="text-sm text-muted-foreground">Interval (seconds):</span>
