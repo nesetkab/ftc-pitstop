@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -84,61 +84,61 @@ interface Analytics {
   team_stats: any[]
 }
 
+const DEFAULT_QUESTIONS = [
+  { text: "How many specimens did the team score in the high basket?", type: "number" as const },
+  { text: "How many specimens did the team score in the low basket?", type: "number" as const },
+  { text: "How many samples did the team score in the high basket?", type: "number" as const },
+  { text: "How many samples did the team score in the low basket?", type: "number" as const },
+  { text: "Did the team achieve level 1 ascent?", type: "boolean" as const },
+  { text: "Did the team achieve level 2 ascent?", type: "boolean" as const },
+  { text: "Did the team achieve level 3 ascent?", type: "boolean" as const },
+  {
+    text: "How would you rate the team's driving ability?",
+    type: "select" as const,
+    options: ["Excellent", "Good", "Average", "Poor"],
+  },
+  {
+    text: "How would you rate the team's autonomous performance?",
+    type: "select" as const,
+    options: ["Excellent", "Good", "Average", "Poor", "None"],
+  },
+  { text: "Additional notes about the team's performance", type: "text" as const },
+]
+
 export default function ScoutingManager({
   sessionId,
   eventCode: initialEventCode,
   managerName: initialManagerName,
   onSessionCreate,
 }: ScoutingManagerProps) {
-  // State for existing event list (used to display name after session creation)
   const [events, setEvents] = useState<Event[]>([])
   const [teams, setTeams] = useState<Team[]>([])
   const [session, setSession] = useState<ScoutingSession | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
   const [answers, setAnswers] = useState<Answer[]>([])
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
-  const [newQuestion, setNewQuestion] = useState({
+  const [newQuestion, setNewQuestion] = useState<{
+    text: string
+    type: "text" | "number" | "boolean" | "select"
+    options: string[]
+  }>({
     text: "",
-    type: "text" as const,
+    type: "text",
     options: [""],
   })
   const [copied, setCopied] = useState(false)
   const [connectedScouts, setConnectedScouts] = useState<string[]>([])
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [loading, setLoading] = useState(true)
-
-  // State for session creation form
   const [selectedEvent, setSelectedEvent] = useState(initialEventCode || "")
   const [managerName, setManagerName] = useState(initialManagerName || "")
   const [isCreatingSession, setIsCreatingSession] = useState(false)
-
-  // New state for event search functionality
   const [searchTerm, setSearchTerm] = useState("")
   const [searchedEvents, setSearchedEvents] = useState<SearchedEvent[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [searchError, setSearchError] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (sessionId) {
-      fetchSessionById(sessionId)
-    } else {
-      // We no longer need to pre-load all events, search is now user-initiated.
-      setLoading(false)
-    }
-  }, [sessionId])
-
-  useEffect(() => {
-    if (session) {
-      fetchEvents() // Still needed to get event name from code
-      fetchTeamsForEvent(session.event_code || "")
-      fetchQuestions()
-      fetchAnswers()
-      fetchConnectedScouts()
-      fetchAnalytics()
-    }
-  }, [session])
-
-  const fetchSessionById = async (sessionCode: string) => {
+  const fetchSessionById = useCallback(async (sessionCode: string) => {
     try {
       setLoading(true)
       const response = await fetch(`/api/scouting/sessions?code=${sessionCode}`)
@@ -149,43 +149,14 @@ export default function ScoutingManager({
         toast.error("Session not found")
       }
     } catch (error) {
+      console.error("Failed to load session:", error)
       toast.error("Failed to load session")
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const createSession = async () => {
-    if (!managerName.trim() || !selectedEvent) {
-      toast.error("Please enter your name and select an event.")
-      return
-    }
-
-    setIsCreatingSession(true)
-    try {
-      const response = await fetch("/api/scouting/sessions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ eventCode: selectedEvent, managerName }),
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setSession(data)
-        onSessionCreate?.(data.session_code)
-        toast.success("Success!", { description: `Session created with code: ${data.session_code}` })
-      } else {
-        toast.error("Failed to create session")
-      }
-    } catch (error) {
-      toast.error("Failed to create session")
-    } finally {
-      setIsCreatingSession(false)
-    }
-  }
-
-  // This function now primarily serves to find an event's name from its code after a session is loaded.
-  const fetchEvents = async () => {
+  const fetchEvents = useCallback(async () => {
     try {
       const response = await fetch("/api/scouting/events")
       if (response.ok) {
@@ -195,10 +166,9 @@ export default function ScoutingManager({
     } catch (error) {
       console.error("Failed to fetch events:", error)
     }
-  }
+  }, [])
 
-  // New function to search for events, adapted from page.tsx
-  const searchEvents = async () => {
+  const searchEvents = useCallback(async () => {
     if (!searchTerm.trim()) return
     setIsSearching(true)
     setSearchError(null)
@@ -221,75 +191,145 @@ export default function ScoutingManager({
     } finally {
       setIsSearching(false)
     }
-  }
+  }, [searchTerm])
 
-  const fetchTeamsForEvent = async (eventCode: string) => {
+  const fetchTeamsForEvent = useCallback(async (eventCode: string) => {
+    if (!eventCode) return
     try {
       const response = await fetch(`/api/events/${eventCode}/teams`)
       if (response.ok) {
         const data = await response.json()
         setTeams(data.teams || [])
-        console.log(data.teams)
       } else {
         const errorText = await response.text()
-        throw new Error(`API Error: ${response.status} - ${errorText}`)
+        console.error(`API Error: ${response.status} - ${errorText}`)
       }
     } catch (error) {
       console.error("Failed to fetch teams:", error)
     }
-  }
+  }, [])
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     if (!session) return
     try {
       const response = await fetch(`/api/scouting/questions?sessionId=${session.id}`)
-      const data = await response.json()
-      setQuestions(data)
+      if (response.ok) {
+        const data = await response.json()
+        setQuestions(data)
+      } else {
+        toast.error("Failed to fetch questions")
+      }
     } catch (error) {
+      console.error("Failed to fetch questions:", error)
       toast.error("Failed to fetch questions")
     }
-  }
+  }, [session])
 
-  const fetchAnswers = async () => {
+  const fetchAnswers = useCallback(async () => {
     if (!session) return
     try {
       const response = await fetch(`/api/scouting/answers?sessionId=${session.id}`)
-      const data = await response.json()
-      setAnswers(Array.isArray(data) ? data : [])
+      if (response.ok) {
+        const data = await response.json()
+        setAnswers(Array.isArray(data) ? data : [])
+      } else {
+        setAnswers([])
+        toast.error("Failed to fetch answers")
+      }
     } catch (error) {
       console.error("Failed to fetch answers:", error)
       setAnswers([])
       toast.error("Failed to fetch answers")
     }
-  }
+  }, [session])
 
-  const fetchConnectedScouts = async () => {
+  const fetchConnectedScouts = useCallback(async () => {
     if (!session) return
     try {
       const response = await fetch(`/api/scouting/scouts?sessionId=${session.id}`)
-      const data = await response.json()
-      setConnectedScouts(data)
+      if (response.ok) {
+        const data = await response.json()
+        setConnectedScouts(data)
+      }
     } catch (error) {
       // Silently fail for polling
     }
-  }
+  }, [session])
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     if (!session) return
     try {
       const response = await fetch(`/api/scouting/analytics?sessionId=${session.id}`)
-      const data = await response.json()
-      setAnalytics(data)
+      if (response.ok) {
+        const data = await response.json()
+        setAnalytics(data)
+      }
     } catch (error) {
       // Silently fail for polling
+    }
+  }, [session])
+
+  useEffect(() => {
+    if (sessionId) {
+      fetchSessionById(sessionId)
+    } else {
+      setLoading(false)
+    }
+  }, [sessionId, fetchSessionById])
+
+  useEffect(() => {
+    if (session) {
+      fetchEvents()
+      fetchTeamsForEvent(session.event_code || "")
+      fetchQuestions()
+      fetchAnswers()
+      fetchConnectedScouts()
+      fetchAnalytics()
+    }
+  }, [session, fetchEvents, fetchTeamsForEvent, fetchQuestions, fetchAnswers, fetchConnectedScouts, fetchAnalytics])
+
+  const createSession = async () => {
+    const trimmedManagerName = managerName.trim()
+    if (!trimmedManagerName || !selectedEvent) {
+      toast.error("Please enter your name and select an event.")
+      return
+    }
+
+    setIsCreatingSession(true)
+    try {
+      const response = await fetch("/api/scouting/sessions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ eventCode: selectedEvent, managerName: trimmedManagerName }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        setSession(data)
+        onSessionCreate?.(data.session_code)
+        toast.success("Success!", { description: `Session created with code: ${data.session_code}` })
+      } else {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
+        toast.error(`Failed to create session: ${errorData.error}`)
+      }
+    } catch (error) {
+      console.error("Failed to create session:", error)
+      toast.error("Failed to create session")
+    } finally {
+      setIsCreatingSession(false)
     }
   }
 
   const refreshData = async () => {
     setIsRefreshing(true)
-    await Promise.all([fetchAnswers(), fetchConnectedScouts(), fetchAnalytics()])
-    setIsRefreshing(false)
-    toast.info("Refreshed", { description: "Data updated successfully" })
+    try {
+      await Promise.all([fetchAnswers(), fetchConnectedScouts(), fetchAnalytics()])
+      toast.info("Refreshed", { description: "Data updated successfully" })
+    } catch (error) {
+      toast.error("Failed to refresh data")
+    } finally {
+      setIsRefreshing(false)
+    }
   }
 
   const exportData = async (format: "json" | "csv") => {
@@ -297,6 +337,10 @@ export default function ScoutingManager({
 
     try {
       const response = await fetch(`/api/scouting/export?sessionId=${session.id}&format=${format}`)
+
+      if (!response.ok) {
+        throw new Error(`Export failed: ${response.statusText}`)
+      }
 
       if (format === "csv") {
         const blob = await response.blob()
@@ -323,12 +367,13 @@ export default function ScoutingManager({
 
       toast.success("Exported", { description: `Data exported as ${format.toUpperCase()}` })
     } catch (error) {
+      console.error("Export failed:", error)
       toast.error("Failed to export data")
     }
   }
 
   const addQuestion = async () => {
-    if (!session || !newQuestion.text) return
+    if (!session || !newQuestion.text.trim()) return
 
     try {
       const response = await fetch("/api/scouting/questions", {
@@ -336,7 +381,7 @@ export default function ScoutingManager({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId: session.id,
-          questionText: newQuestion.text,
+          questionText: newQuestion.text.trim(),
           questionType: newQuestion.type,
           options: newQuestion.type === "select" ? newQuestion.options.filter((o) => o.trim()) : null,
         }),
@@ -347,10 +392,45 @@ export default function ScoutingManager({
         fetchQuestions()
         toast.success("Question added!")
       } else {
-        toast.error("Failed to add question")
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }))
+        toast.error(`Failed to add question: ${errorData.error}`)
       }
     } catch (error) {
+      console.error("Failed to add question:", error)
       toast.error("Failed to add question")
+    }
+  }
+
+  const addDefaultQuestions = async () => {
+    if (!session) return
+
+    try {
+      const promises = DEFAULT_QUESTIONS.map(q =>
+        fetch("/api/scouting/questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            sessionId: session.id,
+            questionText: q.text,
+            questionType: q.type,
+            options: q.options || null,
+          }),
+        })
+      )
+
+      const results = await Promise.all(promises)
+      const failedCount = results.filter(r => !r.ok).length
+
+      if (failedCount === 0) {
+        toast.success("Default questions added!")
+      } else {
+        toast.error(`Failed to add ${failedCount} questions`)
+      }
+
+      fetchQuestions()
+    } catch (error) {
+      console.error("Failed to add default questions:", error)
+      toast.error("Failed to add default questions")
     }
   }
 
@@ -364,7 +444,8 @@ export default function ScoutingManager({
   }
 
   const copySessionUrl = () => {
-    const url = `${window.location.origin}/scout/${session?.session_code}`
+    if (!session) return
+    const url = `${window.location.origin}/scout/${session.session_code}`
     navigator.clipboard.writeText(url)
     toast.success("Copied!", { description: "Scout URL copied to clipboard" })
   }
@@ -390,15 +471,24 @@ export default function ScoutingManager({
     }))
   }
 
-  const getTeamAnswers = (teamId: number) => {
-    return (answers || []).filter((answer) => answer.team_id === teamId)
-  }
+  const getTeamAnswers = useCallback((teamId: number) => {
+    return answers.filter((answer) => answer.team_id === teamId)
+  }, [answers])
 
-  const getAnsweredTeams = () => {
-    const safeAnswers = Array.isArray(answers) ? answers : []
-    const teamIds = [...new Set(safeAnswers.map((a) => a.team_id))]
-    return Array.isArray(teams) ? teams.filter((team) => teamIds.includes(team.teamNumber)) : []
-  }
+  const getAnsweredTeams = useCallback(() => {
+    const teamIds = [...new Set(answers.map((a) => a.team_id))]
+    return teams.filter((team) => teamIds.includes(team.teamNumber))
+  }, [answers, teams])
+
+  const handleEventSelect = useCallback((eventCode: string) => {
+    setSelectedEvent(eventCode)
+  }, [])
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      searchEvents()
+    }
+  }, [searchEvents, searchTerm])
 
   if (loading) {
     return (
@@ -429,7 +519,6 @@ export default function ScoutingManager({
               />
             </div>
 
-            {/* --- New Event Search UI --- */}
             <div className="space-y-2">
               <Label htmlFor="event-search">Search for Event</Label>
               <div className="flex gap-2">
@@ -438,9 +527,9 @@ export default function ScoutingManager({
                   placeholder="Try: Championship, League Meet, or state"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && searchEvents()}
+                  onKeyDown={handleKeyDown}
                 />
-                <Button onClick={searchEvents} disabled={isSearching}>
+                <Button onClick={searchEvents} disabled={isSearching || !searchTerm.trim()}>
                   {isSearching ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   ) : (
@@ -469,7 +558,7 @@ export default function ScoutingManager({
                       ? "border-blue-500 ring-2 ring-blue-500"
                       : "border-transparent"
                       }`}
-                    onClick={() => setSelectedEvent(event.code)}
+                    onClick={() => handleEventSelect(event.code)}
                   >
                     <CardContent className="p-3">
                       <div className="flex justify-between items-start">
@@ -492,7 +581,6 @@ export default function ScoutingManager({
                 ))}
               </div>
             )}
-            {/* --- End Event Search UI --- */}
 
             <Button
               onClick={createSession}
@@ -507,9 +595,10 @@ export default function ScoutingManager({
     )
   }
 
+  const currentEventName = events.find((e) => e.code === session.event_code)?.name || session.event_code
+
   return (
     <div className="space-y-6">
-      {/* Session Info */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
@@ -532,14 +621,13 @@ export default function ScoutingManager({
           </CardTitle>
           <CardDescription className="space-y-1">
             <div>
-              Manager: {session.manager_name} | Event:{" "}
-              {(events || []).find((e) => e.code === session.event_code)?.name || session.event_code}
+              Manager: {session.manager_name} | Event: {currentEventName}
             </div>
             <div className="flex items-center gap-2">
-              <span>Connected Scouts ({(connectedScouts || []).length}):</span>
-              {(connectedScouts || []).length > 0 ? (
+              <span>Connected Scouts ({connectedScouts.length}):</span>
+              {connectedScouts.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
-                  {(connectedScouts || []).map((scout, index) => (
+                  {connectedScouts.map((scout, index) => (
                     <Badge key={index} variant="outline" className="text-xs">
                       {scout}
                     </Badge>
@@ -553,8 +641,7 @@ export default function ScoutingManager({
         </CardHeader>
       </Card>
 
-      {/* Analytics Summary */}
-      {analytics && analytics.summary && (
+      {analytics?.summary && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardContent className="p-4">
@@ -603,9 +690,7 @@ export default function ScoutingManager({
           </TabsTrigger>
         </TabsList>
 
-        {/* Questions Tab */}
         <TabsContent value="questions" className="space-y-4">
-          {/* Add Default Into the Deep Questions */}
           <Card>
             <CardHeader>
               <CardTitle>Default Into the Deep Questions</CardTitle>
@@ -613,43 +698,7 @@ export default function ScoutingManager({
             </CardHeader>
             <CardContent>
               <Button
-                onClick={async () => {
-                  const defaultQuestions = [
-                    { text: "How many specimens did the team score in the high basket?", type: "number" },
-                    { text: "How many specimens did the team score in the low basket?", type: "number" },
-                    { text: "How many samples did the team score in the high basket?", type: "number" },
-                    { text: "How many samples did the team score in the low basket?", type: "number" },
-                    { text: "Did the team achieve level 1 ascent?", type: "boolean" },
-                    { text: "Did the team achieve level 2 ascent?", type: "boolean" },
-                    { text: "Did the team achieve level 3 ascent?", type: "boolean" },
-                    {
-                      text: "How would you rate the team's driving ability?",
-                      type: "select",
-                      options: ["Excellent", "Good", "Average", "Poor"],
-                    },
-                    {
-                      text: "How would you rate the team's autonomous performance?",
-                      type: "select",
-                      options: ["Excellent", "Good", "Average", "Poor", "None"],
-                    },
-                    { text: "Additional notes about the team's performance", type: "text" },
-                  ]
-
-                  for (const q of defaultQuestions) {
-                    await fetch("/api/scouting/questions", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({
-                        sessionId: session?.id,
-                        questionText: q.text,
-                        questionType: q.type,
-                        options: q.options || null,
-                      }),
-                    })
-                  }
-                  fetchQuestions()
-                  toast.success("Default questions added!")
-                }}
+                onClick={addDefaultQuestions}
                 variant="outline"
                 className="w-full"
               >
@@ -658,7 +707,6 @@ export default function ScoutingManager({
             </CardContent>
           </Card>
 
-          {/* Add Custom Question */}
           <Card>
             <CardHeader>
               <CardTitle>Add Custom Question</CardTitle>
@@ -696,14 +744,14 @@ export default function ScoutingManager({
               {newQuestion.type === "select" && (
                 <div className="space-y-2">
                   <Label>Options</Label>
-                  {(newQuestion.options || []).map((option, index) => (
+                  {newQuestion.options.map((option, index) => (
                     <div key={index} className="flex gap-2">
                       <Input
                         placeholder={`Option ${index + 1}`}
                         value={option}
                         onChange={(e) => updateOption(index, e.target.value)}
                       />
-                      {(newQuestion.options || []).length > 1 && (
+                      {newQuestion.options.length > 1 && (
                         <Button variant="outline" size="sm" onClick={() => removeOption(index)}>
                           Remove
                         </Button>
@@ -716,22 +764,21 @@ export default function ScoutingManager({
                   </Button>
                 </div>
               )}
-              <Button onClick={addQuestion}>
+              <Button onClick={addQuestion} disabled={!newQuestion.text.trim()}>
                 <Plus className="h-4 w-4 mr-2" />
                 Add Question
               </Button>
             </CardContent>
           </Card>
 
-          {/* Current Questions */}
-          {(questions || []).length > 0 && (
+          {questions.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Current Questions ({(questions || []).length})</CardTitle>
+                <CardTitle>Current Questions ({questions.length})</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {(questions || []).map((question, index) => (
+                  {questions.map((question, index) => (
                     <div key={question.id} className="p-3 border rounded-lg">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
@@ -754,15 +801,14 @@ export default function ScoutingManager({
           )}
         </TabsContent>
 
-        {/* Teams Tab */}
         <TabsContent value="teams">
           <Card>
             <CardHeader>
-              <CardTitle>Teams ({(teams || []).length})</CardTitle>
+              <CardTitle>Teams ({teams.length})</CardTitle>
               <CardDescription>Teams at this event</CardDescription>
             </CardHeader>
             <CardContent>
-              {(teams || []).length === 0 ? (
+              {teams.length === 0 ? (
                 <div className="text-center py-8 space-y-4">
                   <p className="text-gray-500">
                     No teams available. Make sure FTC API credentials are configured in your environment variables.
@@ -770,7 +816,7 @@ export default function ScoutingManager({
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(teams || []).map((team: Team) => (
+                  {teams.map((team: Team) => (
                     <div key={team.teamNumber} className="p-4 border rounded-lg">
                       <div className="font-bold text-lg">#{team.teamNumber}</div>
                       <div className="font-medium">{team.nameShort}</div>
@@ -786,7 +832,6 @@ export default function ScoutingManager({
           </Card>
         </TabsContent>
 
-        {/* Results Tab */}
         <TabsContent value="results">
           <Card>
             <CardHeader>
@@ -835,11 +880,9 @@ export default function ScoutingManager({
           </Card>
         </TabsContent>
 
-        {/* Analytics Tab */}
         <TabsContent value="analytics" className="space-y-4">
           {analytics ? (
             <div className="space-y-6">
-              {/* Export Options */}
               <Card>
                 <CardHeader>
                   <CardTitle>Export Data</CardTitle>

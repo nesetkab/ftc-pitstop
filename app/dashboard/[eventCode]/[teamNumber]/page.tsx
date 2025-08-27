@@ -13,22 +13,17 @@ import {
   Settings
 } from "lucide-react"
 import Link from "next/link"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { ModularDashboard } from "@/components/dashboard"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-  DropdownMenuCheckboxItemProps,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
-
-
-type Checked = DropdownMenuCheckboxItemProps["checked"]
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import ScoutingManager from "@/components/scouting-manager"
+import { useSearchParams } from 'next/navigation'
 
 interface TeamData {
   teamNumber: number;
@@ -113,8 +108,9 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [nextMatch, setNextMatch] = useState<Match | null>(null)
-
   const [teamName, setTeamName] = useState<string | null>(null);
+  const searchParams = useSearchParams()
+  const sessionId = searchParams.get('sessionId')
 
   useEffect(() => {
     const storedDataString = localStorage.getItem('selectedTeam');
@@ -196,7 +192,6 @@ export default function DashboardPage() {
     );
   };
 
-  const [showStatusBar, setShowStatusBar] = React.useState<Checked>(true)
   const [showIntervalModal, setShowIntervalModal] = useState(false);
   const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(30000); // default 30s
   const [pendingInterval, setPendingInterval] = useState<number>(30000);
@@ -432,14 +427,9 @@ export default function DashboardPage() {
                 }}>
                   Change Auto-Refresh Delay
                 </DropdownMenuItem>
-                <DropdownMenuCheckboxItem
-                  checked={showStatusBar}
-                  onCheckedChange={setShowStatusBar}
-                >
-                  Status Bar
-                </DropdownMenuCheckboxItem>              </DropdownMenuContent>
+              </DropdownMenuContent>
             </DropdownMenu>
-            
+
           </div>
         </div>
 
@@ -476,9 +466,39 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         )}
-        <ModularDashboard className="max-w-screen" eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
 
-        {/* Auto-Refresh Interval Modal */}
+        <Tabs defaultValue="dashboard" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="dashboard" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span className="hidden md:inline">Dashboard</span>
+            </TabsTrigger>
+            <TabsTrigger value="scout" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span className="hidden md:inline">Scout</span>
+            </TabsTrigger>
+            <TabsTrigger value="advancement" className="flex items-center gap-2">
+              <Bell className="h-4 w-4" />
+              <span className="hidden md:inline">Advancement</span>
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="dashboard">
+            <ModularDashboard className="max-w-screen" eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
+          </TabsContent>
+          <TabsContent value="scout">
+            <ScoutingManager
+              sessionId={sessionId ? sessionId : ""}
+              eventCode={eventCode ? eventCode : ""}
+              onSessionCreate={(sessionCode) => {
+                console.log('Session created:', sessionCode)
+              }}
+            />
+          </TabsContent>
+          <TabsContent value="advancement">
+            advancement
+          </TabsContent>
+        </Tabs>
+
         {showIntervalModal && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
             <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg p-6 w-full max-w-xs">

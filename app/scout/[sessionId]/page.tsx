@@ -22,12 +22,10 @@ interface ScoutingSession {
 }
 
 interface Team {
-  id: number
-  team_number: number
-  team_name: string
-  school: string
-  city: string
-  state: string
+  teamNumber: number
+  nameShort: string
+  nameFull: string
+  displayLocation: string
 }
 
 interface Question {
@@ -98,24 +96,22 @@ export default function ScoutSession() {
       setLoading(false)
     }
   }
-
   const fetchTeams = async () => {
     if (!session) return
-
     try {
       const response = await fetch(`/api/events/${session.event_code}/teams`)
       if (response.ok) {
         const data = await response.json()
-        setTeams(Array.isArray(data) ? data : [])
+        setTeams(data.teams || [])
       } else {
-        setTeams([])
-        toast.warning("Failed to fetch teams")
+        const errorText = await response.text()
+        console.error(`API Error: ${response.status} - ${errorText}`)
       }
     } catch (error) {
-      setTeams([])
-      toast.error("Failed to fetch teams")
+      console.error("Failed to fetch teams:", error)
     }
   }
+
 
   const fetchQuestions = async () => {
     if (!session) return
@@ -194,7 +190,7 @@ export default function ScoutSession() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               sessionId: session.id,
-              teamId: selectedTeam.id,
+              teamId: selectedTeam.teamNumber,
               questionId: answer.questionId,
               answerValue: answer.value,
               scoutName: scoutName,
@@ -285,7 +281,7 @@ export default function ScoutSession() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-current p-4 flex items-center justify-center">
         <Card>
           <CardContent className="p-8 text-center">
             <div className="text-lg">Loading session...</div>
@@ -297,7 +293,7 @@ export default function ScoutSession() {
 
   if (!session) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-4 flex items-center justify-center">
+      <div className="min-h-screen bg-current p-4 flex items-center justify-center">
         <Card>
           <CardContent className="p-8 text-center space-y-4">
             <div className="text-lg">Session not found</div>
@@ -312,7 +308,7 @@ export default function ScoutSession() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-100 p-4">
+    <div className="min-h-screen bg-current p-4">
       <div className="max-w-md mx-auto space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -378,15 +374,15 @@ export default function ScoutSession() {
                 </Card>
               ) : (
                 teams.map((team) => (
-                  <Card key={team.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <Card key={team.teamNumber} className="cursor-pointer hover:shadow-md transition-shadow">
                     <CardContent className="p-4" onClick={() => selectTeam(team)}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <div className="font-bold text-lg">#{team.team_number}</div>
-                          <div className="font-medium text-blue-600">{team.team_name}</div>
-                          <div className="text-sm text-gray-600">{team.school}</div>
+                          <div className="font-bold text-lg">#{team.teamNumber}</div>
+                          <div className="font-medium text-blue-600">{team.nameShort}</div>
+                          <div className="text-sm text-gray-600">{team.nameFull}</div>
                           <div className="text-sm text-gray-500">
-                            {team.city}, {team.state}
+                            {team.displayLocation}
                           </div>
                         </div>
                         <div className="text-blue-500">
@@ -417,7 +413,7 @@ export default function ScoutSession() {
                   </Badge>
                 </div>
                 <CardTitle className="text-center">
-                  #{selectedTeam.team_number} - {selectedTeam.team_name}
+                  #{selectedTeam.teamNumber} - {selectedTeam.nameShort}
                 </CardTitle>
               </CardHeader>
             </Card>
@@ -488,7 +484,7 @@ export default function ScoutSession() {
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Scouting Complete!</h2>
                 <p className="text-gray-600 mt-2">
-                  Your data for #{selectedTeam?.team_number} has been submitted successfully.
+                  Your data for #{selectedTeam?.teamNumber} has been submitted successfully.
                 </p>
               </div>
               <div className="space-y-3 pt-4">
