@@ -12,10 +12,8 @@ import Link from "next/link"
 interface Team {
   teamNumber: number
   nameShort: string
-  schoolName: string
-  city: string
-  stateProv: string
-  country: string
+  nameFull: string
+  displayLocation: string
 }
 
 interface Event {
@@ -61,7 +59,8 @@ export default function EventPage() {
     (team) =>
       team.teamNumber.toString().includes(searchTerm) ||
       (team.nameShort?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (team.schoolName?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
+      (team.nameFull?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (team.displayLocation?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
   )
 
   const handleTeamSelect = (team: Team) => {
@@ -139,9 +138,9 @@ export default function EventPage() {
                           <Badge variant="outline">#{team.teamNumber}</Badge>
                           <span className="font-semibold">{team.nameShort}</span>
                         </div>
-                        <p className="text-sm text-muted-foreground">{team.schoolName}</p>
+                        <p className="text-sm text-muted-foreground">{team.nameFull}</p>
                         <p className="text-xs text-muted-foreground">
-                          {team.city}, {team.stateProv}, {team.country}
+                          {team.displayLocation}
                         </p>
                       </div>
                       <div className="text-right">
