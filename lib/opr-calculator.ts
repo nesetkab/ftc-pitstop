@@ -12,6 +12,8 @@ interface Match {
   blue2: number
   redScore: number
   blueScore: number
+  redFoul: number
+  blueFoul: number
   played: boolean
 }
 
@@ -29,6 +31,11 @@ export class OPRCalculator {
 
   constructor(matches: Match[]) {
     this.matches = matches.filter((m) => m.played && m.redScore !== null && m.blueScore !== null)
+      .map(m => ({
+        ...m,
+        redFoul: m.redFoul ?? 0,
+        blueFoul: m.blueFoul ?? 0
+      }))
 
     // Collect all unique team numbers
     this.matches.forEach((match) => {
@@ -71,14 +78,16 @@ export class OPRCalculator {
       redRow[teamToIndex.get(match.red1)!] = 1
       redRow[teamToIndex.get(match.red2)!] = 1
       A.push(redRow)
-      scores.push(match.redScore)
+      // Non-penalty score = final score - opponent's fouls (removes penalty points added to our score)
+      scores.push(match.redScore - match.blueFoul)
 
       // Blue alliance row
       const blueRow = new Array(numTeams).fill(0)
       blueRow[teamToIndex.get(match.blue1)!] = 1
       blueRow[teamToIndex.get(match.blue2)!] = 1
       A.push(blueRow)
-      scores.push(match.blueScore)
+      // Non-penalty score = final score - opponent's fouls (removes penalty points added to our score)
+      scores.push(match.blueScore - match.redFoul)
     })
 
     // Solve using least squares: (A^T * A) * x = A^T * b
@@ -117,19 +126,19 @@ export class OPRCalculator {
     const opponentScores: number[] = []
 
     this.matches.forEach((match) => {
-      // For red alliance, opponent score is blue score
+      // For red alliance, opponent score is blue score (non-penalty)
       const redRow = new Array(numTeams).fill(0)
       redRow[teamToIndex.get(match.red1)!] = 1
       redRow[teamToIndex.get(match.red2)!] = 1
       A.push(redRow)
-      opponentScores.push(match.blueScore)
+      opponentScores.push(match.blueScore + match.blueFoul)
 
-      // For blue alliance, opponent score is red score
+      // For blue alliance, opponent score is red score (non-penalty)
       const blueRow = new Array(numTeams).fill(0)
       blueRow[teamToIndex.get(match.blue1)!] = 1
       blueRow[teamToIndex.get(match.blue2)!] = 1
       A.push(blueRow)
-      opponentScores.push(match.redScore)
+      opponentScores.push(match.redScore + match.redFoul)
     })
 
     // Solve for DPR

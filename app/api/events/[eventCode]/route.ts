@@ -1,33 +1,15 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient } from "@/lib/ftc-api-client"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
   const { eventCode } = await params
+  const bypassCache = request.nextUrl.searchParams.get("bypassCache") === "true"
 
   try {
-    const season = process.env.FTC_SEASON
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
     console.log("Fetching event:", eventCode)
 
-    // Get all events and filter by code
-    const response = await fetch(`${FTC_API_BASE}/${season}/events`, {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        Accept: "application/json",
-      },
-    })
-
-    console.log("API Response status:", response.status)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("API Error:", errorText)
-      throw new Error(`API responded with status: ${response.status} - ${errorText}`)
-    }
-
-    const data = await response.json()
+    // Get event through cache layer
+    const { data, fromCache } = await ftcApiClient.getEvent(eventCode.toUpperCase(), { bypassCache })
     const events = data.events || []
 
     // Find the specific event
@@ -39,7 +21,13 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     console.log("Found event:", event.name)
-    return NextResponse.json({ event })
+    return NextResponse.json({
+      event,
+      _meta: {
+        fromCache,
+        timestamp: new Date().toISOString()
+      }
+    })
   } catch (error) {
     console.error("Error fetching event:", error)
     return NextResponse.json(

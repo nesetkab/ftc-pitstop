@@ -1,36 +1,28 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient } from "@/lib/ftc-api-client"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
   const { eventCode } = await params
+  const bypassCache = request.nextUrl.searchParams.get("bypassCache") === "true"
 
   try {
-    const season = process.env.FTC_SEASON
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
     console.log("Fetching teams for event:", eventCode)
 
-    const response = await fetch(`${FTC_API_BASE}/${season}/teams?eventCode=${eventCode.toUpperCase()}`, {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        Accept: "application/json",
-      },
+    // Get teams through cache layer
+    const { data, fromCache } = await ftcApiClient.getTeams(eventCode.toUpperCase(), { bypassCache })
+
+    console.log("Teams data:", {
+      teamCount: data.teams?.length || 0,
+      fromCache,
     })
 
-    console.log("Teams API Response status:", response.status)
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("Teams API Error:", errorText)
-      throw new Error(`API responded with status: ${response.status} - ${errorText}`)
-    }
-
-    const data = await response.json()
-    console.log("Teams data keys:", Object.keys(data))
-    console.log("Number of teams:", data.teams?.length || 0)
-
-    return NextResponse.json({ teams: data.teams || [] })
+    return NextResponse.json({
+      teams: data.teams || [],
+      _meta: {
+        fromCache,
+        timestamp: new Date().toISOString()
+      }
+    })
   } catch (error) {
     console.error("Error fetching teams:", error)
     return NextResponse.json(

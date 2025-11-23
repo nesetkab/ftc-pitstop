@@ -14,7 +14,7 @@ import { ComparisonData } from "./team-comparison"
 import 'react-grid-layout/css/styles.css'
 import { Button, Text, Dialog, Switch } from "@radix-ui/themes"
 
-interface ModularDashboardPropsimport {
+interface ModularDashboardProps {
   eventCode: string,
   teamNumber: number,
   ranking: Ranking,

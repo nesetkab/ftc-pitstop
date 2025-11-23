@@ -693,8 +693,8 @@ export default function ScoutingManager({
         <TabsContent value="questions" className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Default Into the Deep Questions</CardTitle>
-              <CardDescription>Pre-loaded questions for the 2024-25 FTC season</CardDescription>
+              <CardTitle>Default DECODE Questions</CardTitle>
+              <CardDescription>Pre-loaded questions for the 2025-26 FTC season</CardDescription>
             </CardHeader>
             <CardContent>
               <Button
@@ -702,7 +702,7 @@ export default function ScoutingManager({
                 variant="outline"
                 className="w-full"
               >
-                Add Default Into the Deep Questions
+                Add Default DECODE Questions
               </Button>
             </CardContent>
           </Card>

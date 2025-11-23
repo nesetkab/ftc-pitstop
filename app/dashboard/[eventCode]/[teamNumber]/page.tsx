@@ -15,7 +15,6 @@ import {
   ClipboardPen,
 } from "lucide-react"
 import Link from "next/link"
-import { ModularDashboard } from "@/components/dashboard"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,9 +22,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import * as React from "react"
-import ScoutingManager from "@/components/scouting-manager"
-import IconSwitch from "@/components/ui/icon_switch"
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { ThemeSettingsDialog } from "@/components/theme-settings-dialog"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { GeneralTab } from "@/components/dashboard-tabs/general-tab"
+import { WatchTab } from "@/components/dashboard-tabs/watch-tab"
+import { TeamStatsTab } from "@/components/dashboard-tabs/team-stats-tab"
+import { EventStatsTab } from "@/components/dashboard-tabs/event-stats-tab"
+import { RankingsScheduleTab } from "@/components/dashboard-tabs/rankings-schedule-tab"
+import { PlayoffsTab } from "@/components/dashboard-tabs/playoffs-tab"
 
 interface TeamData {
   teamNumber: number;
@@ -97,20 +102,22 @@ export interface Alliance {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
   const params = useParams()
   const eventCode = params.eventCode as string
   const teamNumber = Number.parseInt(params.teamNumber as string)
+  const searchParams = useSearchParams()
+  const currentTab = searchParams.get('tab') || 'general'
+
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null)
-  const [selectedView, setSelectedView] = useState<string>('dashboard');
   const [rankings, setRankings] = useState<Ranking[]>([])
   const [alliances, setAlliances] = useState<Alliance[]>([])
+  const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [nextMatch, setNextMatch] = useState<Match | null>(null)
-  const [teamName, setTeamName] = useState<string | null>(null);
-  const searchParams = useSearchParams()
-  const sessionId = searchParams.get('sessionId')
+  const [teamName, setTeamName] = useState<string | null>(null)
 
 
   useEffect(() => {
@@ -250,6 +257,7 @@ export default function DashboardPage() {
       setTeamStats(statsData.stats)
       setRankings(rankingsData.rankings || [])
       setAlliances(alliancesData.alliances || [])
+      setMatches(matchesData.matches || [])
 
       // Find next match
       const upcomingMatches = (matchesData.matches || []).filter((m: Match) => !m.played)
@@ -287,93 +295,122 @@ export default function DashboardPage() {
       </div>
     )
   }
-  const menuOptions = [
-    {
-      id: 'dash',
-      icon: <Monitor size={18} />,
-      label: 'Dashboard',
-      component: <ModularDashboard className="max-w-screen" eventCode={eventCode} teamNumber={teamNumber} ranking={teamRanking} rankings={rankings} alliance={teamAlliance} teamStats={teamStats} />
-    },
-    {
-      id: 'scout',
-      icon: <ClipboardPen size={18} />,
-      label: 'Scouting',
-      component: <ScoutingManager
-        sessionId={sessionId ? sessionId : ""}
-        eventCode={eventCode ? eventCode : ""}
-        onSessionCreate={(sessionCode) => {
-          console.log('Session created:', sessionCode)
-        }}
-      />
-    },
-    {
-      id: 'idk',
-      icon: <Bell size={18} />,
-      label: 'what ot put here',
-      component: <div>idk</div>
-    }
-  ];
-  const selectedComponent = menuOptions.find(option => option.id === selectedView)?.component;
+  const handleTabChange = (value: string) => {
+    router.push(`/dashboard/${eventCode}/${teamNumber}?tab=${value}`)
+  }
 
   return (
-    <div className=" h-screen bg-white dark:bg-black">
-      <div className="pt-4 container mx-auto self-center ">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
+      <div className="pt-4 container mx-auto self-center">
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4">
             <Link href={`/event/${eventCode}`}>
               <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 " />
+                <ArrowLeft className="h-4 w-4" />
               </Button>
             </Link>
-            <h1 className="text-3xl font-black">{teamNumber} - {teamName ? teamName : ""} <span className="text-xl font-extralight">{eventCode.toUpperCase()}</span></h1>
+            <h1 className="text-3xl font-black">
+              {teamNumber} - {teamName ? teamName : ""}{" "}
+              <span className="text-xl font-extralight">{eventCode.toUpperCase()}</span>
+            </h1>
           </div>
-          <div>
-            <IconSwitch
-              options={menuOptions}
-              defaultSelected="dash"
-              onSelectionChange={setSelectedView}
-            />
-          </div>
+
           <div className="flex items-center gap-2">
-            <p className="text-xs text-muted-foreground">last update: <TimeAgoDisplay lastUpdate={lastUpdate} /> </p>
+            <p className="text-xs text-muted-foreground">
+              last update: <TimeAgoDisplay lastUpdate={lastUpdate} />
+            </p>
             <Button variant="outline" size="sm" onClick={fetchData}>
               <RefreshCw className="h-4 w-4" />
             </Button>
+            <ThemeSettingsDialog />
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3" >
+                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
                   <Settings className="h-4 w-4" />
                 </div>
-
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                {/* no clue what theme or status bar is supposed to do, home should be in a navbar*/}
-                <DropdownMenuItem>Theme</DropdownMenuItem>
                 <DropdownMenuItem>Change Team</DropdownMenuItem>
-                <DropdownMenuItem onClick={() => {
-                  setPendingInterval(autoRefreshInterval);
-                  setShowIntervalModal(true);
-                }}>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setPendingInterval(autoRefreshInterval)
+                    setShowIntervalModal(true)
+                  }}
+                >
                   Change Auto-Refresh Delay
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-
           </div>
         </div>
-        {selectedComponent && (
-          <div className="transition-all duration-300 ease-in-out">
-            {selectedComponent}
+
+        {/* Tabs */}
+        <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-6">
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="watch">Watch</TabsTrigger>
+            <TabsTrigger value="team-stats">Team Stats</TabsTrigger>
+            <TabsTrigger value="event-stats">Event Stats</TabsTrigger>
+            <TabsTrigger value="rankings">Rankings</TabsTrigger>
+            <TabsTrigger value="playoffs">Playoffs</TabsTrigger>
+          </TabsList>
+
+          <div className="mt-6">
+            <TabsContent value="general">
+              <GeneralTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                ranking={teamRanking}
+                teamStats={teamStats}
+                matches={matches}
+              />
+            </TabsContent>
+
+            <TabsContent value="watch">
+              <WatchTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                rankings={rankings}
+                matches={matches}
+              />
+            </TabsContent>
+
+            <TabsContent value="team-stats">
+              <TeamStatsTab eventCode={eventCode} teamNumber={teamNumber} />
+            </TabsContent>
+
+            <TabsContent value="event-stats">
+              <EventStatsTab eventCode={eventCode} />
+            </TabsContent>
+
+            <TabsContent value="rankings">
+              <RankingsScheduleTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                rankings={rankings}
+                matches={matches}
+              />
+            </TabsContent>
+
+            <TabsContent value="playoffs">
+              <PlayoffsTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                alliances={alliances}
+                matches={matches}
+              />
+            </TabsContent>
           </div>
-        )}
+        </Tabs>
 
         {error && (
-          <Card className="mb-6 border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
+          <Card className="mb-6" style={{ backgroundColor: 'var(--color-warning)', borderColor: 'var(--color-warning)' }}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-yellow-600" />
+                <AlertCircle className="h-5 w-5" style={{ color: 'var(--color-background)' }} />
                 <div className="flex-1">
-                  <p className="text-yellow-900 dark:text-yellow-100">{error}</p>
+                  <p style={{ color: 'var(--color-background)' }}>{error}</p>
                 </div>
               </div>
             </CardContent>
@@ -382,15 +419,15 @@ export default function DashboardPage() {
 
         {/* Next Match Alert */}
         {nextMatch && (
-          <Card className="mb-6 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
+          <Card className="mb-6" style={{ backgroundColor: 'var(--color-info)', borderColor: 'var(--color-info)' }}>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
-                <Bell className="h-5 w-5 text-orange-600" />
+                <Bell className="h-5 w-5" style={{ color: 'var(--color-background)' }} />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-orange-900 dark:text-orange-100">
+                  <h3 className="font-semibold" style={{ color: 'var(--color-background)' }}>
                     Next Match: {nextMatch.description}
                   </h3>
-                  <p className="text-sm text-orange-700 dark:text-orange-300">
+                  <p className="text-sm" style={{ color: 'var(--color-background)', opacity: 0.9 }}>
                     {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString() : "Time TBD"} • Red:{" "}
                     {nextMatch.red1}, {nextMatch.red2} vs Blue: {nextMatch.blue1}, {nextMatch.blue2}
                   </p>
@@ -404,8 +441,8 @@ export default function DashboardPage() {
 
 
         {showIntervalModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-            <div className="bg-white dark:bg-black border-black dark:border-white border rounded-lg shadow-lg p-6 w-full max-w-xs">
+          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
+            <div className="border rounded-lg shadow-lg p-6 w-full max-w-xs" style={{ backgroundColor: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
               <h2 className="text-lg font-bold mb-2">Change Auto-Refresh Interval</h2>
               <label className="block mb-4">
                 <span className="text-sm text-muted-foreground">Interval (seconds):</span>

@@ -1,35 +1,19 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { calculateOPRForMatches } from "@/lib/opr-calculator"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient } from "@/lib/ftc-api-client"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
   const { eventCode } = await params
+  const bypassCache = request.nextUrl.searchParams.get("bypassCache") === "true"
 
   try {
-    const season = process.env.FTC_SEASON
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
     console.log("Calculating OPR for event:", eventCode)
 
-    // Fetch all matches for the event
-    const response = await fetch(`${FTC_API_BASE}/${season}/matches/${eventCode.toUpperCase()}`, {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        Accept: "application/json",
-      },
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("Matches API Error:", errorText)
-      throw new Error(`Failed to fetch matches: ${response.status}`)
-    }
-
-    const data = await response.json()
+    // Fetch all matches through cache layer
+    const { data, fromCache } = await ftcApiClient.getMatches(eventCode.toUpperCase(), { bypassCache })
     const matches = data.matches || []
 
-    console.log(`Processing ${matches.length} matches for OPR calculation`)
+    console.log(`Processing ${matches.length} matches for OPR calculation (fromCache: ${fromCache})`)
 
     // Transform matches to our format
     const transformedMatches = matches
@@ -45,6 +29,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         blue2: match.teams?.find((t: any) => t.station === "Blue2")?.teamNumber || 0,
         redScore: match.scoreRedFinal || 0,
         blueScore: match.scoreBlueFinal || 0,
+        redFoul: match.scoreRedFoul || 0,
+        blueFoul: match.scoreBlueFoul || 0,
         played: true,
       }))
 

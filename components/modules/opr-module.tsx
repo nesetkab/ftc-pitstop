@@ -93,19 +93,19 @@ export function OPRModule({ opr, dpr, ccwm, matchesPlayed, loading, error }: { o
               </div>
               <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg flex flex-col justify-center">
                 <Shield className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                <div className="text-3xl font-bold mb-2 text-blue-600">{dpr.toFixed(1)}</div>
+                <div className="text-3xl font-bold mb-2 text-blue-600">{dpr ? dpr.toFixed(1) : 'N/A'}</div>
                 <div className="text-sm text-muted-foreground">Defensive Power Rating</div>
                 <div className="text-xs text-muted-foreground mt-1">Opponent points allowed</div>
               </div>
               <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg flex flex-col justify-center">
                 <Target className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                <div className="text-3xl font-bold mb-2 text-purple-600">{ccwm.toFixed(1)}</div>
+                <div className="text-3xl font-bold mb-2 text-purple-600">{ccwm ? ccwm.toFixed(1) : 'N/A'}</div>
                 <div className="text-sm text-muted-foreground">CCWM</div>
                 <div className="text-xs text-muted-foreground mt-1">Contribution to winning margin</div>
               </div>
             </div>
             <div className="mt-4 text-center">
-              <Badge variant="outline">Based on {matchesPlayed} matches</Badge>
+              <Badge variant="outline">Based on {matchesPlayed ?? 0} matches</Badge>
             </div>
           </CardContent>
         </Card>
@@ -175,20 +175,20 @@ export function OPRSmallModule({ opr, dpr, ccwm, matchesPlayed, loading, error }
               <div className="flex justify-between items-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <div className="flex">
                   <Shield className="h-8 w-8 mr-2 text-blue-600" />
-                  <div className="text-2xl font-bold text-blue-600">{dpr.toFixed(1)}</div>
+                  <div className="text-2xl font-bold text-blue-600">{dpr ? dpr.toFixed(1) : 'N/A'}</div>
                 </div>
                 <div className="text-sm text-blue-600">DPR</div>
               </div>
               <div className="flex justify-between items-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
                 <div className="flex">
                   <TrendingUp className="h-8 w-8 mr-2 text-purple-600" />
-                  <div className="text-2xl font-bold text-purple-600">{ccwm.toFixed(1)}</div>
+                  <div className="text-2xl font-bold text-purple-600">{ccwm ? ccwm.toFixed(1) : 'N/A'}</div>
                 </div>
                 <div className="text-sm text-purple-600">CCWM</div>
               </div>
             </div>
             <div className="mt-4 text-center">
-              <Badge variant="outline">Based on {matchesPlayed} matches</Badge>
+              <Badge variant="outline">Based on {matchesPlayed ?? 0} matches</Badge>
             </div>
           </CardContent>
         </Card>

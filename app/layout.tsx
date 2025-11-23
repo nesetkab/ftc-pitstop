@@ -3,9 +3,8 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { Analytics } from "@vercel/analytics/next"
-import "@radix-ui/themes/styles.css";
-import { Theme } from '@radix-ui/themes'
 import { Toaster } from "@/components/ui/sonner"
+import { CustomThemeProvider } from "@/components/theme-provider-custom"
 
 export const metadata: Metadata = {
   title: "Pitstop - FTC Pit Display",
@@ -46,14 +45,14 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="__className_e8ce0c" suppressHydrationWarning>
-        <Theme>
+        <CustomThemeProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
             {children}
           </ThemeProvider>
-        </Theme>
+        </CustomThemeProvider>
         <Toaster position="top-center" />
       </body>
-      < Analytics />
+      <Analytics />
     </html>
   )
 }

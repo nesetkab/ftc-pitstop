@@ -1,55 +1,37 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient } from "@/lib/ftc-api-client"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
   const { eventCode } = await params
   const searchParams = request.nextUrl.searchParams
   const teamNumber = searchParams.get("team")
+  const bypassCache = searchParams.get("bypassCache") === "true"
 
   try {
-    const season = process.env.FTC_SEASON
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
     console.log("Fetching team comparison data for event:", eventCode)
 
-    // Get rankings, matches, and our custom OPR data
-    const [rankingsResponse, matchesResponse, oprResponse] = await Promise.all([
-      fetch(`${FTC_API_BASE}/${season}/rankings/${eventCode.toUpperCase()}`, {
-        headers: {
-          Authorization: `Basic ${auth}`,
-          Accept: "application/json",
-        },
-      }),
-      fetch(`${FTC_API_BASE}/${season}/matches/${eventCode.toUpperCase()}`, {
-        headers: {
-          Authorization: `Basic ${auth}`,
-          Accept: "application/json",
-        },
-      }),
-      // Use our custom OPR calculation
-      fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr`),
+    // Get rankings, matches, and our custom OPR data (all through cache)
+    const [rankingsResult, matchesResult, oprResponse] = await Promise.all([
+      ftcApiClient.getRankings(eventCode.toUpperCase(), { bypassCache }),
+      ftcApiClient.getMatches(eventCode.toUpperCase(), { bypassCache }),
+      // Use our custom OPR calculation (which now also uses cache)
+      fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr${bypassCache ? '?bypassCache=true' : ''}`),
     ])
 
     let rankings = []
     let matches = []
     let oprData = []
 
-    if (rankingsResponse.ok) {
-      const rankingsData = await rankingsResponse.json()
-      console.log("Full rankings response:", JSON.stringify(rankingsData, null, 2))
-
-      if (rankingsData && Array.isArray(rankingsData.rankings)) {
-        rankings = rankingsData.rankings
-        console.log(`Found ${rankings.length} rankings`)
-      } else {
-        console.warn("Rankings data structure is unexpected:", rankingsData)
-      }
+    if (rankingsResult.data && Array.isArray(rankingsResult.data.rankings)) {
+      rankings = rankingsResult.data.rankings
+      console.log(`Found ${rankings.length} rankings (fromCache: ${rankingsResult.fromCache})`)
+    } else {
+      console.warn("Rankings data structure is unexpected:", rankingsResult.data)
     }
 
-    if (matchesResponse.ok) {
-      const matchesResult = await matchesResponse.json()
-      matches = matchesResult.matches || []
+    if (matchesResult.data) {
+      matches = matchesResult.data.matches || []
+      console.log(`Found ${matches.length} matches (fromCache: ${matchesResult.fromCache})`)
     }
 
     if (oprResponse.ok) {
