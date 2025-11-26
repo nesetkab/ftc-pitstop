@@ -17,13 +17,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr${bypassCache ? '?bypassCache=true' : ''}`),
     ])
 
-    let matches = []
+    let matches = matchesResult.data.matches || []
     let oprData = []
-
-    if (matchesResponse.ok) {
-      const matchesResult = await matchesResponse.json()
-      matches = matchesResult.matches || []
-    }
 
     if (oprResponse.ok) {
       const oprResult = await oprResponse.json()
@@ -38,7 +33,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       oprMap.set(team.teamNumber, {
         opr: team.opr || 0,
         dpr: team.dpr || 0,
-        ccwm: team.ccwm || 0,
       })
     })
 
@@ -49,22 +43,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const red1Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Red1")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
         const red2Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Red2")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
         const blue1Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Blue1")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
         const blue2Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Blue2")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
 
         // Calculate alliance strengths using our custom OPR

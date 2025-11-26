@@ -31,6 +31,7 @@ import { TeamStatsTab } from "@/components/dashboard-tabs/team-stats-tab"
 import { EventStatsTab } from "@/components/dashboard-tabs/event-stats-tab"
 import { RankingsScheduleTab } from "@/components/dashboard-tabs/rankings-schedule-tab"
 import { PlayoffsTab } from "@/components/dashboard-tabs/playoffs-tab"
+import { LoadingProgress } from "@/components/loading-progress"
 
 interface TeamData {
   teamNumber: number;
@@ -56,7 +57,9 @@ export interface TeamStats {
   ties: number
   opr: number
   dpr: number
-  ccwm: number
+  autoOpr?: number
+  teleopOpr?: number
+  endgameOpr?: number
   rank: number
   rp: number
   tbp: number
@@ -114,10 +117,20 @@ export default function DashboardPage() {
   const [alliances, setAlliances] = useState<Alliance[]>([])
   const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingStep, setLoadingStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [nextMatch, setNextMatch] = useState<Match | null>(null)
   const [teamName, setTeamName] = useState<string | null>(null)
+
+  const loadingSteps = [
+    "Connecting to server...",
+    "Loading team statistics...",
+    "Loading match schedule...",
+    "Loading rankings...",
+    "Loading alliance selections...",
+    "Finalizing dashboard..."
+  ]
 
 
   useEffect(() => {
@@ -207,14 +220,20 @@ export default function DashboardPage() {
   const fetchData = async () => {
     try {
       setError(null)
+      setLoadingStep(0)
       console.log("Fetching dashboard data for team", teamNumber, "at event", eventCode)
 
-      const [statsResponse, matchesResponse, rankingsResponse, alliancesResponse] = await Promise.all([
-        fetch(`/api/teams/${teamNumber}/stats/${eventCode}`),
-        fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`),
-        fetch(`/api/events/${eventCode}/rankings`),
-        fetch(`/api/events/${eventCode}/alliances`),
-      ])
+      setLoadingStep(1) // Loading team statistics
+      const statsResponse = await fetch(`/api/teams/${teamNumber}/stats/${eventCode}`)
+
+      setLoadingStep(2) // Loading match schedule
+      const matchesResponse = await fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`)
+
+      setLoadingStep(3) // Loading rankings
+      const rankingsResponse = await fetch(`/api/events/${eventCode}/rankings`)
+
+      setLoadingStep(4) // Loading alliance selections
+      const alliancesResponse = await fetch(`/api/events/${eventCode}/alliances`)
 
       console.log("API Response statuses:", {
         stats: statsResponse.status,
@@ -254,6 +273,8 @@ export default function DashboardPage() {
         console.error("Alliances API failed:", await alliancesResponse.text())
       }
 
+      setLoadingStep(5) // Finalizing dashboard
+
       setTeamStats(statsData.stats)
       setRankings(rankingsData.rankings || [])
       setAlliances(alliancesData.alliances || [])
@@ -286,14 +307,7 @@ export default function DashboardPage() {
 
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading team dashboard...</p>
-        </div>
-      </div>
-    )
+    return <LoadingProgress steps={loadingSteps} currentStep={loadingStep} />
   }
   const handleTabChange = (value: string) => {
     router.push(`/dashboard/${eventCode}/${teamNumber}?tab=${value}`)
@@ -301,33 +315,33 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
-      <div className="pt-4 container mx-auto self-center">
+      <div className="pt-3 container mx-auto self-center">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
+        <div className="flex justify-between items-center mb-3">
+          <div className="flex items-center gap-3">
             <Link href={`/event/${eventCode}`}>
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4" />
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                <ArrowLeft className="h-3.5 w-3.5" />
               </Button>
             </Link>
-            <h1 className="text-3xl font-black">
+            <h1 className="text-2xl font-normal">
               {teamNumber} - {teamName ? teamName : ""}{" "}
-              <span className="text-xl font-extralight">{eventCode.toUpperCase()}</span>
+              <span className="text-lg font-light opacity-70">{eventCode.toUpperCase()}</span>
             </h1>
           </div>
 
           <div className="flex items-center gap-2">
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] text-muted-foreground">
               last update: <TimeAgoDisplay lastUpdate={lastUpdate} />
             </p>
-            <Button variant="outline" size="sm" onClick={fetchData}>
-              <RefreshCw className="h-4 w-4" />
+            <Button variant="outline" size="sm" onClick={fetchData} className="h-8 w-8 p-0">
+              <RefreshCw className="h-3.5 w-3.5" />
             </Button>
             <ThemeSettingsDialog />
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3">
-                  <Settings className="h-4 w-4" />
+                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-2">
+                  <Settings className="h-3.5 w-3.5" />
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
@@ -347,16 +361,16 @@ export default function DashboardPage() {
 
         {/* Tabs */}
         <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-6">
-            <TabsTrigger value="general">General</TabsTrigger>
-            <TabsTrigger value="watch">Watch</TabsTrigger>
-            <TabsTrigger value="team-stats">Team Stats</TabsTrigger>
-            <TabsTrigger value="event-stats">Event Stats</TabsTrigger>
-            <TabsTrigger value="rankings">Rankings</TabsTrigger>
-            <TabsTrigger value="playoffs">Playoffs</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-6 h-9">
+            <TabsTrigger value="general" className="text-xs">General</TabsTrigger>
+            <TabsTrigger value="watch" className="text-xs">Watch</TabsTrigger>
+            <TabsTrigger value="team-stats" className="text-xs">Team Stats</TabsTrigger>
+            <TabsTrigger value="event-stats" className="text-xs">Event Stats</TabsTrigger>
+            <TabsTrigger value="rankings" className="text-xs">Rankings</TabsTrigger>
+            <TabsTrigger value="playoffs" className="text-xs">Playoffs</TabsTrigger>
           </TabsList>
 
-          <div className="mt-6">
+          <div className="mt-3">
             <TabsContent value="general">
               <GeneralTab
                 eventCode={eventCode}
@@ -364,6 +378,7 @@ export default function DashboardPage() {
                 ranking={teamRanking}
                 teamStats={teamStats}
                 matches={matches}
+                rankings={rankings}
               />
             </TabsContent>
 
@@ -405,12 +420,12 @@ export default function DashboardPage() {
         </Tabs>
 
         {error && (
-          <Card className="mb-6" style={{ backgroundColor: 'var(--color-warning)', borderColor: 'var(--color-warning)' }}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5" style={{ color: 'var(--color-background)' }} />
+          <Card className="mb-3" style={{ backgroundColor: 'var(--color-warning)', borderColor: 'var(--color-warning)' }}>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" style={{ color: 'var(--color-background)' }} />
                 <div className="flex-1">
-                  <p style={{ color: 'var(--color-background)' }}>{error}</p>
+                  <p className="text-xs" style={{ color: 'var(--color-background)' }}>{error}</p>
                 </div>
               </div>
             </CardContent>
@@ -419,20 +434,20 @@ export default function DashboardPage() {
 
         {/* Next Match Alert */}
         {nextMatch && (
-          <Card className="mb-6" style={{ backgroundColor: 'var(--color-info)', borderColor: 'var(--color-info)' }}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Bell className="h-5 w-5" style={{ color: 'var(--color-background)' }} />
+          <Card className="mb-3" style={{ backgroundColor: 'var(--color-info)', borderColor: 'var(--color-info)' }}>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4" style={{ color: 'var(--color-background)' }} />
                 <div className="flex-1">
-                  <h3 className="font-semibold" style={{ color: 'var(--color-background)' }}>
+                  <h3 className="font-semibold text-xs" style={{ color: 'var(--color-background)' }}>
                     Next Match: {nextMatch.description}
                   </h3>
-                  <p className="text-sm" style={{ color: 'var(--color-background)', opacity: 0.9 }}>
-                    {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString() : "Time TBD"} • Red:{" "}
+                  <p className="text-[11px]" style={{ color: 'var(--color-background)', opacity: 0.9 }}>
+                    {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : "Time TBD"} • Red:{" "}
                     {nextMatch.red1}, {nextMatch.red2} vs Blue: {nextMatch.blue1}, {nextMatch.blue2}
                   </p>
                 </div>
-                <Badge variant="secondary">Match {nextMatch.matchNumber}</Badge>
+                <Badge variant="secondary" className="text-[10px] py-0 px-2">Match {nextMatch.matchNumber}</Badge>
               </div>
             </CardContent>
           </Card>

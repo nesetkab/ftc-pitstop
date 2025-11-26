@@ -64,7 +64,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         winRate: winRate,
         opr: 0,
         dpr: 0,
-        ccwm: 0,
         avgScore: 0,
         highScore: 0,
         avgMargin: 0,
@@ -112,7 +111,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             winRate,
             opr: 0,
             dpr: 0,
-            ccwm: 0,
             avgScore: 0,
             highScore: 0,
             avgMargin: 0,
@@ -128,7 +126,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const stats = teamStats.get(team.teamNumber)
         stats.opr = team.opr || 0
         stats.dpr = team.dpr || 0
-        stats.ccwm = team.ccwm || 0
         stats.matchesPlayed = team.matchesPlayed || 0
       } else {
         // Create entry for teams that might not be in rankings yet
@@ -144,7 +141,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           winRate: 0,
           opr: team.opr || 0,
           dpr: team.dpr || 0,
-          ccwm: team.ccwm || 0,
           avgScore: 0,
           highScore: 0,
           avgMargin: 0,

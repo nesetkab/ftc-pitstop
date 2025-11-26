@@ -3,9 +3,10 @@
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { PerformanceModule } from "../modules/performance-module"
-import { OPRSmallModule } from "../modules/opr-module"
+import { DetailedOPRModule } from "../modules/detailed-opr-module"
 import { TeamStats, Ranking, Match } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 import { ComparisonData } from "../team-comparison"
+import { Trophy, TrendingUp, TrendingDown } from "lucide-react"
 
 interface GeneralTabProps {
   eventCode: string
@@ -13,13 +14,17 @@ interface GeneralTabProps {
   ranking: Ranking
   teamStats: TeamStats
   matches: Match[]
+  rankings: Ranking[]
 }
 
-export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches }: GeneralTabProps) {
+export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches, rankings }: GeneralTabProps) {
   const [data, setData] = useState<ComparisonData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [oprHistory, setOprHistory] = useState<any[]>([])
+  const [allTeamsOPR, setAllTeamsOPR] = useState<any[]>([])
+  const [oprRank, setOprRank] = useState<number | undefined>(undefined)
+  const [totalTeams, setTotalTeams] = useState<number | undefined>(undefined)
 
   const fetchComparison = async () => {
     try {
@@ -51,58 +56,85 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches 
     }
   }
 
+  const fetchOPRData = async () => {
+    try {
+      const response = await fetch(`/api/events/${eventCode}/opr`)
+      if (response.ok) {
+        const result = await response.json()
+        const oprData = result.opr || []
+        setAllTeamsOPR(oprData)
+        setTotalTeams(oprData.length)
+
+        // Sort teams by OPR descending to find rank
+        const sortedByOPR = [...oprData].sort((a, b) => b.opr - a.opr)
+        const rank = sortedByOPR.findIndex(team => team.teamNumber === teamNumber) + 1
+        setOprRank(rank > 0 ? rank : undefined)
+      }
+    } catch (error) {
+      console.error("Error fetching OPR data:", error)
+    }
+  }
+
   useEffect(() => {
     fetchComparison()
     fetchOPRHistory()
-    const interval = setInterval(fetchComparison, 240000)
+    fetchOPRData()
+    const interval = setInterval(() => {
+      fetchComparison()
+      fetchOPRData()
+    }, 240000)
     return () => clearInterval(interval)
   }, [eventCode, teamNumber])
 
   const upcomingMatches = matches.filter(m => !m.played).slice(0, 5)
 
   return (
-    <div className="grid grid-cols-12 gap-4">
+    <div className="grid grid-cols-12 gap-3">
       {/* Team Ranking & Performance */}
       <div className="col-span-4">
         <PerformanceModule teamRanking={ranking} teamStats={teamStats} />
       </div>
 
-      {/* OPR Stats */}
+      {/* Team Statistics with OPR */}
       <div className="col-span-4">
-        <OPRSmallModule
-          opr={data?.targetTeam?.opr}
-          dpr={data?.targetTeam?.dpr}
-          ccwm={data?.targetTeam?.ccwm}
+        <DetailedOPRModule
+          opr={teamStats?.opr}
+          dpr={teamStats?.dpr}
+          autoOpr={teamStats?.autoOpr}
+          teleopOpr={teamStats?.teleopOpr}
+          endgameOpr={teamStats?.endgameOpr}
           matchesPlayed={data?.targetTeam?.played}
           loading={loading}
           error={error}
+          oprRank={oprRank}
+          totalTeams={totalTeams}
         />
       </div>
 
       {/* Upcoming Matches */}
       <div className="col-span-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Upcoming Matches</CardTitle>
+        <Card className="h-full flex flex-col">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">Upcoming Matches</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
+          <CardContent className="pt-2">
+            <div className="space-y-1.5">
               {upcomingMatches.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No upcoming matches</p>
+                <p className="text-xs text-muted-foreground text-center py-4">No upcoming matches</p>
               ) : (
                 upcomingMatches.map((match) => (
                   <div
                     key={match.matchNumber}
-                    className="p-3 rounded-lg border"
+                    className="p-2 rounded border"
                     style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-card)' }}
                   >
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="font-semibold">{match.description}</span>
-                      <span className="text-xs text-muted-foreground">
-                        {match.startTime ? new Date(match.startTime).toLocaleTimeString() : "TBD"}
+                    <div className="flex justify-between items-center mb-0.5">
+                      <span className="font-semibold text-xs">{match.description}</span>
+                      <span className="text-[10px] text-muted-foreground">
+                        {match.startTime ? new Date(match.startTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : "TBD"}
                       </span>
                     </div>
-                    <div className="text-sm">
+                    <div className="text-[11px]">
                       <span style={{ color: 'var(--color-red1)' }}>Red: {match.red1}, {match.red2}</span>
                       {" vs "}
                       <span style={{ color: 'var(--color-blue1)' }}>Blue: {match.blue1}, {match.blue2}</span>
@@ -115,16 +147,88 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches 
         </Card>
       </div>
 
+      {/* Event Rankings */}
+      <div className="col-span-12">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Trophy className="h-4 w-4" />
+              Event Rankings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-2">
+            {rankings.length === 0 ? (
+              <p className="text-xs text-muted-foreground text-center py-4">No rankings available yet</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b" style={{ borderColor: 'var(--color-border)' }}>
+                      <th className="text-left py-2 px-3 font-semibold text-xs">Rank</th>
+                      <th className="text-left py-2 px-3 font-semibold text-xs">Team</th>
+                      <th className="text-center py-2 px-3 font-semibold text-xs">RP</th>
+                      <th className="text-center py-2 px-3 font-semibold text-xs">TBP</th>
+                      <th className="text-center py-2 px-3 font-semibold text-xs">Record</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rankings.slice(0, 10).map((r) => (
+                      <tr
+                        key={r.team}
+                        className={`border-b hover:bg-accent/50 transition-colors ${
+                          r.team === teamNumber ? 'bg-purple-100 dark:bg-purple-950/30' : ''
+                        }`}
+                        style={{ borderColor: 'var(--color-border)' }}
+                      >
+                        <td className="py-2 px-3">
+                          <div className="flex items-center gap-1.5">
+                            <span className="font-bold text-xs">{r.rank}</span>
+                            {r.rank === 1 && <Trophy className="h-3 w-3 text-yellow-500" />}
+                            {r.rank <= 3 && r.rank > 1 && <Trophy className="h-3 w-3 text-gray-400" />}
+                          </div>
+                        </td>
+                        <td className="py-2 px-3 font-semibold text-xs">
+                          {r.team}
+                          {r.team === teamNumber && (
+                            <span className="ml-1.5 text-[10px] text-purple-600 dark:text-purple-400">(You)</span>
+                          )}
+                        </td>
+                        <td className="py-2 px-3 text-center text-xs">{r.rp}</td>
+                        <td className="py-2 px-3 text-center text-xs">{r.tbp}</td>
+                        <td className="py-2 px-3 text-center text-[11px]">
+                          <span className="text-green-600 dark:text-green-400">{r.wins}</span>
+                          {" - "}
+                          <span className="text-red-600 dark:text-red-400">{r.losses}</span>
+                          {" - "}
+                          <span className="text-gray-600 dark:text-gray-400">{r.ties}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {rankings.length > 10 && (
+                  <p className="text-[10px] text-muted-foreground text-center mt-2">
+                    Showing top 10 of {rankings.length} teams
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       {/* OPR Over Time Chart */}
       <div className="col-span-12">
         <Card>
-          <CardHeader>
-            <CardTitle>OPR Over Time</CardTitle>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base">OPR Over Time</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="h-64 flex items-center justify-center">
-              <p className="text-muted-foreground">OPR timeline visualization - Coming Soon</p>
-              <p className="text-xs text-muted-foreground ml-2">(Will integrate with FTCScout API)</p>
+          <CardContent className="pt-2">
+            <div className="h-48 flex items-center justify-center">
+              <div className="text-center">
+                <p className="text-muted-foreground text-xs">OPR timeline visualization - Coming Soon</p>
+                <p className="text-[10px] text-muted-foreground mt-1">(Will integrate with FTCScout API)</p>
+              </div>
             </div>
           </CardContent>
         </Card>

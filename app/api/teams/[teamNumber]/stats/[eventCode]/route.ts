@@ -53,7 +53,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     // Get OPR data from our custom calculation
     let opr = 0,
       dpr = 0,
-      ccwm = 0
+      autoOpr = 0,
+      teleopOpr = 0,
+      endgameOpr = 0
 
     if (oprResponse.ok) {
       const oprData = await oprResponse.json()
@@ -61,7 +63,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       if (teamOpr) {
         opr = teamOpr.opr || 0
         dpr = teamOpr.dpr || 0
-        ccwm = teamOpr.ccwm || 0
+        autoOpr = teamOpr.autoOpr || 0
+        teleopOpr = teamOpr.teleopOpr || 0
+        endgameOpr = teamOpr.endgameOpr || 0
       }
     } else {
       console.log("Custom OPR data not available")
@@ -88,7 +92,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       ties,
       opr,
       dpr,
-      ccwm,
+      autoOpr,
+      teleopOpr,
+      endgameOpr,
       rank: teamRank,
       rp,
       tbp,
@@ -106,7 +112,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ties: 0,
         opr: 0,
         dpr: 0,
-        ccwm: 0,
         rank: 0,
         rp: 0,
         tbp: 0,

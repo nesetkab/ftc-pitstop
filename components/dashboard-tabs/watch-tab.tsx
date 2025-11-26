@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { RankingsModule } from "../modules/rankings-module"
 import { Ranking, Match } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
+import { StreamEmbed } from "../stream-embed"
 
 interface WatchTabProps {
   eventCode: string
@@ -23,10 +24,7 @@ export function WatchTab({ eventCode, teamNumber, rankings, matches }: WatchTabP
             <CardTitle>Live Stream</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="aspect-video bg-black rounded-lg flex items-center justify-center">
-              <p className="text-white">Stream embed will go here</p>
-              <p className="text-xs text-gray-400 ml-2">(Twitch/YouTube integration)</p>
-            </div>
+            <StreamEmbed eventCode={eventCode} />
           </CardContent>
         </Card>
 

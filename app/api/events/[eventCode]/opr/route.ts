@@ -9,32 +9,85 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     console.log("Calculating OPR for event:", eventCode)
 
-    // Fetch all matches through cache layer
-    const { data, fromCache } = await ftcApiClient.getMatches(eventCode.toUpperCase(), { bypassCache })
-    const matches = data.matches || []
+    // Fetch all matches and score details through cache layer
+    let matchesResult, scoreDetailsResult
+    try {
+      [matchesResult, scoreDetailsResult] = await Promise.all([
+        ftcApiClient.getMatches(eventCode.toUpperCase(), { bypassCache }),
+        ftcApiClient.getScoreDetails(eventCode.toUpperCase(), 'qual', { bypassCache })
+      ])
+    } catch (error) {
+      console.error("Error fetching data:", error)
+      // If score details fail, continue with just matches
+      matchesResult = await ftcApiClient.getMatches(eventCode.toUpperCase(), { bypassCache })
+      scoreDetailsResult = { data: { MatchScores: [] }, fromCache: false }
+      console.log("Continuing without score details")
+    }
 
-    console.log(`Processing ${matches.length} matches for OPR calculation (fromCache: ${fromCache})`)
+    const matches = matchesResult.data.matches || []
+    const scoreDetails = scoreDetailsResult.data.matchScores || scoreDetailsResult.data.MatchScores || []
 
-    // Transform matches to our format
+    console.log(`Processing ${matches.length} matches for OPR calculation (fromCache: ${matchesResult.fromCache})`)
+    console.log(`Got ${scoreDetails.length} score details (fromCache: ${scoreDetailsResult.fromCache})`)
+
+    // Debug: Log raw score details response structure
+    console.log('Score details response keys:', Object.keys(scoreDetailsResult.data))
+    if (scoreDetails.length > 0) {
+      console.log('First score detail keys:', Object.keys(scoreDetails[0]))
+      console.log('First score detail sample:', JSON.stringify(scoreDetails[0], null, 2))
+    }
+
+    // Create a map of match numbers to their score details
+    const scoreDetailMap = new Map()
+    scoreDetails.forEach((detail: any) => {
+      scoreDetailMap.set(detail.matchNumber, detail)
+    })
+
+    // Transform matches to our format - ONLY QUALIFICATION MATCHES for OPR
     const transformedMatches = matches
       .filter(
         (match: any) =>
-          match.scoreRedFinal !== null && match.scoreBlueFinal !== null && match.teams && match.teams.length === 4,
+          match.scoreRedFinal !== null &&
+          match.scoreBlueFinal !== null &&
+          match.teams &&
+          match.teams.length === 4 &&
+          match.tournamentLevel === "QUALIFICATION",
       )
-      .map((match: any) => ({
-        matchNumber: match.matchNumber,
-        red1: match.teams?.find((t: any) => t.station === "Red1")?.teamNumber || 0,
-        red2: match.teams?.find((t: any) => t.station === "Red2")?.teamNumber || 0,
-        blue1: match.teams?.find((t: any) => t.station === "Blue1")?.teamNumber || 0,
-        blue2: match.teams?.find((t: any) => t.station === "Blue2")?.teamNumber || 0,
-        redScore: match.scoreRedFinal || 0,
-        blueScore: match.scoreBlueFinal || 0,
-        redFoul: match.scoreRedFoul || 0,
-        blueFoul: match.scoreBlueFoul || 0,
-        played: true,
-      }))
+      .map((match: any) => {
+        const detail = scoreDetailMap.get(match.matchNumber)
+
+        // Extract teleopBasePoints from the alliances array
+        const redAlliance = detail?.alliances?.find((a: any) => a.alliance === "Red")
+        const blueAlliance = detail?.alliances?.find((a: any) => a.alliance === "Blue")
+
+        return {
+          matchNumber: match.matchNumber,
+          red1: match.teams?.find((t: any) => t.station === "Red1")?.teamNumber || 0,
+          red2: match.teams?.find((t: any) => t.station === "Red2")?.teamNumber || 0,
+          blue1: match.teams?.find((t: any) => t.station === "Blue1")?.teamNumber || 0,
+          blue2: match.teams?.find((t: any) => t.station === "Blue2")?.teamNumber || 0,
+          redScore: match.scoreRedFinal || 0,
+          blueScore: match.scoreBlueFinal || 0,
+          redFoul: match.scoreRedFoul || 0,
+          blueFoul: match.scoreBlueFoul || 0,
+          redAuto: match.scoreRedAuto ?? 0,
+          blueAuto: match.scoreBlueAuto ?? 0,
+          redEndgame: redAlliance?.teleopBasePoints ?? 0,
+          blueEndgame: blueAlliance?.teleopBasePoints ?? 0,
+          played: true,
+        }
+      })
 
     console.log(`Transformed ${transformedMatches.length} valid matches for OPR calculation`)
+
+    // Debug: Check if endgame (teleopBasePoints) data is available
+    if (transformedMatches.length > 0) {
+      const sampleMatch = transformedMatches[0]
+      console.log('Sample match endgame values:', {
+        redEndgame: sampleMatch.redEndgame,
+        blueEndgame: sampleMatch.blueEndgame
+      })
+    }
 
     if (transformedMatches.length === 0) {
       console.log("No valid matches found for OPR calculation")

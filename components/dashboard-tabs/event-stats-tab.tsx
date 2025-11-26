@@ -69,10 +69,6 @@ export function EventStatsTab({ eventCode }: EventStatsTabProps) {
                       <span className="text-muted-foreground">DPR: </span>
                       <span className="font-semibold">{team.dpr?.toFixed(1) || 'N/A'}</span>
                     </div>
-                    <div>
-                      <span className="text-muted-foreground">CCWM: </span>
-                      <span className="font-semibold">{team.ccwm?.toFixed(1) || 'N/A'}</span>
-                    </div>
                   </div>
                 </div>
               ))}

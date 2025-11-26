@@ -82,7 +82,6 @@ export function PresetDashboard({
           <OPRSmallModule
             opr={data?.targetTeam?.opr}
             dpr={data?.targetTeam?.dpr}
-            ccwm={data?.targetTeam?.ccwm}
             matchesPlayed={data?.targetTeam?.played}
             loading={loading}
             error={error}
@@ -121,7 +120,6 @@ export function PresetDashboard({
           <OPRModule
             opr={data?.targetTeam?.opr}
             dpr={data?.targetTeam?.dpr}
-            ccwm={data?.targetTeam?.ccwm}
             matchesPlayed={data?.targetTeam?.played}
             loading={loading}
             error={error}
@@ -158,7 +156,6 @@ export function PresetDashboard({
           <OPRModule
             opr={data?.targetTeam?.opr}
             dpr={data?.targetTeam?.dpr}
-            ccwm={data?.targetTeam?.ccwm}
             matchesPlayed={data?.targetTeam?.played}
             loading={loading}
             error={error}
@@ -191,7 +188,6 @@ export function PresetDashboard({
           <OPRSmallModule
             opr={data?.targetTeam?.opr}
             dpr={data?.targetTeam?.dpr}
-            ccwm={data?.targetTeam?.ccwm}
             matchesPlayed={data?.targetTeam?.played}
             loading={loading}
             error={error}

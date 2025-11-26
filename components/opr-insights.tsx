@@ -8,21 +8,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   TrendingUp,
   Shield,
-  Target,
   Calculator,
   RefreshCw,
   AlertTriangle,
   Info,
   Trophy,
   BarChart3,
-  Zap,
 } from "lucide-react"
 
 interface TeamOPR {
   teamNumber: number
   opr: number
   dpr: number
-  ccwm: number
   matchesPlayed: number
 }
 
@@ -92,13 +89,8 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
       .slice()
       .sort((a, b) => a.dpr - b.dpr)
       .slice(0, 10) || []
-  const topCCWMTeams =
-    data?.opr
-      .slice()
-      .sort((a, b) => b.ccwm - a.ccwm)
-      .slice(0, 10) || []
 
-  const TeamOPRCard = ({ team, rank, metric }: { team: TeamOPR; rank: number; metric: "opr" | "dpr" | "ccwm" }) => {
+  const TeamOPRCard = ({ team, rank, metric }: { team: TeamOPR; rank: number; metric: "opr" | "dpr" }) => {
     const isTarget = team.teamNumber === teamNumber
     const value = team[metric]
     const displayValue = metric === "dpr" ? value.toFixed(1) : value.toFixed(1)
@@ -190,7 +182,7 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
               <p className="font-semibold mb-1">Custom OPR Calculation:</p>
               <p>
                 Using matrix algebra to solve team contributions from {data.matchesProcessed} completed matches. OPR =
-                offensive contribution, DPR = defensive impact, CCWM = calculated contribution to winning margin.
+                offensive contribution, DPR = defensive impact.
               </p>
             </div>
           </div>
@@ -207,7 +199,7 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 gap-6">
               <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg">
                 <TrendingUp className="h-8 w-8 mx-auto mb-2 text-green-600" />
                 <div className="text-3xl font-bold text-green-600">{targetTeam.opr.toFixed(1)}</div>
@@ -220,12 +212,6 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
                 <div className="text-sm text-muted-foreground">Defensive Power Rating</div>
                 <div className="text-xs text-muted-foreground mt-1">Opponent points allowed</div>
               </div>
-              <div className="text-center p-4 bg-purple-50 dark:bg-purple-950 rounded-lg">
-                <Target className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                <div className="text-3xl font-bold text-purple-600">{targetTeam.ccwm.toFixed(1)}</div>
-                <div className="text-sm text-muted-foreground">CCWM</div>
-                <div className="text-xs text-muted-foreground mt-1">Contribution to winning margin</div>
-              </div>
             </div>
             <div className="mt-4 text-center">
               <Badge variant="outline">Based on {targetTeam.matchesPlayed} matches</Badge>
@@ -235,7 +221,7 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
       )}
 
       <Tabs defaultValue="opr" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="opr" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Top OPR
@@ -243,10 +229,6 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
           <TabsTrigger value="dpr" className="flex items-center gap-2">
             <Shield className="h-4 w-4" />
             Best Defense
-          </TabsTrigger>
-          <TabsTrigger value="ccwm" className="flex items-center gap-2">
-            <Zap className="h-4 w-4" />
-            Top CCWM
           </TabsTrigger>
         </TabsList>
 
@@ -280,24 +262,6 @@ export function OPRInsights({ eventCode, teamNumber }: OPRInsightsProps) {
               <div className="space-y-3">
                 {topDPRTeams.map((team, index) => (
                   <TeamOPRCard key={team.teamNumber} team={team} rank={index + 1} metric="dpr" />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="ccwm" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                Highest Contribution to Winning Margin
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {topCCWMTeams.map((team, index) => (
-                  <TeamOPRCard key={team.teamNumber} team={team} rank={index + 1} metric="ccwm" />
                 ))}
               </div>
             </CardContent>

@@ -146,6 +146,19 @@ export class FTCApiClient {
   }
 
   /**
+   * Get score details for an event
+   */
+  async getScoreDetails(eventCode: string, tournamentLevel: string = 'qual', options?: FetchOptions) {
+    return this.fetchWithCache(
+      `scores/${eventCode}/${tournamentLevel}`,
+      'scores',
+      `${eventCode}-${tournamentLevel}`,
+      CACHE_TTL.MATCHES, // Same TTL as matches since they're related
+      options
+    )
+  }
+
+  /**
    * Invalidate cache for an event (useful for live events)
    */
   async invalidateEvent(eventCode: string) {
@@ -155,6 +168,8 @@ export class FTCApiClient {
       cacheManager.invalidate('rankings', eventCode),
       cacheManager.invalidate('matches', eventCode),
       cacheManager.invalidate('alliances', eventCode),
+      cacheManager.invalidate('scores', `${eventCode}-qual`),
+      cacheManager.invalidate('scores', `${eventCode}-playoff`),
     ])
     console.log(`[Cache] Invalidated all data for event: ${eventCode}`)
   }

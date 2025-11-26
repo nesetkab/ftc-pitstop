@@ -4,60 +4,60 @@
 
 @layer base {
   :root {
-    /* Custom theme variables (set by theme system) */
-    --color-background: #000000;
-    --color-background-secondary: #0a0a0a;
-    --color-background-tertiary: #1a1a1a;
+    /* Custom theme variables - Purple accent scheme */
+    --color-background: #0a0a0f;
+    --color-background-secondary: #12121a;
+    --color-background-tertiary: #1a1a28;
 
-    --color-text: #f9fafb;
-    --color-text-secondary: #d1d5db;
-    --color-text-muted: #9ca3af;
+    --color-text: #e8e8f0;
+    --color-text-secondary: #b8b8cc;
+    --color-text-muted: #888899;
 
-    --color-primary: #3b82f6;
-    --color-primary-hover: #60a5fa;
+    --color-primary: #7c3aed;
+    --color-primary-hover: #8b5cf6;
     --color-primary-text: #ffffff;
 
-    --color-accent: #8b5cf6;
-    --color-accent-hover: #a78bfa;
+    --color-accent: #7c3aed;
+    --color-accent-hover: #8b5cf6;
 
-    --color-border: #27272a;
-    --color-border-hover: #3f3f46;
+    --color-border: #2a2a3a;
+    --color-border-hover: #3a3a4a;
 
     --color-success: #10b981;
     --color-warning: #f59e0b;
     --color-error: #ef4444;
-    --color-info: #3b82f6;
+    --color-info: #7c3aed;
 
-    --color-card: #18181b;
-    --color-card-hover: #27272a;
+    --color-card: #14141d;
+    --color-card-hover: #1a1a28;
 
     --color-red1: #dc2626;
     --color-red2: #ef4444;
     --color-blue1: #2563eb;
     --color-blue2: #3b82f6;
 
-    /* Shadcn/ui theme variables (mapped to custom theme) */
-    --background: 0 0% 0%;
-    --foreground: 249 249 251;
-    --card: 24 24 27;
-    --card-foreground: 249 249 251;
-    --popover: 24 24 27;
-    --popover-foreground: 249 249 251;
-    --primary: 59 130 246;
-    --primary-foreground: 255 255 255;
-    --secondary: 39 39 42;
-    --secondary-foreground: 249 249 251;
-    --muted: 39 39 42;
-    --muted-foreground: 154 163 175;
-    --accent: 139 92 246;
-    --accent-foreground: 255 255 255;
-    --destructive: 239 68 68;
-    --destructive-foreground: 255 255 255;
-    --border: 39 39 42;
-    --input: 39 39 42;
-    --ring: 59 130 246;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
+    /* Shadcn/ui theme variables - Purple accent */
+    --background: 0 0% 4%;
+    --foreground: 240 20% 92%;
+    --card: 240 15% 8%;
+    --card-foreground: 240 20% 92%;
+    --popover: 240 15% 8%;
+    --popover-foreground: 240 20% 92%;
+    --primary: 263 70% 57%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 10% 15%;
+    --secondary-foreground: 240 20% 92%;
+    --muted: 240 10% 15%;
+    --muted-foreground: 240 10% 55%;
+    --accent: 263 70% 57%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 240 10% 18%;
+    --input: 240 10% 18%;
+    --ring: 263 70% 57%;
+    --radius: 0.25rem;
+    --chart-1: 263 70% 57%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;

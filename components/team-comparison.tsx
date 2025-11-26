@@ -34,7 +34,6 @@ interface TeamStats {
   winRate: number
   opr: number
   dpr: number
-  ccwm: number
   avgScore: number
   highScore: number
   avgMargin: number
@@ -185,10 +184,6 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
               <div className="flex justify-between">
                 <span>DPR:</span>
                 <span className="font-semibold">{team.dpr.toFixed(1)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>CCWM:</span>
-                <span className="font-semibold">{team.ccwm.toFixed(1)}</span>
               </div>
             </div>
             <div>
