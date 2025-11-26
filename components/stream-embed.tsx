@@ -32,7 +32,7 @@ export function StreamEmbed({ eventCode }: StreamEmbedProps) {
   const getEmbedUrl = (url: string): string | null => {
     // YouTube
     if (url.includes("youtube.com") || url.includes("youtu.be")) {
-      const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1]
+      const videoId = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?|live|shorts)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/)?.[1]
       if (videoId) {
         return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`
       }
