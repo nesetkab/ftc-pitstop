@@ -58,14 +58,13 @@ export function DetailedOPRModule({
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-base">
-          <Trophy className="h-4 w-4" />
           Team Statistics
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 pt-2">
         {/* OPR Ranking */}
         {oprRank && totalTeams && (
-          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-950/30 rounded text-center border border-purple-200 dark:border-purple-900">
+          <div className="mb-3 p-2 bg-purple-50 dark:bg-purple-950/30 rounded text-start border border-purple-200 dark:border-purple-900">
             <div className="text-xs text-muted-foreground">OPR Ranking</div>
             <div className="text-xl font-bold text-purple-600 dark:text-purple-400">
               {oprRank} / {totalTeams}

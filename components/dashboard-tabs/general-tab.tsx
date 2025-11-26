@@ -131,7 +131,7 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                     <div className="flex justify-between items-center mb-0.5">
                       <span className="font-semibold text-xs">{match.description}</span>
                       <span className="text-[10px] text-muted-foreground">
-                        {match.startTime ? new Date(match.startTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : "TBD"}
+                        {match.startTime ? new Date(match.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "TBD"}
                       </span>
                     </div>
                     <div className="text-[11px]">
@@ -150,13 +150,12 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
       {/* Event Rankings */}
       <div className="col-span-12">
         <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Trophy className="h-4 w-4" />
+          <CardHeader className="">
+            <CardTitle className="flex items-center text-base">
               Event Rankings
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-2">
+          <CardContent className="">
             {rankings.length === 0 ? (
               <p className="text-xs text-muted-foreground text-center py-4">No rankings available yet</p>
             ) : (
@@ -172,12 +171,11 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                     </tr>
                   </thead>
                   <tbody>
-                    {rankings.slice(0, 10).map((r) => (
+                    {rankings.map((r) => (
                       <tr
-                        key={r.team}
-                        className={`border-b hover:bg-accent/50 transition-colors ${
-                          r.team === teamNumber ? 'bg-purple-100 dark:bg-purple-950/30' : ''
-                        }`}
+                        key={r.teamNumber}
+                        className={`border-b hover:bg-accent/50 transition-colors ${r.teamNumber === teamNumber ? 'bg-purple-100 dark:bg-purple-950/30' : ''
+                          }`}
                         style={{ borderColor: 'var(--color-border)' }}
                       >
                         <td className="py-2 px-3">
@@ -188,10 +186,9 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                           </div>
                         </td>
                         <td className="py-2 px-3 font-semibold text-xs">
-                          {r.team}
-                          {r.team === teamNumber && (
-                            <span className="ml-1.5 text-[10px] text-purple-600 dark:text-purple-400">(You)</span>
-                          )}
+                          {r.teamNumber}
+                          {r.teamNumber === teamNumber
+                          }
                         </td>
                         <td className="py-2 px-3 text-center text-xs">{r.rp}</td>
                         <td className="py-2 px-3 text-center text-xs">{r.tbp}</td>
@@ -206,11 +203,7 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                     ))}
                   </tbody>
                 </table>
-                {rankings.length > 10 && (
-                  <p className="text-[10px] text-muted-foreground text-center mt-2">
-                    Showing top 10 of {rankings.length} teams
-                  </p>
-                )}
+
               </div>
             )}
           </CardContent>

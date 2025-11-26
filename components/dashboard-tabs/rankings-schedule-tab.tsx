@@ -43,9 +43,9 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                         borderColor: 'var(--color-border)',
                         backgroundColor:
                           match.red1 === teamNumber ||
-                          match.red2 === teamNumber ||
-                          match.blue1 === teamNumber ||
-                          match.blue2 === teamNumber
+                            match.red2 === teamNumber ||
+                            match.blue1 === teamNumber ||
+                            match.blue2 === teamNumber
                             ? 'var(--color-card-hover)'
                             : 'var(--color-card)',
                       }}
@@ -82,7 +82,7 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                 <div className="space-y-2">
                   {completedMatches.reverse().map((match) => (
                     <div
-                      key={match.matchNumber}
+                      key={match.series ? match.series + match.matchNumber : match.matchNumber}
                       className="p-3 rounded-lg border opacity-75"
                       style={{
                         borderColor: 'var(--color-border)',
@@ -102,12 +102,12 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                           <span style={{ color: 'var(--color-blue1)' }}>{match.blueScore}</span>
                         </div>
                       </div>
-                      <div className="text-sm opacity-75">
+                      <div className="flex flex-row justify-between text-sm opacity-75">
                         <div style={{ color: 'var(--color-red1)' }}>
-                          Red: {match.red1}, {match.red2}
+                          {match.red1} & {match.red2}
                         </div>
                         <div style={{ color: 'var(--color-blue1)' }}>
-                          Blue: {match.blue1}, {match.blue2}
+                          {match.blue1} & {match.blue2}
                         </div>
                       </div>
                     </div>

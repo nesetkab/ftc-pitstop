@@ -7,24 +7,23 @@ import { Ranking } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 
 export function RankingsModule({ rankings, teamNumber }: { rankings: Ranking[], teamNumber: number }) {
   return (
-    <Card className="flex flex-col h-full">
+    <Card className="flex flex-col h-fit">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <TrendingUp className="h-5 w-5" />
+        <CardTitle className="flex items-center ">
           Rankings
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col h-full overflow-y-scroll">
+      <CardContent className="flex flex-col h-fit overflow-y-scroll">
         <div className="space-y-2 flex flex-col">
           {rankings.slice(0, rankings.length).map((ranking, index) => (
             <div
               key={ranking.teamNumber}
-              className={`flex items-center justify-between p-2 rounded ${ranking.team === teamNumber ? "bg-blue-100 dark:bg-blue-900" : ""
+              className={`flex items-center justify-between p-2 rounded ${ranking.teamNumber === teamNumber ? "bg-purple-100 dark:bg-purple-900" : ""
                 }`}
             >
               <div className="flex items-center gap-2">
-                <Badge variant={ranking.teamNumber === teamNumber ? "win" : index < 3 ? "default" : "secondary"} >#{ranking.rank}</Badge>
-                <span className={ranking.teamNumber === teamNumber ? "font-bold" : ""}>{ranking.teamNumber} - {ranking.teamName}</span>
+                <Badge variant={index < 3 ? "default" : "secondary"} >#{ranking.rank}</Badge>
+                <span className={ranking.teamNumber === teamNumber ? "" : ""}>{ranking.teamNumber} - {ranking.teamName}</span>
 
               </div>
               <div className="text-sm text-muted-foreground">

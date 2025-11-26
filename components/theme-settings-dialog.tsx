@@ -40,11 +40,10 @@ export function ThemeSettingsDialog() {
             {availableThemes.map((theme) => (
               <Card
                 key={theme.id}
-                className={`cursor-pointer transition-all hover:shadow-lg ${
-                  currentTheme.id === theme.id
+                className={`cursor-pointer transition-all hover:shadow-lg ${currentTheme.id === theme.id
                     ? 'ring-2 ring-primary'
                     : 'hover:ring-1 hover:ring-border-hover'
-                }`}
+                  }`}
                 onClick={() => {
                   setTheme(theme.id)
                 }}

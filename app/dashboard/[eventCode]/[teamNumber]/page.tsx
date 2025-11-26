@@ -82,6 +82,7 @@ export interface Match {
 }
 
 export interface Ranking {
+  teamNumber: number
   rank: number
   team: number
   rp: number
@@ -337,7 +338,6 @@ export default function DashboardPage() {
             <Button variant="outline" size="sm" onClick={fetchData} className="h-8 w-8 p-0">
               <RefreshCw className="h-3.5 w-3.5" />
             </Button>
-            <ThemeSettingsDialog />
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-2">
@@ -345,6 +345,7 @@ export default function DashboardPage() {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
+                <DropdownMenuItem><ThemeSettingsDialog /></DropdownMenuItem>
                 <DropdownMenuItem>Change Team</DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
@@ -375,7 +376,7 @@ export default function DashboardPage() {
               <GeneralTab
                 eventCode={eventCode}
                 teamNumber={teamNumber}
-                ranking={teamRanking}
+                ranking={teamRanking ? teamRanking : null}
                 teamStats={teamStats}
                 matches={matches}
                 rankings={rankings}
@@ -443,7 +444,7 @@ export default function DashboardPage() {
                     Next Match: {nextMatch.description}
                   </h3>
                   <p className="text-[11px]" style={{ color: 'var(--color-background)', opacity: 0.9 }}>
-                    {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : "Time TBD"} • Red:{" "}
+                    {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Time TBD"} • Red:{" "}
                     {nextMatch.red1}, {nextMatch.red2} vs Blue: {nextMatch.blue1}, {nextMatch.blue2}
                   </p>
                 </div>
