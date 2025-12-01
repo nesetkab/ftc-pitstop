@@ -4,7 +4,7 @@ import {
 } from "lucide-react"
 import { Ranking, TeamStats } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 
-export function PerformanceModule({ teamRanking, teamStats }: { teamRanking: Ranking, teamStats: TeamStats }) {
+export function PerformanceModule({ teamRanking, teamStats }: { teamRanking: Ranking | null, teamStats: TeamStats | null }) {
   return (
     <Card className="flex flex-col h-full">
       <CardHeader className="pb-2">

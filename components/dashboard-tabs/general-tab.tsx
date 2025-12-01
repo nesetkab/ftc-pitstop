@@ -11,8 +11,8 @@ import { Trophy, TrendingUp, TrendingDown } from "lucide-react"
 interface GeneralTabProps {
   eventCode: string
   teamNumber: number
-  ranking: Ranking
-  teamStats: TeamStats
+  ranking: Ranking | null
+  teamStats: TeamStats | null
   matches: Match[]
   rankings: Ranking[]
 }
@@ -92,7 +92,7 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
     <div className="grid grid-cols-12 gap-3">
       {/* Team Ranking & Performance */}
       <div className="col-span-4">
-        <PerformanceModule teamRanking={ranking} teamStats={teamStats} />
+        <PerformanceModule teamRanking={ranking ? ranking : null} teamStats={teamStats ? teamStats : null} />
       </div>
 
       {/* Team Statistics with OPR */}

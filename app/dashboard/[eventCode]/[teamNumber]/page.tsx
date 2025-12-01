@@ -377,7 +377,7 @@ export default function DashboardPage() {
                 eventCode={eventCode}
                 teamNumber={teamNumber}
                 ranking={teamRanking ? teamRanking : null}
-                teamStats={teamStats}
+                teamStats={teamStats ? teamStats : null}
                 matches={matches}
                 rankings={rankings}
               />
