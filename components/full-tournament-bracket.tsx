@@ -183,8 +183,8 @@ export function FullTournamentBracket({ matches, alliances, teamNumber, eventNam
 
   const BracketMatchCard = ({ match, showDetails = false }: { match: BracketMatch; showDetails?: boolean }) => {
     const isTeamInvolved = isTeamInAlliance(match.teams1) || isTeamInAlliance(match.teams2)
-    const alliance1Highlighted = isTeamInAlliance(match.teams1)
-    const alliance2Highlighted = isTeamInAlliance(match.teams2)
+    const alliance1Highlighted = !!isTeamInAlliance(match.teams1)
+    const alliance2Highlighted = !!isTeamInAlliance(match.teams2)
 
     return (
       <Card className={`${isTeamInvolved ? "ring-2 ring-blue-400 shadow-lg" : "hover:shadow-md"} transition-all`}>

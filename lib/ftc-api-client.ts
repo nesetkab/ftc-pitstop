@@ -12,6 +12,151 @@ export interface FetchOptions {
   cacheTTL?: number
 }
 
+// FTC API Response Types
+export interface FTCTeam {
+  teamNumber: number
+  nameShort: string
+  nameFull?: string
+  schoolName?: string
+  city?: string
+  stateProv?: string
+  country?: string
+  website?: string
+  rookieYear?: number
+  robotName?: string
+  districtCode?: string | null
+  homeCMP?: string | null
+}
+
+export interface FTCEvent {
+  code: string
+  divisionCode?: string | null
+  name: string
+  remote: boolean
+  hybrid: boolean
+  fieldCount: number
+  published: boolean
+  type: string
+  typeName: string
+  regionCode?: string
+  leagueCode?: string | null
+  districtCode?: string | null
+  venue: string
+  address?: string
+  city: string
+  stateprov: string
+  country: string
+  website?: string | null
+  liveStreamUrl?: string | null
+  webcasts?: string[]
+  timezone: string
+  dateStart: string
+  dateEnd: string
+}
+
+export interface FTCRanking {
+  rank: number
+  teamNumber: number
+  sortOrder1: number
+  sortOrder2: number
+  sortOrder3: number
+  sortOrder4: number
+  sortOrder5: number
+  sortOrder6: number
+  wins: number
+  losses: number
+  ties: number
+  qualAverage: number
+  dq: number
+  matchesPlayed: number
+  matchesCounted?: number
+  rankingPoints?: number
+  tieBreakerPoints?: number
+  // Aliases that may appear in API responses
+  rp?: number
+  tbp?: number
+}
+
+export interface FTCMatchTeam {
+  teamNumber: number
+  station: string
+  dq: boolean
+  onField: boolean
+}
+
+export interface FTCMatch {
+  matchNumber: number
+  description: string
+  field?: string
+  tournamentLevel: string
+  series: number
+  matchInSeries?: number
+  actualStartTime?: string
+  postResultTime?: string
+  scheduledStartTime?: string
+  teams: FTCMatchTeam[]
+  scoreRedFinal: number | null
+  scoreRedFoul: number | null
+  scoreRedAuto?: number | null
+  scoreBlueFinal: number | null
+  scoreBlueFoul: number | null
+  scoreBlueAuto?: number | null
+  randomization?: number
+  modifiedOn?: string
+}
+
+export interface FTCAlliance {
+  number: number
+  name?: string
+  captain: number
+  round1: number
+  round2: number
+  round3?: number | null
+  backup?: number | null
+  backupReplaced?: number | null
+}
+
+export interface FTCScoreDetail {
+  matchNumber: number
+  matchLevel: string
+  alliances: Array<{
+    alliance: string
+    autoPoints?: number
+    dcPoints?: number
+    endgamePoints?: number
+    penaltyPointsCommitted?: number
+    totalPoints?: number
+    teleopBasePoints?: number
+    [key: string]: unknown
+  }>
+}
+
+// API Response wrappers
+export interface EventsResponse {
+  events: FTCEvent[]
+}
+
+export interface TeamsResponse {
+  teams: FTCTeam[]
+}
+
+export interface RankingsResponse {
+  rankings: FTCRanking[]
+}
+
+export interface MatchesResponse {
+  matches: FTCMatch[]
+}
+
+export interface AlliancesResponse {
+  alliances: FTCAlliance[]
+}
+
+export interface ScoreDetailsResponse {
+  matchScores?: FTCScoreDetail[]
+  MatchScores?: FTCScoreDetail[]
+}
+
 export class FTCApiClient {
   private season: string
   private authHeader: string
@@ -70,8 +215,8 @@ export class FTCApiClient {
   /**
    * Get all events for the season
    */
-  async getEvents(options?: FetchOptions) {
-    return this.fetchWithCache(
+  async getEvents(options?: FetchOptions): Promise<{ data: EventsResponse; fromCache: boolean }> {
+    return this.fetchWithCache<EventsResponse>(
       'events',
       'events',
       'all',
@@ -83,8 +228,8 @@ export class FTCApiClient {
   /**
    * Get specific event
    */
-  async getEvent(eventCode: string, options?: FetchOptions) {
-    return this.fetchWithCache(
+  async getEvent(eventCode: string, options?: FetchOptions): Promise<{ data: EventsResponse; fromCache: boolean }> {
+    return this.fetchWithCache<EventsResponse>(
       `events?eventCode=${eventCode}`,
       'events',
       eventCode,
@@ -96,8 +241,8 @@ export class FTCApiClient {
   /**
    * Get teams for an event
    */
-  async getTeams(eventCode: string, options?: FetchOptions) {
-    return this.fetchWithCache(
+  async getTeams(eventCode: string, options?: FetchOptions): Promise<{ data: TeamsResponse; fromCache: boolean }> {
+    return this.fetchWithCache<TeamsResponse>(
       `teams?eventCode=${eventCode}`,
       'teams',
       eventCode,
@@ -109,8 +254,8 @@ export class FTCApiClient {
   /**
    * Get rankings for an event
    */
-  async getRankings(eventCode: string, options?: FetchOptions) {
-    return this.fetchWithCache(
+  async getRankings(eventCode: string, options?: FetchOptions): Promise<{ data: RankingsResponse; fromCache: boolean }> {
+    return this.fetchWithCache<RankingsResponse>(
       `rankings/${eventCode}`,
       'rankings',
       eventCode,
@@ -122,8 +267,8 @@ export class FTCApiClient {
   /**
    * Get matches for an event
    */
-  async getMatches(eventCode: string, options?: FetchOptions) {
-    return this.fetchWithCache(
+  async getMatches(eventCode: string, options?: FetchOptions): Promise<{ data: MatchesResponse; fromCache: boolean }> {
+    return this.fetchWithCache<MatchesResponse>(
       `matches/${eventCode}`,
       'matches',
       eventCode,
@@ -135,8 +280,8 @@ export class FTCApiClient {
   /**
    * Get alliances for an event
    */
-  async getAlliances(eventCode: string, options?: FetchOptions) {
-    return this.fetchWithCache(
+  async getAlliances(eventCode: string, options?: FetchOptions): Promise<{ data: AlliancesResponse; fromCache: boolean }> {
+    return this.fetchWithCache<AlliancesResponse>(
       `alliances/${eventCode}`,
       'alliances',
       eventCode,
@@ -148,8 +293,8 @@ export class FTCApiClient {
   /**
    * Get score details for an event
    */
-  async getScoreDetails(eventCode: string, tournamentLevel: string = 'qual', options?: FetchOptions) {
-    return this.fetchWithCache(
+  async getScoreDetails(eventCode: string, tournamentLevel: string = 'qual', options?: FetchOptions): Promise<{ data: ScoreDetailsResponse; fromCache: boolean }> {
+    return this.fetchWithCache<ScoreDetailsResponse>(
       `scores/${eventCode}/${tournamentLevel}`,
       'scores',
       `${eventCode}-${tournamentLevel}`,

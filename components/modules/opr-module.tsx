@@ -33,7 +33,7 @@ interface OPRData {
   lastUpdated: string
 }
 
-export function OPRModule({ opr, dpr, matchesPlayed, loading, error }: { opr: number | undefined, dpr: number | undefined, matchesPlayed: number | undefined, loading: boolean, error: string | null }) {
+export function OPRModule({ opr, dpr, autoOpr, teleopOpr, endgameOpr, matchesPlayed, loading, error }: { opr: number | undefined, dpr: number | undefined, autoOpr?: number, teleopOpr?: number, endgameOpr?: number, matchesPlayed: number | undefined, loading: boolean, error: string | null }) {
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -82,20 +82,39 @@ export function OPRModule({ opr, dpr, matchesPlayed, loading, error }: { opr: nu
             </div>
           </CardHeader>
           <CardContent className="flex flex-col h-full">
-            <div className="grid grid-cols-2 gap-6 h-full">
+            <div className="grid grid-cols-2 gap-4">
               <div className="text-center p-4 bg-green-50 dark:bg-green-950 rounded-lg flex flex-col justify-center">
                 <TrendingUp className="h-8 w-8 mx-auto mb-2 text-green-600" />
                 <div className="text-3xl font-bold mb-2 text-green-600">{opr.toFixed(1)}</div>
-                <div className="text-sm text-muted-foreground">Offensive Power Rating</div>
-                <div className="text-xs text-muted-foreground mt-1">Points contributed per match</div>
+                <div className="text-sm text-muted-foreground">Total OPR</div>
+                <div className="text-xs text-muted-foreground mt-1">Overall contribution</div>
               </div>
               <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg flex flex-col justify-center">
                 <Shield className="h-8 w-8 mx-auto mb-2 text-blue-600" />
                 <div className="text-3xl font-bold mb-2 text-blue-600">{dpr ? dpr.toFixed(1) : 'N/A'}</div>
-                <div className="text-sm text-muted-foreground">Defensive Power Rating</div>
-                <div className="text-xs text-muted-foreground mt-1">Opponent points allowed</div>
+                <div className="text-sm text-muted-foreground">DPR</div>
+                <div className="text-xs text-muted-foreground mt-1">Opponent points</div>
               </div>
             </div>
+
+            {/* Detailed OPR Breakdown */}
+            {(autoOpr !== undefined || teleopOpr !== undefined || endgameOpr !== undefined) && (
+              <div className="grid grid-cols-3 gap-3 mt-4">
+                <div className="text-center p-3 bg-purple-50 dark:bg-purple-950 rounded-lg">
+                  <div className="text-2xl font-bold mb-1 text-purple-600">{autoOpr?.toFixed(1) || 'N/A'}</div>
+                  <div className="text-xs text-muted-foreground">Auto OPR</div>
+                </div>
+                <div className="text-center p-3 bg-indigo-50 dark:bg-indigo-950 rounded-lg">
+                  <div className="text-2xl font-bold mb-1 text-indigo-600">{teleopOpr?.toFixed(1) || 'N/A'}</div>
+                  <div className="text-xs text-muted-foreground">TeleOp OPR</div>
+                </div>
+                <div className="text-center p-3 bg-cyan-50 dark:bg-cyan-950 rounded-lg">
+                  <div className="text-2xl font-bold mb-1 text-cyan-600">{endgameOpr?.toFixed(1) || 'N/A'}</div>
+                  <div className="text-xs text-muted-foreground">Endgame OPR</div>
+                </div>
+              </div>
+            )}
+
             <div className="mt-4 text-center">
               <Badge variant="outline">Based on {matchesPlayed ?? 0} matches</Badge>
             </div>

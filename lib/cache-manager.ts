@@ -60,7 +60,7 @@ export class CacheManager {
     try {
       if (this.useRedis) {
         // Try Redis first
-        const cached = await kv.get<CacheEntry<T>>(key)
+        const cached = await kv.get(key) as CacheEntry<T> | null
 
         if (cached && this.isValid(cached)) {
           console.log(`[Cache HIT] Redis: ${key}`)

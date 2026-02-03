@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Session code and scout name are required" }, { status: 400 })
     }
 
-    const success = sessionStore.addScoutToSession(sessionCode.toUpperCase(), scoutName)
+    const success = await sessionStore.addScoutToSession(sessionCode.toUpperCase(), scoutName)
 
     if (success) {
       return NextResponse.json({ message: "Scout connected successfully" })
@@ -24,14 +24,14 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const sessionId = searchParams.get("sessionId")
+    const sessionCode = searchParams.get("sessionCode")
 
-    if (sessionId) {
-      const scouts = sessionStore.getConnectedScouts(Number.parseInt(sessionId))
+    if (sessionCode) {
+      const scouts = await sessionStore.getConnectedScouts(sessionCode)
       return NextResponse.json(scouts)
     }
 
-    return NextResponse.json({ error: "Session ID is required" }, { status: 400 })
+    return NextResponse.json({ error: "Session code is required" }, { status: 400 })
   } catch (error) {
     return NextResponse.json({ error: "Failed to fetch connected scouts" }, { status: 500 })
   }

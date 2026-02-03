@@ -43,7 +43,7 @@ export default function TestPage() {
         rankings: rankingsResponse.status,
       })
 
-      const results = {
+      const results: Record<string, { status: number; ok: boolean; data?: unknown; count?: number }> = {
         event: { status: eventResponse.status, ok: eventResponse.ok },
         teams: { status: teamsResponse.status, ok: teamsResponse.ok },
         matches: { status: matchesResponse.status, ok: matchesResponse.ok },

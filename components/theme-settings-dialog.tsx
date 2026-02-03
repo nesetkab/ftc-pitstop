@@ -15,18 +15,29 @@ import {
 } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
-export function ThemeSettingsDialog() {
+interface ThemeSettingsDialogProps {
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+}
+
+export function ThemeSettingsDialog({ open: externalOpen, onOpenChange }: ThemeSettingsDialogProps = {}) {
   const { currentTheme, setTheme, availableThemes } = useCustomTheme()
-  const [open, setOpen] = useState(false)
+  const [internalOpen, setInternalOpen] = useState(false)
+
+  const open = externalOpen !== undefined ? externalOpen : internalOpen
+  const setOpen = onOpenChange || setInternalOpen
+  const isControlled = externalOpen !== undefined
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="gap-2">
-          <Palette className="h-4 w-4" />
-          Theme
-        </Button>
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Palette className="h-4 w-4" />
+            Theme
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Choose Your Theme</DialogTitle>
@@ -41,8 +52,8 @@ export function ThemeSettingsDialog() {
               <Card
                 key={theme.id}
                 className={`cursor-pointer transition-all hover:shadow-lg ${currentTheme.id === theme.id
-                    ? 'ring-2 ring-primary'
-                    : 'hover:ring-1 hover:ring-border-hover'
+                  ? 'ring-2 ring-primary'
+                  : 'hover:ring-1 hover:ring-border-hover'
                   }`}
                 onClick={() => {
                   setTheme(theme.id)

@@ -182,7 +182,7 @@ export const ModuleSelectionDialog = ({ modules }: { modules: string[] }) => {
   </Dialog.Root>)
 };
 
-const saveLayout = (layout: Layout) => {
+const saveLayout = (layout: Layout[]) => {
   setClientSideCookie('layout', JSON.stringify(layout))
 }
 

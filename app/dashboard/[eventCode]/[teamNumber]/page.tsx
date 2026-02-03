@@ -83,6 +83,7 @@ export interface Match {
 
 export interface Ranking {
   teamNumber: number
+  teamName?: string
   rank: number
   team: number
   rp: number
@@ -217,6 +218,7 @@ export default function DashboardPage() {
   const [showIntervalModal, setShowIntervalModal] = useState(false);
   const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(30000); // default 30s
   const [pendingInterval, setPendingInterval] = useState<number>(30000);
+  const [showThemeDialog, setShowThemeDialog] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -345,8 +347,9 @@ export default function DashboardPage() {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem><ThemeSettingsDialog /></DropdownMenuItem>
-                <DropdownMenuItem>Change Team</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setShowThemeDialog(true)}>
+                  Theme Settings
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
                     setPendingInterval(autoRefreshInterval)
@@ -357,6 +360,7 @@ export default function DashboardPage() {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            <ThemeSettingsDialog open={showThemeDialog} onOpenChange={setShowThemeDialog} />
           </div>
         </div>
 

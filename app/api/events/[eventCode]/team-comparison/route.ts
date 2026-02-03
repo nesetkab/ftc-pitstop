@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { ftcApiClient } from "@/lib/ftc-api-client"
+import { ftcApiClient, type FTCRanking, type FTCMatch } from "@/lib/ftc-api-client"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
   const { eventCode } = await params
@@ -18,9 +18,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr${bypassCache ? '?bypassCache=true' : ''}`),
     ])
 
-    let rankings = []
-    let matches = []
-    let oprData = []
+    let rankings: FTCRanking[] = []
+    let matches: FTCMatch[] = []
+    let oprData: Array<{ teamNumber: number; opr: number; dpr: number; autoOpr: number; teleopOpr: number; endgameOpr: number; matchesPlayed: number }> = []
 
     if (rankingsResult.data && Array.isArray(rankingsResult.data.rankings)) {
       rankings = rankingsResult.data.rankings
@@ -64,6 +64,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         winRate: winRate,
         opr: 0,
         dpr: 0,
+        autoOpr: 0,
+        teleopOpr: 0,
+        endgameOpr: 0,
         avgScore: 0,
         highScore: 0,
         avgMargin: 0,
@@ -111,6 +114,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             winRate,
             opr: 0,
             dpr: 0,
+            autoOpr: 0,
+            teleopOpr: 0,
+            endgameOpr: 0,
             avgScore: 0,
             highScore: 0,
             avgMargin: 0,
@@ -126,6 +132,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const stats = teamStats.get(team.teamNumber)
         stats.opr = team.opr || 0
         stats.dpr = team.dpr || 0
+        stats.autoOpr = team.autoOpr || 0
+        stats.teleopOpr = team.teleopOpr || 0
+        stats.endgameOpr = team.endgameOpr || 0
         stats.matchesPlayed = team.matchesPlayed || 0
       } else {
         // Create entry for teams that might not be in rankings yet
@@ -141,6 +150,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           winRate: 0,
           opr: team.opr || 0,
           dpr: team.dpr || 0,
+          autoOpr: team.autoOpr || 0,
+          teleopOpr: team.teleopOpr || 0,
+          endgameOpr: team.endgameOpr || 0,
           avgScore: 0,
           highScore: 0,
           avgMargin: 0,

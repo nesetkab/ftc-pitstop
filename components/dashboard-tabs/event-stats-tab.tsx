@@ -1,16 +1,23 @@
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { ComparisonData } from "../team-comparison"
+import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
 
 interface EventStatsTabProps {
   eventCode: string
 }
 
+type SortField = 'opr' | 'dpr' | 'autoOpr' | 'teleopOpr' | 'endgameOpr'
+type SortDirection = 'asc' | 'desc'
+
 export function EventStatsTab({ eventCode }: EventStatsTabProps) {
   const [data, setData] = useState<ComparisonData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [sortField, setSortField] = useState<SortField>('opr')
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   const fetchData = async () => {
     try {
@@ -34,14 +41,50 @@ export function EventStatsTab({ eventCode }: EventStatsTabProps) {
     return () => clearInterval(interval)
   }, [eventCode])
 
-  const sortedTeams = data?.allTeams?.sort((a, b) => (b.opr || 0) - (a.opr || 0)) || []
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
+    } else {
+      setSortField(field)
+      setSortDirection('desc')
+    }
+  }
+
+  const sortedTeams = data?.allTeams?.sort((a, b) => {
+    const aValue = a[sortField] || 0
+    const bValue = b[sortField] || 0
+    return sortDirection === 'desc' ? bValue - aValue : aValue - bValue
+  }) || []
+
+  const SortButton = ({ field, label }: { field: SortField, label: string }) => (
+    <Button
+      variant={sortField === field ? "default" : "outline"}
+      size="sm"
+      onClick={() => handleSort(field)}
+      className="gap-1"
+    >
+      {label}
+      {sortField === field && (
+        sortDirection === 'desc' ? <ArrowDown className="h-3 w-3" /> : <ArrowUp className="h-3 w-3" />
+      )}
+    </Button>
+  )
 
   return (
     <div className="space-y-4">
       {/* Top Teams by OPR */}
       <Card>
         <CardHeader>
-          <CardTitle>Top Teams by OPR</CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle>Team Rankings</CardTitle>
+            <div className="flex gap-2">
+              <SortButton field="opr" label="Total OPR" />
+              <SortButton field="autoOpr" label="Auto" />
+              <SortButton field="teleopOpr" label="TeleOp" />
+              <SortButton field="endgameOpr" label="Endgame" />
+              <SortButton field="dpr" label="DPR" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
@@ -60,10 +103,22 @@ export function EventStatsTab({ eventCode }: EventStatsTabProps) {
                     <span className="font-bold text-muted-foreground w-6">#{index + 1}</span>
                     <span className="font-semibold">{team.teamNumber}</span>
                   </div>
-                  <div className="flex gap-6 text-sm">
+                  <div className="flex gap-4 text-sm">
                     <div>
                       <span className="text-muted-foreground">OPR: </span>
                       <span className="font-semibold">{team.opr?.toFixed(1) || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Auto: </span>
+                      <span className="font-semibold text-purple-600">{team.autoOpr?.toFixed(1) || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">TeleOp: </span>
+                      <span className="font-semibold text-indigo-600">{team.teleopOpr?.toFixed(1) || 'N/A'}</span>
+                    </div>
+                    <div>
+                      <span className="text-muted-foreground">Endgame: </span>
+                      <span className="font-semibold text-cyan-600">{team.endgameOpr?.toFixed(1) || 'N/A'}</span>
                     </div>
                     <div>
                       <span className="text-muted-foreground">DPR: </span>
@@ -78,13 +133,13 @@ export function EventStatsTab({ eventCode }: EventStatsTabProps) {
       </Card>
 
       {/* Event Statistics Summary */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardHeader>
-            <CardTitle>Highest OPR</CardTitle>
+            <CardTitle className="text-base">Highest Total OPR</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold">
+            <p className="text-2xl font-bold">
               {sortedTeams[0]?.opr?.toFixed(1) || 'N/A'}
             </p>
             <p className="text-sm text-muted-foreground">
@@ -93,6 +148,50 @@ export function EventStatsTab({ eventCode }: EventStatsTabProps) {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Highest Auto OPR</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-purple-600">
+              {[...sortedTeams].sort((a, b) => (b.autoOpr || 0) - (a.autoOpr || 0))[0]?.autoOpr?.toFixed(1) || 'N/A'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Team {[...sortedTeams].sort((a, b) => (b.autoOpr || 0) - (a.autoOpr || 0))[0]?.teamNumber || '-'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Highest TeleOp OPR</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-indigo-600">
+              {[...sortedTeams].sort((a, b) => (b.teleopOpr || 0) - (a.teleopOpr || 0))[0]?.teleopOpr?.toFixed(1) || 'N/A'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Team {[...sortedTeams].sort((a, b) => (b.teleopOpr || 0) - (a.teleopOpr || 0))[0]?.teamNumber || '-'}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Highest Endgame OPR</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-bold text-cyan-600">
+              {[...sortedTeams].sort((a, b) => (b.endgameOpr || 0) - (a.endgameOpr || 0))[0]?.endgameOpr?.toFixed(1) || 'N/A'}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Team {[...sortedTeams].sort((a, b) => (b.endgameOpr || 0) - (a.endgameOpr || 0))[0]?.teamNumber || '-'}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
         <Card>
           <CardHeader>
             <CardTitle>Average OPR</CardTitle>

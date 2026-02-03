@@ -47,6 +47,9 @@ export function TeamStatsTab({ eventCode, teamNumber }: TeamStatsTabProps) {
       <OPRModule
         opr={data?.targetTeam?.opr}
         dpr={data?.targetTeam?.dpr}
+        autoOpr={data?.targetTeam?.autoOpr}
+        teleopOpr={data?.targetTeam?.teleopOpr}
+        endgameOpr={data?.targetTeam?.endgameOpr}
         matchesPlayed={data?.targetTeam?.played}
         loading={loading}
         error={error}

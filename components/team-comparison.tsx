@@ -34,6 +34,9 @@ interface TeamStats {
   winRate: number
   opr: number
   dpr: number
+  autoOpr?: number
+  teleopOpr?: number
+  endgameOpr?: number
   avgScore: number
   highScore: number
   avgMargin: number
