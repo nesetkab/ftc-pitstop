@@ -21,6 +21,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import * as React from "react"
 import { useSearchParams, useRouter } from 'next/navigation'
 import { ThemeSettingsDialog } from "@/components/theme-settings-dialog"
@@ -298,10 +307,20 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, autoRefreshInterval);
-    return () => clearInterval(interval);
-  }, [eventCode, teamNumber, autoRefreshInterval]);
+    let timeoutId: ReturnType<typeof setTimeout>
+    const tick = async () => {
+      await fetchData()
+      if (autoRefreshInterval > 0) {
+        timeoutId = setTimeout(tick, autoRefreshInterval)
+      }
+    }
+
+    tick()
+
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [eventCode, teamNumber, autoRefreshInterval])
 
   const teamRanking = rankings.find((r) => r.team === teamNumber)
   const teamAlliance = alliances.find(
@@ -460,43 +479,56 @@ export default function DashboardPage() {
 
 
 
-        {showIntervalModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}>
-            <div className="border rounded-lg shadow-lg p-6 w-full max-w-xs" style={{ backgroundColor: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
-              <h2 className="text-lg font-bold mb-2">Change Auto-Refresh Interval</h2>
-              <label className="block mb-4">
-                <span className="text-sm text-muted-foreground">Interval (seconds):</span>
-                <input
+        <Dialog open={showIntervalModal} onOpenChange={setShowIntervalModal}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Change Auto-Refresh Interval</DialogTitle>
+              <DialogDescription>
+                Set how frequently the dashboard data will automatically refresh. Minimum 5
+                seconds.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="grid gap-4 py-2">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="refresh-interval" className="text-right">
+                  Interval (s)
+                </Label>
+                <Input
+                  id="refresh-interval"
                   type="number"
                   min={5}
                   max={600}
-                  // When there is no input, it removes the 0 by default
                   value={pendingInterval ? pendingInterval / 1000 : ""}
-                  onChange={e => {
-                    const val = e.target.value;
-                    if (val === "" || isNaN(Number(val))) {
-                      setPendingInterval(0);
+                  onChange={(e) => {
+                    const val = e.target.value
+                    if (val === "" || Number.isNaN(Number(val))) {
+                      setPendingInterval(0)
                     } else {
-                      setPendingInterval(Number(val) * 1000);
+                      setPendingInterval(Number(val) * 1000)
                     }
                   }}
-                  className="mt-1 block w-full rounded border border-gray-300 dark:border-gray-700 px-2 py-1 bg-background"
+                  className="col-span-3"
                 />
-              </label>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" size="sm" onClick={() => setShowIntervalModal(false)}>
-                  Cancel
-                </Button>
-                <Button size="sm" onClick={() => {
-                  setAutoRefreshInterval(pendingInterval);
-                  setShowIntervalModal(false);
-                }}>
-                  Save
-                </Button>
               </div>
             </div>
-          </div>
-        )}
+
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button variant="outline" onClick={() => setShowIntervalModal(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={() => {
+                  const newInterval = pendingInterval >= 5000 ? pendingInterval : 5000
+                  setAutoRefreshInterval(newInterval)
+                  setShowIntervalModal(false)
+                }}
+              >
+                Save Changes
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
 
       </div >
     </div >
