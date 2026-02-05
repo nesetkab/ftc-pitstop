@@ -53,36 +53,36 @@ export const PRESET_THEMES: Theme[] = [
     id: 'default',
     name: 'Default Dark',
     colors: {
-      background: '#000000',
-      backgroundSecondary: '#0a0a0a',
-      backgroundTertiary: '#1a1a1a',
+      background: '#0A0A0A',
+      backgroundSecondary: '#262626', // from globals.css --secondary: 0 0% 14.9%
+      backgroundTertiary: '#262626', // using --secondary for consistency
 
-      text: '#f9fafb',
-      textSecondary: '#d1d5db',
-      textMuted: '#9ca3af',
+      text: '#fafafa', // from globals.css --foreground: 0 0% 98%
+      textSecondary: '##81819A', // from globals.css --muted-foreground: 0 0% 63.9%
+      textMuted: '#81819A', // from globals.css --muted-foreground: 0 0% 63.9%
 
-      primary: '#3b82f6',
-      primaryHover: '#60a5fa',
-      primaryText: '#ffffff',
+      primary: '#fafafa', // from globals.css --primary: 0 0% 98%
+      primaryHover: '#d4d4d4', // custom for hover (lighter primary)
+      primaryText: '#171717', // from globals.css --primary-foreground: 0 0% 9%
 
-      accent: '#8b5cf6',
-      accentHover: '#a78bfa',
+      accent: '#262626', // from globals.css --accent: 0 0% 14.9%
+      accentHover: '#404040', // custom for hover (slightly lighter accent)
 
-      border: '#27272a',
-      borderHover: '#3f3f46',
+      border: '#262626', // from globals.css --border: 0 0% 14.9%
+      borderHover: '#404040', // custom for hover (slightly lighter border)
 
-      success: '#10b981',
-      warning: '#f59e0b',
-      error: '#ef4444',
-      info: '#3b82f6',
+      success: '#10b981', // existing, no direct equivalent in globals.css based on dark mode variables
+      warning: '#f59e0b', // existing
+      error: '#7f1d1d', // from globals.css --destructive: 0 62.8% 30.6%
+      info: '#3b82f6', // existing
 
-      card: '#18181b',
-      cardHover: '#27272a',
+      card: '#000000', // from globals.css --card: 0 0% 3.9%
+      cardHover: '#262626', // custom for hover (slightly lighter card)
 
-      red1: '#dc2626',
-      red2: '#ef4444',
-      blue1: '#2563eb',
-      blue2: '#3b82f6',
+      red1: '#dc2626', // existing
+      red2: '#ef4444', // existing
+      blue1: '#2563eb', // existing
+      blue2: '#3b82f6', // existing
     },
   },
   {
