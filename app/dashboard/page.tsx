@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Calendar, Trophy, Users, AlertCircle, TestTube, Clock, MapPin } from "lucide-react"
+import { Search, Calendar, Trophy, Users, AlertCircle, TestTube, Clock, MapPin, ArrowDown } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -26,6 +26,8 @@ export default function DashboardPage() {
   const [debugInfo, setDebugInfo] = useState<any>(null)
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
   const [loadingUpcoming, setLoadingUpcoming] = useState(true)
+  const [showScrollHint, setShowScrollHint] = useState(true);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadUpcomingEvents = async () => {
@@ -45,12 +47,32 @@ export default function DashboardPage() {
     loadUpcomingEvents()
   }, [])
 
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    const handleScroll = () => {
+      if (scrollContainer.scrollTop > 0) {
+        setShowScrollHint(false);
+      }
+    };
+
+    if (showScrollHint && events.length > 0 && scrollContainer.scrollHeight > scrollContainer.clientHeight) {
+      scrollContainer.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      scrollContainer.removeEventListener('scroll', handleScroll);
+    };
+  }, [showScrollHint, events.length]);
+
   const searchEvents = async () => {
     if (!searchTerm.trim()) return
 
     setLoading(true)
     setError(null)
     setDebugInfo(null)
+    setShowScrollHint(true)
 
     try {
       console.log("Searching for:", searchTerm)
@@ -125,7 +147,7 @@ export default function DashboardPage() {
             Find Your Event
           </CardTitle>
           <CardDescription>
-            Search for your FTC event by name, location, or enter the event code directly...
+            Search for your FTC event by name, location, or enter the event code directly:
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -179,33 +201,42 @@ export default function DashboardPage() {
           )}
 
           {events.length > 0 && (
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              <h3 className="font-semibold text-sm text-muted-foreground">Search Results:</h3>
-              {events.map((event) => (
-                <Card
-                  key={event.code}
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => handleEventSelect(event)}
-                >
-                  <CardContent className="p-4">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="secondary">{event.code}</Badge>
-                          <span className="text-sm text-muted-foreground">
-                            {new Date(event.dateStart).toLocaleDateString()}
-                          </span>
+            <div>
+              <div className="space-y-2 max-h-96 overflow-y-auto relative" ref={scrollRef}>
+                <h3 className="font-semibold text-sm text-muted-foreground">Search Results:</h3>
+                {showScrollHint && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center bg-black/70 text-white px-4 py-2 rounded-lg text-xl opacity-90 animate-pulse pointer-events-none">
+                    <ArrowDown className="h-8 w-8 mb-2" />
+                    <span>Scroll</span>
+                  </div>
+                )}
+                {events.map((event) => (
+                  <Card
+                    key={event.code}
+                    className="cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => handleEventSelect(event)}
+                  >
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Badge variant="secondary">{event.code}</Badge>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(event.dateStart).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <h4 className="font-semibold">{event.name}</h4>
+                          <p className="text-sm text-muted-foreground">
+                            {event.venue} • {event.city}, {event.stateprov}
+                          </p>
                         </div>
-                        <h4 className="font-semibold">{event.name}</h4>
-                        <p className="text-sm text-muted-foreground">
-                          {event.venue} • {event.city}, {event.stateprov}
-                        </p>
+                        <Calendar className="h-4 w-4 text-muted-foreground" />
                       </div>
-                      <Calendar className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              <div className="my-8 border-t dark:border-gray-400" />
             </div>
           )}
 
@@ -213,13 +244,14 @@ export default function DashboardPage() {
             <div className="text-center py-8 text-muted-foreground">
               <p>Try searching for:</p>
               <ul className="mt-2 text-sm">
-                <li>• "Championship" for championship events</li>
-                <li>• "League Meet" for league tournaments</li>
-                <li>• Your state name (e.g., "Washington", "California")</li>
-                <li>• Specific event codes if you know them</li>
+                <li>"Championship"</li>
+                <li>"League Meet"</li>
+                <li>Your state name</li>
+                <li>Specific event codes</li>
               </ul>
             </div>
           )}
+
 
           {/* Upcoming Events */}
           {!loadingUpcoming && upcomingEvents.length > 0 && (
@@ -279,7 +311,6 @@ export default function DashboardPage() {
                                 : `${eventStart.toLocaleDateString()} - ${eventEnd.toLocaleDateString()}`}
                             </div>
                           </div>
-                          <Calendar className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </CardContent>
                     </Card>

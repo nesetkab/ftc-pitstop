@@ -83,7 +83,7 @@ export default function HomePage() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-4">
                   <Smartphone className="h-8 w-8" />
-                  <h3 className="text-xl font-semibold">Mobile App</h3>
+                  <h3 className="text-xl font-semibold">Mobile Site</h3>
                 </div>
                 <Badge variant="secondary">Coming Soon</Badge>
               </div>
