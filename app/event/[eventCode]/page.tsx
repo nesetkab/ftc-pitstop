@@ -12,10 +12,8 @@ import Link from "next/link"
 interface Team {
   teamNumber: number
   nameShort: string
-  schoolName: string
-  city: string
-  stateProv: string
-  country: string
+  nameFull: string
+  displayLocation: string
 }
 
 interface Event {
@@ -61,7 +59,8 @@ export default function EventPage() {
     (team) =>
       team.teamNumber.toString().includes(searchTerm) ||
       (team.nameShort?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
-      (team.schoolName?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
+      (team.nameFull?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (team.displayLocation?.toLowerCase() || "").includes(searchTerm.toLowerCase()),
   )
 
   const handleTeamSelect = (team: Team) => {
@@ -73,7 +72,7 @@ export default function EventPage() {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
           <p>Loading event data...</p>
         </div>
       </div>
@@ -81,7 +80,7 @@ export default function EventPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6">
           <Link href="/">
@@ -139,9 +138,9 @@ export default function EventPage() {
                           <Badge variant="outline">#{team.teamNumber}</Badge>
                           <span className="font-semibold">{team.nameShort}</span>
                         </div>
-                        <p className="text-sm text-muted-foreground">{team.schoolName}</p>
+                        <p className="text-sm text-muted-foreground">{team.nameFull}</p>
                         <p className="text-xs text-muted-foreground">
-                          {team.city}, {team.stateProv}, {team.country}
+                          {team.displayLocation}
                         </p>
                       </div>
                       <div className="text-right">

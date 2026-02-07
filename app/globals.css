@@ -4,6 +4,7 @@
 
 @layer base {
   :root {
+    /* shadcn/ui base variables */
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
@@ -29,28 +30,60 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
+
+    /* Custom theme variables - Default dark scheme */
+    --color-background: #121218;
+    --color-background-secondary: #1a1a24;
+    --color-background-tertiary: #22222e;
+
+    --color-text: #e0e0ec;
+    --color-text-secondary: #9898aa;
+    --color-text-muted: #6e6e82;
+
+    --color-primary: #e0e0ec;
+    --color-primary-hover: #c8c8d8;
+    --color-primary-text: #121218;
+
+    --color-accent: #1e1e2a;
+    --color-accent-hover: #2a2a38;
+
+    --color-border: #2a2a38;
+    --color-border-hover: #3a3a4a;
+
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #3b82f6;
+
+    --color-card: #16161e;
+    --color-card-hover: #1e1e2a;
+
+    --color-red1: #dc2626;
+    --color-red2: #ef4444;
+    --color-blue1: #2563eb;
+    --color-blue2: #3b82f6;
   }
 
   .dark {
-    --background: 0 0% 1%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --background: 230 18% 7%;
+    --foreground: 235 25% 90%;
+    --card: 230 15% 10%;
+    --card-foreground: 235 25% 90%;
+    --popover: 230 15% 10%;
+    --popover-foreground: 235 25% 90%;
+    --primary: 235 25% 90%;
+    --primary-foreground: 230 18% 7%;
+    --secondary: 230 15% 14%;
+    --secondary-foreground: 235 25% 90%;
+    --muted: 230 15% 14%;
+    --muted-foreground: 235 10% 50%;
+    --accent: 230 15% 14%;
+    --accent-foreground: 235 25% 90%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 230 15% 18%;
+    --input: 230 15% 18%;
+    --ring: 235 25% 90%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -63,7 +96,53 @@
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--color-background) !important;
+    color: var(--color-text) !important;
   }
+
+  /* Override any Radix Theme styles */
+  .radix-themes {
+    background-color: transparent !important;
+  }
+}
+
+/* Custom theme utility classes */
+@layer utilities {
+  .bg-theme-background { background-color: var(--color-background); }
+  .bg-theme-background-secondary { background-color: var(--color-background-secondary); }
+  .bg-theme-background-tertiary { background-color: var(--color-background-tertiary); }
+
+  .text-theme { color: var(--color-text); }
+  .text-theme-secondary { color: var(--color-text-secondary); }
+  .text-theme-muted { color: var(--color-text-muted); }
+
+  .bg-theme-primary { background-color: var(--color-primary); }
+  .bg-theme-primary-hover { background-color: var(--color-primary-hover); }
+  .text-theme-primary { color: var(--color-primary-text); }
+
+  .bg-theme-accent { background-color: var(--color-accent); }
+  .bg-theme-accent-hover { background-color: var(--color-accent-hover); }
+
+  .border-theme { border-color: var(--color-border); }
+  .border-theme-hover { border-color: var(--color-border-hover); }
+
+  .bg-theme-card { background-color: var(--color-card); }
+  .bg-theme-card-hover { background-color: var(--color-card-hover); }
+
+  .text-theme-success { color: var(--color-success); }
+  .text-theme-warning { color: var(--color-warning); }
+  .text-theme-error { color: var(--color-error); }
+  .text-theme-info { color: var(--color-info); }
+
+  .bg-theme-success { background-color: var(--color-success); }
+  .bg-theme-warning { background-color: var(--color-warning); }
+  .bg-theme-error { background-color: var(--color-error); }
+  .bg-theme-info { background-color: var(--color-info); }
+
+  .bg-theme-red1 { background-color: var(--color-red1); }
+  .bg-theme-red2 { background-color: var(--color-red2); }
+  .bg-theme-blue1 { background-color: var(--color-blue1); }
+  .bg-theme-blue2 { background-color: var(--color-blue2); }
 }

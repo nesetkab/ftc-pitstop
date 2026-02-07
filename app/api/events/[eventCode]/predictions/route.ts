@@ -1,40 +1,24 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient } from "@/lib/ftc-api-client"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
   const { eventCode } = await params
   const searchParams = request.nextUrl.searchParams
   const teamNumber = searchParams.get("team")
+  const bypassCache = searchParams.get("bypassCache") === "true"
 
   try {
-    const season = 2024
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
     console.log("Fetching prediction data for event:", eventCode)
 
-    // Get matches and our custom OPR data
-    const [matchesResponse, oprResponse] = await Promise.all([
-      fetch(
-        `${FTC_API_BASE}/${season}/matches/${eventCode.toUpperCase()}${teamNumber ? `?teamNumber=${teamNumber}` : ""}`,
-        {
-          headers: {
-            Authorization: `Basic ${auth}`,
-            Accept: "application/json",
-          },
-        },
-      ),
-      // Use our custom OPR calculation
-      fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr`),
+    // Get matches and our custom OPR data (both through cache)
+    const [matchesResult, oprResponse] = await Promise.all([
+      ftcApiClient.getMatches(eventCode.toUpperCase(), { bypassCache }),
+      // Use our custom OPR calculation (which now uses cache)
+      fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr${bypassCache ? '?bypassCache=true' : ''}`),
     ])
 
-    let matches = []
+    let matches = matchesResult.data.matches || []
     let oprData = []
-
-    if (matchesResponse.ok) {
-      const matchesResult = await matchesResponse.json()
-      matches = matchesResult.matches || []
-    }
 
     if (oprResponse.ok) {
       const oprResult = await oprResponse.json()
@@ -49,7 +33,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       oprMap.set(team.teamNumber, {
         opr: team.opr || 0,
         dpr: team.dpr || 0,
-        ccwm: team.ccwm || 0,
       })
     })
 
@@ -60,22 +43,18 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const red1Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Red1")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
         const red2Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Red2")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
         const blue1Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Blue1")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
         const blue2Stats = oprMap.get(match.teams?.find((t: any) => t.station === "Blue2")?.teamNumber) || {
           opr: 0,
           dpr: 0,
-          ccwm: 0,
         }
 
         // Calculate alliance strengths using our custom OPR

@@ -34,7 +34,9 @@ interface TeamStats {
   winRate: number
   opr: number
   dpr: number
-  ccwm: number
+  autoOpr?: number
+  teleopOpr?: number
+  endgameOpr?: number
   avgScore: number
   highScore: number
   avgMargin: number
@@ -45,7 +47,7 @@ interface TeamComparisonProps {
   teamNumber?: number
 }
 
-interface ComparisonData {
+export interface ComparisonData {
   targetTeam: TeamStats | null
   allTeams: TeamStats[]
   similarTeams: TeamStats[]
@@ -149,7 +151,7 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
     return (
       <Card
         className={`${highlight || isTarget
-          ? "border-blue-300 bg-blue-50 dark:bg-blue-950"
+          ? "border-purple-300 bg-purple-50 dark:bg-purple-950"
           : isCompare
             ? "border-green-300 bg-green-50 dark:bg-green-950"
             : ""
@@ -185,10 +187,6 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
               <div className="flex justify-between">
                 <span>DPR:</span>
                 <span className="font-semibold">{team.dpr.toFixed(1)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>CCWM:</span>
-                <span className="font-semibold">{team.ccwm.toFixed(1)}</span>
               </div>
             </div>
             <div>
@@ -266,7 +264,7 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
                 <Badge variant={index === 0 ? "default" : "outline"}>
                   {index === 0 ? <Medal className="h-3 w-3 mr-1" /> : null}#{index + 1}
                 </Badge>
-                <span className={`font-mono ${team.teamNumber === teamNumber ? "font-bold text-blue-600" : ""}`}>
+                <span className={`font-mono ${team.teamNumber === teamNumber ? "font-bold text-purple-500" : ""}`}>
                   {team.teamNumber}
                 </span>
               </div>
@@ -287,7 +285,7 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
   if (loading) {
     return (
       <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-4"></div>
         <p>Loading team comparison data...</p>
       </div>
     )
@@ -346,7 +344,7 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
       </div>
 
       {/* Event Overview */}
-      <Card className="bg-slate-300 border-black dark:bg-black dark:border-gray-500">
+      <Card className="border" style={{ backgroundColor: 'var(--color-background-secondary)', borderColor: 'var(--color-border)' }}>
         <CardContent className="p-6">
           <h3 className="font-semibold mb-4">Event Overview</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">

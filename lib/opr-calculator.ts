@@ -12,6 +12,12 @@ interface Match {
   blue2: number
   redScore: number
   blueScore: number
+  redFoul: number
+  blueFoul: number
+  redAuto?: number
+  blueAuto?: number
+  redEndgame?: number
+  blueEndgame?: number
   played: boolean
 }
 
@@ -19,7 +25,9 @@ interface TeamOPR {
   teamNumber: number
   opr: number
   dpr: number
-  ccwm: number
+  autoOpr: number
+  teleopOpr: number
+  endgameOpr: number
   matchesPlayed: number
 }
 
@@ -29,6 +37,11 @@ export class OPRCalculator {
 
   constructor(matches: Match[]) {
     this.matches = matches.filter((m) => m.played && m.redScore !== null && m.blueScore !== null)
+      .map(m => ({
+        ...m,
+        redFoul: m.redFoul ?? 0,
+        blueFoul: m.blueFoul ?? 0
+      }))
 
     // Collect all unique team numbers
     this.matches.forEach((match) => {
@@ -71,14 +84,16 @@ export class OPRCalculator {
       redRow[teamToIndex.get(match.red1)!] = 1
       redRow[teamToIndex.get(match.red2)!] = 1
       A.push(redRow)
-      scores.push(match.redScore)
+      // Non-penalty score = final score - opponent's foul points (removes penalty points added to our score)
+      scores.push(match.redScore - match.blueFoul)
 
       // Blue alliance row
       const blueRow = new Array(numTeams).fill(0)
       blueRow[teamToIndex.get(match.blue1)!] = 1
       blueRow[teamToIndex.get(match.blue2)!] = 1
       A.push(blueRow)
-      scores.push(match.blueScore)
+      // Non-penalty score = final score - opponent's foul points (removes penalty points added to our score)
+      scores.push(match.blueScore - match.redFoul)
     })
 
     // Solve using least squares: (A^T * A) * x = A^T * b
@@ -91,8 +106,14 @@ export class OPRCalculator {
     // Calculate DPR (Defensive Power Rating)
     const dprValues = this.calculateDPR(teamList, teamToIndex)
 
-    // Calculate CCWM (Calculated Contribution to Winning Margin)
-    const ccwmValues = oprValues.map((opr, i) => opr - dprValues[i])
+    // Calculate Auto OPR
+    const autoOprValues = this.calculateAutoOPR(teamList, teamToIndex)
+
+    // Calculate TeleOp OPR (Teleop only, without endgame)
+    const teleopOprValues = this.calculateTeleopOPR(teamList, teamToIndex)
+
+    // Calculate Endgame OPR
+    const endgameOprValues = this.calculateEndgameOPR(teamList, teamToIndex)
 
     // Count matches played for each team
     const matchCounts = this.countMatchesPlayed(teamList, teamToIndex)
@@ -102,7 +123,9 @@ export class OPRCalculator {
       teamNumber,
       opr: oprValues[index] || 0,
       dpr: dprValues[index] || 0,
-      ccwm: ccwmValues[index] || 0,
+      autoOpr: autoOprValues[index] || 0,
+      teleopOpr: teleopOprValues[index] || 0,
+      endgameOpr: endgameOprValues[index] || 0,
       matchesPlayed: matchCounts[index] || 0,
     }))
   }
@@ -117,24 +140,148 @@ export class OPRCalculator {
     const opponentScores: number[] = []
 
     this.matches.forEach((match) => {
-      // For red alliance, opponent score is blue score
+      // For red alliance, opponent score is blue score (non-penalty)
       const redRow = new Array(numTeams).fill(0)
       redRow[teamToIndex.get(match.red1)!] = 1
       redRow[teamToIndex.get(match.red2)!] = 1
       A.push(redRow)
-      opponentScores.push(match.blueScore)
+      // Non-penalty opponent score = opponent's final score - our foul points (removes penalty points we gave them)
+      opponentScores.push(match.blueScore - match.redFoul)
 
-      // For blue alliance, opponent score is red score
+      // For blue alliance, opponent score is red score (non-penalty)
       const blueRow = new Array(numTeams).fill(0)
       blueRow[teamToIndex.get(match.blue1)!] = 1
       blueRow[teamToIndex.get(match.blue2)!] = 1
       A.push(blueRow)
-      opponentScores.push(match.redScore)
+      // Non-penalty opponent score = opponent's final score - our foul points (removes penalty points we gave them)
+      opponentScores.push(match.redScore - match.blueFoul)
     })
 
     // Solve for DPR
     const AtA = this.multiplyMatrices(this.transpose(A), A)
     const Atb = this.multiplyMatrixVector(this.transpose(A), opponentScores)
+
+    return this.solveLinearSystem(AtA, Atb)
+  }
+
+  /**
+   * Calculate Auto OPR
+   * OPR specifically for the autonomous period
+   */
+  private calculateAutoOPR(teamList: number[], teamToIndex: Map<number, number>): number[] {
+    const numTeams = teamList.length
+    const A: number[][] = []
+    const autoScores: number[] = []
+
+    this.matches.forEach((match) => {
+      // Only calculate if auto scores are available
+      if (match.redAuto !== undefined && match.blueAuto !== undefined) {
+        // Red alliance row
+        const redRow = new Array(numTeams).fill(0)
+        redRow[teamToIndex.get(match.red1)!] = 1
+        redRow[teamToIndex.get(match.red2)!] = 1
+        A.push(redRow)
+        autoScores.push(match.redAuto)
+
+        // Blue alliance row
+        const blueRow = new Array(numTeams).fill(0)
+        blueRow[teamToIndex.get(match.blue1)!] = 1
+        blueRow[teamToIndex.get(match.blue2)!] = 1
+        A.push(blueRow)
+        autoScores.push(match.blueAuto)
+      }
+    })
+
+    // If no auto data available, return zeros
+    if (A.length === 0) {
+      return new Array(numTeams).fill(0)
+    }
+
+    // Solve for Auto OPR
+    const AtA = this.multiplyMatrices(this.transpose(A), A)
+    const Atb = this.multiplyMatrixVector(this.transpose(A), autoScores)
+
+    return this.solveLinearSystem(AtA, Atb)
+  }
+
+  /**
+   * Calculate TeleOp OPR (Teleop including endgame)
+   * This is the OPR for the teleop period (total - auto - fouls)
+   */
+  private calculateTeleopOPR(teamList: number[], teamToIndex: Map<number, number>): number[] {
+    const numTeams = teamList.length
+    const A: number[][] = []
+    const teleopScores: number[] = []
+
+    this.matches.forEach((match) => {
+      // Only calculate if auto scores are available
+      if (match.redAuto !== undefined && match.blueAuto !== undefined) {
+        // Red alliance row
+        const redRow = new Array(numTeams).fill(0)
+        redRow[teamToIndex.get(match.red1)!] = 1
+        redRow[teamToIndex.get(match.red2)!] = 1
+        A.push(redRow)
+        // TeleOp score = final score - auto score - opponent fouls (includes endgame)
+        teleopScores.push(match.redScore - match.redAuto - match.blueFoul)
+
+        // Blue alliance row
+        const blueRow = new Array(numTeams).fill(0)
+        blueRow[teamToIndex.get(match.blue1)!] = 1
+        blueRow[teamToIndex.get(match.blue2)!] = 1
+        A.push(blueRow)
+        // TeleOp score = final score - auto score - opponent fouls (includes endgame)
+        teleopScores.push(match.blueScore - match.blueAuto - match.redFoul)
+      }
+    })
+
+    // If no teleop data available, return zeros
+    if (A.length === 0) {
+      return new Array(numTeams).fill(0)
+    }
+
+    // Solve for TeleOp OPR
+    const AtA = this.multiplyMatrices(this.transpose(A), A)
+    const Atb = this.multiplyMatrixVector(this.transpose(A), teleopScores)
+
+    return this.solveLinearSystem(AtA, Atb)
+  }
+
+  /**
+   * Calculate Endgame OPR
+   * OPR specifically for the endgame period
+   */
+  private calculateEndgameOPR(teamList: number[], teamToIndex: Map<number, number>): number[] {
+    const numTeams = teamList.length
+    const A: number[][] = []
+    const endgameScores: number[] = []
+
+    this.matches.forEach((match) => {
+      // Only calculate if endgame scores are available
+      if (match.redEndgame !== undefined && match.blueEndgame !== undefined) {
+        // Red alliance row
+        const redRow = new Array(numTeams).fill(0)
+        redRow[teamToIndex.get(match.red1)!] = 1
+        redRow[teamToIndex.get(match.red2)!] = 1
+        A.push(redRow)
+        endgameScores.push(match.redEndgame)
+
+        // Blue alliance row
+        const blueRow = new Array(numTeams).fill(0)
+        blueRow[teamToIndex.get(match.blue1)!] = 1
+        blueRow[teamToIndex.get(match.blue2)!] = 1
+        A.push(blueRow)
+        endgameScores.push(match.blueEndgame)
+      }
+    })
+
+    // If no endgame data available, return zeros
+    if (A.length === 0) {
+      return new Array(numTeams).fill(0)
+    }
+
+    // Solve for Endgame OPR
+    const AtA = this.multiplyMatrices(this.transpose(A), A)
+    const Atb = this.multiplyMatrixVector(this.transpose(A), endgameScores)
 
     return this.solveLinearSystem(AtA, Atb)
   }
@@ -295,11 +442,4 @@ export function sortTeamsByOPR(oprData: TeamOPR[]): TeamOPR[] {
  */
 export function sortTeamsByDPR(oprData: TeamOPR[]): TeamOPR[] {
   return [...oprData].sort((a, b) => a.dpr - b.dpr)
-}
-
-/**
- * Sort teams by CCWM (highest first)
- */
-export function sortTeamsByCCWM(oprData: TeamOPR[]): TeamOPR[] {
-  return [...oprData].sort((a, b) => b.ccwm - a.ccwm)
 }

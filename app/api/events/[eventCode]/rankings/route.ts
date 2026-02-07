@@ -1,35 +1,29 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient } from "@/lib/ftc-api-client"
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ eventCode: string }> }
 ) {
   const { eventCode } = await params
-  const season = 2024
-  const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
+  const teamNumberParam = request.nextUrl.searchParams.get("teamNumber")
+  const bypassCache = request.nextUrl.searchParams.get("bypassCache") === "true"
 
   try {
-    const teamNumberParam = request.nextUrl.searchParams.get("teamNumber")
-    const response = await fetch(
-      `${FTC_API_BASE}/${season}/rankings/${eventCode.toUpperCase()}`,
-      {
-        headers: {
-          Authorization: `Basic ${auth}`,
-          Accept: "application/json",
-        },
-      }
+    // Fetch rankings through cache layer
+    const { data, fromCache } = await ftcApiClient.getRankings(
+      eventCode.toUpperCase(),
+      { bypassCache }
     )
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("Rankings API Error:", errorText)
-      return NextResponse.json({ rankings: [] })
-    }
-
-    const data = await response.json()
-    let rankings = data.rankings || []
+    let rankings = (data.rankings || []).map((r: any) => ({
+      ...r,
+      // Map FTC API sortOrder fields to RP/TBP
+      rp: r.sortOrder1 ?? r.rankingPoints ?? r.rp ?? 0,
+      tbp: r.sortOrder2 ?? r.tieBreakerPoints ?? r.tbp ?? 0,
+      team: r.teamNumber,
+      teamName: r.teamName || undefined,
+    }))
 
     // If teamNumber provided, filter for that team
     if (teamNumberParam) {
@@ -37,9 +31,21 @@ export async function GET(
       rankings = rankings.filter((r: any) => r.teamNumber === teamNumber)
     }
 
-    return NextResponse.json({ rankings })
+    return NextResponse.json({
+      rankings,
+      _meta: {
+        fromCache,
+        timestamp: new Date().toISOString()
+      }
+    })
   } catch (error) {
     console.error("Error fetching rankings:", error)
-    return NextResponse.json({ rankings: [] })
+    return NextResponse.json(
+      {
+        rankings: [],
+        error: error instanceof Error ? error.message : "Failed to fetch rankings"
+      },
+      { status: 500 }
+    )
   }
 }

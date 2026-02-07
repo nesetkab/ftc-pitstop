@@ -4,7 +4,7 @@ const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
 
 export async function GET() {
   try {
-    const season = 2024
+    const season = process.env.FTC_SEASON
     const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
 
     console.log("Testing FTC API connection...")

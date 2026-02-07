@@ -1,55 +1,37 @@
 import { type NextRequest, NextResponse } from "next/server"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient, type FTCRanking, type FTCMatch } from "@/lib/ftc-api-client"
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ eventCode: string }> }) {
   const { eventCode } = await params
   const searchParams = request.nextUrl.searchParams
   const teamNumber = searchParams.get("team")
+  const bypassCache = searchParams.get("bypassCache") === "true"
 
   try {
-    const season = 2024
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
     console.log("Fetching team comparison data for event:", eventCode)
 
-    // Get rankings, matches, and our custom OPR data
-    const [rankingsResponse, matchesResponse, oprResponse] = await Promise.all([
-      fetch(`${FTC_API_BASE}/${season}/rankings/${eventCode.toUpperCase()}`, {
-        headers: {
-          Authorization: `Basic ${auth}`,
-          Accept: "application/json",
-        },
-      }),
-      fetch(`${FTC_API_BASE}/${season}/matches/${eventCode.toUpperCase()}`, {
-        headers: {
-          Authorization: `Basic ${auth}`,
-          Accept: "application/json",
-        },
-      }),
-      // Use our custom OPR calculation
-      fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr`),
+    // Get rankings, matches, and our custom OPR data (all through cache)
+    const [rankingsResult, matchesResult, oprResponse] = await Promise.all([
+      ftcApiClient.getRankings(eventCode.toUpperCase(), { bypassCache }),
+      ftcApiClient.getMatches(eventCode.toUpperCase(), { bypassCache }),
+      // Use our custom OPR calculation (which now also uses cache)
+      fetch(`${request.nextUrl.origin}/api/events/${eventCode}/opr${bypassCache ? '?bypassCache=true' : ''}`),
     ])
 
-    let rankings = []
-    let matches = []
-    let oprData = []
+    let rankings: FTCRanking[] = []
+    let matches: FTCMatch[] = []
+    let oprData: Array<{ teamNumber: number; opr: number; dpr: number; autoOpr: number; teleopOpr: number; endgameOpr: number; matchesPlayed: number }> = []
 
-    if (rankingsResponse.ok) {
-      const rankingsData = await rankingsResponse.json()
-      console.log("Full rankings response:", JSON.stringify(rankingsData, null, 2))
-
-      if (rankingsData && Array.isArray(rankingsData.rankings)) {
-        rankings = rankingsData.rankings
-        console.log(`Found ${rankings.length} rankings`)
-      } else {
-        console.warn("Rankings data structure is unexpected:", rankingsData)
-      }
+    if (rankingsResult.data && Array.isArray(rankingsResult.data.rankings)) {
+      rankings = rankingsResult.data.rankings
+      console.log(`Found ${rankings.length} rankings (fromCache: ${rankingsResult.fromCache})`)
+    } else {
+      console.warn("Rankings data structure is unexpected:", rankingsResult.data)
     }
 
-    if (matchesResponse.ok) {
-      const matchesResult = await matchesResponse.json()
-      matches = matchesResult.matches || []
+    if (matchesResult.data) {
+      matches = matchesResult.data.matches || []
+      console.log(`Found ${matches.length} matches (fromCache: ${matchesResult.fromCache})`)
     }
 
     if (oprResponse.ok) {
@@ -69,12 +51,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ? ((ranking.wins || 0) + (ranking.ties || 0) * 0.5) / totalMatches * 100
         : 0
 
-      // console.log("i think the ranking is!!", ranking.rank)
       teamStats.set(ranking.teamNumber, {
         teamNumber: ranking.teamNumber,
-        rank: ranking.rank,  // Use the rank directly from the API
-        rp: ranking.rankingPoints || 0,
-        tbp: ranking.tieBreakerPoints || 0,
+        rank: ranking.rank,
+        rp: ranking.sortOrder1 ?? ranking.rankingPoints ?? ranking.rp ?? 0,
+        tbp: ranking.sortOrder2 ?? ranking.tieBreakerPoints ?? ranking.tbp ?? 0,
         wins: ranking.wins || 0,
         losses: ranking.losses || 0,
         ties: ranking.ties || 0,
@@ -82,7 +63,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         winRate: winRate,
         opr: 0,
         dpr: 0,
-        ccwm: 0,
+        autoOpr: 0,
+        teleopOpr: 0,
+        endgameOpr: 0,
         avgScore: 0,
         highScore: 0,
         avgMargin: 0,
@@ -130,7 +113,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             winRate,
             opr: 0,
             dpr: 0,
-            ccwm: 0,
+            autoOpr: 0,
+            teleopOpr: 0,
+            endgameOpr: 0,
             avgScore: 0,
             highScore: 0,
             avgMargin: 0,
@@ -146,7 +131,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         const stats = teamStats.get(team.teamNumber)
         stats.opr = team.opr || 0
         stats.dpr = team.dpr || 0
-        stats.ccwm = team.ccwm || 0
+        stats.autoOpr = team.autoOpr || 0
+        stats.teleopOpr = team.teleopOpr || 0
+        stats.endgameOpr = team.endgameOpr || 0
         stats.matchesPlayed = team.matchesPlayed || 0
       } else {
         // Create entry for teams that might not be in rankings yet
@@ -162,7 +149,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           winRate: 0,
           opr: team.opr || 0,
           dpr: team.dpr || 0,
-          ccwm: team.ccwm || 0,
+          autoOpr: team.autoOpr || 0,
+          teleopOpr: team.teleopOpr || 0,
+          endgameOpr: team.endgameOpr || 0,
           avgScore: 0,
           highScore: 0,
           avgMargin: 0,

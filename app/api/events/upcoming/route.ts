@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server"
-
-const FTC_API_BASE = "https://ftc-api.firstinspires.org/v2.0"
+import { ftcApiClient } from "@/lib/ftc-api-client"
 
 interface Event {
   code: string
@@ -15,28 +14,10 @@ interface Event {
 
 export async function GET() {
   try {
-    const season = 2024
-    const auth = Buffer.from(`${process.env.FTC_USERNAME}:${process.env.FTC_API_KEY}`).toString("base64")
-
     console.log("Fetching upcoming events...")
 
-    const response = await fetch(`${FTC_API_BASE}/${season}/events`, {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        Accept: "application/json",
-      },
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error("API Error:", errorText)
-      return NextResponse.json({
-        success: false,
-        error: errorText,
-      })
-    }
-
-    const data = await response.json()
+    // Get all events through cache layer
+    const { data, fromCache } = await ftcApiClient.getEvents()
     const allEvents = data.events || []
 
     // Filter for upcoming and current events
@@ -68,6 +49,10 @@ export async function GET() {
       success: true,
       events: upcomingEvents,
       totalEvents: allEvents.length,
+      _meta: {
+        fromCache,
+        timestamp: new Date().toISOString()
+      }
     })
   } catch (error) {
     console.error("Error fetching upcoming events:", error)

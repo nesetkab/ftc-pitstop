@@ -5,44 +5,77 @@ import { useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  Trophy,
-  Calendar,
-  Clock,
-  TrendingUp,
   ArrowLeft,
   Bell,
   RefreshCw,
   AlertCircle,
-  Users,
-  Target,
-  Zap,
-  ExternalLink,
-  BarChart3,
-  Calculator,
+  Settings,
+  Monitor,
+  ClipboardPen,
 } from "lucide-react"
 import Link from "next/link"
-import { TournamentBracket } from "@/components/tournament-bracket"
-import { MatchPredictions } from "@/components/match-predictions"
-import { TeamComparison } from "@/components/team-comparison"
-import { OPRInsights } from "@/components/opr-insights"
-import { ThemeToggle } from "@/components/theme-toggle"
-import AllianceTeamName from "@/components/alliance-team-name"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import * as React from "react"
+import { useSearchParams, useRouter } from 'next/navigation'
+import { ThemeSettingsDialog } from "@/components/theme-settings-dialog"
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { GeneralTab } from "@/components/dashboard-tabs/general-tab"
+import { WatchTab } from "@/components/dashboard-tabs/watch-tab"
+import { TeamStatsTab } from "@/components/dashboard-tabs/team-stats-tab"
+import { EventStatsTab } from "@/components/dashboard-tabs/event-stats-tab"
+import { RankingsScheduleTab } from "@/components/dashboard-tabs/rankings-schedule-tab"
+import { PlayoffsTab } from "@/components/dashboard-tabs/playoffs-tab"
+import { LoadingProgress } from "@/components/loading-progress"
+import { MatchDetailDialog } from "@/components/match-detail-dialog"
 
-interface TeamStats {
+interface TeamData {
+  teamNumber: number;
+  displayTeamNumber: string;
+  nameFull: string;
+  nameShort: string;
+  schoolName: string | null;
+  city: string;
+  stateProv: string;
+  country: string;
+  website: string | null;
+  rookieYear: number;
+  robotName: string | null;
+  districtCode: string | null;
+  homeCMP: string | null;
+  homeRegion: string;
+  displayLocation: string;
+}
+
+export interface TeamStats {
   wins: number
   losses: number
   ties: number
   opr: number
   dpr: number
-  ccwm: number
+  autoOpr?: number
+  teleopOpr?: number
+  endgameOpr?: number
   rank: number
   rp: number
   tbp: number
 }
 
-interface Match {
+export interface Match {
   matchNumber: number
   description: string
   startTime: string
@@ -58,7 +91,9 @@ interface Match {
   matchInSeries?: number
 }
 
-interface Ranking {
+export interface Ranking {
+  teamNumber: number
+  teamName?: string
   rank: number
   team: number
   rp: number
@@ -68,7 +103,7 @@ interface Ranking {
   ties: number
 }
 
-interface Alliance {
+export interface Alliance {
   number: number
   captain: number
   captainDisplay?: string
@@ -81,38 +116,146 @@ interface Alliance {
   name?: string
 }
 
-
-
 export default function DashboardPage() {
+  const router = useRouter()
   const params = useParams()
   const eventCode = params.eventCode as string
   const teamNumber = Number.parseInt(params.teamNumber as string)
+  const searchParams = useSearchParams()
+  const currentTab = searchParams.get('tab') || 'general'
+
   const [teamStats, setTeamStats] = useState<TeamStats | null>(null)
-  const [matches, setMatches] = useState<Match[]>([])
   const [rankings, setRankings] = useState<Ranking[]>([])
   const [alliances, setAlliances] = useState<Alliance[]>([])
+  const [matches, setMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingStep, setLoadingStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [nextMatch, setNextMatch] = useState<Match | null>(null)
+  const [teamName, setTeamName] = useState<string | null>(null)
+  const [teamNames, setTeamNames] = useState<{ [key: number]: string }>({})
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
+  const [matchDialogOpen, setMatchDialogOpen] = useState(false)
+
+  const loadingSteps = [
+    "Connecting to server...",
+    "Loading team statistics...",
+    "Loading match schedule...",
+    "Loading rankings...",
+    "Loading alliance selections...",
+    "Finalizing dashboard..."
+  ]
+
+
+  useEffect(() => {
+    const storedDataString = localStorage.getItem('selectedTeam');
+
+    if (storedDataString) {
+      try {
+        const storedDataObject: TeamData = JSON.parse(storedDataString);
+
+        if (storedDataObject && storedDataObject.nameShort) {
+          setTeamName(storedDataObject.nameShort);
+        }
+      } catch (error) {
+        console.error("Failed to parse team data from local storage:", error);
+      }
+    }
+  }, []);
+
+
+
+  const getRelativeTime = (date: Date): string => {
+    const now = new Date();
+    // Difference in seconds
+    const diffSeconds = (date.getTime() - now.getTime()) / 1000;
+
+    const rtf = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+
+    // Define time units in seconds
+    const units: { [key: string]: number } = {
+      year: 31536000,
+      month: 2592000,
+      week: 604800,
+      day: 86400,
+      hour: 3600,
+      minute: 60,
+      second: 1
+    };
+
+    for (const unit in units) {
+      if (Math.abs(diffSeconds) > units[unit]) {
+        const value = Math.round(diffSeconds / units[unit]);
+        return rtf.format(value, unit as Intl.RelativeTimeFormatUnit);
+      }
+    }
+    return rtf.format(Math.round(diffSeconds), 'second');
+  };
+
+  interface TimeAgoProps {
+    lastUpdate: Date;
+  }
+
+  const TimeAgoDisplay: React.FC<TimeAgoProps> = ({ lastUpdate }) => {
+    const [timeAgo, setTimeAgo] = useState<string>('');
+
+    useEffect(() => {
+      // Don't run if the date is not set yet
+      if (!lastUpdate) return;
+
+      // Set the initial value immediately on mount
+      setTimeAgo(getRelativeTime(lastUpdate));
+
+      // Set up an interval to update the time every 5 seconds
+      const intervalId = setInterval(() => {
+        setTimeAgo(getRelativeTime(lastUpdate));
+      }, 1000); // 1000 ms = 1 second
+
+      // This is the cleanup function.
+      // React runs this when the component unmounts or `lastUpdate` changes.
+      return () => {
+        clearInterval(intervalId);
+      };
+    }, [lastUpdate]); // Rerun the effect if lastUpdate ever changes
+
+    if (!lastUpdate) {
+      return null; // Or return a loading/placeholder state
+    }
+
+    return (
+      <span>{timeAgo}</span>
+    );
+  };
+
+  const [showIntervalModal, setShowIntervalModal] = useState(false);
+  const [autoRefreshInterval, setAutoRefreshInterval] = useState<number>(30000); // default 30s
+  const [pendingInterval, setPendingInterval] = useState<number>(30000);
+  const [showThemeDialog, setShowThemeDialog] = useState(false);
 
   const fetchData = async () => {
     try {
       setError(null)
+      setLoadingStep(0)
       console.log("Fetching dashboard data for team", teamNumber, "at event", eventCode)
 
-      const [statsResponse, matchesResponse, rankingsResponse, alliancesResponse] = await Promise.all([
+      setLoadingStep(1) // Loading team statistics
+      // Fetch all data in parallel for speed
+      const [statsResponse, matchesResponse, rankingsResponse, alliancesResponse, teamsResponse] = await Promise.all([
         fetch(`/api/teams/${teamNumber}/stats/${eventCode}`),
         fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`),
         fetch(`/api/events/${eventCode}/rankings`),
         fetch(`/api/events/${eventCode}/alliances`),
+        fetch(`/api/events/${eventCode}/teams`),
       ])
+      setLoadingStep(4) // Loading alliance selections
 
       console.log("API Response statuses:", {
         stats: statsResponse.status,
         matches: matchesResponse.status,
         rankings: rankingsResponse.status,
         alliances: alliancesResponse.status,
+        teams: teamsResponse.status,
       })
 
       // Handle each response individually to avoid failing everything if one fails
@@ -120,6 +263,7 @@ export default function DashboardPage() {
       let matchesData = { matches: [] }
       let rankingsData = { rankings: [] }
       let alliancesData = { alliances: [] }
+      let teamsData = { teams: [] as any[] }
 
       if (statsResponse.ok) {
         statsData = await statsResponse.json()
@@ -146,10 +290,27 @@ export default function DashboardPage() {
         console.error("Alliances API failed:", await alliancesResponse.text())
       }
 
+      if (teamsResponse.ok) {
+        teamsData = await teamsResponse.json()
+      } else {
+        console.error("Teams API failed:", await teamsResponse.text())
+      }
+
+      // Build team names map
+      const names: { [key: number]: string } = {}
+      for (const team of (teamsData.teams || [])) {
+        if (team.teamNumber && team.nameShort) {
+          names[team.teamNumber] = team.nameShort
+        }
+      }
+      setTeamNames(names)
+
+      setLoadingStep(5) // Finalizing dashboard
+
       setTeamStats(statsData.stats)
-      setMatches(matchesData.matches || [])
       setRankings(rankingsData.rankings || [])
       setAlliances(alliancesData.alliances || [])
+      setMatches(matchesData.matches || [])
 
       // Find next match
       const upcomingMatches = (matchesData.matches || []).filter((m: Match) => !m.played)
@@ -166,209 +327,167 @@ export default function DashboardPage() {
   }
 
   useEffect(() => {
-    fetchData()
+    let timeoutId: ReturnType<typeof setTimeout>
+    const tick = async () => {
+      await fetchData()
+      if (autoRefreshInterval > 0) {
+        timeoutId = setTimeout(tick, autoRefreshInterval)
+      }
+    }
 
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(fetchData, 30000)
-    return () => clearInterval(interval)
-  }, [eventCode, teamNumber])
+    tick()
+
+    return () => {
+      clearTimeout(timeoutId)
+    }
+  }, [eventCode, teamNumber, autoRefreshInterval])
 
   const teamRanking = rankings.find((r) => r.team === teamNumber)
   const teamAlliance = alliances.find(
     (a) => a.captain === teamNumber || a.round1 === teamNumber || a.round2 === teamNumber || a.backup === teamNumber,
   )
 
-  // Separate matches by type
-  const qualificationMatches = matches.filter(
-    (m) => m.tournamentLevel === "Qualification" || m.description.toLowerCase().includes("qual"),
-  )
-  const playoffMatches = matches.filter(
-    (m) => m.tournamentLevel !== "Qualification" && !m.description.toLowerCase().includes("qual"),
-  )
-
-  const playedQualMatches = qualificationMatches.filter((m) => m.played)
-  const upcomingQualMatches = qualificationMatches.filter((m) => !m.played)
-  const playedPlayoffMatches = playoffMatches.filter((m) => m.played)
-  const upcomingPlayoffMatches = playoffMatches.filter((m) => !m.played)
-
-  const getMatchResult = (match: Match) => {
-    const isRed = match.red1 === teamNumber || match.red2 === teamNumber
-    const isBlue = match.blue1 === teamNumber || match.blue2 === teamNumber
-
-    if (!match.played) return "upcoming"
-
-    if (isRed) {
-      if (match.redScore > match.blueScore) return "win"
-      if (match.redScore < match.blueScore) return "loss"
-      return "tie"
-    } else if (isBlue) {
-      if (match.blueScore > match.redScore) return "win"
-      if (match.blueScore < match.redScore) return "loss"
-      return "tie"
-    }
-    return "unknown"
+  const onMatchClick = (match: Match) => {
+    setSelectedMatch(match)
+    setMatchDialogOpen(true)
   }
 
-  const MatchCard = ({ match, showAlliance = false }: { match: Match; showAlliance?: boolean }) => {
-    const result = getMatchResult(match)
-    const isRed = match.red1 === teamNumber || match.red2 === teamNumber
-    const isBlue = match.blue1 === teamNumber || match.blue2 === teamNumber
-
-    return (
-      <Link className="" href={match.played ? `https://ftcscout.org/events/2024/${eventCode}/matches?scores=${eventCode}-${match.tournamentLevel == "PLAYOFF" && match.series ? (20 + match.series).toString().concat("001") : match.matchNumber}` : ""} target={match.played ? "_blank" : ""}>
-        <div className={match.played ? "mt-2 mb-2 rounded-lg p-4 space-y-3 border hover:border-purple-400" : "mt-2 mb-2 rounded-lg p-4 space-y-3"}>
-          <div className="flex justify-between items-start">
-            <div>
-              <div className="font-semibold">{match.description}</div>
-              {match.startTime && (
-                <div className="text-sm text-muted-foreground">{new Date(match.startTime).toLocaleTimeString()}</div>
-              )}
-            </div>
-            <div className="text-right">
-              <Badge variant="outline">Match {match.tournamentLevel == "PLAYOFF" && match.series ? match.series : match.matchNumber}</Badge>
-              {match.played && (
-                <Badge
-                  variant={result === "win" ? "win" : result === "loss" ? "destructive" : "tie"}
-                  className="ml-2 "
-                >
-                  {result.toUpperCase()}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            {/* Red Alliance */}
-            <div
-              className={`p-3 rounded-lg ${isRed ? "bg-red-100 dark:bg-red-900 border-2 border-red-300" : "bg-red-50 dark:bg-red-950"}`}
-            >
-              <div className="text-center">
-                <div className="text-sm font-semibold text-red-700 dark:text-red-300 mb-2">Red Alliance</div>
-                <div className="space-y-1">
-                  <div className={`${match.red1 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.red1}
-                  </div>
-                  <div className={`${match.red2 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.red2}
-                  </div>
-                </div>
-                {match.played && (
-                  <div className="text-2xl font-bold text-red-700 dark:text-red-300 mt-2">{match.redScore}</div>
-                )}
-              </div>
-            </div>
-
-            {/* Blue Alliance */}
-            <div
-              className={`p-3 rounded-lg ${isBlue ? "bg-blue-100 dark:bg-blue-900 border-2 border-blue-300" : "bg-blue-50 dark:bg-blue-950"}`}
-            >
-              <div className="text-center">
-                <div className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2">Blue Alliance</div>
-                <div className="space-y-1">
-                  <div className={`${match.blue1 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.blue1}
-                  </div>
-                  <div className={`${match.blue2 === teamNumber ? "font-black" : "font-medium"}`}>
-                    {match.blue2}
-                  </div>
-                </div>
-                {match.played && (
-                  <div className="text-2xl font-bold text-blue-700 dark:text-blue-300 mt-2">{match.blueScore}</div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      </Link>
-    )
+  const teamLabel = (num: number) => {
+    const name = teamNames[num]
+    return name ? `${num} ${name}` : `${num}`
   }
 
-  const AllianceCard = ({ alliance }: { alliance: Alliance }) => {
-    const isTeamInAlliance =
-      alliance.captain === teamNumber ||
-      alliance.round1 === teamNumber ||
-      alliance.round2 === teamNumber ||
-      alliance.backup === teamNumber
-
-    return (
-      <Card className={isTeamInAlliance ? "border-purple-500 dark:border-purple-300 bg-white dark:bg-black" : ""}>
-        <CardContent className="p-4">
-          <div className="text-center">
-            <Badge variant="outline" className="mb-3">
-              Alliance {alliance.number}
-            </Badge>
-            <div className="space-y-2">
-              <div className={`font-bold ${alliance.captain === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Captain</div>
-                <div>{alliance.captain}{alliance.captainDisplay}</div>
-              </div>
-              <div className={`${alliance.round1 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Pick 1</div>
-                <div>{alliance.round1}</div>
-              </div>
-              {alliance.round2 && (<div className={`${alliance.round2 === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                <div className="text-xs text-muted-foreground">Pick 2</div>
-                <div>{alliance.round2}</div>
-              </div>
-              )}
-              {alliance.backup && (
-                <div className={`${alliance.backup === teamNumber ? "text-purple-600 dark:text-purple-400 font-bold" : ""}`}>
-                  <div className="text-xs text-muted-foreground">Backup</div>
-                  <div>{alliance.backup}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p>Loading team dashboard...</p>
-        </div>
-      </div>
-    )
+    return <LoadingProgress steps={loadingSteps} currentStep={loadingStep} />
+  }
+  const handleTabChange = (value: string) => {
+    router.push(`/dashboard/${eventCode}/${teamNumber}?tab=${value}`)
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black">
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-4">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-background)' }}>
+      <div className="pt-3 container mx-auto self-center">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-3">
+          <div className="flex items-center gap-3">
             <Link href={`/event/${eventCode}`}>
-              <Button variant="outline" size="sm">
-                <ArrowLeft className="h-4 w-4 md:mr-2" />
-                <span className="hidden md:inline">Back</span>
+              <Button variant="outline" size="sm" className="h-8 w-8 p-0">
+                <ArrowLeft className="h-3.5 w-3.5" />
               </Button>
             </Link>
-            <div>
-              <h1 className="text-3xl font-bold">Team {teamNumber}</h1>
-              <p className="text-muted-foreground">Event: {eventCode}</p>
-            </div>
+            <h1 className="text-2xl font-normal">
+              {teamNumber} - {teamName ? teamName : ""}{" "}
+              <span className="text-lg font-light opacity-70">{eventCode.toUpperCase()}</span>
+            </h1>
           </div>
+
           <div className="flex items-center gap-2">
-            <p className="text-xs text-muted-foreground">Last updated: {lastUpdate.toLocaleTimeString()}</p>
-
-            <Button variant="outline" size="sm" onClick={fetchData}>
-              <RefreshCw className="h-4 w-4" />
+            <p className="text-[10px] text-muted-foreground">
+              last update: <TimeAgoDisplay lastUpdate={lastUpdate} />
+            </p>
+            <Button variant="outline" size="sm" onClick={fetchData} className="h-8 w-8 p-0">
+              <RefreshCw className="h-3.5 w-3.5" />
             </Button>
-            <ThemeToggle />
-
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-2">
+                  <Settings className="h-3.5 w-3.5" />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={() => setShowThemeDialog(true)}>
+                  Theme Settings
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => {
+                    setPendingInterval(autoRefreshInterval)
+                    setShowIntervalModal(true)
+                  }}
+                >
+                  Change Auto-Refresh Delay
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <ThemeSettingsDialog open={showThemeDialog} onOpenChange={setShowThemeDialog} />
           </div>
         </div>
 
+        {/* Tabs */}
+        <Tabs value={currentTab} onValueChange={handleTabChange} className="w-full">
+          <TabsList className="grid w-full grid-cols-6 h-9">
+            <TabsTrigger value="general" className="text-xs">General</TabsTrigger>
+            <TabsTrigger value="watch" className="text-xs">Watch</TabsTrigger>
+            <TabsTrigger value="team-stats" className="text-xs">Team Stats</TabsTrigger>
+            <TabsTrigger value="event-stats" className="text-xs">Event Stats</TabsTrigger>
+            <TabsTrigger value="rankings" className="text-xs">Rankings</TabsTrigger>
+            <TabsTrigger value="playoffs" className="text-xs">Playoffs</TabsTrigger>
+          </TabsList>
+
+          <div className="mt-3">
+            <TabsContent value="general">
+              <GeneralTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                ranking={teamRanking ? teamRanking : null}
+                teamStats={teamStats ? teamStats : null}
+                matches={matches}
+                rankings={rankings}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
+              />
+            </TabsContent>
+
+            <TabsContent value="watch" forceMount className={currentTab !== 'watch' ? 'hidden' : ''}>
+              <WatchTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                rankings={rankings}
+                matches={matches}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
+              />
+            </TabsContent>
+
+            <TabsContent value="team-stats">
+              <TeamStatsTab eventCode={eventCode} teamNumber={teamNumber} matches={matches} teamStats={teamStats} ranking={teamRanking} teamNames={teamNames} onMatchClick={onMatchClick} />
+            </TabsContent>
+
+            <TabsContent value="event-stats">
+              <EventStatsTab eventCode={eventCode} teamNames={teamNames} />
+            </TabsContent>
+
+            <TabsContent value="rankings">
+              <RankingsScheduleTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                rankings={rankings}
+                matches={matches}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
+              />
+            </TabsContent>
+
+            <TabsContent value="playoffs">
+              <PlayoffsTab
+                eventCode={eventCode}
+                teamNumber={teamNumber}
+                alliances={alliances}
+                matches={matches}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
+              />
+            </TabsContent>
+          </div>
+        </Tabs>
+
         {error && (
-          <Card className="mb-6 border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <AlertCircle className="h-5 w-5 text-yellow-600" />
+          <Card className="mb-3" style={{ backgroundColor: 'var(--color-warning)', borderColor: 'var(--color-warning)' }}>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" style={{ color: 'var(--color-background)' }} />
                 <div className="flex-1">
-                  <p className="text-yellow-900 dark:text-yellow-100">{error}</p>
+                  <p className="text-xs" style={{ color: 'var(--color-background)' }}>{error}</p>
                 </div>
               </div>
             </CardContent>
@@ -377,137 +496,25 @@ export default function DashboardPage() {
 
         {/* Next Match Alert */}
         {nextMatch && (
-          <Card className="mb-6 border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <Bell className="h-5 w-5 text-orange-600" />
+          <Card className="mb-3" style={{ backgroundColor: 'var(--color-info)', borderColor: 'var(--color-info)' }}>
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2">
+                <Bell className="h-4 w-4" style={{ color: 'var(--color-background)' }} />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-orange-900 dark:text-orange-100">
+                  <h3 className="font-semibold text-xs" style={{ color: 'var(--color-background)' }}>
                     Next Match: {nextMatch.description}
                   </h3>
-                  <p className="text-sm text-orange-700 dark:text-orange-300">
-                    {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString() : "Time TBD"} • Red:{" "}
-                    {nextMatch.red1}, {nextMatch.red2} vs Blue: {nextMatch.blue1}, {nextMatch.blue2}
+                  <p className="text-[11px]" style={{ color: 'var(--color-background)', opacity: 0.9 }}>
+                    {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Time TBD"} • Red:{" "}
+                    {teamLabel(nextMatch.red1)}, {teamLabel(nextMatch.red2)} vs Blue: {teamLabel(nextMatch.blue1)}, {teamLabel(nextMatch.blue2)}
                   </p>
                 </div>
-                <Badge variant="secondary">Match {nextMatch.matchNumber}</Badge>
+                <Badge variant="secondary" className="text-[10px] py-0 px-2">Match {nextMatch.matchNumber}</Badge>
               </div>
             </CardContent>
           </Card>
         )}
 
-        <div className="grid lg:grid-cols-4 gap-6">
-          {/* Team Stats - Left Column */}
-          <div className="lg:col-span-1 space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5" />
-                  Performance
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {teamRanking && (
-                  <div className="text-center p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-                    <div className="text-3xl font-bold text-blue-600">#{teamRanking.rank}</div>
-                    <div className="text-sm text-muted-foreground">Current Rank</div>
-                  </div>
-                )}
-
-                {teamStats && (
-                  <>
-                    <div className="grid grid-cols-3 gap-4 text-center">
-                      <div>
-                        <div className="text-2xl font-bold text-green-600">{teamStats.wins}</div>
-                        <div className="text-xs text-muted-foreground">Wins</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-red-600">{teamStats.losses}</div>
-                        <div className="text-xs text-muted-foreground">Losses</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-yellow-600">{teamStats.ties}</div>
-                        <div className="text-xs text-muted-foreground">Ties</div>
-                      </div>
-                    </div>
-
-                    {(teamStats.opr > 0 || teamStats.dpr > 0 || teamStats.ccwm > 0) && (
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm">OPR</span>
-                          <span className="font-semibold">{teamStats.opr.toFixed(1)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">DPR</span>
-                          <span className="font-semibold">{teamStats.dpr.toFixed(1)}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-sm">CCWM</span>
-                          <span className="font-semibold">{teamStats.ccwm.toFixed(1)}</span>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {!teamStats && (
-                  <div className="text-center text-muted-foreground py-4">
-                    <p>Statistics will appear here once matches begin.</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Alliance Information */}
-            {teamAlliance && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Your Alliance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <AllianceCard alliance={teamAlliance} />
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Rankings */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Rankings
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
-                  {rankings.slice(0, rankings.length).map((ranking, index) => (
-                    <div
-                      key={ranking.teamNumber}
-                      className={`flex items-center justify-between p-2 rounded ${ranking.team === teamNumber ? "bg-blue-100 dark:bg-blue-900" : ""
-                        }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <Badge variant={ranking.teamNumber === teamNumber ? "win" : index < 3 ? "default" : "secondary"} >#{ranking.rank}</Badge>
-                        <span className={ranking.teamNumber === teamNumber ? "font-bold" : ""}>{ranking.teamNumber} - {ranking.teamName}</span>
-
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {ranking.wins}-{ranking.losses}-{ranking.ties}
-                      </div>
-                    </div>
-                  ))}
-                  {rankings.length === 0 && (
-                    <p className="text-center text-muted-foreground py-4">
-                      Rankings will appear here during the event.
-                    </p>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
 
           {/* Matches - Right Columns */}
           <div className="lg:col-span-3">
