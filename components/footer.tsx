@@ -68,7 +68,7 @@ export default function Footer() {
           className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
         >
           <BugIcon className="h-4 w-4" />
-          <span className="hidden sm:inline">Report Bug</span>
+          <span className="hidden sm:inline">Report Bugs</span>
         </Link>
       </div>
       <div
@@ -78,7 +78,7 @@ export default function Footer() {
       </div>
 
       <div>
-        v2
+        v2 beta - expect problems!
       </div>
 
     </div >

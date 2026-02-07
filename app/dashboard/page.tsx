@@ -3,9 +3,10 @@
 import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Calendar, AlertCircle, Clock, MapPin, Hash } from "lucide-react"
+import { Search, Calendar, AlertCircle, Clock, MapPin, Hash, Monitor } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 interface Event {
   code: string
@@ -30,6 +31,14 @@ export default function DashboardPage() {
   const [loadingUpcoming, setLoadingUpcoming] = useState(true)
   const [teamInfo, setTeamInfo] = useState<any>(null)
   const [teamEvents, setTeamEvents] = useState<Event[]>([])
+  const [showMobileWarning, setShowMobileWarning] = useState(false)
+
+  useEffect(() => {
+    if (window.innerWidth < 768) {
+      const dismissed = sessionStorage.getItem('mobile-warning-dismissed')
+      if (!dismissed) setShowMobileWarning(true)
+    }
+  }, [])
 
   useEffect(() => {
     const loadUpcomingEvents = async () => {
@@ -300,6 +309,29 @@ export default function DashboardPage() {
           <p className="text-sm text-muted-foreground">Loading upcoming events...</p>
         </div>
       )}
+
+      <Dialog open={showMobileWarning} onOpenChange={(open) => {
+        setShowMobileWarning(open)
+        if (!open) sessionStorage.setItem('mobile-warning-dismissed', '1')
+      }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Monitor className="h-5 w-5" />
+              Desktop Recommended
+            </DialogTitle>
+            <DialogDescription>
+              Pitstop is designed for large screens. For the best experience, please use a computer or tablet.
+            </DialogDescription>
+          </DialogHeader>
+          <Button onClick={() => {
+            setShowMobileWarning(false)
+            sessionStorage.setItem('mobile-warning-dismissed', '1')
+          }}>
+            Continue Anyway
+          </Button>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

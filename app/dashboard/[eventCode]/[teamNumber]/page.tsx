@@ -137,7 +137,6 @@ export default function DashboardPage() {
   const [teamNames, setTeamNames] = useState<{ [key: number]: string }>({})
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
   const [matchDialogOpen, setMatchDialogOpen] = useState(false)
-
   const loadingSteps = [
     "Connecting to server...",
     "Loading team statistics...",
@@ -552,6 +551,7 @@ export default function DashboardPage() {
         eventCode={eventCode}
         teamNames={teamNames}
       />
+
     </div>
   )
 }
