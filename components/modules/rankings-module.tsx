@@ -5,7 +5,7 @@ import {
 } from "lucide-react"
 import { Ranking } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 
-export function RankingsModule({ rankings, teamNumber }: { rankings: Ranking[], teamNumber: number }) {
+export function RankingsModule({ rankings, teamNumber, teamNames = {} }: { rankings: Ranking[], teamNumber: number, teamNames?: { [key: number]: string } }) {
   return (
     <Card className="flex flex-col h-fit">
       <CardHeader>
@@ -23,11 +23,14 @@ export function RankingsModule({ rankings, teamNumber }: { rankings: Ranking[], 
             >
               <div className="flex items-center gap-2">
                 <Badge variant={index < 3 ? "default" : "secondary"} >#{ranking.rank}</Badge>
-                <span className={ranking.teamNumber === teamNumber ? "" : ""}>{ranking.teamNumber} - {ranking.teamName}</span>
+                <span>{ranking.teamNumber} {ranking.teamName || teamNames[ranking.teamNumber] || ''}</span>
 
               </div>
-              <div className="text-sm text-muted-foreground">
-                {ranking.wins}-{ranking.losses}-{ranking.ties}
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                {(ranking.rp > 0 || ranking.tbp > 0) && (
+                  <span className="text-[10px]">RP: {ranking.rp} | TBP: {ranking.tbp}</span>
+                )}
+                <span>{ranking.wins}-{ranking.losses}-{ranking.ties}</span>
               </div>
             </div>
           ))}

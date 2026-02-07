@@ -3,8 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Monitor, Smartphone, TestTube } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { Monitor, Smartphone } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 import { useTheme } from "next-themes"
@@ -24,21 +23,8 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <header className="container mx-auto px-4 py-4 flex justify-end items-center">
-        {/* Removed logo from here. Adjusted justify-content. */}
-        <div className="flex items-center gap-2">
-          <Link href="/test">
-            <Button variant="outline" size="icon">
-              <TestTube className="h-5 w-5" />
-            </Button>
-          </Link>
-          <ThemeToggle />
-        </div>
-      </header>
-
       <main className="flex-grow container mx-auto px-4 py-16 md:py-24">
         <div className="text-center mb-16">
-          {/* Logo moved here and made larger */}
           <div className="flex items-center justify-center mb-8">
             {mounted && (
               <Image

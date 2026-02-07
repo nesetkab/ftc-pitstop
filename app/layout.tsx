@@ -9,7 +9,6 @@ import { CustomThemeProvider } from "@/components/theme-provider-custom"
 
 const instrumentSans = Instrument_Sans({
   subsets: ["latin"],
-  weight: ["variable"],
   variable: "--font-instrument-sans",
 })
 

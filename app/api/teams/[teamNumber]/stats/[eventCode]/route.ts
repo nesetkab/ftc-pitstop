@@ -82,8 +82,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     )
     if (teamRanking) {
       teamRank = teamRanking.rank || 0
-      rp = teamRanking.rp || 0
-      tbp = teamRanking.tbp || 0
+      rp = teamRanking.sortOrder1 ?? teamRanking.rankingPoints ?? teamRanking.rp ?? 0
+      tbp = teamRanking.sortOrder2 ?? teamRanking.tieBreakerPoints ?? teamRanking.tbp ?? 0
     }
 
     const stats = {

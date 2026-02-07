@@ -1,23 +1,35 @@
 /**
  * Cache Manager for FTC API Data
- * Provides server-side caching with Redis (Upstash KV)
- * Falls back to in-memory cache if Redis is unavailable
+ * Provides server-side caching with MongoDB
+ * Falls back to in-memory cache if MongoDB is not available
  */
 
-// Conditionally import Vercel KV if available
-let kv: any = null
+// Conditionally import MongoDB if available
+let MongoClient: any = null
+let mongoDb: any = null
+let mongoCollection: any = null
+let mongoConnecting: Promise<void> | null = null
+
 try {
   // @ts-ignore - Optional dependency
-  const kvModule = require('@vercel/kv')
-  kv = kvModule.kv
+  const mongoModule = require('mongodb')
+  MongoClient = mongoModule.MongoClient
 } catch (e) {
-  console.log('[Cache] @vercel/kv not available, using in-memory cache only')
+  // mongodb not available
 }
 
 interface CacheEntry<T> {
   data: T
   timestamp: number
   ttl: number // Time to live in seconds
+}
+
+interface MongoCacheDoc {
+  key: string
+  data: any
+  timestamp: number
+  ttl: number
+  expiresAt: Date
 }
 
 // In-memory fallback cache
@@ -33,14 +45,51 @@ export const CACHE_TTL = {
   ALLIANCES: 180, // 3 minutes - alliances form during playoffs
 }
 
+async function connectMongo(): Promise<void> {
+  if (mongoCollection) return
+  if (!MongoClient || !process.env.MONGODB_URI) return
+
+  if (mongoConnecting) {
+    await mongoConnecting
+    return
+  }
+
+  mongoConnecting = (async () => {
+    try {
+      const client = new MongoClient(process.env.MONGODB_URI)
+      await client.connect()
+      const dbName = process.env.MONGODB_DB || 'ftc-pitstop'
+      const collectionName = process.env.MONGODB_CACHE_COLLECTION || 'cache'
+      mongoDb = client.db(dbName)
+      mongoCollection = mongoDb.collection(collectionName)
+
+      // Ensure indexes exist
+      await mongoCollection.createIndex({ key: 1 }, { unique: true })
+      await mongoCollection.createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 })
+
+      console.log('[Cache] MongoDB connected successfully')
+    } catch (error) {
+      console.error('[Cache] MongoDB connection failed:', error)
+      mongoCollection = null
+    } finally {
+      mongoConnecting = null
+    }
+  })()
+
+  await mongoConnecting
+}
+
 export class CacheManager {
-  private useRedis: boolean
+  private useMongo: boolean
 
   constructor() {
-    // Check if Redis is available (both package and env vars)
-    this.useRedis = !!(kv && process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN)
-    if (!this.useRedis) {
-      console.log('[Cache] Redis unavailable, using in-memory cache only')
+    this.useMongo = !!(MongoClient && process.env.MONGODB_URI)
+
+    if (this.useMongo) {
+      console.log('[Cache] MongoDB configured, connecting...')
+      connectMongo()
+    } else {
+      console.log('[Cache] No MongoDB configured, using in-memory cache only')
     }
   }
 
@@ -58,24 +107,25 @@ export class CacheManager {
     const key = this.getCacheKey(namespace, identifier)
 
     try {
-      if (this.useRedis) {
-        // Try Redis first
-        const cached = await kv.get(key) as CacheEntry<T> | null
-
-        if (cached && this.isValid(cached)) {
-          console.log(`[Cache HIT] Redis: ${key}`)
-          return cached.data
-        }
-      }
-
-      // Fallback to memory cache
+      // Check in-memory first (fastest)
       const memCached = memoryCache.get(key)
       if (memCached && this.isValid(memCached)) {
-        console.log(`[Cache HIT] Memory: ${key}`)
         return memCached.data as T
       }
 
-      console.log(`[Cache MISS] ${key}`)
+      // Try MongoDB if available
+      if (this.useMongo) {
+        await connectMongo()
+        if (mongoCollection) {
+          const doc = await mongoCollection.findOne({ key }) as MongoCacheDoc | null
+          if (doc && this.isValid({ data: doc.data, timestamp: doc.timestamp, ttl: doc.ttl })) {
+            // Populate memory cache for faster subsequent reads
+            memoryCache.set(key, { data: doc.data, timestamp: doc.timestamp, ttl: doc.ttl })
+            return doc.data as T
+          }
+        }
+      }
+
       return null
     } catch (error) {
       console.error(`[Cache Error] ${key}:`, error)
@@ -95,15 +145,27 @@ export class CacheManager {
     }
 
     try {
-      // Store in Redis
-      if (this.useRedis) {
-        await kv.set(key, entry, { ex: ttl })
-        console.log(`[Cache SET] Redis: ${key} (TTL: ${ttl}s)`)
-      }
-
-      // Always store in memory as backup
+      // Always store in memory
       memoryCache.set(key, entry)
-      console.log(`[Cache SET] Memory: ${key} (TTL: ${ttl}s)`)
+
+      // Store in MongoDB if available
+      if (this.useMongo) {
+        await connectMongo()
+        if (mongoCollection) {
+          const doc: MongoCacheDoc = {
+            key,
+            data,
+            timestamp: Date.now(),
+            ttl,
+            expiresAt: new Date(Date.now() + ttl * 1000),
+          }
+          await mongoCollection.updateOne(
+            { key },
+            { $set: doc },
+            { upsert: true }
+          )
+        }
+      }
     } catch (error) {
       console.error(`[Cache Error] Failed to set ${key}:`, error)
     }
@@ -116,11 +178,10 @@ export class CacheManager {
     const key = this.getCacheKey(namespace, identifier)
 
     try {
-      if (this.useRedis) {
-        await kv.del(key)
+      if (this.useMongo && mongoCollection) {
+        await mongoCollection.deleteOne({ key })
       }
       memoryCache.delete(key)
-      console.log(`[Cache INVALIDATE] ${key}`)
     } catch (error) {
       console.error(`[Cache Error] Failed to invalidate ${key}:`, error)
     }
@@ -131,19 +192,18 @@ export class CacheManager {
    */
   async invalidateNamespace(namespace: string): Promise<void> {
     try {
-      // Clear memory cache for this namespace
       const prefix = `ftc:${namespace}:`
+
+      // Clear from MongoDB
+      if (this.useMongo && mongoCollection) {
+        await mongoCollection.deleteMany({ key: { $regex: `^${prefix}` } })
+      }
+
+      // Clear memory cache for this namespace
       for (const key of memoryCache.keys()) {
         if (key.startsWith(prefix)) {
           memoryCache.delete(key)
         }
-      }
-
-      // Redis pattern deletion (if supported)
-      if (this.useRedis) {
-        // Note: Upstash KV might not support pattern deletion
-        // This would need to track keys separately
-        console.log(`[Cache INVALIDATE] Namespace: ${namespace}`)
       }
     } catch (error) {
       console.error(`[Cache Error] Failed to invalidate namespace ${namespace}:`, error)

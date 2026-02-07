@@ -41,6 +41,7 @@ import { EventStatsTab } from "@/components/dashboard-tabs/event-stats-tab"
 import { RankingsScheduleTab } from "@/components/dashboard-tabs/rankings-schedule-tab"
 import { PlayoffsTab } from "@/components/dashboard-tabs/playoffs-tab"
 import { LoadingProgress } from "@/components/loading-progress"
+import { MatchDetailDialog } from "@/components/match-detail-dialog"
 
 interface TeamData {
   teamNumber: number;
@@ -133,6 +134,9 @@ export default function DashboardPage() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date())
   const [nextMatch, setNextMatch] = useState<Match | null>(null)
   const [teamName, setTeamName] = useState<string | null>(null)
+  const [teamNames, setTeamNames] = useState<{ [key: number]: string }>({})
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
+  const [matchDialogOpen, setMatchDialogOpen] = useState(false)
 
   const loadingSteps = [
     "Connecting to server...",
@@ -236,22 +240,22 @@ export default function DashboardPage() {
       console.log("Fetching dashboard data for team", teamNumber, "at event", eventCode)
 
       setLoadingStep(1) // Loading team statistics
-      const statsResponse = await fetch(`/api/teams/${teamNumber}/stats/${eventCode}`)
-
-      setLoadingStep(2) // Loading match schedule
-      const matchesResponse = await fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`)
-
-      setLoadingStep(3) // Loading rankings
-      const rankingsResponse = await fetch(`/api/events/${eventCode}/rankings`)
-
+      // Fetch all data in parallel for speed
+      const [statsResponse, matchesResponse, rankingsResponse, alliancesResponse, teamsResponse] = await Promise.all([
+        fetch(`/api/teams/${teamNumber}/stats/${eventCode}`),
+        fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`),
+        fetch(`/api/events/${eventCode}/rankings`),
+        fetch(`/api/events/${eventCode}/alliances`),
+        fetch(`/api/events/${eventCode}/teams`),
+      ])
       setLoadingStep(4) // Loading alliance selections
-      const alliancesResponse = await fetch(`/api/events/${eventCode}/alliances`)
 
       console.log("API Response statuses:", {
         stats: statsResponse.status,
         matches: matchesResponse.status,
         rankings: rankingsResponse.status,
         alliances: alliancesResponse.status,
+        teams: teamsResponse.status,
       })
 
       // Handle each response individually to avoid failing everything if one fails
@@ -259,6 +263,7 @@ export default function DashboardPage() {
       let matchesData = { matches: [] }
       let rankingsData = { rankings: [] }
       let alliancesData = { alliances: [] }
+      let teamsData = { teams: [] as any[] }
 
       if (statsResponse.ok) {
         statsData = await statsResponse.json()
@@ -284,6 +289,21 @@ export default function DashboardPage() {
       } else {
         console.error("Alliances API failed:", await alliancesResponse.text())
       }
+
+      if (teamsResponse.ok) {
+        teamsData = await teamsResponse.json()
+      } else {
+        console.error("Teams API failed:", await teamsResponse.text())
+      }
+
+      // Build team names map
+      const names: { [key: number]: string } = {}
+      for (const team of (teamsData.teams || [])) {
+        if (team.teamNumber && team.nameShort) {
+          names[team.teamNumber] = team.nameShort
+        }
+      }
+      setTeamNames(names)
 
       setLoadingStep(5) // Finalizing dashboard
 
@@ -326,6 +346,16 @@ export default function DashboardPage() {
   const teamAlliance = alliances.find(
     (a) => a.captain === teamNumber || a.round1 === teamNumber || a.round2 === teamNumber || a.backup === teamNumber,
   )
+
+  const onMatchClick = (match: Match) => {
+    setSelectedMatch(match)
+    setMatchDialogOpen(true)
+  }
+
+  const teamLabel = (num: number) => {
+    const name = teamNames[num]
+    return name ? `${num} ${name}` : `${num}`
+  }
 
 
   if (loading) {
@@ -403,24 +433,28 @@ export default function DashboardPage() {
                 teamStats={teamStats ? teamStats : null}
                 matches={matches}
                 rankings={rankings}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
               />
             </TabsContent>
 
-            <TabsContent value="watch">
+            <TabsContent value="watch" forceMount className={currentTab !== 'watch' ? 'hidden' : ''}>
               <WatchTab
                 eventCode={eventCode}
                 teamNumber={teamNumber}
                 rankings={rankings}
                 matches={matches}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
               />
             </TabsContent>
 
             <TabsContent value="team-stats">
-              <TeamStatsTab eventCode={eventCode} teamNumber={teamNumber} />
+              <TeamStatsTab eventCode={eventCode} teamNumber={teamNumber} matches={matches} teamStats={teamStats} ranking={teamRanking} teamNames={teamNames} onMatchClick={onMatchClick} />
             </TabsContent>
 
             <TabsContent value="event-stats">
-              <EventStatsTab eventCode={eventCode} />
+              <EventStatsTab eventCode={eventCode} teamNames={teamNames} />
             </TabsContent>
 
             <TabsContent value="rankings">
@@ -429,6 +463,8 @@ export default function DashboardPage() {
                 teamNumber={teamNumber}
                 rankings={rankings}
                 matches={matches}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
               />
             </TabsContent>
 
@@ -438,6 +474,8 @@ export default function DashboardPage() {
                 teamNumber={teamNumber}
                 alliances={alliances}
                 matches={matches}
+                teamNames={teamNames}
+                onMatchClick={onMatchClick}
               />
             </TabsContent>
           </div>
@@ -468,7 +506,7 @@ export default function DashboardPage() {
                   </h3>
                   <p className="text-[11px]" style={{ color: 'var(--color-background)', opacity: 0.9 }}>
                     {nextMatch.startTime ? new Date(nextMatch.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Time TBD"} • Red:{" "}
-                    {nextMatch.red1}, {nextMatch.red2} vs Blue: {nextMatch.blue1}, {nextMatch.blue2}
+                    {teamLabel(nextMatch.red1)}, {teamLabel(nextMatch.red2)} vs Blue: {teamLabel(nextMatch.blue1)}, {teamLabel(nextMatch.blue2)}
                   </p>
                 </div>
                 <Badge variant="secondary" className="text-[10px] py-0 px-2">Match {nextMatch.matchNumber}</Badge>
@@ -530,6 +568,13 @@ export default function DashboardPage() {
           </DialogContent>
         </Dialog>
 
+        <MatchDetailDialog
+          match={selectedMatch}
+          open={matchDialogOpen}
+          onOpenChange={setMatchDialogOpen}
+          eventCode={eventCode}
+          teamNames={teamNames}
+        />
       </div >
     </div >
   )

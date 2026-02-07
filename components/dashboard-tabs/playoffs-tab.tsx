@@ -10,9 +10,15 @@ interface PlayoffsTabProps {
   teamNumber: number
   alliances: Alliance[]
   matches: Match[]
+  teamNames?: { [key: number]: string }
+  onMatchClick?: (match: Match) => void
 }
 
-export function PlayoffsTab({ eventCode, teamNumber, alliances, matches }: PlayoffsTabProps) {
+export function PlayoffsTab({ eventCode, teamNumber, alliances, matches, teamNames = {}, onMatchClick }: PlayoffsTabProps) {
+  const teamLabel = (num: number) => {
+    const name = teamNames[num]
+    return name ? `${num} ${name}` : `${num}`
+  }
   const [allMatches, setAllMatches] = useState<Match[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -37,6 +43,8 @@ export function PlayoffsTab({ eventCode, teamNumber, alliances, matches }: Playo
   }, [eventCode])
 
   const playoffMatches = allMatches.filter(m => m.tournamentLevel === 'PLAYOFF')
+  const hasPick2 = alliances.some(a => a.round2 != null && a.round2 !== 0)
+
   return (
     <div className="space-y-4">
       {/* Alliance Selection */}
@@ -71,10 +79,10 @@ export function PlayoffsTab({ eventCode, teamNumber, alliances, matches }: Playo
                 >
                   <div className="font-bold mb-2">Alliance {alliance.number}</div>
                   <div className="text-sm space-y-1">
-                    <div>Captain: {alliance.captain}</div>
-                    <div>Pick 1: {alliance.round1}</div>
-                    <div>Pick 2: {alliance.round2}</div>
-                    {alliance.backup && <div>Backup: {alliance.backup}</div>}
+                    <div>Captain: {teamLabel(alliance.captain)}</div>
+                    <div>Pick 1: {teamLabel(alliance.round1)}</div>
+                    {hasPick2 && <div>Pick 2: {alliance.round2 ? teamLabel(alliance.round2) : 'N/A'}</div>}
+                    {alliance.backup && <div>Backup: {teamLabel(alliance.backup)}</div>}
                   </div>
                 </div>
               ))}
@@ -94,7 +102,7 @@ export function PlayoffsTab({ eventCode, teamNumber, alliances, matches }: Playo
               <p className="text-muted-foreground">Loading playoff bracket...</p>
             </div>
           ) : alliances.length >= 4 ? (
-            <DoubleEliminationBracket alliances={alliances} playoffMatches={playoffMatches} />
+            <DoubleEliminationBracket alliances={alliances} playoffMatches={playoffMatches} onMatchClick={onMatchClick} />
           ) : (
             <div className="min-h-[400px] flex items-center justify-center">
               <p className="text-muted-foreground">

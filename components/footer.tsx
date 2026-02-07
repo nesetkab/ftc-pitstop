@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { Bug } from "lucide-react";
+
+const BugIcon = Bug;
 
 const GithubIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -56,15 +59,26 @@ export default function Footer() {
           <span className="hidden sm:inline">Discord</span>
         </Link>
       </div>
+      <div>
+        <Link
+          href="https://github.com/nesetkab/ftc-pitstop/issues"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Report a Bug"
+          className="flex items-center gap-1.5 text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <BugIcon className="h-4 w-4" />
+          <span className="hidden sm:inline">Report Bug</span>
+        </Link>
+      </div>
       <div
         className="hidden text-muted-foreground/50 md:inline"
       >
         |
       </div>
 
-      <div
-      >
-        v0.1 <span className="hidden md:inline">- expect bugs!</span>
+      <div>
+        v2
       </div>
 
     </div >

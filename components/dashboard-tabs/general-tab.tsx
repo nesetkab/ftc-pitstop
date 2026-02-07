@@ -6,7 +6,8 @@ import { PerformanceModule } from "../modules/performance-module"
 import { DetailedOPRModule } from "../modules/detailed-opr-module"
 import { TeamStats, Ranking, Match } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 import { ComparisonData } from "../team-comparison"
-import { Trophy, TrendingUp, TrendingDown } from "lucide-react"
+import { Trophy } from "lucide-react"
+import { cachedFetch, BROWSER_CACHE_TTL } from "@/lib/browser-cache"
 
 interface GeneralTabProps {
   eventCode: string
@@ -15,13 +16,18 @@ interface GeneralTabProps {
   teamStats: TeamStats | null
   matches: Match[]
   rankings: Ranking[]
+  teamNames?: { [key: number]: string }
+  onMatchClick?: (match: Match) => void
 }
 
-export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches, rankings }: GeneralTabProps) {
+export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches, rankings, teamNames = {}, onMatchClick }: GeneralTabProps) {
+  const teamLabel = (num: number) => {
+    const name = teamNames[num]
+    return name ? `${num} ${name}` : `${num}`
+  }
   const [data, setData] = useState<ComparisonData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [oprHistory, setOprHistory] = useState<any[]>([])
   const [allTeamsOPR, setAllTeamsOPR] = useState<any[]>([])
   const [oprRank, setOprRank] = useState<number | undefined>(undefined)
   const [totalTeams, setTotalTeams] = useState<number | undefined>(undefined)
@@ -30,12 +36,11 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
     try {
       setError(null)
       const url = `/api/events/${eventCode}/team-comparison?team=${teamNumber}`
-      const response = await fetch(url)
-      const result = await response.json()
+      const { data: result } = await cachedFetch<any>(url, BROWSER_CACHE_TTL.COMPARISON)
 
-      if (response.ok) {
+      if (result.allTeams || result.targetTeam) {
         setData(result)
-      } else {
+      } else if (result.error) {
         setError("Unable to load team comparison data")
       }
     } catch (error) {
@@ -46,30 +51,18 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
     }
   }
 
-  const fetchOPRHistory = async () => {
-    try {
-      // TODO: Implement FTCScout API integration for historical OPR data
-      // For now, just show current OPR
-      console.log("OPR history fetch - to be implemented with FTCScout API")
-    } catch (error) {
-      console.error("Error fetching OPR history:", error)
-    }
-  }
-
   const fetchOPRData = async () => {
     try {
-      const response = await fetch(`/api/events/${eventCode}/opr`)
-      if (response.ok) {
-        const result = await response.json()
-        const oprData = result.opr || []
-        setAllTeamsOPR(oprData)
-        setTotalTeams(oprData.length)
+      const url = `/api/events/${eventCode}/opr`
+      const { data: result } = await cachedFetch<any>(url, BROWSER_CACHE_TTL.OPR)
+      const oprData = result.opr || []
+      setAllTeamsOPR(oprData)
+      setTotalTeams(oprData.length)
 
-        // Sort teams by OPR descending to find rank
-        const sortedByOPR = [...oprData].sort((a, b) => b.opr - a.opr)
-        const rank = sortedByOPR.findIndex(team => team.teamNumber === teamNumber) + 1
-        setOprRank(rank > 0 ? rank : undefined)
-      }
+      // Sort teams by OPR descending to find rank
+      const sortedByOPR = [...oprData].sort((a: any, b: any) => b.opr - a.opr)
+      const rank = sortedByOPR.findIndex((team: any) => team.teamNumber === teamNumber) + 1
+      setOprRank(rank > 0 ? rank : undefined)
     } catch (error) {
       console.error("Error fetching OPR data:", error)
     }
@@ -77,7 +70,6 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
 
   useEffect(() => {
     fetchComparison()
-    fetchOPRHistory()
     fetchOPRData()
     const interval = setInterval(() => {
       fetchComparison()
@@ -125,8 +117,9 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                 upcomingMatches.map((match) => (
                   <div
                     key={match.matchNumber}
-                    className="p-2 rounded border"
+                    className="p-2 rounded border cursor-pointer hover:bg-accent/30 transition-colors"
                     style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-card)' }}
+                    onClick={() => onMatchClick?.(match)}
                   >
                     <div className="flex justify-between items-center mb-0.5">
                       <span className="font-semibold text-xs">{match.description}</span>
@@ -135,9 +128,9 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                       </span>
                     </div>
                     <div className="text-[11px]">
-                      <span style={{ color: 'var(--color-red1)' }}>Red: {match.red1}, {match.red2}</span>
+                      <span style={{ color: 'var(--color-red1)' }}>Red: {teamLabel(match.red1)}, {teamLabel(match.red2)}</span>
                       {" vs "}
-                      <span style={{ color: 'var(--color-blue1)' }}>Blue: {match.blue1}, {match.blue2}</span>
+                      <span style={{ color: 'var(--color-blue1)' }}>Blue: {teamLabel(match.blue1)}, {teamLabel(match.blue2)}</span>
                     </div>
                   </div>
                 ))
@@ -186,9 +179,7 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                           </div>
                         </td>
                         <td className="py-2 px-3 font-semibold text-xs">
-                          {r.teamNumber}
-                          {r.teamNumber === teamNumber
-                          }
+                          {r.teamNumber} {r.teamName || teamNames[r.teamNumber] || ''}
                         </td>
                         <td className="py-2 px-3 text-center text-xs">{r.rp}</td>
                         <td className="py-2 px-3 text-center text-xs">{r.tbp}</td>
@@ -210,22 +201,6 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
         </Card>
       </div>
 
-      {/* OPR Over Time Chart */}
-      <div className="col-span-12">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">OPR Over Time</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-2">
-            <div className="h-48 flex items-center justify-center">
-              <div className="text-center">
-                <p className="text-muted-foreground text-xs">OPR timeline visualization - Coming Soon</p>
-                <p className="text-[10px] text-muted-foreground mt-1">(Will integrate with FTCScout API)</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   )
 }

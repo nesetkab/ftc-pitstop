@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Search, Calendar, Trophy, Users, AlertCircle, TestTube, Clock, MapPin, ArrowDown } from "lucide-react"
+import { Search, Calendar, AlertCircle, Clock, MapPin, Hash } from "lucide-react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
@@ -20,14 +20,16 @@ interface Event {
 
 export default function DashboardPage() {
   const [events, setEvents] = useState<Event[]>([])
-  const [searchTerm, setSearchTerm] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [debugInfo, setDebugInfo] = useState<any>(null)
+  const [eventSearchTerm, setEventSearchTerm] = useState("")
+  const [teamSearchTerm, setTeamSearchTerm] = useState("")
+  const [loadingEvents, setLoadingEvents] = useState(false)
+  const [loadingTeam, setLoadingTeam] = useState(false)
+  const [eventError, setEventError] = useState<string | null>(null)
+  const [teamError, setTeamError] = useState<string | null>(null)
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
   const [loadingUpcoming, setLoadingUpcoming] = useState(true)
-  const [showScrollHint, setShowScrollHint] = useState(true);
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const [teamInfo, setTeamInfo] = useState<any>(null)
+  const [teamEvents, setTeamEvents] = useState<Event[]>([])
 
   useEffect(() => {
     const loadUpcomingEvents = async () => {
@@ -47,65 +49,50 @@ export default function DashboardPage() {
     loadUpcomingEvents()
   }, [])
 
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (!scrollContainer) return;
-
-    const handleScroll = () => {
-      if (scrollContainer.scrollTop > 0) {
-        setShowScrollHint(false);
-      }
-    };
-
-    if (showScrollHint && events.length > 0 && scrollContainer.scrollHeight > scrollContainer.clientHeight) {
-      scrollContainer.addEventListener('scroll', handleScroll);
-    }
-
-    return () => {
-      scrollContainer.removeEventListener('scroll', handleScroll);
-    };
-  }, [showScrollHint, events.length]);
-
   const searchEvents = async () => {
-    if (!searchTerm.trim()) return
-
-    setLoading(true)
-    setError(null)
-    setDebugInfo(null)
-    setShowScrollHint(true)
-
+    if (!eventSearchTerm.trim()) return
+    setLoadingEvents(true)
+    setEventError(null)
     try {
-      console.log("Searching for:", searchTerm)
-      const response = await fetch(`/api/events/search?q=${encodeURIComponent(searchTerm)}`)
+      const response = await fetch(`/api/events/search?q=${encodeURIComponent(eventSearchTerm)}`)
       const data = await response.json()
-
-      console.log("Response status:", response.status)
-      console.log("Response data:", data)
-
       if (!response.ok) {
-        console.error("Search error:", data)
-        setError(`Error: ${data.error}${data.details ? ` - ${data.details}` : ""}`)
+        setEventError(data.error || "Search failed")
         return
       }
-
-      console.log("Search results:", data.events?.length || 0, "events")
       setEvents(data.events || [])
-      setDebugInfo({
-        totalEvents: data.totalEvents,
-        searchQuery: data.searchQuery,
-        foundEvents: data.events?.length || 0,
-      })
-
       if (data.events?.length === 0) {
-        setError(
-          `No events found matching "${searchTerm}". Try searching for event names like "Championship" or "League Meet".`,
-        )
+        setEventError(`No events found for "${eventSearchTerm}"`)
       }
-    } catch (error) {
-      console.error("Error searching events:", error)
-      setError("Failed to search events. Please check your internet connection and API credentials.")
+    } catch {
+      setEventError("Failed to search events.")
     } finally {
-      setLoading(false)
+      setLoadingEvents(false)
+    }
+  }
+
+  const searchTeam = async () => {
+    if (!teamSearchTerm.trim()) return
+    setLoadingTeam(true)
+    setTeamError(null)
+    setTeamInfo(null)
+    setTeamEvents([])
+    try {
+      const response = await fetch(`/api/teams/search?q=${encodeURIComponent(teamSearchTerm.trim())}`)
+      const data = await response.json()
+      if (!response.ok) {
+        setTeamError(data.error || "Search failed")
+        return
+      }
+      setTeamInfo(data.teamInfo)
+      setTeamEvents(data.events || [])
+      if (!data.events || data.events.length === 0) {
+        setTeamError(`No events found for team ${teamSearchTerm.trim()}`)
+      }
+    } catch {
+      setTeamError("Failed to search for team.")
+    } finally {
+      setLoadingTeam(false)
     }
   }
 
@@ -115,220 +102,204 @@ export default function DashboardPage() {
   }
 
   const handleDirectEventCode = () => {
-    if (searchTerm.trim()) {
-      window.location.href = `/event/${searchTerm.trim()}`
+    if (eventSearchTerm.trim()) {
+      window.location.href = `/event/${eventSearchTerm.trim()}`
     }
   }
 
-  const quickTestEvent = (eventCode: string) => {
-    window.location.href = `/event/${eventCode}`
-  }
-
-  const isEventUpcoming = (event: Event) => {
+  const isEventLive = (event: Event) => {
     const now = new Date()
-    const eventStart = new Date(event.dateStart)
-    const eventEnd = new Date(event.dateEnd)
-    return eventStart <= now && eventEnd >= now
+    return new Date(event.dateStart) <= now && new Date(event.dateEnd) >= now
   }
 
   const isEventSoon = (event: Event) => {
     const now = new Date()
-    const eventStart = new Date(event.dateStart)
-    const daysUntil = Math.ceil((eventStart.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
+    const daysUntil = Math.ceil((new Date(event.dateStart).getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     return daysUntil > 0 && daysUntil <= 14
   }
 
+  const EventCard = ({ event, onClick }: { event: Event; onClick: () => void }) => {
+    const live = isEventLive(event)
+    const soon = isEventSoon(event)
+    return (
+      <div
+        className={`p-3 rounded-lg border cursor-pointer transition-all hover:border-purple-500/50 ${live ? "border-red-500/70" : soon ? "border-purple-500/50" : ""
+          }`}
+        style={{ borderColor: live ? undefined : soon ? undefined : "var(--color-border)", backgroundColor: "var(--color-background-secondary)" }}
+        onClick={onClick}
+      >
+        <div className="flex items-center gap-2 mb-1">
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{event.code}</Badge>
+          {live && (
+            <Badge className="bg-red-500 text-white text-[10px] px-1.5 py-0 animate-pulse">LIVE</Badge>
+          )}
+          {soon && !live && (
+            <Badge variant="outline" className="border-purple-400 text-purple-400 text-[10px] px-1.5 py-0">
+              <Clock className="h-2.5 w-2.5 mr-0.5" />Soon
+            </Badge>
+          )}
+          <span className="text-[10px] text-muted-foreground ml-auto">
+            {new Date(event.dateStart).toLocaleDateString()}
+          </span>
+        </div>
+        <div className="font-medium text-sm">{event.name}</div>
+        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+          <MapPin className="h-2.5 w-2.5" />
+          {event.city}, {event.stateprov}
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="max-w-2xl mx-auto py-8">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search className="h-5 w-5" />
-            Find Your Event
-          </CardTitle>
-          <CardDescription>
-            Search for your FTC event by name, location, or enter the event code directly:
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
+    <div className="max-w-4xl mx-auto py-8 px-4">
+      <div className="text-center mb-6">
+        <h1 className="text-2xl font-bold mb-1">Find Your Event</h1>
+        <p className="text-sm text-muted-foreground">Search for an event or look up a team to find their events</p>
+      </div>
 
-            <Input
-              placeholder="Try: Championship, League Meet, or event code"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && searchEvents()}
-              className="flex-1"
-            />
-            <Button onClick={searchEvents} disabled={loading}>
-              {loading ? (
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-              ) : (
-                <Search className="h-4 w-4" />
-              )}
-            </Button>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={handleDirectEventCode}
-              className="flex-1"
-              disabled={!searchTerm.trim()}
-            >
+      {/* Side-by-side search */}
+      <div className="grid md:grid-cols-[1fr_auto_1fr] gap-4 items-start mb-8">
+        {/* Event Search */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-purple-500" />
+              Search by Event
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Event name, location, or code"
+                value={eventSearchTerm}
+                onChange={(e) => setEventSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && searchEvents()}
+                className="text-sm"
+              />
+              <Button size="sm" onClick={searchEvents} disabled={loadingEvents} className="bg-purple-600 hover:bg-purple-700">
+                {loadingEvents ? (
+                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white" />
+                ) : (
+                  <Search className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleDirectEventCode} className="w-full" disabled={!eventSearchTerm.trim()}>
               Go to Event Code
             </Button>
-          </div>
 
-          {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 rounded-lg">
-              <div className="flex items-center gap-2 text-red-800 dark:text-red-200">
-                <AlertCircle className="h-4 w-4" />
-                <span className="text-sm">{error}</span>
+            {eventError && (
+              <div className="text-xs text-red-400 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />{eventError}
               </div>
-            </div>
-          )}
+            )}
 
-          {debugInfo && (
-            <div className="p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg">
-              <div className="text-xs text-blue-800 dark:text-blue-200">
-                <p>
-                  Search: "{debugInfo.searchQuery}" | Total Events: {debugInfo.totalEvents} | Found:{" "}
-                  {debugInfo.foundEvents}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {events.length > 0 && (
-            <div>
-              <div className="space-y-2 max-h-96 overflow-y-auto relative" ref={scrollRef}>
-                <h3 className="font-semibold text-sm text-muted-foreground">Search Results:</h3>
-                {showScrollHint && (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center bg-black/70 text-white px-4 py-2 rounded-lg text-xl opacity-90 animate-pulse pointer-events-none">
-                    <ArrowDown className="h-8 w-8 mb-2" />
-                    <span>Scroll</span>
-                  </div>
-                )}
+            {events.length > 0 && (
+              <div className="space-y-2 max-h-72 overflow-y-auto">
                 {events.map((event) => (
-                  <Card
-                    key={event.code}
-                    className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => handleEventSelect(event)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Badge variant="secondary">{event.code}</Badge>
-                            <span className="text-sm text-muted-foreground">
-                              {new Date(event.dateStart).toLocaleDateString()}
-                            </span>
-                          </div>
-                          <h4 className="font-semibold">{event.name}</h4>
-                          <p className="text-sm text-muted-foreground">
-                            {event.venue} • {event.city}, {event.stateprov}
-                          </p>
-                        </div>
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <EventCard key={event.code} event={event} onClick={() => handleEventSelect(event)} />
                 ))}
               </div>
-              <div className="my-8 border-t dark:border-gray-400" />
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Divider */}
+        <div className="hidden md:flex flex-col items-center justify-center self-center">
+          <div className="w-px h-12 bg-border" />
+          <span className="text-xs text-muted-foreground py-2 font-medium">or</span>
+          <div className="w-px h-12 bg-border" />
+        </div>
+        <div className="md:hidden text-center text-xs text-muted-foreground py-1 font-medium">or</div>
+
+        {/* Team Search */}
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base flex items-center gap-2">
+              <Hash className="h-4 w-4 text-purple-500" />
+              Search by Team
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="flex gap-2">
+              <Input
+                placeholder="Team number (e.g. 3747)"
+                value={teamSearchTerm}
+                onChange={(e) => setTeamSearchTerm(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && searchTeam()}
+                type="number"
+                className="text-sm"
+              />
+              <Button size="sm" onClick={searchTeam} disabled={loadingTeam} className="bg-purple-600 hover:bg-purple-700">
+                {loadingTeam ? (
+                  <div className="animate-spin rounded-full h-3.5 w-3.5 border-b-2 border-white" />
+                ) : (
+                  <Search className="h-3.5 w-3.5" />
+                )}
+              </Button>
             </div>
-          )}
 
-          {!loading && !error && events.length === 0 && searchTerm && (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>Try searching for:</p>
-              <ul className="mt-2 text-sm">
-                <li>"Championship"</li>
-                <li>"League Meet"</li>
-                <li>Your state name</li>
-                <li>Specific event codes</li>
-              </ul>
-            </div>
-          )}
-
-
-          {/* Upcoming Events */}
-          {!loadingUpcoming && upcomingEvents.length > 0 && (
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm text-muted-foreground flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Upcoming & Current Events
-              </h3>
-              <div className="grid grid-cols-1 gap-3">
-                {upcomingEvents.map((event) => {
-                  const isLive = isEventUpcoming(event)
-                  const isSoon = isEventSoon(event)
-                  const eventStart = new Date(event.dateStart)
-                  const eventEnd = new Date(event.dateEnd)
-
-                  return (
-                    <Card
-                      key={event.code}
-                      className={`cursor-pointer hover:shadow-md transition-all ${isLive
-                        ? "border-red-500 dark:border-red-300 hover:border-red-100 dark:hover:border-red-900 bg-white dark:bg-black shadow-md"
-                        : isSoon
-                          ? "border-purple-500 dark:border-purple-300 hover:border-purple-100 dark:hover:border-purple-900 bg-white dark:bg-black"
-                          : "hover:border-gray-300"
-                        }`}
-                      onClick={() => quickTestEvent(event.code)}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <Badge variant="secondary" className="font-mono">
-                                {event.code}
-                              </Badge>
-                              {isLive && (
-                                <Badge variant="default" className="bg-red-500 text-white animate-pulse">
-                                  <div className="w-2 h-2 bg-white rounded-full mr-1"></div>
-                                  LIVE
-                                </Badge>
-                              )}
-                              {isSoon && !isLive && (
-                                <Badge variant="outline" className="border-purple-400 text-purple-600">
-                                  <Clock className="h-3 w-3 mr-1" />
-                                  Soon
-                                </Badge>
-                              )}
-                            </div>
-                            <h4 className="font-semibold text-sm mb-1">{event.name}</h4>
-                            <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
-                              <MapPin className="h-3 w-3" />
-                              <span>
-                                {event.venue} • {event.city}, {event.stateprov}
-                              </span>
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {isLive
-                                ? `Ends ${eventEnd.toLocaleDateString()}`
-                                : `${eventStart.toLocaleDateString()} - ${eventEnd.toLocaleDateString()}`}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )
-                })}
+            {teamError && (
+              <div className="text-xs text-red-400 flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" />{teamError}
               </div>
-            </div>
-          )}
+            )}
 
-          {loadingUpcoming && (
-            <div className="text-center py-4">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 mx-auto mb-2"></div>
-              <p className="text-sm text-muted-foreground">Loading upcoming events...</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            {teamInfo && (
+              <div className="p-2 rounded-lg text-sm" style={{ backgroundColor: "var(--color-background-secondary)", borderColor: "var(--color-border)" }}>
+                <span className="font-semibold">{teamInfo.teamNumber}</span> - {teamInfo.nameShort}
+                {teamInfo.city && <span className="text-xs text-muted-foreground block">{teamInfo.city}{teamInfo.stateProv ? `, ${teamInfo.stateProv}` : ""}</span>}
+              </div>
+            )}
+
+            {loadingTeam && (
+              <div className="text-center py-4">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-purple-500 mx-auto mb-2" />
+                <p className="text-xs text-muted-foreground">Searching events...</p>
+              </div>
+            )}
+
+            {teamEvents.length > 0 && (
+              <div className="space-y-2 max-h-72 overflow-y-auto">
+                <p className="text-[10px] text-muted-foreground">Events (closest first):</p>
+                {teamEvents.map((event) => (
+                  <EventCard key={event.code} event={event} onClick={() => {
+                    if (teamInfo?.teamNumber) {
+                      localStorage.setItem("selectedTeam", JSON.stringify(teamInfo))
+                      window.location.href = `/dashboard/${event.code}/${teamInfo.teamNumber}`
+                    } else {
+                      handleEventSelect(event)
+                    }
+                  }} />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Upcoming Events */}
+      {!loadingUpcoming && upcomingEvents.length > 0 && (
+        <div className="space-y-3">
+          <h3 className="font-semibold text-sm text-muted-foreground flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Upcoming & Current Events
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {upcomingEvents.map((event) => (
+              <EventCard key={event.code} event={event} onClick={() => handleEventSelect(event)} />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {loadingUpcoming && (
+        <div className="text-center py-4">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500 mx-auto mb-2" />
+          <p className="text-sm text-muted-foreground">Loading upcoming events...</p>
+        </div>
+      )}
     </div>
-
   )
 }

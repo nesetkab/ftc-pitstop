@@ -4,16 +4,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { ComparisonData } from "../team-comparison"
-import { ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react"
+import { ArrowUp, ArrowDown } from "lucide-react"
+import { cachedFetch, BROWSER_CACHE_TTL } from "@/lib/browser-cache"
 
 interface EventStatsTabProps {
   eventCode: string
+  teamNames?: { [key: number]: string }
 }
 
-type SortField = 'opr' | 'dpr' | 'autoOpr' | 'teleopOpr' | 'endgameOpr'
+type SortField = 'rank' | 'opr' | 'dpr' | 'autoOpr' | 'teleopOpr' | 'endgameOpr' | 'winRate' | 'avgScore'
 type SortDirection = 'asc' | 'desc'
 
-export function EventStatsTab({ eventCode }: EventStatsTabProps) {
+export function EventStatsTab({ eventCode, teamNames = {} }: EventStatsTabProps) {
   const [data, setData] = useState<ComparisonData | null>(null)
   const [loading, setLoading] = useState(true)
   const [sortField, setSortField] = useState<SortField>('opr')
@@ -22,10 +24,9 @@ export function EventStatsTab({ eventCode }: EventStatsTabProps) {
   const fetchData = async () => {
     try {
       const url = `/api/events/${eventCode}/team-comparison`
-      const response = await fetch(url)
-      const result = await response.json()
+      const { data: result } = await cachedFetch<any>(url, BROWSER_CACHE_TTL.COMPARISON)
 
-      if (response.ok) {
+      if (result.allTeams) {
         setData(result)
       }
     } catch (error) {
@@ -46,175 +47,132 @@ export function EventStatsTab({ eventCode }: EventStatsTabProps) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc')
     } else {
       setSortField(field)
-      setSortDirection('desc')
+      setSortDirection(field === 'rank' ? 'asc' : 'desc')
     }
   }
 
-  const sortedTeams = data?.allTeams?.sort((a, b) => {
-    const aValue = a[sortField] || 0
-    const bValue = b[sortField] || 0
+  const sortedTeams = [...(data?.allTeams || [])].sort((a, b) => {
+    const aValue = (a as any)[sortField] || 0
+    const bValue = (b as any)[sortField] || 0
     return sortDirection === 'desc' ? bValue - aValue : aValue - bValue
-  }) || []
+  })
 
-  const SortButton = ({ field, label }: { field: SortField, label: string }) => (
-    <Button
-      variant={sortField === field ? "default" : "outline"}
-      size="sm"
+  const SortHeader = ({ field, label, className = '' }: { field: SortField, label: string, className?: string }) => (
+    <th
+      className={`py-2 px-2 font-semibold text-xs cursor-pointer select-none hover:text-purple-400 transition-colors ${className}`}
       onClick={() => handleSort(field)}
-      className="gap-1"
     >
-      {label}
-      {sortField === field && (
-        sortDirection === 'desc' ? <ArrowDown className="h-3 w-3" /> : <ArrowUp className="h-3 w-3" />
-      )}
-    </Button>
+      <div className="flex items-center gap-0.5 justify-end">
+        <span>{label}</span>
+        {sortField === field && (
+          sortDirection === 'desc'
+            ? <ArrowDown className="h-3 w-3 text-purple-500" />
+            : <ArrowUp className="h-3 w-3 text-purple-500" />
+        )}
+      </div>
+    </th>
   )
 
   return (
     <div className="space-y-4">
-      {/* Top Teams by OPR */}
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-2">
           <div className="flex justify-between items-center">
-            <CardTitle>Team Rankings</CardTitle>
-            <div className="flex gap-2">
-              <SortButton field="opr" label="Total OPR" />
-              <SortButton field="autoOpr" label="Auto" />
-              <SortButton field="teleopOpr" label="TeleOp" />
-              <SortButton field="endgameOpr" label="Endgame" />
-              <SortButton field="dpr" label="DPR" />
-            </div>
+            <CardTitle className="text-base">All Teams - OPR Breakdown</CardTitle>
+            <span className="text-xs text-muted-foreground">{sortedTeams.length} teams</span>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {loading ? (
-            <p className="text-muted-foreground">Loading...</p>
+            <div className="p-6 text-center">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500 mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Loading...</p>
+            </div>
           ) : sortedTeams.length === 0 ? (
-            <p className="text-muted-foreground">No team data available yet</p>
+            <p className="text-muted-foreground p-6 text-center">No team data available yet</p>
           ) : (
-            <div className="space-y-2">
-              {sortedTeams.slice(0, 20).filter(team => team && team.teamNumber).map((team, index) => (
-                <div
-                  key={`team-${team.teamNumber}-${index}`}
-                  className="flex justify-between items-center p-2 rounded border"
-                  style={{ borderColor: 'var(--color-border)' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="font-bold text-muted-foreground w-6">#{index + 1}</span>
-                    <span className="font-semibold">{team.teamNumber}</span>
-                  </div>
-                  <div className="flex gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground">OPR: </span>
-                      <span className="font-semibold">{team.opr?.toFixed(1) || 'N/A'}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Auto: </span>
-                      <span className="font-semibold text-purple-600">{team.autoOpr?.toFixed(1) || 'N/A'}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">TeleOp: </span>
-                      <span className="font-semibold text-indigo-600">{team.teleopOpr?.toFixed(1) || 'N/A'}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">Endgame: </span>
-                      <span className="font-semibold text-cyan-600">{team.endgameOpr?.toFixed(1) || 'N/A'}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground">DPR: </span>
-                      <span className="font-semibold">{team.dpr?.toFixed(1) || 'N/A'}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b" style={{ borderColor: 'var(--color-border)' }}>
+                    <th className="py-2 px-2 text-left font-semibold text-xs w-8">#</th>
+                    <th className="py-2 px-2 text-left font-semibold text-xs">Team</th>
+                    <SortHeader field="opr" label="OPR" />
+                    <SortHeader field="autoOpr" label="Auto" />
+                    <SortHeader field="teleopOpr" label="TeleOp" />
+                    <SortHeader field="endgameOpr" label="Endgame" />
+                    <SortHeader field="dpr" label="DPR" />
+                    <SortHeader field="winRate" label="Win%" />
+                    <SortHeader field="avgScore" label="Avg" />
+                    <th className="py-2 px-2 text-right font-semibold text-xs">Record</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedTeams.filter(t => t && t.teamNumber).map((team, index) => (
+                    <tr
+                      key={team.teamNumber}
+                      className="border-b hover:bg-accent/30 transition-colors"
+                      style={{ borderColor: 'var(--color-border)' }}
+                    >
+                      <td className="py-1.5 px-2 text-xs text-muted-foreground">{index + 1}</td>
+                      <td className="py-1.5 px-2 font-semibold text-xs">{team.teamNumber} <span className="font-normal text-muted-foreground">{teamNames[team.teamNumber] || ''}</span></td>
+                      <td className="py-1.5 px-2 text-right font-mono text-xs font-semibold">{team.opr?.toFixed(1) ?? '-'}</td>
+                      <td className="py-1.5 px-2 text-right font-mono text-xs text-purple-500">{team.autoOpr?.toFixed(1) ?? '-'}</td>
+                      <td className="py-1.5 px-2 text-right font-mono text-xs text-indigo-500">{team.teleopOpr?.toFixed(1) ?? '-'}</td>
+                      <td className="py-1.5 px-2 text-right font-mono text-xs text-cyan-500">{team.endgameOpr?.toFixed(1) ?? '-'}</td>
+                      <td className="py-1.5 px-2 text-right font-mono text-xs">{team.dpr?.toFixed(1) ?? '-'}</td>
+                      <td className="py-1.5 px-2 text-right font-mono text-xs">{team.winRate?.toFixed(0) ?? '-'}%</td>
+                      <td className="py-1.5 px-2 text-right font-mono text-xs">{team.avgScore?.toFixed(0) ?? '-'}</td>
+                      <td className="py-1.5 px-2 text-right text-xs">
+                        <span className="text-green-500">{team.wins}</span>
+                        -<span className="text-red-500">{team.losses}</span>
+                        -<span className="text-muted-foreground">{team.ties}</span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </CardContent>
       </Card>
 
-      {/* Event Statistics Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Event Summary Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Highest Total OPR</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold">
-              {sortedTeams[0]?.opr?.toFixed(1) || 'N/A'}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Team {sortedTeams[0]?.teamNumber || '-'}
-            </p>
+          <CardContent className="p-3">
+            <div className="text-xs text-muted-foreground">Highest OPR</div>
+            <div className="text-xl font-bold">{sortedTeams[0]?.opr?.toFixed(1) || '-'}</div>
+            <div className="text-[10px] text-muted-foreground">Team {sortedTeams[0]?.teamNumber || '-'}</div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Highest Auto OPR</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-purple-600">
-              {[...sortedTeams].sort((a, b) => (b.autoOpr || 0) - (a.autoOpr || 0))[0]?.autoOpr?.toFixed(1) || 'N/A'}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Team {[...sortedTeams].sort((a, b) => (b.autoOpr || 0) - (a.autoOpr || 0))[0]?.teamNumber || '-'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Highest TeleOp OPR</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-indigo-600">
-              {[...sortedTeams].sort((a, b) => (b.teleopOpr || 0) - (a.teleopOpr || 0))[0]?.teleopOpr?.toFixed(1) || 'N/A'}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Team {[...sortedTeams].sort((a, b) => (b.teleopOpr || 0) - (a.teleopOpr || 0))[0]?.teamNumber || '-'}
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Highest Endgame OPR</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-bold text-cyan-600">
-              {[...sortedTeams].sort((a, b) => (b.endgameOpr || 0) - (a.endgameOpr || 0))[0]?.endgameOpr?.toFixed(1) || 'N/A'}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Team {[...sortedTeams].sort((a, b) => (b.endgameOpr || 0) - (a.endgameOpr || 0))[0]?.teamNumber || '-'}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="grid grid-cols-2 gap-4">
-        <Card>
-          <CardHeader>
-            <CardTitle>Average OPR</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
+          <CardContent className="p-3">
+            <div className="text-xs text-muted-foreground">Avg OPR</div>
+            <div className="text-xl font-bold">
               {sortedTeams.length > 0
-                ? (sortedTeams.reduce((sum, t) => sum + (t.opr || 0), 0) / sortedTeams.length).toFixed(1)
-                : 'N/A'}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              Across {sortedTeams.length} teams
-            </p>
+                ? (sortedTeams.reduce((s, t) => s + (t.opr || 0), 0) / sortedTeams.length).toFixed(1)
+                : '-'}
+            </div>
+            <div className="text-[10px] text-muted-foreground">Across {sortedTeams.length} teams</div>
           </CardContent>
         </Card>
-
         <Card>
-          <CardHeader>
-            <CardTitle>Total Teams</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">{sortedTeams.length}</p>
-            <p className="text-sm text-muted-foreground">At this event</p>
+          <CardContent className="p-3">
+            <div className="text-xs text-muted-foreground">Highest Auto</div>
+            <div className="text-xl font-bold text-purple-500">
+              {[...sortedTeams].sort((a, b) => (b.autoOpr || 0) - (a.autoOpr || 0))[0]?.autoOpr?.toFixed(1) || '-'}
+            </div>
+            <div className="text-[10px] text-muted-foreground">
+              Team {[...sortedTeams].sort((a, b) => (b.autoOpr || 0) - (a.autoOpr || 0))[0]?.teamNumber || '-'}
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-3">
+            <div className="text-xs text-muted-foreground">Total Teams</div>
+            <div className="text-xl font-bold">{sortedTeams.length}</div>
+            <div className="text-[10px] text-muted-foreground">At this event</div>
           </CardContent>
         </Card>
       </div>

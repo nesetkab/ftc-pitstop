@@ -51,12 +51,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         ? ((ranking.wins || 0) + (ranking.ties || 0) * 0.5) / totalMatches * 100
         : 0
 
-      // console.log("i think the ranking is!!", ranking.rank)
       teamStats.set(ranking.teamNumber, {
         teamNumber: ranking.teamNumber,
-        rank: ranking.rank,  // Use the rank directly from the API
-        rp: ranking.rankingPoints || 0,
-        tbp: ranking.tieBreakerPoints || 0,
+        rank: ranking.rank,
+        rp: ranking.sortOrder1 ?? ranking.rankingPoints ?? ranking.rp ?? 0,
+        tbp: ranking.sortOrder2 ?? ranking.tieBreakerPoints ?? ranking.tbp ?? 0,
         wins: ranking.wins || 0,
         losses: ranking.losses || 0,
         ties: ranking.ties || 0,

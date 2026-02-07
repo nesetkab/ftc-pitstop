@@ -16,7 +16,14 @@ export async function GET(
       { bypassCache }
     )
 
-    let rankings = data.rankings || []
+    let rankings = (data.rankings || []).map((r: any) => ({
+      ...r,
+      // Map FTC API sortOrder fields to RP/TBP
+      rp: r.sortOrder1 ?? r.rankingPoints ?? r.rp ?? 0,
+      tbp: r.sortOrder2 ?? r.tieBreakerPoints ?? r.tbp ?? 0,
+      team: r.teamNumber,
+      teamName: r.teamName || undefined,
+    }))
 
     // If teamNumber provided, filter for that team
     if (teamNumberParam) {

@@ -10,9 +10,15 @@ interface RankingsScheduleTabProps {
   teamNumber: number
   rankings: Ranking[]
   matches: Match[]
+  teamNames?: { [key: number]: string }
+  onMatchClick?: (match: Match) => void
 }
 
-export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }: RankingsScheduleTabProps) {
+export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches, teamNames = {}, onMatchClick }: RankingsScheduleTabProps) {
+  const teamLabel = (num: number) => {
+    const name = teamNames[num]
+    return name ? `${num} ${name}` : `${num}`
+  }
   const upcomingMatches = matches.filter(m => !m.played)
   const completedMatches = matches.filter(m => m.played)
 
@@ -20,7 +26,7 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
     <div className="grid grid-cols-12 gap-4">
       {/* Rankings */}
       <div className="col-span-5">
-        <RankingsModule rankings={rankings} teamNumber={teamNumber} />
+        <RankingsModule rankings={rankings} teamNumber={teamNumber} teamNames={teamNames} />
       </div>
 
       {/* Schedule */}
@@ -38,7 +44,7 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                   {upcomingMatches.map((match) => (
                     <div
                       key={match.matchNumber}
-                      className="p-3 rounded-lg border"
+                      className="p-3 rounded-lg border cursor-pointer hover:bg-accent/30 transition-colors"
                       style={{
                         borderColor: 'var(--color-border)',
                         backgroundColor:
@@ -49,6 +55,7 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                             ? 'var(--color-card-hover)'
                             : 'var(--color-card)',
                       }}
+                      onClick={() => onMatchClick?.(match)}
                     >
                       <div className="flex justify-between items-center mb-2">
                         <div className="flex items-center gap-2">
@@ -63,10 +70,10 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                       </div>
                       <div className="text-sm">
                         <div style={{ color: 'var(--color-red1)' }}>
-                          Red: {match.red1}, {match.red2}
+                          Red: {teamLabel(match.red1)}, {teamLabel(match.red2)}
                         </div>
                         <div style={{ color: 'var(--color-blue1)' }}>
-                          Blue: {match.blue1}, {match.blue2}
+                          Blue: {teamLabel(match.blue1)}, {teamLabel(match.blue2)}
                         </div>
                       </div>
                     </div>
@@ -83,11 +90,12 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                   {completedMatches.reverse().map((match) => (
                     <div
                       key={match.series ? match.series + match.matchNumber : match.matchNumber}
-                      className="p-3 rounded-lg border opacity-75"
+                      className="p-3 rounded-lg border opacity-75 cursor-pointer hover:opacity-100 transition-all"
                       style={{
                         borderColor: 'var(--color-border)',
                         backgroundColor: 'var(--color-card)',
                       }}
+                      onClick={() => onMatchClick?.(match)}
                     >
                       <div className="flex justify-between items-center mb-2">
                         <div className="flex items-center gap-2">
@@ -104,10 +112,10 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches }
                       </div>
                       <div className="flex flex-row justify-between text-sm opacity-75">
                         <div style={{ color: 'var(--color-red1)' }}>
-                          {match.red1} & {match.red2}
+                          {teamLabel(match.red1)} & {teamLabel(match.red2)}
                         </div>
                         <div style={{ color: 'var(--color-blue1)' }}>
-                          {match.blue1} & {match.blue2}
+                          {teamLabel(match.blue1)} & {teamLabel(match.blue2)}
                         </div>
                       </div>
                     </div>

@@ -1,21 +1,19 @@
 "use client"
 
-import { Card, CardContent } from "@/components/ui/card"
 import { Alliance, Match } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 
 interface DoubleEliminationBracketProps {
   alliances: Alliance[]
   playoffMatches: Match[]
+  onMatchClick?: (match: Match) => void
 }
 
-export function DoubleEliminationBracket({ alliances, playoffMatches }: DoubleEliminationBracketProps) {
-  // Helper function to get alliance number by captain
+export function DoubleEliminationBracket({ alliances, playoffMatches, onMatchClick }: DoubleEliminationBracketProps) {
   const getAllianceNumber = (teamNumber: number) => {
     const alliance = alliances.find(a => a.captain === teamNumber)
     return alliance ? alliance.number : null
   }
 
-  // Helper function to determine winner of a match
   const getWinner = (match: Match) => {
     if (!match.played) return null
     if (match.redScore > match.blueScore) return 'red'
@@ -24,19 +22,13 @@ export function DoubleEliminationBracket({ alliances, playoffMatches }: DoubleEl
   }
 
   // Map playoff matches by series number
+  // Series: 1,2 = Winners R1, 3 = Losers R2, 4 = Winners Final, 5 = Losers Final, 6 = Grand Final
   const matchBySeries: { [key: number]: Match } = {}
   playoffMatches.forEach(match => {
     if (match.series) {
       matchBySeries[match.series] = match
     }
   })
-
-  // Series mapping:
-  // 1, 2: Winners Round 1
-  // 3: Losers Round 2
-  // 4: Winners Final
-  // 5: Losers Final
-  // 6: Grand Final
 
   const winnersRound1Match1 = matchBySeries[1]
   const winnersRound1Match2 = matchBySeries[2]
@@ -49,15 +41,17 @@ export function DoubleEliminationBracket({ alliances, playoffMatches }: DoubleEl
     if (!match) {
       return (
         <div
-          className="flex flex-col gap-1 p-3 rounded border min-w-[200px]"
+          className="flex flex-col gap-1.5 p-3 rounded-lg border"
           style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-card)' }}
         >
-          <div className="text-xs text-muted-foreground mb-1">{label}</div>
-          <div className="flex justify-between items-center p-2 rounded" style={{ backgroundColor: 'var(--color-background-secondary)' }}>
-            <span className="font-semibold">TBD</span>
+          <div className="text-xs font-medium text-muted-foreground">{label}</div>
+          <div className="flex justify-between items-center px-3 py-2 rounded" style={{ backgroundColor: 'var(--color-background-secondary)' }}>
+            <span className="text-sm text-muted-foreground">TBD</span>
+            <span className="text-sm text-muted-foreground">-</span>
           </div>
-          <div className="flex justify-between items-center p-2 rounded" style={{ backgroundColor: 'var(--color-background-secondary)' }}>
-            <span className="font-semibold">TBD</span>
+          <div className="flex justify-between items-center px-3 py-2 rounded" style={{ backgroundColor: 'var(--color-background-secondary)' }}>
+            <span className="text-sm text-muted-foreground">TBD</span>
+            <span className="text-sm text-muted-foreground">-</span>
           </div>
         </div>
       )
@@ -69,37 +63,40 @@ export function DoubleEliminationBracket({ alliances, playoffMatches }: DoubleEl
 
     return (
       <div
-        className="flex flex-col gap-1 p-3 rounded border min-w-[200px]"
+        className="flex flex-col gap-1.5 p-3 rounded-lg border cursor-pointer hover:bg-accent/30 transition-colors"
         style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-card)' }}
+        onClick={() => onMatchClick?.(match)}
       >
-        <div className="text-xs text-muted-foreground mb-1">{label}</div>
+        <div className="text-xs font-medium text-muted-foreground">{label}</div>
 
         {/* Red Alliance */}
         <div
-          className="flex justify-between items-center p-2 rounded"
+          className="flex justify-between items-center px-3 py-2 rounded transition-opacity"
           style={{
-            backgroundColor: redWon ? 'var(--color-success)' : 'var(--color-background-secondary)',
-            opacity: blueWon ? 0.6 : 1
+            backgroundColor: redWon ? 'rgba(34, 197, 94, 0.2)' : 'var(--color-background-secondary)',
+            borderLeft: '3px solid var(--color-red1)',
+            opacity: blueWon ? 0.5 : 1
           }}
         >
-          <span className={`font-semibold ${redWon ? 'font-bold' : ''}`}>
+          <span className={`text-sm ${redWon ? 'font-bold' : 'font-medium'}`}>
             Alliance {getAllianceNumber(match.red1) || '?'}
           </span>
-          {match.played && <span className="font-bold">{match.redScore}</span>}
+          {match.played && <span className={`text-sm ${redWon ? 'font-bold' : ''}`}>{match.redScore}</span>}
         </div>
 
         {/* Blue Alliance */}
         <div
-          className="flex justify-between items-center p-2 rounded"
+          className="flex justify-between items-center px-3 py-2 rounded transition-opacity"
           style={{
-            backgroundColor: blueWon ? 'var(--color-success)' : 'var(--color-background-secondary)',
-            opacity: redWon ? 0.6 : 1
+            backgroundColor: blueWon ? 'rgba(34, 197, 94, 0.2)' : 'var(--color-background-secondary)',
+            borderLeft: '3px solid var(--color-blue1)',
+            opacity: redWon ? 0.5 : 1
           }}
         >
-          <span className={`font-semibold ${blueWon ? 'font-bold' : ''}`}>
+          <span className={`text-sm ${blueWon ? 'font-bold' : 'font-medium'}`}>
             Alliance {getAllianceNumber(match.blue1) || '?'}
           </span>
-          {match.played && <span className="font-bold">{match.blueScore}</span>}
+          {match.played && <span className={`text-sm ${blueWon ? 'font-bold' : ''}`}>{match.blueScore}</span>}
         </div>
       </div>
     )
@@ -107,144 +104,68 @@ export function DoubleEliminationBracket({ alliances, playoffMatches }: DoubleEl
 
   return (
     <div className="w-full overflow-x-auto">
-      <div className="min-w-[1200px] p-6 relative">
-        {/* SVG for connecting lines - positioned absolutely to overlay the bracket */}
-        <svg
-          className="absolute pointer-events-none"
-          style={{
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            zIndex: 0
-          }}
-          viewBox="0 0 1200 650"
-          preserveAspectRatio="none"
-        >
-          {/* Winners Round 1 Match 1 to Winners Final (winner - green) */}
-          <path d="M 210 110 L 270 110 L 270 210 L 330 210" stroke="#22c55e" strokeWidth="3" fill="none" opacity="0.7" />
-
-          {/* Winners Round 1 Match 1 to Losers Round 2 (loser - red) */}
-          <path d="M 210 110 L 240 110 L 240 470 L 330 470" stroke="#ef4444" strokeWidth="3" fill="none" opacity="0.7" strokeDasharray="8,4" />
-
-          {/* Winners Round 1 Match 2 to Winners Final (winner - green) */}
-          <path d="M 210 250 L 270 250 L 270 210 L 330 210" stroke="#22c55e" strokeWidth="3" fill="none" opacity="0.7" />
-
-          {/* Winners Round 1 Match 2 to Losers Round 2 (loser - red) */}
-          <path d="M 210 250 L 240 250 L 240 470 L 330 470" stroke="#ef4444" strokeWidth="3" fill="none" opacity="0.7" strokeDasharray="8,4" />
-
-          {/* Winners Final to Grand Final (winner - green) */}
-          <path d="M 530 210 L 830 210" stroke="#22c55e" strokeWidth="3" fill="none" opacity="0.7" />
-
-          {/* Winners Final to Losers Final (loser - red) */}
-          <path d="M 530 210 L 600 210 L 600 470 L 630 470" stroke="#ef4444" strokeWidth="3" fill="none" opacity="0.7" strokeDasharray="8,4" />
-
-          {/* Losers Round 2 to Losers Final (winner - green) */}
-          <path d="M 530 470 L 630 470" stroke="#22c55e" strokeWidth="3" fill="none" opacity="0.7" />
-
-          {/* Losers Final to Grand Final (winner - green) */}
-          <path d="M 830 470 L 900 470 L 900 210 L 830 210" stroke="#22c55e" strokeWidth="3" fill="none" opacity="0.7" />
-        </svg>
-
+      <div className="min-w-[900px] space-y-6">
         {/* Winners Bracket */}
-        <div className="mb-8 relative" style={{ zIndex: 1 }}>
-          <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-primary)' }}>Winners Bracket</h2>
-          <div className="grid grid-cols-4 gap-8 items-center">
-            {/* Column 1: Winners Round 1 */}
+        <div>
+          <h3 className="text-sm font-bold mb-3 text-green-500">Winners Bracket</h3>
+          <div className="grid grid-cols-3 gap-6 items-center">
+            {/* Col 1: Winners R1 */}
             <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-center mb-4">Round 1</h3>
-              <div className="flex flex-col gap-12">
-                {renderMatch(winnersRound1Match1, 'Match 1')}
-                {renderMatch(winnersRound1Match2, 'Match 2')}
-              </div>
+              <div className="text-xs text-muted-foreground text-center mb-2">Round 1</div>
+              {renderMatch(winnersRound1Match1, 'Match 1')}
+              {renderMatch(winnersRound1Match2, 'Match 2')}
             </div>
 
-            {/* Column 2: Winners Final */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-center mb-4">Winners Final</h3>
-              <div className="flex items-center justify-center h-full">
-                {renderMatch(winnersFinal, 'Winners Final')}
-              </div>
+            {/* Col 2: Winners Final */}
+            <div>
+              <div className="text-xs text-muted-foreground text-center mb-2">Winners Final</div>
+              {renderMatch(winnersFinal, 'Winners Final')}
             </div>
 
-            {/* Column 3: Empty (for spacing) */}
-            <div></div>
-
-            {/* Column 4: Grand Final */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-center mb-4" style={{ color: 'var(--color-success)' }}>Grand Final</h3>
-              <div className="flex items-center justify-center h-full">
-                {renderMatch(grandFinal, 'Grand Final')}
-              </div>
+            {/* Col 3: Grand Final */}
+            <div>
+              <div className="text-xs text-center mb-2 font-semibold text-purple-400">Grand Final</div>
+              {renderMatch(grandFinal, 'Grand Final')}
             </div>
           </div>
         </div>
+
+        {/* Divider */}
+        <div className="border-t" style={{ borderColor: 'var(--color-border)' }} />
 
         {/* Losers Bracket */}
-        <div className="pt-8 border-t-2 relative" style={{ borderColor: 'var(--color-border)', zIndex: 1 }}>
-          <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-error)' }}>Losers Bracket</h2>
-          <div className="grid grid-cols-4 gap-8 items-center">
-            {/* Column 1: Empty (aligns with Winners Round 1) */}
-            <div></div>
+        <div>
+          <h3 className="text-sm font-bold mb-3 text-red-400">Losers Bracket</h3>
+          <div className="grid grid-cols-3 gap-6 items-center">
+            {/* Col 1: Empty */}
+            <div />
 
-            {/* Column 2: Losers Round 2 */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-center mb-4">Losers Round 2</h3>
-              <div className="flex items-center justify-center">
-                {renderMatch(losersRound2, 'Losers Round 2')}
-              </div>
+            {/* Col 2: Losers Round 2 */}
+            <div>
+              <div className="text-xs text-muted-foreground text-center mb-2">Losers Round 2</div>
+              {renderMatch(losersRound2, 'Losers Round 2')}
             </div>
 
-            {/* Column 3: Losers Final */}
-            <div className="space-y-4">
-              <h3 className="text-sm font-semibold text-center mb-4">Losers Final</h3>
-              <div className="flex items-center justify-center">
-                {renderMatch(losersFinal, 'Losers Final')}
-              </div>
-            </div>
-
-            {/* Column 4: Empty (aligns with Grand Final) */}
-            <div></div>
-          </div>
-        </div>
-
-        {/* Bracket Legend */}
-        <div className="mt-8 p-4 rounded border relative" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-card)', zIndex: 1 }}>
-          <div className="flex gap-6 text-sm flex-wrap">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--color-primary)' }}></div>
-              <span>Winners Bracket</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--color-error)' }}></div>
-              <span>Losers Bracket</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: 'var(--color-success)' }}></div>
-              <span>Winner</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5" style={{ backgroundColor: '#22c55e' }}></div>
-              <span>Winner Path</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-0.5" style={{ backgroundColor: '#ef4444', backgroundImage: 'repeating-linear-gradient(90deg, #ef4444, #ef4444 5px, transparent 5px, transparent 10px)' }}></div>
-              <span>Loser Path</span>
+            {/* Col 3: Losers Final */}
+            <div>
+              <div className="text-xs text-muted-foreground text-center mb-2">Losers Final</div>
+              {renderMatch(losersFinal, 'Losers Final')}
             </div>
           </div>
         </div>
 
-        {/* Match results info */}
+        {/* Flow description */}
+        <div className="text-xs text-muted-foreground space-y-1 pt-2">
+          <p>Winners of Round 1 advance to Winners Final. Losers drop to Losers Bracket.</p>
+          <p>Loser of Winners Final plays winner of Losers Round 2 in Losers Final.</p>
+          <p>Winner of Winners Final vs winner of Losers Final in Grand Final.</p>
+        </div>
+
         {playoffMatches.length > 0 && (
-          <div className="mt-4 text-sm text-muted-foreground text-center relative" style={{ zIndex: 1 }}>
-            <p>Showing {playoffMatches.filter(m => m.played).length} of {playoffMatches.length} playoff matches completed</p>
+          <div className="text-xs text-muted-foreground text-center pt-2">
+            {playoffMatches.filter(m => m.played).length} of {playoffMatches.length} playoff matches completed
           </div>
         )}
-
-        {/* Tournament Flow Note */}
-        <div className="mt-4 text-xs text-muted-foreground text-center relative" style={{ zIndex: 1 }}>
-          <p>Winners Final and Losers Round 2 are played simultaneously</p>
-        </div>
       </div>
     </div>
   )

@@ -3,6 +3,9 @@
 # dependencies
 /node_modules
 
+# macOS
+.DS_Store
+
 # next.js
 /.next/
 /out/
@@ -28,3 +31,4 @@ next-env.d.ts
 
 # claude
 CLAUDE.md
+meow.md

@@ -38,6 +38,19 @@ export function PerformanceModule({ teamRanking, teamStats }: { teamRanking: Ran
               </div>
             </div>
 
+            {(teamStats.rp > 0 || teamStats.tbp > 0) && (
+              <div className="grid grid-cols-2 gap-2 text-center pt-2 border-t border-border/50">
+                <div>
+                  <div className="text-lg font-bold">{teamStats.rp}</div>
+                  <div className="text-[10px] text-muted-foreground">RP</div>
+                </div>
+                <div>
+                  <div className="text-lg font-bold">{teamStats.tbp}</div>
+                  <div className="text-[10px] text-muted-foreground">TBP</div>
+                </div>
+              </div>
+            )}
+
             {(teamStats.opr > 0 || teamStats.dpr > 0) && (
               <div className="space-y-1 pt-2 border-t border-border/50">
                 <div className="flex justify-between items-center">

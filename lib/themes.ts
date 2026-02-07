@@ -53,36 +53,36 @@ export const PRESET_THEMES: Theme[] = [
     id: 'default',
     name: 'Default Dark',
     colors: {
-      background: '#0A0A0A',
-      backgroundSecondary: '#262626', // from globals.css --secondary: 0 0% 14.9%
-      backgroundTertiary: '#262626', // using --secondary for consistency
+      background: '#121218',
+      backgroundSecondary: '#1a1a24',
+      backgroundTertiary: '#22222e',
 
-      text: '#fafafa', // from globals.css --foreground: 0 0% 98%
-      textSecondary: '##81819A', // from globals.css --muted-foreground: 0 0% 63.9%
-      textMuted: '#81819A', // from globals.css --muted-foreground: 0 0% 63.9%
+      text: '#e0e0ec',
+      textSecondary: '#9898aa',
+      textMuted: '#6e6e82',
 
-      primary: '#fafafa', // from globals.css --primary: 0 0% 98%
-      primaryHover: '#d4d4d4', // custom for hover (lighter primary)
-      primaryText: '#171717', // from globals.css --primary-foreground: 0 0% 9%
+      primary: '#e0e0ec',
+      primaryHover: '#c8c8d8',
+      primaryText: '#121218',
 
-      accent: '#262626', // from globals.css --accent: 0 0% 14.9%
-      accentHover: '#404040', // custom for hover (slightly lighter accent)
+      accent: '#1e1e2a',
+      accentHover: '#2a2a38',
 
-      border: '#262626', // from globals.css --border: 0 0% 14.9%
-      borderHover: '#404040', // custom for hover (slightly lighter border)
+      border: '#2a2a38',
+      borderHover: '#3a3a4a',
 
-      success: '#10b981', // existing, no direct equivalent in globals.css based on dark mode variables
-      warning: '#f59e0b', // existing
-      error: '#7f1d1d', // from globals.css --destructive: 0 62.8% 30.6%
-      info: '#3b82f6', // existing
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444',
+      info: '#3b82f6',
 
-      card: '#000000', // from globals.css --card: 0 0% 3.9%
-      cardHover: '#262626', // custom for hover (slightly lighter card)
+      card: '#16161e',
+      cardHover: '#1e1e2a',
 
-      red1: '#dc2626', // existing
-      red2: '#ef4444', // existing
-      blue1: '#2563eb', // existing
-      blue2: '#3b82f6', // existing
+      red1: '#dc2626',
+      red2: '#ef4444',
+      blue1: '#2563eb',
+      blue2: '#3b82f6',
     },
   },
   {
@@ -348,7 +348,6 @@ export function applyTheme(theme: Theme) {
   })
 
   // Also update shadcn/ui variables to match theme
-  // Convert hex colors to RGB for shadcn's hsl format
   const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
     return result ? {
@@ -358,26 +357,64 @@ export function applyTheme(theme: Theme) {
     } : null
   }
 
+  const rgbToHsl = (r: number, g: number, b: number) => {
+    r /= 255
+    g /= 255
+    b /= 255
+
+    const max = Math.max(r, g, b)
+    const min = Math.min(r, g, b)
+    let h = 0
+    let s = 0
+    let l = (max + min) / 2
+
+    if (max === min) {
+      h = s = 0 // achromatic
+    } else {
+      const d = max - min
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0)
+          break
+        case g:
+          h = (b - r) / d + 2
+          break
+        case b:
+          h = (r - g) / d + 4
+          break
+      }
+      h /= 6
+    }
+
+    h = Math.round(h * 360)
+    s = Math.round(s * 100)
+    l = Math.round(l * 100)
+
+    return `${h} ${s}% ${l}%`
+  }
+
   // Map theme colors to shadcn variables
-  root.style.setProperty('--background', theme.colors.background)
-  root.style.setProperty('--foreground', theme.colors.text)
-  root.style.setProperty('--card', theme.colors.card)
-  root.style.setProperty('--card-foreground', theme.colors.text)
-  root.style.setProperty('--popover', theme.colors.card)
-  root.style.setProperty('--popover-foreground', theme.colors.text)
-  root.style.setProperty('--primary', theme.colors.primary)
-  root.style.setProperty('--primary-foreground', theme.colors.primaryText)
-  root.style.setProperty('--secondary', theme.colors.backgroundSecondary)
-  root.style.setProperty('--secondary-foreground', theme.colors.text)
-  root.style.setProperty('--muted', theme.colors.backgroundSecondary)
-  root.style.setProperty('--muted-foreground', theme.colors.textMuted)
-  root.style.setProperty('--accent', theme.colors.accent)
-  root.style.setProperty('--accent-foreground', theme.colors.primaryText)
-  root.style.setProperty('--destructive', theme.colors.error)
-  root.style.setProperty('--destructive-foreground', theme.colors.primaryText)
-  root.style.setProperty('--border', theme.colors.border)
-  root.style.setProperty('--input', theme.colors.border)
-  root.style.setProperty('--ring', theme.colors.primary)
+  // Convert hex colors to HSL for shadcn's hsl format
+  root.style.setProperty('--background', rgbToHsl(hexToRgb(theme.colors.background)!.r, hexToRgb(theme.colors.background)!.g, hexToRgb(theme.colors.background)!.b))
+  root.style.setProperty('--foreground', rgbToHsl(hexToRgb(theme.colors.text)!.r, hexToRgb(theme.colors.text)!.g, hexToRgb(theme.colors.text)!.b))
+  root.style.setProperty('--card', rgbToHsl(hexToRgb(theme.colors.card)!.r, hexToRgb(theme.colors.card)!.g, hexToRgb(theme.colors.card)!.b))
+  root.style.setProperty('--card-foreground', rgbToHsl(hexToRgb(theme.colors.text)!.r, hexToRgb(theme.colors.text)!.g, hexToRgb(theme.colors.text)!.b))
+  root.style.setProperty('--popover', rgbToHsl(hexToRgb(theme.colors.card)!.r, hexToRgb(theme.colors.card)!.g, hexToRgb(theme.colors.card)!.b))
+  root.style.setProperty('--popover-foreground', rgbToHsl(hexToRgb(theme.colors.text)!.r, hexToRgb(theme.colors.text)!.g, hexToRgb(theme.colors.text)!.b))
+  root.style.setProperty('--primary', rgbToHsl(hexToRgb(theme.colors.primary)!.r, hexToRgb(theme.colors.primary)!.g, hexToRgb(theme.colors.primary)!.b))
+  root.style.setProperty('--primary-foreground', rgbToHsl(hexToRgb(theme.colors.primaryText)!.r, hexToRgb(theme.colors.primaryText)!.g, hexToRgb(theme.colors.primaryText)!.b))
+  root.style.setProperty('--secondary', rgbToHsl(hexToRgb(theme.colors.backgroundSecondary)!.r, hexToRgb(theme.colors.backgroundSecondary)!.g, hexToRgb(theme.colors.backgroundSecondary)!.b))
+  root.style.setProperty('--secondary-foreground', rgbToHsl(hexToRgb(theme.colors.text)!.r, hexToRgb(theme.colors.text)!.g, hexToRgb(theme.colors.text)!.b))
+  root.style.setProperty('--muted', rgbToHsl(hexToRgb(theme.colors.backgroundSecondary)!.r, hexToRgb(theme.colors.backgroundSecondary)!.g, hexToRgb(theme.colors.backgroundSecondary)!.b))
+  root.style.setProperty('--muted-foreground', rgbToHsl(hexToRgb(theme.colors.textMuted)!.r, hexToRgb(theme.colors.textMuted)!.g, hexToRgb(theme.colors.textMuted)!.b))
+  root.style.setProperty('--accent', rgbToHsl(hexToRgb(theme.colors.accent)!.r, hexToRgb(theme.colors.accent)!.g, hexToRgb(theme.colors.accent)!.b))
+  root.style.setProperty('--accent-foreground', rgbToHsl(hexToRgb(theme.colors.primaryText)!.r, hexToRgb(theme.colors.primaryText)!.g, hexToRgb(theme.colors.primaryText)!.b))
+  root.style.setProperty('--destructive', rgbToHsl(hexToRgb(theme.colors.error)!.r, hexToRgb(theme.colors.error)!.g, hexToRgb(theme.colors.error)!.b))
+  root.style.setProperty('--destructive-foreground', rgbToHsl(hexToRgb(theme.colors.primaryText)!.r, hexToRgb(theme.colors.primaryText)!.g, hexToRgb(theme.colors.primaryText)!.b))
+  root.style.setProperty('--border', rgbToHsl(hexToRgb(theme.colors.border)!.r, hexToRgb(theme.colors.border)!.g, hexToRgb(theme.colors.border)!.b))
+  root.style.setProperty('--input', rgbToHsl(hexToRgb(theme.colors.border)!.r, hexToRgb(theme.colors.border)!.g, hexToRgb(theme.colors.border)!.b))
+  root.style.setProperty('--ring', rgbToHsl(hexToRgb(theme.colors.primary)!.r, hexToRgb(theme.colors.primary)!.g, hexToRgb(theme.colors.primary)!.b))
 }
 
 function camelToKebab(str: string): string {
