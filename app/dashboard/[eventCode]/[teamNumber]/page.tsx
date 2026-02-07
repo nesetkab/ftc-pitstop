@@ -193,7 +193,7 @@ export default function DashboardPage() {
     return rtf.format(Math.round(diffSeconds), 'second');
   };
 
-  interface TimeAgoProps {
+  type TimeAgoProps = {
     lastUpdate: Date;
   }
 
@@ -515,169 +515,43 @@ export default function DashboardPage() {
           </Card>
         )}
 
-
-          {/* Matches - Right Columns */}
-          <div className="lg:col-span-3">
-            <Tabs defaultValue="qualification" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-6">
-                <TabsTrigger value="qualification" className="flex items-center gap-2">
-                  <Target className="h-4 w-4" />
-                  <span className="hidden md:inline">Quals ({qualificationMatches.length})</span>
-                </TabsTrigger>
-                <TabsTrigger value="comparison" className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4" />
-                  <span className="hidden md:inline">Compare</span>
-                </TabsTrigger>
-                <TabsTrigger value="opr" className="flex items-center gap-2">
-                  <Calculator className="h-4 w-4" />
-                  <span className="hidden md:inline">PR</span>
-                </TabsTrigger>
-                <TabsTrigger value="bracket" className="flex items-center gap-2">
-                  <Zap className="h-4 w-4" />
-                  <span className="hidden md:inline">Bracket</span>
-                </TabsTrigger>
-                <TabsTrigger value="playoffs" className="flex items-center gap-2">
-                  <Trophy className="h-4 w-4" />
-                  <span className="hidden md:inline">Playoffs ({playoffMatches.length})</span>
-                </TabsTrigger>
-                <TabsTrigger value="alliances" className="flex items-center gap-2">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden md:inline">Alliances ({alliances.length})</span>
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="qualification" className="space-y-6">
-                {/* Upcoming Qualification Matches */}
-                {upcomingQualMatches.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5" />
-                        Upcoming Qualification Matches
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {upcomingQualMatches.slice(0, 5).map((match) => (
-                          <MatchCard key={match.matchNumber} match={match} />
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Played Qualification Matches */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
-                      Qualification Match History
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {playedQualMatches
-                        .slice(-10)
-                        .reverse()
-                        .map((match) => (
-                          <MatchCard key={match.matchNumber} match={match} />
-                        ))}
-                      {playedQualMatches.length === 0 && (
-                        <p className="text-center text-muted-foreground py-4">No qualification matches played yet</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-
-              <TabsContent value="comparison" className="space-y-6">
-                <TeamComparison eventCode={eventCode} teamNumber={teamNumber} />
-              </TabsContent>
-
-              <TabsContent value="opr" className="space-y-6">
-                <OPRInsights eventCode={eventCode} teamNumber={teamNumber} />
-              </TabsContent>
-
-              <TabsContent value="bracket" className="space-y-6">
-                <Card>
-                  <CardContent className="p-6">
-                    <TournamentBracket matches={matches} alliances={alliances} teamNumber={teamNumber} />
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="playoffs" className="space-y-6">
-                {/* Upcoming Playoff Matches */}
-                {upcomingPlayoffMatches.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Calendar className="h-5 w-5" />
-                        Upcoming Playoff Matches
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {upcomingPlayoffMatches.map((match) => (
-                          <MatchCard key={match.matchNumber} match={match} showAlliance />
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Played Playoff Matches */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="h-5 w-5" />
-                      Playoff Match History
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {playedPlayoffMatches.reverse().map((match) => (
-                        <MatchCard key={match.description} match={match} showAlliance />
-                      ))}
-                      {playedPlayoffMatches.length === 0 && (
-                        <p className="text-center text-muted-foreground py-4">
-                          Playoff matches will appear here after alliance selection
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value="alliances" className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Users className="h-5 w-5" />
-                      Alliance Selection
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    {alliances.length > 0 ? (
-                      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        {alliances.map((alliance) => (
-                          <AllianceCard key={alliance.number} alliance={alliance} />
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-center text-muted-foreground py-8">
-                        Alliance selection has not occurred yet. Alliances will be displayed here after qualification
-                        matches are complete.
-                      </p>
-                    )}
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
-          </div>
-        </div>
       </div>
+
+      {/* Auto-refresh interval modal */}
+      <Dialog open={showIntervalModal} onOpenChange={setShowIntervalModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Auto-Refresh Interval</DialogTitle>
+            <DialogDescription>Set how often the dashboard refreshes data.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Interval (seconds)</Label>
+              <Input
+                type="number"
+                min={5}
+                max={300}
+                value={pendingInterval / 1000}
+                onChange={(e) => setPendingInterval(Number(e.target.value) * 1000)}
+              />
+            </div>
+            <Button onClick={() => {
+              setAutoRefreshInterval(pendingInterval)
+              setShowIntervalModal(false)
+            }}>
+              Save
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <MatchDetailDialog
+        match={selectedMatch}
+        open={matchDialogOpen}
+        onOpenChange={setMatchDialogOpen}
+        eventCode={eventCode}
+        teamNames={teamNames}
+      />
     </div>
   )
 }
