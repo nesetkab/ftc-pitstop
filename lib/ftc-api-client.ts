@@ -146,6 +146,7 @@ export interface RankingsResponse {
 
 export interface MatchesResponse {
   matches: FTCMatch[]
+  schedule?: FTCMatch[]
 }
 
 export interface AlliancesResponse {
@@ -265,13 +266,26 @@ export class FTCApiClient {
   }
 
   /**
-   * Get matches for an event
+   * Get matches for an event (results only - played matches)
    */
   async getMatches(eventCode: string, options?: FetchOptions): Promise<{ data: MatchesResponse; fromCache: boolean }> {
     return this.fetchWithCache<MatchesResponse>(
       `matches/${eventCode}`,
       'matches',
       eventCode,
+      CACHE_TTL.MATCHES,
+      options
+    )
+  }
+
+  /**
+   * Get match schedule for an event (includes unplayed matches)
+   */
+  async getSchedule(eventCode: string, tournamentLevel: string = 'qual', options?: FetchOptions): Promise<{ data: MatchesResponse; fromCache: boolean }> {
+    return this.fetchWithCache<MatchesResponse>(
+      `schedule/${eventCode}?tournamentLevel=${tournamentLevel}`,
+      'schedule',
+      `${eventCode}-${tournamentLevel}`,
       CACHE_TTL.MATCHES,
       options
     )
@@ -312,6 +326,8 @@ export class FTCApiClient {
       cacheManager.invalidate('teams', eventCode),
       cacheManager.invalidate('rankings', eventCode),
       cacheManager.invalidate('matches', eventCode),
+      cacheManager.invalidate('schedule', `${eventCode}-qual`),
+      cacheManager.invalidate('schedule', `${eventCode}-playoff`),
       cacheManager.invalidate('alliances', eventCode),
       cacheManager.invalidate('scores', `${eventCode}-qual`),
       cacheManager.invalidate('scores', `${eventCode}-playoff`),
