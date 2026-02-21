@@ -96,8 +96,12 @@ export class OPRCalculator {
       scores.push(match.blueScore - match.redFoul)
     })
 
-    // Solve using least squares: (A^T * A) * x = A^T * b
+    // Solve using least squares with ridge regression: (A^T * A + λI) * x = A^T * b
+    // The regularization term λI prevents singular matrices when the system is
+    // underdetermined (e.g., teams have only played one match), producing the
+    // minimum-norm solution (equal split between partners) instead of arbitrary values.
     const AtA = this.multiplyMatrices(this.transpose(A), A)
+    this.addRegularization(AtA)
     const Atb = this.multiplyMatrixVector(this.transpose(A), scores)
 
     // Solve the system using Gaussian elimination
@@ -159,6 +163,7 @@ export class OPRCalculator {
 
     // Solve for DPR
     const AtA = this.multiplyMatrices(this.transpose(A), A)
+    this.addRegularization(AtA)
     const Atb = this.multiplyMatrixVector(this.transpose(A), opponentScores)
 
     return this.solveLinearSystem(AtA, Atb)
@@ -199,6 +204,7 @@ export class OPRCalculator {
 
     // Solve for Auto OPR
     const AtA = this.multiplyMatrices(this.transpose(A), A)
+    this.addRegularization(AtA)
     const Atb = this.multiplyMatrixVector(this.transpose(A), autoScores)
 
     return this.solveLinearSystem(AtA, Atb)
@@ -241,6 +247,7 @@ export class OPRCalculator {
 
     // Solve for TeleOp OPR
     const AtA = this.multiplyMatrices(this.transpose(A), A)
+    this.addRegularization(AtA)
     const Atb = this.multiplyMatrixVector(this.transpose(A), teleopScores)
 
     return this.solveLinearSystem(AtA, Atb)
@@ -281,6 +288,7 @@ export class OPRCalculator {
 
     // Solve for Endgame OPR
     const AtA = this.multiplyMatrices(this.transpose(A), A)
+    this.addRegularization(AtA)
     const Atb = this.multiplyMatrixVector(this.transpose(A), endgameScores)
 
     return this.solveLinearSystem(AtA, Atb)
@@ -300,6 +308,17 @@ export class OPRCalculator {
     })
 
     return counts
+  }
+
+  /**
+   * Add Tikhonov regularization (ridge regression) to prevent singular matrices.
+   * Adds a small value λ to the diagonal of A^T*A, ensuring the system is always
+   * solvable and producing minimum-norm solutions for underdetermined systems.
+   */
+  private addRegularization(AtA: number[][], lambda: number = 1e-3): void {
+    for (let i = 0; i < AtA.length; i++) {
+      AtA[i][i] += lambda
+    }
   }
 
   /**
