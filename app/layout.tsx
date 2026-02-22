@@ -56,7 +56,7 @@ export default function RootLayout({
             {children}
           </ThemeProvider>
         </CustomThemeProvider>
-        <Toaster position="top-center" />
+        <Toaster position="top-left" duration={Infinity} visibleToasts={10} />
       </body>
       <Analytics />
     </html>

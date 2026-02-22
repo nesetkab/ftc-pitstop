@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -42,6 +42,7 @@ import { RankingsScheduleTab } from "@/components/dashboard-tabs/rankings-schedu
 import { PlayoffsTab } from "@/components/dashboard-tabs/playoffs-tab"
 import { LoadingProgress } from "@/components/loading-progress"
 import { MatchDetailDialog } from "@/components/match-detail-dialog"
+import { toast } from "sonner"
 
 interface TeamData {
   teamNumber: number;
@@ -232,6 +233,11 @@ export default function DashboardPage() {
   const [pendingInterval, setPendingInterval] = useState<number>(30000);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
 
+  const prevMatchesRef = useRef<Match[] | null>(null);
+  const prevNextMatchRef = useRef<Match | null>(null);
+  const prevAllMatchesRef = useRef<Match[] | null>(null);
+
+
   const fetchData = async () => {
     try {
       setError(null)
@@ -240,9 +246,10 @@ export default function DashboardPage() {
 
       setLoadingStep(1) // Loading team statistics
       // Fetch all data in parallel for speed
-      const [statsResponse, matchesResponse, rankingsResponse, alliancesResponse, teamsResponse] = await Promise.all([
+      const [statsResponse, matchesResponse, allMatchesResponse, rankingsResponse, alliancesResponse, teamsResponse] = await Promise.all([
         fetch(`/api/teams/${teamNumber}/stats/${eventCode}`),
         fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`),
+        fetch(`/api/events/${eventCode}/matches`),
         fetch(`/api/events/${eventCode}/rankings`),
         fetch(`/api/events/${eventCode}/alliances`),
         fetch(`/api/events/${eventCode}/teams`),
@@ -252,6 +259,7 @@ export default function DashboardPage() {
       console.log("API Response statuses:", {
         stats: statsResponse.status,
         matches: matchesResponse.status,
+        allMatches: allMatchesResponse.status,
         rankings: rankingsResponse.status,
         alliances: alliancesResponse.status,
         teams: teamsResponse.status,
@@ -260,6 +268,7 @@ export default function DashboardPage() {
       // Handle each response individually to avoid failing everything if one fails
       let statsData = { stats: null }
       let matchesData = { matches: [] }
+      let allMatchesData = { matches: [] as Match[] }
       let rankingsData = { rankings: [] }
       let alliancesData = { alliances: [] }
       let teamsData = { teams: [] as any[] }
@@ -275,6 +284,12 @@ export default function DashboardPage() {
       } else {
         console.error("Matches API failed:", await matchesResponse.text())
         setError("Unable to load match data. The event may not have started yet.")
+      }
+
+      if (allMatchesResponse.ok) {
+        allMatchesData = await allMatchesResponse.json()
+      } else {
+        console.error("All matches API failed:", await allMatchesResponse.text())
       }
 
       if (rankingsResponse.ok) {
@@ -309,17 +324,89 @@ export default function DashboardPage() {
       setTeamStats(statsData.stats)
       setRankings(rankingsData.rankings || [])
       setAlliances(alliancesData.alliances || [])
-      setMatches(matchesData.matches || [])
+
+      const newMatches: Match[] = matchesData.matches || []
+      setMatches(newMatches)
 
       // Find next match
-      const upcomingMatches = (matchesData.matches || []).filter((m: Match) => !m.played)
-      setNextMatch(upcomingMatches.length > 0 ? upcomingMatches[0] : null)
+      const upcomingMatches = newMatches.filter((m: Match) => !m.played)
+      const newNextMatch = upcomingMatches.length > 0 ? upcomingMatches[0] : null
+      setNextMatch(newNextMatch)
+
+      // All event matches for countdown tracking
+      const newAllMatches: Match[] = allMatchesData.matches || []
+
+      // Match notifications (skip on first load)
+      if (prevMatchesRef.current !== null) {
+        const prevMatches = prevMatchesRef.current
+        // Detect newly scored matches for this team
+        for (const m of newMatches) {
+          if (!m.played) continue
+          const isTeamMatch = m.red1 === teamNumber || m.red2 === teamNumber || m.blue1 === teamNumber || m.blue2 === teamNumber
+          if (!isTeamMatch) continue
+          const prev = prevMatches.find(
+            (p) => p.matchNumber === m.matchNumber && p.tournamentLevel === m.tournamentLevel
+          )
+          if (prev && !prev.played) {
+            const isRed = m.red1 === teamNumber || m.red2 === teamNumber
+            const won = isRed ? m.redScore > m.blueScore : m.blueScore > m.redScore
+            const result = m.redScore === m.blueScore ? "Tied" : won ? "Won" : "Lost"
+            toast.success(`${m.description} scored!`, {
+              description: `Red ${m.redScore} - Blue ${m.blueScore} (${result})`,
+            })
+          }
+        }
+
+        // Detect next match change
+        const prevNext = prevNextMatchRef.current
+        if (
+          newNextMatch &&
+          (!prevNext || prevNext.matchNumber !== newNextMatch.matchNumber || prevNext.tournamentLevel !== newNextMatch.tournamentLevel)
+        ) {
+          toast.info(`Up next: ${newNextMatch.description}`, {
+            description: `Match ${newNextMatch.matchNumber} — ${newNextMatch.startTime ? new Date(newNextMatch.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "Time TBD"}`,
+          })
+        }
+
+        // Countdown: when any match gets scored, check how many matches remain until ours
+        if (newNextMatch && prevAllMatchesRef.current) {
+          const prevAll = prevAllMatchesRef.current
+          // Check if any match in the event was newly scored
+          const anyNewlyScored = newAllMatches.some((m) => {
+            const prev = prevAll.find(
+              (p) => p.matchNumber === m.matchNumber && p.tournamentLevel === m.tournamentLevel
+            )
+            return m.played && prev && !prev.played
+          })
+
+          if (anyNewlyScored) {
+            // Count unplayed matches before our next match (same tournament level)
+            const matchesBefore = newAllMatches.filter(
+              (m) =>
+                !m.played &&
+                m.tournamentLevel === newNextMatch.tournamentLevel &&
+                m.matchNumber < newNextMatch.matchNumber
+            ).length
+
+            if (matchesBefore > 0 && matchesBefore <= 3) {
+              toast.info(
+                `${matchesBefore} match${matchesBefore === 1 ? "" : "es"} until ${newNextMatch.description}`,
+                { description: "Get ready!" }
+              )
+            }
+          }
+        }
+      }
+      prevMatchesRef.current = newMatches
+      prevNextMatchRef.current = newNextMatch
+      prevAllMatchesRef.current = newAllMatches
 
       setLastUpdate(new Date())
       console.log("Dashboard data loaded successfully")
     } catch (error) {
       console.error("Error fetching dashboard data:", error)
       setError("Failed to load dashboard data. Please check your connection.")
+      toast.error("Data fetch failed", { description: "Could not refresh dashboard data. Check your connection." })
     } finally {
       setLoading(false)
     }
@@ -385,7 +472,7 @@ export default function DashboardPage() {
             <p className="text-[10px] text-muted-foreground">
               last update: <TimeAgoDisplay lastUpdate={lastUpdate} />
             </p>
-            <Button variant="outline" size="sm" onClick={fetchData} className="h-8 w-8 p-0">
+<Button variant="outline" size="sm" onClick={fetchData} className="h-8 w-8 p-0">
               <RefreshCw className="h-3.5 w-3.5" />
             </Button>
             <DropdownMenu>
