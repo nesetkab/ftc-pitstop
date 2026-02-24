@@ -18,8 +18,14 @@ export async function GET(
   }
 
   try {
+    // Demo events use their key as-is (e.g. "demo8364")
+    // Real FTC events need the season year prepended (e.g. "2025USPAAMS")
+    const isDemo = eventCode.toLowerCase().startsWith("demo")
+    const season = process.env.FTC_SEASON || "2025"
+    const eventKey = isDemo ? eventCode : `${season}${eventCode}`
+
     // Check cache first
-    const cacheKey = `nexus-${eventCode}`
+    const cacheKey = `nexus-${eventKey}`
     const cached = await cacheManager.get<any>("nexus", cacheKey)
     if (cached) {
       return NextResponse.json(cached)
@@ -31,7 +37,7 @@ export async function GET(
     }
 
     // First check if the event is tracked on Nexus
-    const eventResponse = await fetch(`${NEXUS_API_BASE}/event/${eventCode}`, { headers })
+    const eventResponse = await fetch(`${NEXUS_API_BASE}/event/${eventKey}`, { headers })
 
     if (!eventResponse.ok) {
       const result = {
@@ -72,7 +78,7 @@ export async function GET(
 
     const result = {
       available: true,
-      eventKey: eventCode,
+      eventKey,
       dataAsOfTime: eventData.dataAsOfTime || null,
       nowQueuing,
       matches: matchTimings,

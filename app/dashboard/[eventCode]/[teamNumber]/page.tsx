@@ -117,6 +117,27 @@ export interface Alliance {
   name?: string
 }
 
+export type NexusMatch = {
+  label: string
+  status: string
+  redTeams: (string | number)[]
+  blueTeams: (string | number)[]
+  replayOf: string | null
+  estimatedStartTime: number | null
+  actualStartTime: number | null
+  estimatedQueueTime: number | null
+}
+
+export type NexusData = {
+  available: boolean
+  reason?: string
+  nowQueuing: string | null
+  matches: NexusMatch[]
+  announcements: { text: string; postedByTeam: string | null }[]
+  partsRequests: { parts: string; requestedByTeam: string }[]
+  dataAsOfTime: number | null
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const params = useParams()
@@ -136,6 +157,7 @@ export default function DashboardPage() {
   const [nextMatch, setNextMatch] = useState<Match | null>(null)
   const [teamName, setTeamName] = useState<string | null>(null)
   const [teamNames, setTeamNames] = useState<{ [key: number]: string }>({})
+  const [nexusData, setNexusData] = useState<NexusData | null>(null)
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
   const [matchDialogOpen, setMatchDialogOpen] = useState(false)
   const loadingSteps = [
@@ -149,20 +171,29 @@ export default function DashboardPage() {
 
 
   useEffect(() => {
+    // Try localStorage first for initial load
     const storedDataString = localStorage.getItem('selectedTeam');
 
     if (storedDataString) {
       try {
         const storedDataObject: TeamData = JSON.parse(storedDataString);
 
-        if (storedDataObject && storedDataObject.nameShort) {
+        if (storedDataObject && storedDataObject.teamNumber === teamNumber && storedDataObject.nameShort) {
           setTeamName(storedDataObject.nameShort);
+          return;
         }
       } catch (error) {
         console.error("Failed to parse team data from local storage:", error);
       }
     }
-  }, []);
+
+    // Fall back to teamNames map if localStorage doesn't match
+    if (teamNames[teamNumber]) {
+      setTeamName(teamNames[teamNumber]);
+    } else {
+      setTeamName(null);
+    }
+  }, [teamNumber, teamNames]);
 
 
 
@@ -236,6 +267,7 @@ export default function DashboardPage() {
   const prevMatchesRef = useRef<Match[] | null>(null);
   const prevNextMatchRef = useRef<Match | null>(null);
   const prevAllMatchesRef = useRef<Match[] | null>(null);
+  const prevNexusRef = useRef<NexusData | null>(null);
 
 
   const fetchData = async () => {
@@ -245,14 +277,15 @@ export default function DashboardPage() {
       console.log("Fetching dashboard data for team", teamNumber, "at event", eventCode)
 
       setLoadingStep(1) // Loading team statistics
-      // Fetch all data in parallel for speed
-      const [statsResponse, matchesResponse, allMatchesResponse, rankingsResponse, alliancesResponse, teamsResponse] = await Promise.all([
+      // Fetch all data in parallel for speed (including Nexus)
+      const [statsResponse, matchesResponse, allMatchesResponse, rankingsResponse, alliancesResponse, teamsResponse, nexusResponse] = await Promise.all([
         fetch(`/api/teams/${teamNumber}/stats/${eventCode}`),
         fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`),
         fetch(`/api/events/${eventCode}/matches`),
         fetch(`/api/events/${eventCode}/rankings`),
         fetch(`/api/events/${eventCode}/alliances`),
         fetch(`/api/events/${eventCode}/teams`),
+        fetch(`/api/events/${eventCode}/nexus`).catch(() => null),
       ])
       setLoadingStep(4) // Loading alliance selections
 
@@ -263,6 +296,7 @@ export default function DashboardPage() {
         rankings: rankingsResponse.status,
         alliances: alliancesResponse.status,
         teams: teamsResponse.status,
+        nexus: nexusResponse?.status ?? 'failed',
       })
 
       // Handle each response individually to avoid failing everything if one fails
@@ -272,6 +306,7 @@ export default function DashboardPage() {
       let rankingsData = { rankings: [] }
       let alliancesData = { alliances: [] }
       let teamsData = { teams: [] as any[] }
+      let nexusResult: NexusData = { available: false, nowQueuing: null, matches: [], announcements: [], partsRequests: [], dataAsOfTime: null }
 
       if (statsResponse.ok) {
         statsData = await statsResponse.json()
@@ -310,6 +345,11 @@ export default function DashboardPage() {
         console.error("Teams API failed:", await teamsResponse.text())
       }
 
+      if (nexusResponse?.ok) {
+        nexusResult = await nexusResponse.json()
+      }
+      setNexusData(nexusResult)
+
       // Build team names map
       const names: { [key: number]: string } = {}
       for (const team of (teamsData.teams || [])) {
@@ -325,7 +365,24 @@ export default function DashboardPage() {
       setRankings(rankingsData.rankings || [])
       setAlliances(alliancesData.alliances || [])
 
-      const newMatches: Match[] = matchesData.matches || []
+      // Merge Nexus timing data into FTC match data
+      // Nexus provides more accurate estimated start times and queue status
+      const mergeNexusTiming = (ftcMatches: Match[]): Match[] => {
+        if (!nexusResult.available || nexusResult.matches.length === 0) return ftcMatches
+        return ftcMatches.map((match) => {
+          // Match Nexus data by label (e.g. "Qualification 1" matches description)
+          const nexusMatch = nexusResult.matches.find((nm) => nm.label === match.description)
+          if (!nexusMatch) return match
+          // Prefer Nexus timing over FTC API timing
+          const nexusTime = nexusMatch.actualStartTime || nexusMatch.estimatedStartTime
+          if (nexusTime) {
+            return { ...match, startTime: new Date(nexusTime).toISOString() }
+          }
+          return match
+        })
+      }
+
+      const newMatches: Match[] = mergeNexusTiming(matchesData.matches || [])
       setMatches(newMatches)
 
       // Find next match
@@ -334,7 +391,7 @@ export default function DashboardPage() {
       setNextMatch(newNextMatch)
 
       // All event matches for countdown tracking
-      const newAllMatches: Match[] = allMatchesData.matches || []
+      const newAllMatches: Match[] = mergeNexusTiming(allMatchesData.matches || [])
 
       // Match notifications (skip on first load)
       if (prevMatchesRef.current !== null) {
@@ -397,6 +454,50 @@ export default function DashboardPage() {
           }
         }
       }
+      // Nexus queue notifications — detect when our team should queue
+      if (nexusResult.available && nexusResult.matches.length > 0) {
+        const prevNexus = prevNexusRef.current
+        const teamStr = String(teamNumber)
+        for (const nm of nexusResult.matches) {
+          const teamInMatch = nm.redTeams?.some(t => String(t) === teamStr) || nm.blueTeams?.some(t => String(t) === teamStr)
+          if (!teamInMatch) continue
+
+          const status = (nm.status || "").toLowerCase()
+          const isQueuing = status.includes("queuing") || status.includes("queue")
+          const isOnDeck = status.includes("deck")
+          const isOnField = status.includes("field")
+
+          if (!isQueuing && !isOnDeck && !isOnField) continue
+
+          // Check if this is a new status change (or first load)
+          const prevMatch = prevNexus?.matches?.find((pm) => pm.label === nm.label)
+          const prevStatus = (prevMatch?.status || "").toLowerCase()
+          const wasQueuing = prevStatus.includes("queuing") || prevStatus.includes("queue")
+          const wasOnDeck = prevStatus.includes("deck")
+          const wasOnField = prevStatus.includes("field")
+
+          if (isOnField && !wasOnField) {
+            toast.warning(`${nm.label} — Report to field NOW!`, {
+              description: `Your team is on the field`,
+              duration: 15000,
+            })
+          } else if (isOnDeck && !wasOnDeck) {
+            toast.warning(`${nm.label} — You are ON DECK!`, {
+              description: `Head to the queue area now`,
+              duration: 10000,
+            })
+          } else if (isQueuing && !wasQueuing) {
+            toast.info(`${nm.label} — Time to queue!`, {
+              description: nm.estimatedStartTime
+                ? `Est. start: ${new Date(nm.estimatedStartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                : `Head to the queue area`,
+              duration: 10000,
+            })
+          }
+        }
+      }
+      prevNexusRef.current = nexusResult
+
       prevMatchesRef.current = newMatches
       prevNextMatchRef.current = newNextMatch
       prevAllMatchesRef.current = newAllMatches
@@ -521,6 +622,7 @@ export default function DashboardPage() {
                 rankings={rankings}
                 teamNames={teamNames}
                 onMatchClick={onMatchClick}
+                nexusData={nexusData}
               />
             </TabsContent>
 
@@ -532,6 +634,7 @@ export default function DashboardPage() {
                 matches={matches}
                 teamNames={teamNames}
                 onMatchClick={onMatchClick}
+                nexusData={nexusData}
               />
             </TabsContent>
 

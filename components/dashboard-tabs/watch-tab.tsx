@@ -1,33 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { RankingsModule } from "../modules/rankings-module"
 import { Ranking, Match } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
+import type { NexusData } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 import { StreamEmbed } from "../stream-embed"
 import { Megaphone, Timer, Wrench } from "lucide-react"
-
-interface NexusMatch {
-  label: string
-  status: string
-  redTeams: number[]
-  blueTeams: number[]
-  replayOf: string | null
-  estimatedStartTime: number | null
-  actualStartTime: number | null
-  estimatedQueueTime: number | null
-}
-
-interface NexusData {
-  available: boolean
-  reason?: string
-  nowQueuing: string | null
-  matches: NexusMatch[]
-  announcements: { text: string; postedByTeam: string | null }[]
-  partsRequests: { parts: string; requestedByTeam: string }[]
-  dataAsOfTime: number | null
-}
 
 interface WatchTabProps {
   eventCode: string
@@ -36,36 +15,16 @@ interface WatchTabProps {
   matches: Match[]
   teamNames?: { [key: number]: string }
   onMatchClick?: (match: Match) => void
+  nexusData?: NexusData | null
 }
 
-export function WatchTab({ eventCode, teamNumber, rankings, matches, teamNames = {}, onMatchClick }: WatchTabProps) {
+export function WatchTab({ eventCode, teamNumber, rankings, matches, teamNames = {}, onMatchClick, nexusData }: WatchTabProps) {
   const teamLabel = (num: number) => {
     const name = teamNames[num]
     return name ? `${num} ${name}` : `${num}`
   }
-  const [nexusData, setNexusData] = useState<NexusData | null>(null)
-  const [nexusLoading, setNexusLoading] = useState(true)
 
   const upcomingMatches = matches.filter(m => !m.played).slice(0, 10)
-
-  useEffect(() => {
-    const fetchNexus = async () => {
-      try {
-        const response = await fetch(`/api/events/${eventCode}/nexus`)
-        const data = await response.json()
-        setNexusData(data)
-      } catch {
-        setNexusData({ available: false, reason: "Failed to check", nowQueuing: null, matches: [], announcements: [], partsRequests: [], dataAsOfTime: null })
-      } finally {
-        setNexusLoading(false)
-      }
-    }
-
-    fetchNexus()
-    // Refresh Nexus data every 30 seconds
-    const interval = setInterval(fetchNexus, 30000)
-    return () => clearInterval(interval)
-  }, [eventCode])
 
   // Find active/queuing matches from Nexus
   const activeNexusMatches = nexusData?.matches?.filter(m =>
@@ -74,7 +33,7 @@ export function WatchTab({ eventCode, teamNumber, rankings, matches, teamNames =
 
   // Check if our team is in any upcoming Nexus match
   const teamNexusMatch = nexusData?.matches?.find(m =>
-    m.redTeams?.includes(teamNumber) || m.blueTeams?.includes(teamNumber)
+    m.redTeams?.some(t => String(t) === String(teamNumber)) || m.blueTeams?.some(t => String(t) === String(teamNumber))
   )
 
   return (
@@ -113,7 +72,7 @@ export function WatchTab({ eventCode, teamNumber, rankings, matches, teamNames =
               {activeNexusMatches.length > 0 ? (
                 <div className="space-y-2">
                   {activeNexusMatches.map((m, i) => {
-                    const hasTeam = m.redTeams?.includes(teamNumber) || m.blueTeams?.includes(teamNumber)
+                    const hasTeam = m.redTeams?.some(t => String(t) === String(teamNumber)) || m.blueTeams?.some(t => String(t) === String(teamNumber))
                     return (
                       <div
                         key={i}
@@ -247,10 +206,10 @@ export function WatchTab({ eventCode, teamNumber, rankings, matches, teamNames =
 
       {/* Rankings */}
       <div className="col-span-4">
-        <RankingsModule rankings={rankings} teamNumber={teamNumber} teamNames={teamNames} />
+        <RankingsModule rankings={rankings} teamNumber={teamNumber} eventCode={eventCode} teamNames={teamNames} />
 
         {/* Nexus status indicator */}
-        {!nexusLoading && (
+        {nexusData && (
           <div className="mt-3 text-center">
             {nexusData?.available ? (
               <Badge variant="outline" className="text-[10px] border-green-500/50 text-green-400">

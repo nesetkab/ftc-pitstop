@@ -3,6 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { ComparisonData } from "../team-comparison"
 import { ArrowUp, ArrowDown } from "lucide-react"
 import { cachedFetch, BROWSER_CACHE_TTL } from "@/lib/browser-cache"
@@ -16,6 +17,7 @@ type SortField = 'rank' | 'opr' | 'dpr' | 'autoOpr' | 'teleopOpr' | 'endgameOpr'
 type SortDirection = 'asc' | 'desc'
 
 export function EventStatsTab({ eventCode, teamNames = {} }: EventStatsTabProps) {
+  const router = useRouter()
   const [data, setData] = useState<ComparisonData | null>(null)
   const [loading, setLoading] = useState(true)
   const [sortField, setSortField] = useState<SortField>('opr')
@@ -91,9 +93,9 @@ export function EventStatsTab({ eventCode, teamNames = {} }: EventStatsTabProps)
           ) : sortedTeams.length === 0 ? (
             <p className="text-muted-foreground p-6 text-center">No team data available yet</p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[500px]">
               <table className="w-full text-sm">
-                <thead>
+                <thead className="sticky top-0 z-10" style={{ backgroundColor: 'var(--color-card, hsl(var(--card)))' }}>
                   <tr className="border-b" style={{ borderColor: 'var(--color-border)' }}>
                     <th className="py-2 px-2 text-left font-semibold text-xs w-8">#</th>
                     <th className="py-2 px-2 text-left font-semibold text-xs">Team</th>
@@ -111,8 +113,9 @@ export function EventStatsTab({ eventCode, teamNames = {} }: EventStatsTabProps)
                   {sortedTeams.filter(t => t && t.teamNumber).map((team, index) => (
                     <tr
                       key={team.teamNumber}
-                      className="border-b hover:bg-accent/30 transition-colors"
+                      className="border-b hover:bg-accent/30 transition-colors cursor-pointer"
                       style={{ borderColor: 'var(--color-border)' }}
+                      onClick={() => router.push(`/dashboard/${eventCode}/${team.teamNumber}`)}
                     >
                       <td className="py-1.5 px-2 text-xs text-muted-foreground">{index + 1}</td>
                       <td className="py-1.5 px-2 font-semibold text-xs">{team.teamNumber} <span className="font-normal text-muted-foreground">{teamNames[team.teamNumber] || ''}</span></td>

@@ -138,6 +138,10 @@ export interface EventsResponse {
 
 export interface TeamsResponse {
   teams: FTCTeam[]
+  teamCountTotal?: number
+  teamCountPage?: number
+  pageCurrent?: number
+  pageTotal?: number
 }
 
 export interface RankingsResponse {
@@ -240,16 +244,69 @@ export class FTCApiClient {
   }
 
   /**
-   * Get teams for an event
+   * Get teams for an event (handles pagination automatically)
    */
   async getTeams(eventCode: string, options?: FetchOptions): Promise<{ data: TeamsResponse; fromCache: boolean }> {
-    return this.fetchWithCache<TeamsResponse>(
-      `teams?eventCode=${eventCode}`,
-      'teams',
-      eventCode,
-      CACHE_TTL.TEAMS,
-      options
-    )
+    // Check cache first
+    if (!options?.bypassCache) {
+      const cached = await cacheManager.get<TeamsResponse>('teams', eventCode)
+      if (cached !== null) {
+        return { data: cached, fromCache: true }
+      }
+    }
+
+    // Fetch first page
+    const url = `${FTC_API_BASE}/${this.season}/teams?eventCode=${eventCode}`
+    console.log(`[FTC API] Fetching: ${url}`)
+
+    const response = await fetch(url, {
+      headers: { Authorization: this.authHeader, Accept: 'application/json' },
+    })
+
+    if (!response.ok) {
+      const errorText = await response.text()
+      throw new Error(`FTC API Error (${response.status}): ${errorText}`)
+    }
+
+    const firstPage: TeamsResponse = await response.json()
+    const allTeams = [...(firstPage.teams || [])]
+    const pageTotal = firstPage.pageTotal || 1
+
+    // Fetch remaining pages if any
+    if (pageTotal > 1) {
+      const pagePromises = []
+      for (let page = 2; page <= pageTotal; page++) {
+        pagePromises.push(
+          fetch(`${url}&page=${page}`, {
+            headers: { Authorization: this.authHeader, Accept: 'application/json' },
+          }).then(async (res) => {
+            if (res.ok) {
+              const data: TeamsResponse = await res.json()
+              return data.teams || []
+            }
+            return []
+          })
+        )
+      }
+      const remainingPages = await Promise.all(pagePromises)
+      for (const teams of remainingPages) {
+        allTeams.push(...teams)
+      }
+      console.log(`[FTC API] Fetched ${pageTotal} pages, ${allTeams.length} total teams`)
+    }
+
+    const result: TeamsResponse = {
+      teams: allTeams,
+      teamCountTotal: allTeams.length,
+      pageCurrent: 1,
+      pageTotal: 1,
+    }
+
+    // Cache the combined result
+    const cacheTTL = options?.cacheTTL ?? CACHE_TTL.TEAMS
+    await cacheManager.set('teams', eventCode, result, cacheTTL)
+
+    return { data: result, fromCache: false }
   }
 
   /**

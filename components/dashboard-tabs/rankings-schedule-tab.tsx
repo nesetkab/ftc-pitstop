@@ -26,7 +26,7 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches, 
     <div className="grid grid-cols-12 gap-4">
       {/* Rankings */}
       <div className="col-span-5">
-        <RankingsModule rankings={rankings} teamNumber={teamNumber} teamNames={teamNames} />
+        <RankingsModule rankings={rankings} teamNumber={teamNumber} eventCode={eventCode} teamNames={teamNames} />
       </div>
 
       {/* Schedule */}

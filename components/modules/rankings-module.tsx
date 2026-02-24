@@ -1,11 +1,15 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
   TrendingUp
 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import { Ranking } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 
-export function RankingsModule({ rankings, teamNumber, teamNames = {} }: { rankings: Ranking[], teamNumber: number, teamNames?: { [key: number]: string } }) {
+export function RankingsModule({ rankings, teamNumber, eventCode, teamNames = {} }: { rankings: Ranking[], teamNumber: number, eventCode?: string, teamNames?: { [key: number]: string } }) {
+  const router = useRouter()
   return (
     <Card className="flex flex-col h-fit">
       <CardHeader>
@@ -13,13 +17,14 @@ export function RankingsModule({ rankings, teamNumber, teamNames = {} }: { ranki
           Rankings
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col h-fit overflow-y-scroll">
+      <CardContent className="flex flex-col overflow-y-auto max-h-[500px]">
         <div className="space-y-2 flex flex-col">
           {rankings.slice(0, rankings.length).map((ranking, index) => (
             <div
               key={ranking.teamNumber}
-              className={`flex items-center justify-between p-2 rounded ${ranking.teamNumber === teamNumber ? "bg-purple-100 dark:bg-purple-900" : ""
+              className={`flex items-center justify-between p-2 rounded cursor-pointer hover:bg-accent/50 transition-colors ${ranking.teamNumber === teamNumber ? "bg-purple-100 dark:bg-purple-900" : ""
                 }`}
+              onClick={() => eventCode && router.push(`/dashboard/${eventCode}/${ranking.teamNumber}`)}
             >
               <div className="flex items-center gap-2">
                 <Badge variant={index < 3 ? "default" : "secondary"} >#{ranking.rank}</Badge>

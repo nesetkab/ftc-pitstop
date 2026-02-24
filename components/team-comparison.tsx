@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -75,6 +76,7 @@ export interface ComparisonData {
 }
 
 export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
+  const router = useRouter()
   const [data, setData] = useState<ComparisonData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -155,8 +157,8 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
           : isCompare
             ? "border-green-300 bg-green-50 dark:bg-green-950"
             : ""
-          } ${showComparison ? "cursor-pointer hover:shadow-md" : ""}`}
-        onClick={showComparison ? () => setCompareTeam(team.teamNumber) : undefined}
+          } cursor-pointer hover:shadow-md`}
+        onClick={() => router.push(`/dashboard/${eventCode}/${team.teamNumber}`)}
       >
         <CardContent className="p-4">
           <div className="flex justify-between items-start mb-3">
@@ -259,7 +261,11 @@ export function TeamComparison({ eventCode, teamNumber }: TeamComparisonProps) {
       <CardContent>
         <div className="space-y-2">
           {teams.map((team, index) => (
-            <div key={team.teamNumber} className="flex items-center justify-between p-2 rounded hover:bg-muted/50">
+            <div
+              key={team.teamNumber}
+              className="flex items-center justify-between p-2 rounded hover:bg-muted/50 cursor-pointer"
+              onClick={() => router.push(`/dashboard/${eventCode}/${team.teamNumber}`)}
+            >
               <div className="flex items-center gap-2">
                 <Badge variant={index === 0 ? "default" : "outline"}>
                   {index === 0 ? <Medal className="h-3 w-3 mr-1" /> : null}#{index + 1}

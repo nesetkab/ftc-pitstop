@@ -40,9 +40,6 @@ export function ThemeSettingsDialog({ open: externalOpen, onOpenChange }: ThemeS
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Choose Your Theme</DialogTitle>
-          <DialogDescription>
-            Select a preset theme or customize your own color scheme
-          </DialogDescription>
         </DialogHeader>
 
         <ScrollArea className="h-[400px] pr-4">
@@ -51,7 +48,7 @@ export function ThemeSettingsDialog({ open: externalOpen, onOpenChange }: ThemeS
               <div
                 key={theme.id}
                 className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${currentTheme.id === theme.id
-                  ? 'ring-2 ring-primary bg-accent/50'
+                  ? 'bg-accent/50'
                   : 'hover:bg-accent/30'
                   }`}
                 onClick={() => {
@@ -60,7 +57,7 @@ export function ThemeSettingsDialog({ open: externalOpen, onOpenChange }: ThemeS
               >
                 <div
                   className="h-8 w-8 rounded-full border flex-shrink-0"
-                  style={{ backgroundColor: theme.colors.primary, borderColor: theme.colors.border }}
+                  style={{ backgroundColor: theme.colors.background, borderColor: theme.colors.border }}
                 />
                 <span className="font-medium flex-1">{theme.name}</span>
                 {currentTheme.id === theme.id && (
