@@ -22,9 +22,10 @@ interface GeneralTabProps {
   teamNames?: { [key: number]: string }
   onMatchClick?: (match: Match) => void
   nexusData?: NexusData | null
+  oprMap?: { [key: number]: number }
 }
 
-export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches, rankings, teamNames = {}, onMatchClick, nexusData }: GeneralTabProps) {
+export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches, rankings, teamNames = {}, onMatchClick, nexusData, oprMap = {} }: GeneralTabProps) {
   const router = useRouter()
   const teamLabel = (num: number) => {
     const name = teamNames[num]
@@ -285,6 +286,7 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                       <th className="text-left py-2 px-3 font-semibold text-xs">Team</th>
                       <th className="text-center py-2 px-3 font-semibold text-xs">RP</th>
                       <th className="text-center py-2 px-3 font-semibold text-xs">TBP</th>
+                      <th className="text-center py-2 px-3 font-semibold text-xs">OPR</th>
                       <th className="text-center py-2 px-3 font-semibold text-xs">Record</th>
                     </tr>
                   </thead>
@@ -309,6 +311,9 @@ export function GeneralTab({ eventCode, teamNumber, ranking, teamStats, matches,
                         </td>
                         <td className="py-2 px-3 text-center text-xs">{r.rp}</td>
                         <td className="py-2 px-3 text-center text-xs">{r.tbp}</td>
+                        <td className="py-2 px-3 text-center text-xs font-medium" style={{ color: 'var(--color-purple, #a855f7)' }}>
+                          {oprMap[r.teamNumber] != null ? oprMap[r.teamNumber].toFixed(1) : '—'}
+                        </td>
                         <td className="py-2 px-3 text-center text-[11px]">
                           <span className="text-green-600 dark:text-green-400">{r.wins}</span>
                           {" - "}

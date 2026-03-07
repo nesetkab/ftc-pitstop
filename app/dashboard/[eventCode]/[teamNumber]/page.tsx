@@ -158,6 +158,7 @@ export default function DashboardPage() {
   const [teamName, setTeamName] = useState<string | null>(null)
   const [teamNames, setTeamNames] = useState<{ [key: number]: string }>({})
   const [nexusData, setNexusData] = useState<NexusData | null>(null)
+  const [oprMap, setOprMap] = useState<{ [key: number]: number }>({})
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
   const [matchDialogOpen, setMatchDialogOpen] = useState(false)
   const loadingSteps = [
@@ -278,7 +279,7 @@ export default function DashboardPage() {
 
       setLoadingStep(1) // Loading team statistics
       // Fetch all data in parallel for speed (including Nexus)
-      const [statsResponse, matchesResponse, allMatchesResponse, rankingsResponse, alliancesResponse, teamsResponse, nexusResponse] = await Promise.all([
+      const [statsResponse, matchesResponse, allMatchesResponse, rankingsResponse, alliancesResponse, teamsResponse, nexusResponse, oprResponse] = await Promise.all([
         fetch(`/api/teams/${teamNumber}/stats/${eventCode}`),
         fetch(`/api/events/${eventCode}/matches?team=${teamNumber}`),
         fetch(`/api/events/${eventCode}/matches`),
@@ -286,6 +287,7 @@ export default function DashboardPage() {
         fetch(`/api/events/${eventCode}/alliances`),
         fetch(`/api/events/${eventCode}/teams`),
         fetch(`/api/events/${eventCode}/nexus`).catch(() => null),
+        fetch(`/api/events/${eventCode}/opr`).catch(() => null),
       ])
       setLoadingStep(4) // Loading alliance selections
 
@@ -297,6 +299,7 @@ export default function DashboardPage() {
         alliances: alliancesResponse.status,
         teams: teamsResponse.status,
         nexus: nexusResponse?.status ?? 'failed',
+        opr: oprResponse?.status ?? 'failed',
       })
 
       // Handle each response individually to avoid failing everything if one fails
@@ -349,6 +352,18 @@ export default function DashboardPage() {
         nexusResult = await nexusResponse.json()
       }
       setNexusData(nexusResult)
+
+      // Parse OPR data into a map of teamNumber -> opr
+      if (oprResponse?.ok) {
+        const oprData = await oprResponse.json()
+        const map: { [key: number]: number } = {}
+        for (const entry of (oprData.opr || [])) {
+          if (entry.teamNumber && entry.opr != null) {
+            map[entry.teamNumber] = entry.opr
+          }
+        }
+        setOprMap(map)
+      }
 
       // Build team names map
       const names: { [key: number]: string } = {}
@@ -623,6 +638,7 @@ export default function DashboardPage() {
                 teamNames={teamNames}
                 onMatchClick={onMatchClick}
                 nexusData={nexusData}
+                oprMap={oprMap}
               />
             </TabsContent>
 
@@ -654,6 +670,7 @@ export default function DashboardPage() {
                 matches={matches}
                 teamNames={teamNames}
                 onMatchClick={onMatchClick}
+                oprMap={oprMap}
               />
             </TabsContent>
 

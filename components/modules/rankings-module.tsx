@@ -8,7 +8,7 @@ import {
 import { useRouter } from "next/navigation"
 import { Ranking } from "@/app/dashboard/[eventCode]/[teamNumber]/page"
 
-export function RankingsModule({ rankings, teamNumber, eventCode, teamNames = {} }: { rankings: Ranking[], teamNumber: number, eventCode?: string, teamNames?: { [key: number]: string } }) {
+export function RankingsModule({ rankings, teamNumber, eventCode, teamNames = {}, oprMap = {} }: { rankings: Ranking[], teamNumber: number, eventCode?: string, teamNames?: { [key: number]: string }, oprMap?: { [key: number]: number } }) {
   const router = useRouter()
   return (
     <Card className="flex flex-col h-fit">
@@ -32,6 +32,11 @@ export function RankingsModule({ rankings, teamNumber, eventCode, teamNames = {}
 
               </div>
               <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                {oprMap[ranking.teamNumber] != null && (
+                  <span className="text-[10px] font-medium" style={{ color: 'var(--color-purple, #a855f7)' }}>
+                    OPR: {oprMap[ranking.teamNumber].toFixed(1)}
+                  </span>
+                )}
                 {(ranking.rp > 0 || ranking.tbp > 0) && (
                   <span className="text-[10px]">RP: {ranking.rp} | TBP: {ranking.tbp}</span>
                 )}

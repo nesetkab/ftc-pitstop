@@ -12,9 +12,10 @@ interface RankingsScheduleTabProps {
   matches: Match[]
   teamNames?: { [key: number]: string }
   onMatchClick?: (match: Match) => void
+  oprMap?: { [key: number]: number }
 }
 
-export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches, teamNames = {}, onMatchClick }: RankingsScheduleTabProps) {
+export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches, teamNames = {}, onMatchClick, oprMap = {} }: RankingsScheduleTabProps) {
   const teamLabel = (num: number) => {
     const name = teamNames[num]
     return name ? `${num} ${name}` : `${num}`
@@ -26,7 +27,7 @@ export function RankingsScheduleTab({ eventCode, teamNumber, rankings, matches, 
     <div className="grid grid-cols-12 gap-4">
       {/* Rankings */}
       <div className="col-span-5">
-        <RankingsModule rankings={rankings} teamNumber={teamNumber} eventCode={eventCode} teamNames={teamNames} />
+        <RankingsModule rankings={rankings} teamNumber={teamNumber} eventCode={eventCode} teamNames={teamNames} oprMap={oprMap} />
       </div>
 
       {/* Schedule */}
