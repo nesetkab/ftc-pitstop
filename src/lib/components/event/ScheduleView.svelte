@@ -110,11 +110,6 @@
 	select {
 		min-width: 0;
 		max-width: 100%;
-		padding: 6px 28px 6px 10px;
-		border: 1px solid var(--line-2);
-		border-radius: var(--radius-control);
-		background: var(--bg);
-		font-size: 14px;
 	}
 
 	.section {

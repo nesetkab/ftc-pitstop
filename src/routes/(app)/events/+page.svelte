@@ -232,6 +232,9 @@
 	select {
 		width: 100%;
 		min-width: 0;
+	}
+
+	input {
 		padding: 7px 10px;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);
@@ -242,7 +245,6 @@
 
 	select {
 		max-width: 260px;
-		padding-right: 28px;
 	}
 
 	input::placeholder {

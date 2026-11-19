@@ -94,16 +94,6 @@
 
 	select {
 		min-width: 150px;
-		padding: 7px 8px;
-		border: 1px solid var(--line-2);
-		border-radius: var(--radius-control);
-		background: var(--bg);
-		color: var(--text);
-		font-size: 14px;
-	}
-
-	select:disabled {
-		color: var(--text-3);
 	}
 
 	.clear {
