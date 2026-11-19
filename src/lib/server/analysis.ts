@@ -100,6 +100,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 	const background = deps.background ?? keepAlive;
 	let current: { model: SeasonModel; expires: number } | null = null;
 	let pending: Promise<SeasonModel> | null = null;
+	let pendingSince = 0;
 
 	async function build(): Promise<SeasonModel> {
 		const season = await loaders.loadSeasonMatches();
@@ -115,6 +116,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 		const time = now();
 		if (current && time < current.expires) return Promise.resolve(current.model);
 		if (!pending) {
+			pendingSince = time;
 			pending = build()
 				.then((model) => {
 					current = { model, expires: now() + (model.complete ? HOUR : 2 * MINUTE) };
@@ -136,9 +138,9 @@ export function createAnalysis(deps: AnalysisDeps) {
 	async function loadEventAnalysisEntry(
 		input: string
 	): Promise<{ analysis: EventAnalysis; cacheControl: string }> {
-		const deadline = now() + budget;
 		const model = loadSeasonModel();
 		model.catch(() => undefined);
+		const deadline = pending ? Math.max(now(), pendingSince + budget) : now() + budget;
 		const { cacheControl, ...bundle } = await loaders.loadEventBundle(input);
 		const teams = teamsOf(bundle);
 		const day = dayNumber(bundle.event.start);

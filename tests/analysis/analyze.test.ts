@@ -41,6 +41,7 @@ describe('analyzeEvent on the finished Gilbert qualifier', async () => {
 		expectRanksConsistent(analysis);
 		for (const r of analysis.ratings) {
 			expect(r.history).toHaveLength(r.matches);
+			expect(r.sd).toBeGreaterThan(0);
 			const sum = r.parts.auto + r.parts.hive + r.parts.flower + r.parts.garden + r.parts.park;
 			expect(sum).toBeCloseTo(r.opr, 0);
 		}
@@ -224,12 +225,14 @@ describe('an upcoming event without a schedule', async () => {
 	const bundle = await bundleFor('USMTBUQ');
 	const analysis = run(bundle);
 
-	it('rates registered teams from their priors only', () => {
+	it('rates registered teams from their priors only', async () => {
 		expect(bundle.phase).toBe('upcoming');
 		expect(analysis.ratings).toHaveLength(bundle.teams.length);
 		expectRanksConsistent(analysis);
 		expect(analysis.ratings.every((r) => r.matches === 0 && r.history.length === 0)).toBe(true);
 		expect(analysis.ratings.every((r) => r.opr === r.prior && r.opr > 0)).toBe(true);
+		const played = run(await bundleFor('USAZGIQ')).ratings.map((r) => r.sd!);
+		expect(Math.min(...analysis.ratings.map((r) => r.sd!))).toBeGreaterThan(Math.max(...played));
 		const known = Object.keys(contexts.USMTBUQ.previous).length;
 		expect(known).toBeGreaterThan(0);
 		expect(new Set(analysis.ratings.map((r) => r.opr)).size).toBeGreaterThan(1);

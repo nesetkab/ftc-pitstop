@@ -30,6 +30,7 @@ import {
 	OPR_PARAMS,
 	priorFor,
 	rateSeason,
+	SCORE_SIGMA,
 	type Priors,
 	type Track
 } from '#lib/model/opr.ts';
@@ -474,6 +475,11 @@ export function analyzeEvent(
 		park: points(value(team, 'park')),
 		tips: points(value(team, 'tips'))
 	});
+	const sigma = SCORE_SIGMA * run.stats.sd;
+	const spread = (team: number) =>
+		rater.has(team)
+			? rater.rating(team, sigma).sd
+			: sigma / Math.sqrt(priorFor(team, priors, run.stats, day).prec);
 	const ratings: TeamRating[] = order.map((team) => ({
 		team,
 		opr: points(opr.get(team)!),
@@ -481,6 +487,7 @@ export function analyzeEvent(
 		matches: rater.matchesPlayed(team),
 		rank: rankOf.get(team)!,
 		prior: points(firstPrior.get(team) ?? opr.get(team)!),
+		sd: points(spread(team)),
 		history: history.get(team) ?? []
 	}));
 

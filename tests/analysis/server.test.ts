@@ -15,7 +15,9 @@ const previous = previousFrom(previous2025.teams);
 const gilbert = await bundleFor('USAZGIQ');
 const earlier = seasonMatchesOf(gilbert, 'USAZXXQ', '2026-11-07');
 
-function setup(options: { season?: () => Promise<SeasonMatch[]>; budgetMs?: number } = {}) {
+function setup(
+	options: { season?: () => Promise<SeasonMatch[]>; budgetMs?: number; clock?: () => number } = {}
+) {
 	const season = vi.fn(async () => ({
 		matches: await (options.season ?? (async () => earlier))(),
 		fetchedAt: NOW,
@@ -25,9 +27,9 @@ function setup(options: { season?: () => Promise<SeasonMatch[]>; budgetMs?: numb
 	const background = vi.fn();
 	const analysis = createAnalysis({
 		loaders: { loadEventBundle: fixtureLoaders().loadEventBundle, loadSeasonMatches: season },
-		cache: createCache({ onError: () => {}, now: () => NOW }),
+		cache: createCache({ onError: () => {}, now: options.clock ?? (() => NOW) }),
 		previous,
-		now: () => NOW,
+		now: options.clock ?? (() => NOW),
 		budgetMs: options.budgetMs,
 		background
 	});
@@ -79,10 +81,19 @@ describe('createAnalysis', () => {
 	});
 
 	it('answers right away with last season priors while the season loads', async () => {
-		const data = setup({ season: () => new Promise(() => {}), budgetMs: 20 });
+		const started = performance.now();
+		const data = setup({
+			season: () => new Promise(() => {}),
+			budgetMs: 200,
+			clock: () => NOW + Math.round(performance.now() - started)
+		});
 		const { analysis, cacheControl } = await data.loadEventAnalysisEntry('USAZGIQ');
 		expect(cacheControl).toBe(CACHE_CONTROL.live);
 		expect(data.background).toHaveBeenCalledTimes(1);
+		const start = performance.now();
+		await data.loadEventAnalysisEntry('USAZGIQ');
+		expect(performance.now() - start).toBeLessThan(150);
+		expect(data.background).toHaveBeenCalledTimes(2);
 		const teams = analysis.ratings.map((r) => r.team);
 		const cold = analyzeEvent(gilbert, baseContext(teams, previous), { now: NOW });
 		expect(analysis.ratings).toEqual(cold.ratings);

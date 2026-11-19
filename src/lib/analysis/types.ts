@@ -19,6 +19,7 @@ export type TeamRating = {
 	matches: number;
 	rank: number;
 	prior: number;
+	sd?: number;
 	history: { key: string; time: number; opr: number }[];
 };
 
