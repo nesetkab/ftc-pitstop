@@ -274,7 +274,7 @@
 
 	.as {
 		display: grid;
-		grid-template-columns: 290px minmax(0, 1fr);
+		grid-template-columns: 270px minmax(0, 1fr);
 		gap: 28px;
 		align-items: start;
 	}

@@ -60,9 +60,9 @@ export class Workspace {
 	#cache: DeviceStore | null = null;
 	#store: WorkspaceStore | null = null;
 	#versions: Versions = {};
-	#pending = new Map<DocName, AnyChange[]>();
-	#timers = new Map<DocName, ReturnType<typeof setTimeout>>();
-	#running = new Set<DocName>();
+	#pending: Partial<Record<DocName, AnyChange[]>> = {};
+	#timers: Partial<Record<DocName, ReturnType<typeof setTimeout>>> = {};
+	#running: Partial<Record<DocName, boolean>> = {};
 	#failures = 0;
 	#now: () => number;
 	#flushDelay: number;
@@ -131,8 +131,8 @@ export class Workspace {
 		});
 		return () => {
 			for (const stop of stops) stop();
-			for (const timer of this.#timers.values()) clearTimeout(timer);
-			this.#timers.clear();
+			for (const timer of Object.values(this.#timers)) clearTimeout(timer);
+			this.#timers = {};
 		};
 	}
 
@@ -142,9 +142,9 @@ export class Workspace {
 		const next = change(current);
 		if (Object.is(next, current)) return;
 		this.docs = withDoc(this.docs, name, next);
-		const queue = this.#pending.get(name) ?? [];
+		const queue = this.#pending[name] ?? [];
 		queue.push(change as unknown as AnyChange);
-		this.#pending.set(name, queue);
+		this.#pending[name] = queue;
 		this.sync = 'saving';
 		this.message = null;
 		this.#schedule(name, this.#flushDelay);
@@ -153,30 +153,27 @@ export class Workspace {
 	async flush(): Promise<void> {
 		await Promise.all(
 			this.names.map((name) => {
-				clearTimeout(this.#timers.get(name));
-				this.#timers.delete(name);
+				clearTimeout(this.#timers[name]);
+				delete this.#timers[name];
 				return this.#write(name);
 			})
 		);
 	}
 
 	#schedule(name: DocName, delay: number) {
-		clearTimeout(this.#timers.get(name));
-		this.#timers.set(
-			name,
-			setTimeout(() => {
-				this.#timers.delete(name);
-				void this.#write(name);
-			}, delay)
-		);
+		clearTimeout(this.#timers[name]);
+		this.#timers[name] = setTimeout(() => {
+			delete this.#timers[name];
+			void this.#write(name);
+		}, delay);
 	}
 
 	#queued(name: DocName): number {
-		return this.#pending.get(name)?.length ?? 0;
+		return this.#pending[name]?.length ?? 0;
 	}
 
 	#settle() {
-		const busy = this.names.some((name) => this.#queued(name) > 0 || this.#running.has(name));
+		const busy = this.names.some((name) => this.#queued(name) > 0 || this.#running[name] === true);
 		if (!busy && this.sync !== 'failed') this.sync = 'saved';
 	}
 
@@ -192,14 +189,14 @@ export class Workspace {
 		this.docs = docs;
 		if (confirmed) this.#mirror(snapshot);
 		for (const name of this.names) {
-			if (this.#queued(name) > 0 && !this.#running.has(name)) {
+			if (this.#queued(name) > 0 && !this.#running[name]) {
 				this.#schedule(name, this.#flushDelay);
 			}
 		}
 	}
 
 	#rebase<K extends DocName>(name: K, base: DocMap[K]): DocMap[K] {
-		const queue = (this.#pending.get(name) ?? []) as unknown as Change<K>[];
+		const queue = (this.#pending[name] ?? []) as unknown as Change<K>[];
 		return queue.reduce((doc, change) => change(doc), base);
 	}
 
@@ -214,11 +211,11 @@ export class Workspace {
 
 	async #write(name: DocName): Promise<void> {
 		const store = this.#store;
-		if (!store || this.#running.has(name) || this.#queued(name) === 0) {
+		if (!store || this.#running[name] || this.#queued(name) === 0) {
 			this.#settle();
 			return;
 		}
-		this.#running.add(name);
+		this.#running[name] = true;
 		let retry = false;
 		try {
 			for (let attempt = 0; attempt < MAX_REBASES; attempt++) {
@@ -231,7 +228,7 @@ export class Workspace {
 				);
 				if (result.ok) {
 					this.#versions[name] = result.stamped.updatedAt;
-					this.#pending.set(name, (this.#pending.get(name) ?? []).slice(sent));
+					this.#pending[name] = (this.#pending[name] ?? []).slice(sent);
 					this.savedAt = this.#now();
 					this.offline = false;
 					this.#failures = 0;
@@ -244,7 +241,7 @@ export class Workspace {
 		} catch (error) {
 			retry = this.#fail(name, error);
 		} finally {
-			this.#running.delete(name);
+			delete this.#running[name];
 		}
 		if (this.#queued(name) > 0) {
 			this.sync = retry ? 'retrying' : 'saving';
@@ -270,7 +267,7 @@ export class Workspace {
 	#fail(name: DocName, error: unknown): boolean {
 		const code = error instanceof WorkspaceError ? error.code : 'unavailable';
 		if (code === 'too-large' || code === 'invalid') {
-			this.#pending.set(name, []);
+			this.#pending[name] = [];
 			this.sync = 'failed';
 			this.message =
 				code === 'too-large'
@@ -279,7 +276,7 @@ export class Workspace {
 			return false;
 		}
 		if (code === 'not-found') {
-			this.#pending.set(name, []);
+			this.#pending[name] = [];
 			this.status = 'missing';
 			return false;
 		}

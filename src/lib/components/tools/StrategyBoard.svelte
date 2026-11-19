@@ -825,12 +825,12 @@
 
 		.rail {
 			display: flex;
+			flex-wrap: wrap;
 			align-items: center;
 			gap: 2px;
 			padding: 8px;
 			border-right: 0;
 			border-bottom: 1px solid var(--line);
-			overflow-x: auto;
 		}
 
 		.tool {
@@ -841,9 +841,10 @@
 		}
 
 		.rule {
-			width: 1px;
-			height: 22px;
-			margin: 0 4px;
+			flex-basis: 100%;
+			width: auto;
+			height: 0;
+			margin: 2px 0;
 		}
 
 		.swatches {

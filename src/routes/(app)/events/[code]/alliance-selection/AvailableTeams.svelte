@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fixed } from '#lib/format/number.ts';
+	import { MISSING } from '#lib/format/pct.ts';
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
@@ -29,20 +30,20 @@
 		<tr>
 			<th class="l" scope="col">Team</th>
 			{#if table.rated}
-				<th scope="col">OPR</th>
-				<th scope="col">Auto OPR</th>
+				<th class="w" scope="col">OPR</th>
+				<th class="w" scope="col">Auto OPR</th>
 			{:else}
-				<th scope="col">RS</th>
-				<th scope="col">TBP</th>
-				<th scope="col">Avg auto</th>
+				<th class="w" scope="col">RS</th>
+				<th class="w" scope="col">TBP</th>
+				<th class="w" scope="col">Avg auto</th>
 			{/if}
-			<th scope="col">Avg tips</th>
-			<th scope="col">Avg park</th>
-			<th scope="col">Rank</th>
+			<th class="w" scope="col">Avg tips</th>
+			<th class="w" scope="col">Avg park</th>
+			<th class="w" scope="col">Rank</th>
 			{#if table.picks}
-				<th scope="col">Win round 1</th>
-				<th scope="col">Reach upper final</th>
-				<th scope="col">Win event</th>
+				<th class="w" scope="col">Win round 1</th>
+				<th class="w" scope="col">Reach upper final</th>
+				<th class="w" scope="col">Win event</th>
 			{/if}
 			<th class="l" scope="col">Note</th>
 		</tr>
@@ -51,7 +52,8 @@
 		{#each rows as row (row.team)}
 			{@const taken = row.status.kind !== 'available'}
 			<tr class:dim={taken} class:me={row.team === me}>
-				<td class="team"><TeamCell number={row.team} name={row.name} href="/teams/{row.team}" /></td
+				<td class="team wrap"
+					><TeamCell number={row.team} name={row.name} href="/teams/{row.team}" /></td
 				>
 				{#if table.rated}
 					<td>{fixed(row.opr)}</td>
@@ -63,7 +65,7 @@
 				{/if}
 				<td>{fixed(row.avgTips)}</td>
 				<td>{fixed(row.avgPark)}</td>
-				<td>{row.rank ?? '—'}</td>
+				<td>{row.rank ?? MISSING}</td>
 				{#if table.picks}
 					{#if taken}
 						<td></td>
@@ -75,8 +77,19 @@
 						<ProbCell p={row.winEvent} shade={false} />
 					{/if}
 				{/if}
-				<td class="l">{note(row)}</td>
+				<td class="l wrap note">{note(row)}</td>
 			</tr>
 		{/each}
 	</tbody>
 </Table>
+
+<style>
+	th.w {
+		min-width: 0;
+		white-space: normal;
+	}
+
+	td.note {
+		min-width: 150px;
+	}
+</style>

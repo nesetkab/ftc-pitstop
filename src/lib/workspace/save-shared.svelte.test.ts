@@ -21,7 +21,7 @@ import type { Plan } from '#lib/workspace/schemas.ts';
 
 let storage: StorageLike;
 let device: DeviceStore;
-let time = 1_700_000_000_000;
+const time = 1_700_000_000_000;
 
 const plan: Plan = {
 	id: 'plan1',

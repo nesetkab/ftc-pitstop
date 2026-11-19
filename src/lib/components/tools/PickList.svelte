@@ -177,7 +177,7 @@
 			{update ? 'Add the teams you want to pick, best first.' : 'This list is empty.'}
 		</EmptyState>
 	{:else}
-		<ol class="rows" bind:this={listElement}>
+		<ol class={['rows', { editable: Boolean(update) }]} bind:this={listElement}>
 			{#each list.entries as entry, index (entry.team)}
 				{@const label = auto?.get(entry.team) ?? null}
 				{@const gone = entry.taken || label !== null}
@@ -333,16 +333,22 @@
 
 	.rows {
 		display: grid;
+		grid-template-columns: 26px minmax(120px, 0.7fr) minmax(0, 1.3fr) auto;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
+	.rows.editable {
+		grid-template-columns: 22px 26px minmax(120px, 0.7fr) minmax(0, 1.3fr) auto;
+	}
+
 	.row {
 		position: relative;
 		display: grid;
-		grid-template-columns: 26px minmax(120px, 0.7fr) minmax(0, 1.3fr) auto;
-		gap: 8px;
+		grid-template-columns: subgrid;
+		grid-column: 1 / -1;
+		column-gap: 8px;
 		align-items: center;
 		padding: 6px 0;
 		border-bottom: 1px solid var(--line);
@@ -351,8 +357,8 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	.row.editable {
-		grid-template-columns: 22px 26px minmax(120px, 0.7fr) minmax(0, 1.3fr) auto;
+	.gone .note-input:placeholder-shown {
+		text-decoration: none;
 	}
 
 	.row.dragging {
@@ -463,11 +469,17 @@
 	}
 
 	@container (max-width: 520px) {
+		.rows,
+		.rows.editable {
+			grid-template-columns: minmax(0, 1fr);
+		}
+
 		.row {
+			grid-column: auto;
 			grid-template-columns: 22px minmax(0, 1fr) auto;
 			grid-template-areas:
 				'rank team actions'
-				'note note note';
+				'. note note';
 			padding: 8px 0;
 		}
 

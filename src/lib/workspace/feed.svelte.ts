@@ -1,3 +1,4 @@
+import { SvelteMap } from 'svelte/reactivity';
 import type { AllianceSelection, Team } from '#lib/types.ts';
 import { deriveSelection, takenLabels } from '#lib/workspace/selection.ts';
 
@@ -15,14 +16,14 @@ export async function fetchTeamName(
 }
 
 export class SelectionFeed {
-	labels = $state.raw<ReadonlyMap<number, string>>(new Map());
-	names = $state.raw<ReadonlyMap<number, string>>(new Map());
+	labels = $state.raw<ReadonlyMap<number, string>>(new SvelteMap());
+	names = $state.raw<ReadonlyMap<number, string>>(new SvelteMap());
 
 	constructor(event: () => string | null, interval = 15_000, fetcher: typeof fetch = fetch) {
 		$effect(() => {
 			const code = event();
-			this.labels = new Map();
-			this.names = new Map();
+			this.labels = new SvelteMap();
+			this.names = new SvelteMap();
 			if (!code) return;
 			let stopped = false;
 			let timer: ReturnType<typeof setTimeout> | undefined;
@@ -45,8 +46,8 @@ export class SelectionFeed {
 	}
 
 	apply(bundle: FeedBundle) {
-		this.labels = takenLabels(deriveSelection(bundle.alliances ?? []));
-		this.names = new Map((bundle.teams ?? []).map((team) => [team.number, team.name]));
+		this.labels = new SvelteMap(takenLabels(deriveSelection(bundle.alliances ?? [])));
+		this.names = new SvelteMap((bundle.teams ?? []).map((team) => [team.number, team.name]));
 	}
 
 	name(team: number): Promise<string | null> {

@@ -49,6 +49,17 @@
 	const suggestedId = $derived(suggestNext(batteries.items));
 	const suggested = $derived(batteries.items.find((battery) => battery.id === suggestedId) ?? null);
 
+	const detail = $derived(
+		suggested
+			? [
+					suggested.voltage === null ? 'Voltage not logged' : `${fixed(suggested.voltage)} V`,
+					restLabel(restedMinutes(suggested, now)).toLowerCase()
+				]
+					.filter(Boolean)
+					.join(', ')
+			: ''
+	);
+
 	function rest(battery: Battery): string {
 		return restLabel(restedMinutes(battery, now));
 	}
@@ -106,10 +117,7 @@
 	{#if suggested}
 		<div class="picking">
 			<b>Use next: {suggested.name}</b>
-			<span>
-				{suggested.voltage === null ? 'Voltage not logged' : `${fixed(suggested.voltage)} V`}
-				{#if rest(suggested)}, {rest(suggested).toLowerCase()}{/if}
-			</span>
+			<span>{detail}</span>
 		</div>
 	{:else if batteries.items.length > 0}
 		<p class="note">No battery is marked charged.</p>
@@ -232,32 +240,34 @@
 							</td>
 							{#if update}
 								<td class="l actions" data-label="">
-									<button
-										type="button"
-										class="ctl-btn"
-										disabled={battery.status === 'in-robot'}
-										onclick={() => enterRobot(battery.id)}
-									>
-										Put in robot
-									</button>
-									<button
-										type="button"
-										class="ctl-btn"
-										disabled={battery.status === 'charged'}
-										onclick={() => charged(battery.id)}
-									>
-										Mark charged
-									</button>
-									<button
-										type="button"
-										class="ctl-btn plain"
-										aria-label={removing === battery.id
-											? `Confirm removing ${battery.name}`
-											: `Remove ${battery.name}`}
-										onclick={() => remove(battery.id)}
-									>
-										{removing === battery.id ? 'Confirm' : 'Remove'}
-									</button>
+									<div class="buttons">
+										<button
+											type="button"
+											class="ctl-btn"
+											disabled={battery.status === 'in-robot'}
+											onclick={() => enterRobot(battery.id)}
+										>
+											Put in robot
+										</button>
+										<button
+											type="button"
+											class="ctl-btn"
+											disabled={battery.status === 'charged'}
+											onclick={() => charged(battery.id)}
+										>
+											Mark charged
+										</button>
+										<button
+											type="button"
+											class="ctl-btn plain"
+											aria-label={removing === battery.id
+												? `Confirm removing ${battery.name}`
+												: `Remove ${battery.name}`}
+											onclick={() => remove(battery.id)}
+										>
+											{removing === battery.id ? 'Confirm' : 'Remove'}
+										</button>
+									</div>
 								</td>
 							{/if}
 						</tr>
@@ -361,8 +371,9 @@
 		color: var(--text-2);
 	}
 
-	.actions {
+	.buttons {
 		display: flex;
+		justify-content: flex-end;
 		gap: 4px;
 	}
 
@@ -426,9 +437,9 @@
 			grid-column: 1 / -1;
 		}
 
-		table.sheet td.actions {
+		.buttons {
 			flex-wrap: wrap;
-			display: flex;
+			justify-content: flex-start;
 		}
 
 		.voltage {
