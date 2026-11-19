@@ -64,7 +64,10 @@ export async function ftcAllPages(
 	const total = Math.min(first.body.pageTotal ?? 1, 200);
 	const pages: FtcBody<'teams'>[] = [first.body];
 	for (let page = 2; page <= total; page += concurrency) {
-		const batch = Array.from({ length: Math.min(concurrency, total - page + 1) }, (_, i) => page + i);
+		const batch = Array.from(
+			{ length: Math.min(concurrency, total - page + 1) },
+			(_, i) => page + i
+		);
 		const responses = await Promise.all(batch.map((n) => ftcEndpoint(client, 'teams', pathFor(n))));
 		for (const response of responses) if (response.status === 'ok') pages.push(response.body);
 	}

@@ -31,7 +31,7 @@ export const ftcEvent = z.object({
 });
 
 export const ftcEventsResponse = z.object({
-	events: z.array(ftcEvent).nullish(),
+	events: z.array(ftcEvent),
 	eventCount: count
 });
 
@@ -50,7 +50,7 @@ export const ftcTeam = z.object({
 });
 
 export const ftcTeamsResponse = z.object({
-	teams: z.array(ftcTeam).nullish(),
+	teams: z.array(ftcTeam),
 	teamCountTotal: count,
 	teamCountPage: count,
 	pageCurrent: count,
@@ -77,7 +77,7 @@ export const ftcRanking = z.object({
 });
 
 export const ftcRankingsResponse = z.object({
-	rankings: z.array(ftcRanking).nullish()
+	rankings: z.array(ftcRanking)
 });
 
 export const ftcScheduleTeam = z.object({
@@ -110,7 +110,7 @@ export const ftcScheduleMatch = z.object({
 });
 
 export const ftcScheduleResponse = z.object({
-	schedule: z.array(ftcScheduleMatch).nullish()
+	schedule: z.array(ftcScheduleMatch)
 });
 
 export const ftcMatchResultTeam = z.object({
@@ -138,7 +138,7 @@ export const ftcMatchResult = z.object({
 });
 
 export const ftcMatchesResponse = z.object({
-	matches: z.array(ftcMatchResult).nullish()
+	matches: z.array(ftcMatchResult)
 });
 
 const flower = z.array(z.string()).nullish();
@@ -188,7 +188,7 @@ export const ftcMatchScore = z.object({
 });
 
 export const ftcScoresResponse = z.object({
-	matchScores: z.array(ftcMatchScore).nullish()
+	matchScores: z.array(ftcMatchScore)
 });
 
 const ftcAllianceTeam = z
@@ -210,7 +210,7 @@ export const ftcAlliance = z.object({
 });
 
 export const ftcAlliancesResponse = z.object({
-	alliances: z.array(ftcAlliance).nullish(),
+	alliances: z.array(ftcAlliance),
 	count: count
 });
 
@@ -226,7 +226,7 @@ export const ftcAward = z.object({
 });
 
 export const ftcAwardsResponse = z.object({
-	awards: z.array(ftcAward).nullish()
+	awards: z.array(ftcAward)
 });
 
 export const ftcAdvancementSlot = z.object({

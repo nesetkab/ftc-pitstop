@@ -196,7 +196,8 @@ export interface Award {
 	person: string | null;
 }
 
-export type AdvancementStatus = 'first' | 'already-advancing' | 'advancing-above' | 'ineligible' | null;
+export type AdvancementStatus =
+	'first' | 'already-advancing' | 'advancing-above' | 'ineligible' | null;
 
 export interface AdvancementSlot {
 	slot: number;

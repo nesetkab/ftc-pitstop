@@ -1,4 +1,10 @@
-import type { AllianceScore, FlowerElement, Flowers, MatchResult, ScoreBreakdown } from '#lib/types.ts';
+import type {
+	AllianceScore,
+	FlowerElement,
+	Flowers,
+	MatchResult,
+	ScoreBreakdown
+} from '#lib/types.ts';
 
 export const SEASON = 2026;
 
@@ -22,7 +28,12 @@ export const RP_THRESHOLDS = {
 	pollinator2: 7
 } as const;
 
-export const FLOWER_NAMES = ['red', 'blue', 'scoring', 'audience'] as const satisfies (keyof Flowers)[];
+export const FLOWER_NAMES = [
+	'red',
+	'blue',
+	'scoring',
+	'audience'
+] as const satisfies (keyof Flowers)[];
 
 export interface BreakdownParts {
 	auto: number;

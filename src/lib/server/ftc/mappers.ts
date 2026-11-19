@@ -8,6 +8,7 @@ import type {
 	AllianceSelection,
 	Award,
 	Event,
+	EventSummary,
 	FlowerElement,
 	Match,
 	MatchResult,
@@ -64,6 +65,25 @@ export function mapEvent(raw: FtcEvent): Event {
 	};
 }
 
+export function summarizeEvent(event: Event, hasMatches: boolean | null = null): EventSummary {
+	return {
+		code: event.code,
+		name: event.name,
+		type: event.type,
+		typeName: event.typeName,
+		region: event.region,
+		league: event.league,
+		venue: event.venue,
+		city: event.city,
+		state: event.state,
+		country: event.country,
+		timezone: event.timezone,
+		start: event.start,
+		end: event.end,
+		hasMatches
+	};
+}
+
 export function schoolFromFullName(fullName: string | null): string | null {
 	if (!fullName?.includes('&')) return null;
 	return clean(fullName.slice(fullName.lastIndexOf('&') + 1));
@@ -85,12 +105,12 @@ export function mapTeam(raw: FtcTeam): Team {
 
 export function mapTeams(pages: FtcTeamsResponse[]): Team[] {
 	const teams = new Map<number, Team>();
-	for (const page of pages) for (const raw of page.teams ?? []) teams.set(raw.teamNumber, mapTeam(raw));
+	for (const page of pages) for (const raw of page.teams) teams.set(raw.teamNumber, mapTeam(raw));
 	return [...teams.values()].sort((a, b) => a.number - b.number);
 }
 
 export function mapRankings(raw: FtcRankingsResponse): Ranking[] {
-	return (raw.rankings ?? [])
+	return raw.rankings
 		.map((ranking) => ({
 			rank: ranking.rank,
 			team: ranking.teamNumber,
@@ -108,7 +128,7 @@ export function mapRankings(raw: FtcRankingsResponse): Ranking[] {
 }
 
 export function mapAlliances(raw: FtcAlliancesResponse): AllianceSelection[] {
-	return (raw.alliances ?? [])
+	return raw.alliances
 		.filter((alliance) => alliance.captain)
 		.map((alliance) => ({
 			seed: alliance.number,
@@ -124,7 +144,7 @@ export function mapAlliances(raw: FtcAlliancesResponse): AllianceSelection[] {
 }
 
 export function mapAwards(raw: FtcAwardsResponse): Award[] {
-	return (raw.awards ?? []).map((award) => ({
+	return raw.awards.map((award) => ({
 		id: award.awardId,
 		name: clean(award.name) ?? 'Award',
 		placement: award.series ?? 1,
@@ -235,7 +255,11 @@ function scheduleTotals(match: FtcScheduleMatch, color: AllianceColor): Alliance
 	};
 }
 
-function winnerOf(match: FtcScheduleMatch, red: AllianceScore, blue: AllianceScore): AllianceColor | null {
+function winnerOf(
+	match: FtcScheduleMatch,
+	red: AllianceScore,
+	blue: AllianceScore
+): AllianceColor | null {
 	if (match.redWins) return 'red';
 	if (match.blueWins) return 'blue';
 	if (match.redWins === false && match.blueWins === false) return null;
@@ -245,7 +269,9 @@ function winnerOf(match: FtcScheduleMatch, red: AllianceScore, blue: AllianceSco
 
 function mapResult(match: FtcScheduleMatch, detail: FtcMatchScore | undefined): MatchResult | null {
 	const redDetail = detail?.alliances.find((alliance) => alliance.alliance.toLowerCase() === 'red');
-	const blueDetail = detail?.alliances.find((alliance) => alliance.alliance.toLowerCase() === 'blue');
+	const blueDetail = detail?.alliances.find(
+		(alliance) => alliance.alliance.toLowerCase() === 'blue'
+	);
 	const detailed = redDetail && blueDetail;
 	const red = detailed ? mapAllianceScore(redDetail, blueDetail) : scheduleTotals(match, 'red');
 	const blue = detailed ? mapAllianceScore(blueDetail, redDetail) : scheduleTotals(match, 'blue');

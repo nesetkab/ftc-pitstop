@@ -76,7 +76,10 @@ export function createFtcClient(options: FtcClientOptions = {}) {
 			? `Basic ${btoa(`${options.username}:${options.apiKey}`)}`
 			: null;
 
-	async function request(path: string, init: FtcRequestOptions = {}): Promise<FtcResponse<unknown>> {
+	async function request(
+		path: string,
+		init: FtcRequestOptions = {}
+	): Promise<FtcResponse<unknown>> {
 		if (!authorization) throw new FtcApiError(503, path, 'FTC API credentials are not configured');
 		const headers: Record<string, string> = { authorization, accept: 'application/json' };
 		if (init.ifModifiedSince) headers['if-modified-since'] = init.ifModifiedSince;
@@ -136,7 +139,9 @@ export function createFtcClient(options: FtcClientOptions = {}) {
 		if (response.status === 'unchanged') return response;
 		const parsed = schema.safeParse(response.body);
 		if (!parsed.success) {
-			console.warn(`FTC API shape changed for ${path}: ${z.prettifyError(parsed.error).slice(0, 500)}`);
+			console.warn(
+				`FTC API shape changed for ${path}: ${z.prettifyError(parsed.error).slice(0, 500)}`
+			);
 			throw new FtcApiError(502, path, 'FTC API sent data in an unexpected shape');
 		}
 		return { status: 'ok', body: parsed.data, lastModified: response.lastModified };

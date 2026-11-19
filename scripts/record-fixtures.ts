@@ -47,7 +47,10 @@ async function save(dir: string, name: string, value: unknown) {
 	await mkdir(dir, { recursive: true });
 	const file = `${dir}${name}.json`;
 	const config = await prettier.resolveConfig(file);
-	await writeFile(file, await prettier.format(JSON.stringify(value), { ...config, filepath: file }));
+	await writeFile(
+		file,
+		await prettier.format(JSON.stringify(value), { ...config, filepath: file })
+	);
 }
 
 async function recordFtc(code: string) {
@@ -56,7 +59,9 @@ async function recordFtc(code: string) {
 		apiKey: process.env.FTC_API_KEY
 	});
 	if (!client.configured) {
-		throw new Error('Set FTC_USERNAME and FTC_API_KEY, for example with node --env-file=.env.local');
+		throw new Error(
+			'Set FTC_USERNAME and FTC_API_KEY, for example with node --env-file=.env.local'
+		);
 	}
 	const dir = `${ftcRoot}${code}/`;
 	const meta: Record<string, { path: string; status: number; lastModified: string | null }> = {};
@@ -103,7 +108,10 @@ async function recordScout() {
 		['team-missing', () => fetchTeamSeason(999998, 2026, scout)],
 		['events-on-2026-11-14', () => fetchEventsOnDate('2026-11-14', scout)],
 		['quick-stats-2025', () => fetchQuickStats([2844, 18420, 26670, 999998], 2025, scout)],
-		['season-matches-2026-09-19', () => fetchSeasonMatches({ start: '2026-09-19', end: '2026-09-20' }, scout)]
+		[
+			'season-matches-2026-09-19',
+			() => fetchSeasonMatches({ start: '2026-09-19', end: '2026-09-20' }, scout)
+		]
 	];
 	for (const [file, job] of jobs) {
 		name = file;
