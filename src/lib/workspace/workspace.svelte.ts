@@ -142,7 +142,7 @@ export class Workspace {
 		const next = change(current);
 		if (Object.is(next, current)) return;
 		this.docs = withDoc(this.docs, name, next);
-		const queue = this.#pending[name] ?? [];
+		const queue: AnyChange[] = this.#pending[name] ?? [];
 		queue.push(change as unknown as AnyChange);
 		this.#pending[name] = queue;
 		this.sync = 'saving';
