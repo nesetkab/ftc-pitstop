@@ -24,3 +24,5 @@ vite.config.ts.timestamp-*
 .env*
 
 .claude/worktrees/
+# Backtest cache
+.cache/

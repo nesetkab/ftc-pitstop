@@ -1,0 +1,2677 @@
+{
+	"source": "FTCScout GraphQL, season 2026, event USAZGIQ, fetched 2026-11-19",
+	"event": {
+		"code": "USAZGIQ",
+		"start": "2026-11-14",
+		"end": "2026-11-14",
+		"official": true,
+		"matches": [
+			{
+				"key": "q1",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 1,
+				"time": 1794677597955,
+				"scheduledTime": 1794677400000,
+				"actualTime": 1794677597955,
+				"red": [
+					26670,
+					32043
+				],
+				"blue": [
+					26128,
+					38444
+				],
+				"redScore": 89,
+				"blueScore": 83,
+				"redNp": 89,
+				"blueNp": 83,
+				"redDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 61,
+					"hivePoints": 74,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						0
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 11,
+					"teleopPoints": 72,
+					"hivePoints": 60,
+					"tips": 3,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q2",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 2,
+				"time": 1794677979683,
+				"scheduledTime": 1794677790000,
+				"actualTime": 1794677979683,
+				"red": [
+					2844,
+					22257
+				],
+				"blue": [
+					21579,
+					15135
+				],
+				"redScore": 50,
+				"blueScore": 67,
+				"redNp": 50,
+				"blueNp": 67,
+				"redDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 22,
+					"hivePoints": 42,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 5,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						0
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 33,
+					"teleopPoints": 34,
+					"hivePoints": 42,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 20,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						10
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q3",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 3,
+				"time": 1794678533815,
+				"scheduledTime": 1794678180000,
+				"actualTime": 1794678533815,
+				"red": [
+					32040,
+					11980
+				],
+				"blue": [
+					35802,
+					36980
+				],
+				"redScore": 39,
+				"blueScore": 50,
+				"redNp": 39,
+				"blueNp": 50,
+				"redDetail": {
+					"autoPoints": 3,
+					"teleopPoints": 36,
+					"hivePoints": 24,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 23,
+					"teleopPoints": 27,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 5,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						0,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q4",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 4,
+				"time": 1794678852007,
+				"scheduledTime": 1794678570000,
+				"actualTime": 1794678852007,
+				"red": [
+					18421,
+					18420
+				],
+				"blue": [
+					16647,
+					25620
+				],
+				"redScore": 108,
+				"blueScore": 37,
+				"redNp": 108,
+				"blueNp": 37,
+				"redDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 77,
+					"hivePoints": 86,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 23,
+					"teleopPoints": 14,
+					"hivePoints": 22,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q5",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 5,
+				"time": 1794679258754,
+				"scheduledTime": 1794678960000,
+				"actualTime": 1794679258754,
+				"red": [
+					15058,
+					14624
+				],
+				"blue": [
+					10246,
+					26635
+				],
+				"redScore": 36,
+				"blueScore": 26,
+				"redNp": 36,
+				"blueNp": 21,
+				"redDetail": {
+					"autoPoints": 13,
+					"teleopPoints": 23,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 5,
+					"robotSwarm": [
+						8,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 0,
+					"teleopPoints": 21,
+					"hivePoints": 10,
+					"tips": 0,
+					"leavePoints": 0,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q6",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 6,
+				"time": 1794679594306,
+				"scheduledTime": 1794679350000,
+				"actualTime": 1794679594306,
+				"red": [
+					35849,
+					10984
+				],
+				"blue": [
+					18625,
+					22258
+				],
+				"redScore": 45,
+				"blueScore": 28,
+				"redNp": 45,
+				"blueNp": 28,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 37,
+					"hivePoints": 26,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 3,
+					"teleopPoints": 25,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 5,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						0,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q7",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 7,
+				"time": 1794679960775,
+				"scheduledTime": 1794679740000,
+				"actualTime": 1794679960775,
+				"red": [
+					14254,
+					37557
+				],
+				"blue": [
+					12841,
+					35802
+				],
+				"redScore": 47,
+				"blueScore": 54,
+				"redNp": 47,
+				"blueNp": 54,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 39,
+					"hivePoints": 34,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						0,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 46,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q8",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 8,
+				"time": 1794680380653,
+				"scheduledTime": 1794680130000,
+				"actualTime": 1794680380653,
+				"red": [
+					16647,
+					21579
+				],
+				"blue": [
+					10246,
+					38444
+				],
+				"redScore": 75,
+				"blueScore": 26,
+				"redNp": 75,
+				"blueNp": 21,
+				"redDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 39,
+					"hivePoints": 42,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 20,
+					"gardenPoints": 7,
+					"flowerPoints": 0,
+					"fouls": 5,
+					"robotSwarm": [
+						13,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 3,
+					"teleopPoints": 18,
+					"hivePoints": 8,
+					"tips": 0,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q9",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 9,
+				"time": 1794680707244,
+				"scheduledTime": 1794680520000,
+				"actualTime": 1794680707244,
+				"red": [
+					22258,
+					11980
+				],
+				"blue": [
+					26635,
+					18420
+				],
+				"redScore": 51,
+				"blueScore": 77,
+				"redNp": 51,
+				"blueNp": 77,
+				"redDetail": {
+					"autoPoints": 16,
+					"teleopPoints": 35,
+					"hivePoints": 28,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 23,
+					"teleopPoints": 54,
+					"hivePoints": 60,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 4,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q10",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 10,
+				"time": 1794681048266,
+				"scheduledTime": 1794680910000,
+				"actualTime": 1794681048266,
+				"red": [
+					14254,
+					18421
+				],
+				"blue": [
+					32043,
+					36980
+				],
+				"redScore": 68,
+				"blueScore": 64,
+				"redNp": 68,
+				"blueNp": 64,
+				"redDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 37,
+					"hivePoints": 44,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 28,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q11",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 11,
+				"time": 1794681502599,
+				"scheduledTime": 1794681300000,
+				"actualTime": 1794681502599,
+				"red": [
+					15135,
+					12841
+				],
+				"blue": [
+					32040,
+					18625
+				],
+				"redScore": 52,
+				"blueScore": 34,
+				"redNp": 52,
+				"blueNp": 34,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 44,
+					"hivePoints": 30,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 4,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						10
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 26,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						0,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q12",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 12,
+				"time": 1794681956794,
+				"scheduledTime": 1794681690000,
+				"actualTime": 1794681956794,
+				"red": [
+					37557,
+					26670
+				],
+				"blue": [
+					10984,
+					25620
+				],
+				"redScore": 110,
+				"blueScore": 68,
+				"redNp": 110,
+				"blueNp": 68,
+				"redDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 74,
+					"hivePoints": 92,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 5,
+					"teleopPoints": 63,
+					"hivePoints": 50,
+					"tips": 2,
+					"leavePoints": 0,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						10
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q13",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 13,
+				"time": 1794682463817,
+				"scheduledTime": 1794682080000,
+				"actualTime": 1794682463817,
+				"red": [
+					35849,
+					26128
+				],
+				"blue": [
+					15058,
+					2844
+				],
+				"redScore": 57,
+				"blueScore": 63,
+				"redNp": 57,
+				"blueNp": 63,
+				"redDetail": {
+					"autoPoints": 5,
+					"teleopPoints": 52,
+					"hivePoints": 44,
+					"tips": 2,
+					"leavePoints": 0,
+					"parkPoints": 10,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 33,
+					"teleopPoints": 30,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 20,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						10
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q14",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 14,
+				"time": 1794682833843,
+				"scheduledTime": 1794682470000,
+				"actualTime": 1794682833843,
+				"red": [
+					22257,
+					38444
+				],
+				"blue": [
+					14624,
+					18421
+				],
+				"redScore": 26,
+				"blueScore": 74,
+				"redNp": 26,
+				"blueNp": 74,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 18,
+					"hivePoints": 8,
+					"tips": 0,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 46,
+					"hivePoints": 60,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q15",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 15,
+				"time": 1794683123660,
+				"scheduledTime": 1794682860000,
+				"actualTime": 1794683123660,
+				"red": [
+					15135,
+					16647
+				],
+				"blue": [
+					36980,
+					26670
+				],
+				"redScore": 49,
+				"blueScore": 102,
+				"redNp": 49,
+				"blueNp": 102,
+				"redDetail": {
+					"autoPoints": 16,
+					"teleopPoints": 33,
+					"hivePoints": 28,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 71,
+					"hivePoints": 84,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						8
+					]
+				},
+				"surrogates": [
+					15135
+				],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q16",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 16,
+				"time": 1794683486676,
+				"scheduledTime": 1794683250000,
+				"actualTime": 1794683486676,
+				"red": [
+					11980,
+					10246
+				],
+				"blue": [
+					37557,
+					26128
+				],
+				"redScore": 19,
+				"blueScore": 114,
+				"redNp": 19,
+				"blueNp": 114,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 11,
+					"hivePoints": 6,
+					"tips": 0,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 83,
+					"hivePoints": 90,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q17",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 17,
+				"time": 1794686689729,
+				"scheduledTime": 1794686400000,
+				"actualTime": 1794686689729,
+				"red": [
+					14624,
+					2844
+				],
+				"blue": [
+					10984,
+					32040
+				],
+				"redScore": 61,
+				"blueScore": 22,
+				"redNp": 61,
+				"blueNp": 22,
+				"redDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 33,
+					"hivePoints": 42,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 0,
+					"teleopPoints": 22,
+					"hivePoints": 8,
+					"tips": 0,
+					"leavePoints": 0,
+					"parkPoints": 10,
+					"gardenPoints": 4,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q18",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 18,
+				"time": 1794687134871,
+				"scheduledTime": 1794686790000,
+				"actualTime": 1794687134871,
+				"red": [
+					18625,
+					26635
+				],
+				"blue": [
+					22257,
+					35802
+				],
+				"redScore": 19,
+				"blueScore": 40,
+				"redNp": 19,
+				"blueNp": 40,
+				"redDetail": {
+					"autoPoints": 3,
+					"teleopPoints": 16,
+					"hivePoints": 6,
+					"tips": 0,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 3,
+					"teleopPoints": 37,
+					"hivePoints": 26,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q19",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 19,
+				"time": 1794687457421,
+				"scheduledTime": 1794687180000,
+				"actualTime": 1794687457421,
+				"red": [
+					18420,
+					32043
+				],
+				"blue": [
+					12841,
+					35849
+				],
+				"redScore": 99,
+				"blueScore": 51,
+				"redNp": 99,
+				"blueNp": 46,
+				"redDetail": {
+					"autoPoints": 23,
+					"teleopPoints": 76,
+					"hivePoints": 90,
+					"tips": 4,
+					"leavePoints": 3,
+					"parkPoints": 5,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 5,
+					"robotSwarm": [
+						8,
+						0
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 16,
+					"teleopPoints": 30,
+					"hivePoints": 24,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q20",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 20,
+				"time": 1794687846980,
+				"scheduledTime": 1794687570000,
+				"actualTime": 1794687846980,
+				"red": [
+					21579,
+					15058
+				],
+				"blue": [
+					22258,
+					14254
+				],
+				"redScore": 56,
+				"blueScore": 32,
+				"redNp": 56,
+				"blueNp": 32,
+				"redDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 20,
+					"hivePoints": 30,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 20,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 6,
+					"teleopPoints": 26,
+					"hivePoints": 26,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 0,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						3,
+						3
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q21",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 21,
+				"time": 1794688219009,
+				"scheduledTime": 1794687960000,
+				"actualTime": 1794688219009,
+				"red": [
+					25620,
+					36980
+				],
+				"blue": [
+					2844,
+					10246
+				],
+				"redScore": 86,
+				"blueScore": 71,
+				"redNp": 86,
+				"blueNp": 71,
+				"redDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 58,
+					"hivePoints": 72,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						0,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 43,
+					"hivePoints": 52,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q22",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 22,
+				"time": 1794688492333,
+				"scheduledTime": 1794688350000,
+				"actualTime": 1794688492333,
+				"red": [
+					12841,
+					26635
+				],
+				"blue": [
+					26670,
+					18421
+				],
+				"redScore": 45,
+				"blueScore": 97,
+				"redNp": 45,
+				"blueNp": 97,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 37,
+					"hivePoints": 26,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 66,
+					"hivePoints": 80,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q23",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 23,
+				"time": 1794688944205,
+				"scheduledTime": 1794688740000,
+				"actualTime": 1794688944205,
+				"red": [
+					10984,
+					35802
+				],
+				"blue": [
+					26128,
+					21579
+				],
+				"redScore": 34,
+				"blueScore": 84,
+				"redNp": 34,
+				"blueNp": 84,
+				"redDetail": {
+					"autoPoints": 6,
+					"teleopPoints": 28,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 5,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						3
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 33,
+					"teleopPoints": 51,
+					"hivePoints": 60,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 20,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						10
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q24",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 24,
+				"time": 1794689251779,
+				"scheduledTime": 1794689130000,
+				"actualTime": 1794689251779,
+				"red": [
+					38444,
+					14254
+				],
+				"blue": [
+					15135,
+					35849
+				],
+				"redScore": 29,
+				"blueScore": 61,
+				"redNp": 29,
+				"blueNp": 61,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 21,
+					"hivePoints": 8,
+					"tips": 0,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						10
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 16,
+					"teleopPoints": 45,
+					"hivePoints": 32,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 20,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q25",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 25,
+				"time": 1794689577848,
+				"scheduledTime": 1794689520000,
+				"actualTime": 1794689577848,
+				"red": [
+					18625,
+					16647
+				],
+				"blue": [
+					11980,
+					15058
+				],
+				"redScore": 39,
+				"blueScore": 43,
+				"redNp": 39,
+				"blueNp": 43,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 31,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 10,
+					"teleopPoints": 33,
+					"hivePoints": 22,
+					"tips": 1,
+					"leavePoints": 0,
+					"parkPoints": 20,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						10
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q26",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 26,
+				"time": 1794689877982,
+				"scheduledTime": 1794689910000,
+				"actualTime": 1794689877982,
+				"red": [
+					25620,
+					14624
+				],
+				"blue": [
+					32043,
+					22258
+				],
+				"redScore": 75,
+				"blueScore": 64,
+				"redNp": 75,
+				"blueNp": 64,
+				"redDetail": {
+					"autoPoints": 11,
+					"teleopPoints": 64,
+					"hivePoints": 54,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 36,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 6,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q27",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 27,
+				"time": 1794690207075,
+				"scheduledTime": 1794690300000,
+				"actualTime": 1794690207075,
+				"red": [
+					37557,
+					18420
+				],
+				"blue": [
+					22257,
+					32040
+				],
+				"redScore": 114,
+				"blueScore": 34,
+				"redNp": 114,
+				"blueNp": 34,
+				"redDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 78,
+					"hivePoints": 92,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 5,
+					"teleopPoints": 29,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 0,
+					"parkPoints": 10,
+					"gardenPoints": 4,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						0
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q28",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 28,
+				"time": 1794690851775,
+				"scheduledTime": 1794690690000,
+				"actualTime": 1794690851775,
+				"red": [
+					15135,
+					10984
+				],
+				"blue": [
+					18421,
+					15058
+				],
+				"redScore": 41,
+				"blueScore": 70,
+				"redNp": 41,
+				"blueNp": 70,
+				"redDetail": {
+					"autoPoints": 16,
+					"teleopPoints": 25,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 39,
+					"hivePoints": 48,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q29",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 29,
+				"time": 1794691151190,
+				"scheduledTime": 1794691080000,
+				"actualTime": 1794691151190,
+				"red": [
+					22258,
+					12841
+				],
+				"blue": [
+					38444,
+					2844
+				],
+				"redScore": 86,
+				"blueScore": 75,
+				"redNp": 86,
+				"blueNp": 75,
+				"redDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 55,
+					"hivePoints": 64,
+					"tips": 3,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 47,
+					"hivePoints": 62,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q30",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 30,
+				"time": 1794691457934,
+				"scheduledTime": 1794691470000,
+				"actualTime": 1794691457934,
+				"red": [
+					32043,
+					37557
+				],
+				"blue": [
+					26635,
+					16647
+				],
+				"redScore": 22,
+				"blueScore": 23,
+				"redNp": 22,
+				"blueNp": 23,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 14,
+					"hivePoints": 8,
+					"tips": 0,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						3
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 10,
+					"teleopPoints": 13,
+					"hivePoints": 6,
+					"tips": 0,
+					"leavePoints": 0,
+					"parkPoints": 15,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q31",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 31,
+				"time": 1794691892414,
+				"scheduledTime": 1794691860000,
+				"actualTime": 1794691892414,
+				"red": [
+					36980,
+					18625
+				],
+				"blue": [
+					26128,
+					14624
+				],
+				"redScore": 56,
+				"blueScore": 60,
+				"redNp": 56,
+				"blueNp": 60,
+				"redDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 25,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						3
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 52,
+					"hivePoints": 42,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q32",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 32,
+				"time": 1794692239674,
+				"scheduledTime": 1794692250000,
+				"actualTime": 1794692239674,
+				"red": [
+					32040,
+					35849
+				],
+				"blue": [
+					26670,
+					21579
+				],
+				"redScore": 46,
+				"blueScore": 77,
+				"redNp": 46,
+				"blueNp": 77,
+				"redDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 38,
+					"hivePoints": 28,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						5,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 41,
+					"hivePoints": 60,
+					"tips": 3,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q33",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 33,
+				"time": 1794692524427,
+				"scheduledTime": 1794692640000,
+				"actualTime": 1794692524427,
+				"red": [
+					25620,
+					22257
+				],
+				"blue": [
+					11980,
+					14254
+				],
+				"redScore": 84,
+				"blueScore": 47,
+				"redNp": 84,
+				"blueNp": 47,
+				"redDetail": {
+					"autoPoints": 13,
+					"teleopPoints": 71,
+					"hivePoints": 64,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 11,
+					"teleopPoints": 36,
+					"hivePoints": 26,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "q34",
+				"eventCode": "USAZGIQ",
+				"level": "qual",
+				"series": 0,
+				"number": 34,
+				"time": 1794693218003,
+				"scheduledTime": 1794693030000,
+				"actualTime": 1794693218003,
+				"red": [
+					35802,
+					10246
+				],
+				"blue": [
+					18420,
+					15135
+				],
+				"redScore": 36,
+				"blueScore": 86,
+				"redNp": 36,
+				"blueNp": 86,
+				"redDetail": {
+					"autoPoints": 11,
+					"teleopPoints": 25,
+					"hivePoints": 20,
+					"tips": 1,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						3,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 78,
+					"hivePoints": 66,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						10
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p1",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 1,
+				"number": 1,
+				"time": 1794695923404,
+				"scheduledTime": 1794695700000,
+				"actualTime": 1794695923404,
+				"red": [
+					15058,
+					15135
+				],
+				"blue": [
+					14624,
+					2844
+				],
+				"redScore": 48,
+				"blueScore": 51,
+				"redNp": 48,
+				"blueNp": 51,
+				"redDetail": {
+					"autoPoints": 13,
+					"teleopPoints": 35,
+					"hivePoints": 24,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 20,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 23,
+					"hivePoints": 32,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p2",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 2,
+				"number": 1,
+				"time": 1794696200822,
+				"scheduledTime": 1794696060000,
+				"actualTime": 1794696200822,
+				"red": [
+					21579,
+					26128
+				],
+				"blue": [
+					37557,
+					12841
+				],
+				"redScore": 67,
+				"blueScore": 54,
+				"redNp": 67,
+				"blueNp": 54,
+				"redDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 31,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 20,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 26,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						3,
+						10
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p3",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 3,
+				"number": 1,
+				"time": 1794696709528,
+				"scheduledTime": 1794696420000,
+				"actualTime": 1794696709528,
+				"red": [
+					26670,
+					18421
+				],
+				"blue": [
+					14624,
+					2844
+				],
+				"redScore": 130,
+				"blueScore": 76,
+				"redNp": 110,
+				"blueNp": 76,
+				"redDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 79,
+					"hivePoints": 88,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 11,
+					"teleopPoints": 65,
+					"hivePoints": 52,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 20,
+					"robotSwarm": [
+						13,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p4",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 4,
+				"number": 1,
+				"time": 1794697045893,
+				"scheduledTime": 1794696780000,
+				"actualTime": 1794697045893,
+				"red": [
+					18420,
+					25620
+				],
+				"blue": [
+					21579,
+					26128
+				],
+				"redScore": 106,
+				"blueScore": 72,
+				"redNp": 106,
+				"blueNp": 72,
+				"redDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 70,
+					"hivePoints": 80,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 20,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 13,
+					"teleopPoints": 59,
+					"hivePoints": 44,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 20,
+					"gardenPoints": 5,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						10,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p5",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 5,
+				"number": 1,
+				"time": 1794697482372,
+				"scheduledTime": 1794697140000,
+				"actualTime": 1794697482372,
+				"red": [
+					14624,
+					2844
+				],
+				"blue": [
+					37557,
+					12841
+				],
+				"redScore": 58,
+				"blueScore": 68,
+				"redNp": 58,
+				"blueNp": 68,
+				"redDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 27,
+					"hivePoints": 46,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 5,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						3,
+						8
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 37,
+					"hivePoints": 46,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p6",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 6,
+				"number": 1,
+				"time": 1794697826023,
+				"scheduledTime": 1794697500000,
+				"actualTime": 1794697826023,
+				"red": [
+					21579,
+					26128
+				],
+				"blue": [
+					15058,
+					15135
+				],
+				"redScore": 94,
+				"blueScore": 47,
+				"redNp": 74,
+				"blueNp": 47,
+				"redDetail": {
+					"autoPoints": 33,
+					"teleopPoints": 41,
+					"hivePoints": 54,
+					"tips": 2,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						10
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 13,
+					"teleopPoints": 34,
+					"hivePoints": 24,
+					"tips": 1,
+					"leavePoints": 3,
+					"parkPoints": 20,
+					"gardenPoints": 0,
+					"flowerPoints": 0,
+					"fouls": 20,
+					"robotSwarm": [
+						10,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p7",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 7,
+				"number": 1,
+				"time": 1794698237934,
+				"scheduledTime": 1794697860000,
+				"actualTime": 1794698237934,
+				"red": [
+					26670,
+					18421
+				],
+				"blue": [
+					18420,
+					25620
+				],
+				"redScore": 97,
+				"blueScore": 156,
+				"redNp": 97,
+				"blueNp": 136,
+				"redDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 66,
+					"hivePoints": 80,
+					"tips": 4,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 20,
+					"robotSwarm": [
+						3,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 31,
+					"teleopPoints": 105,
+					"hivePoints": 112,
+					"tips": 5,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p8",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 8,
+				"number": 1,
+				"time": 1794698569335,
+				"scheduledTime": 1794698220000,
+				"actualTime": 1794698569335,
+				"red": [
+					21579,
+					26128
+				],
+				"blue": [
+					37557,
+					12841
+				],
+				"redScore": 80,
+				"blueScore": 68,
+				"redNp": 80,
+				"blueNp": 68,
+				"redDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 52,
+					"hivePoints": 60,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						10
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 11,
+					"teleopPoints": 57,
+					"hivePoints": 46,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 15,
+					"gardenPoints": 1,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						13
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p9",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 9,
+				"number": 1,
+				"time": 1794699554958,
+				"scheduledTime": 1794699300000,
+				"actualTime": 1794699554958,
+				"red": [
+					26670,
+					18421
+				],
+				"blue": [
+					21579,
+					26128
+				],
+				"redScore": 86,
+				"blueScore": 58,
+				"redNp": 86,
+				"blueNp": 58,
+				"redDetail": {
+					"autoPoints": 28,
+					"teleopPoints": 58,
+					"hivePoints": 70,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 10,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						5
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 22,
+					"hivePoints": 40,
+					"tips": 2,
+					"leavePoints": 6,
+					"parkPoints": 10,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						8,
+						8
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			},
+			{
+				"key": "p10",
+				"eventCode": "USAZGIQ",
+				"level": "playoff",
+				"series": 10,
+				"number": 1,
+				"time": 1794700440884,
+				"scheduledTime": 1794700380000,
+				"actualTime": 1794700440884,
+				"red": [
+					18420,
+					25620
+				],
+				"blue": [
+					26670,
+					18421
+				],
+				"redScore": 178,
+				"blueScore": 81,
+				"redNp": 178,
+				"blueNp": 81,
+				"redDetail": {
+					"autoPoints": 36,
+					"teleopPoints": 142,
+					"hivePoints": 150,
+					"tips": 7,
+					"leavePoints": 6,
+					"parkPoints": 20,
+					"gardenPoints": 2,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						13
+					]
+				},
+				"blueDetail": {
+					"autoPoints": 8,
+					"teleopPoints": 73,
+					"hivePoints": 60,
+					"tips": 3,
+					"leavePoints": 3,
+					"parkPoints": 15,
+					"gardenPoints": 3,
+					"flowerPoints": 0,
+					"fouls": 0,
+					"robotSwarm": [
+						13,
+						5
+					]
+				},
+				"surrogates": [],
+				"noShows": [],
+				"dqs": []
+			}
+		]
+	},
+	"rankings": [
+		{
+			"team": 26670,
+			"rank": 1,
+			"rs": 4.4,
+			"tbp": 95,
+			"tips": 3.6,
+			"played": 5
+		},
+		{
+			"team": 18420,
+			"rank": 2,
+			"rs": 4.2,
+			"tbp": 96.8,
+			"tips": 3.6,
+			"played": 5
+		},
+		{
+			"team": 18421,
+			"rank": 3,
+			"rs": 4.2,
+			"tbp": 83.4,
+			"tips": 3,
+			"played": 5
+		},
+		{
+			"team": 21579,
+			"rank": 4,
+			"rs": 4,
+			"tbp": 71.8,
+			"tips": 2.2,
+			"played": 5
+		},
+		{
+			"team": 15058,
+			"rank": 5,
+			"rs": 3.8,
+			"tbp": 53.6,
+			"tips": 1.4,
+			"played": 5
+		},
+		{
+			"team": 14624,
+			"rank": 6,
+			"rs": 3.6,
+			"tbp": 61.2,
+			"tips": 2,
+			"played": 5
+		},
+		{
+			"team": 15135,
+			"rank": 7,
+			"rs": 3.4,
+			"tbp": 61.4,
+			"tips": 1.6,
+			"played": 5
+		},
+		{
+			"team": 37557,
+			"rank": 8,
+			"rs": 3,
+			"tbp": 81.4,
+			"tips": 2.6,
+			"played": 5
+		},
+		{
+			"team": 26128,
+			"rank": 9,
+			"rs": 2.8,
+			"tbp": 79.6,
+			"tips": 2.8,
+			"played": 5
+		},
+		{
+			"team": 36980,
+			"rank": 10,
+			"rs": 2.6,
+			"tbp": 71.6,
+			"tips": 2.6,
+			"played": 5
+		},
+		{
+			"team": 12841,
+			"rank": 11,
+			"rs": 2.6,
+			"tbp": 56.6,
+			"tips": 1.6,
+			"played": 5
+		},
+		{
+			"team": 25620,
+			"rank": 12,
+			"rs": 2.2,
+			"tbp": 70,
+			"tips": 2.2,
+			"played": 5
+		},
+		{
+			"team": 35849,
+			"rank": 13,
+			"rs": 2,
+			"tbp": 51,
+			"tips": 1.2,
+			"played": 5
+		},
+		{
+			"team": 35802,
+			"rank": 14,
+			"rs": 2,
+			"tbp": 42.8,
+			"tips": 1.4,
+			"played": 5
+		},
+		{
+			"team": 32043,
+			"rank": 15,
+			"rs": 1.8,
+			"tbp": 67.6,
+			"tips": 2.2,
+			"played": 5
+		},
+		{
+			"team": 2844,
+			"rank": 16,
+			"rs": 1.8,
+			"tbp": 64,
+			"tips": 2.2,
+			"played": 5
+		},
+		{
+			"team": 16647,
+			"rank": 17,
+			"rs": 1.8,
+			"tbp": 44.6,
+			"tips": 1,
+			"played": 5
+		},
+		{
+			"team": 22257,
+			"rank": 18,
+			"rs": 1.6,
+			"tbp": 46.8,
+			"tips": 1.4,
+			"played": 5
+		},
+		{
+			"team": 26635,
+			"rank": 19,
+			"rs": 1.4,
+			"tbp": 37,
+			"tips": 0.8,
+			"played": 5
+		},
+		{
+			"team": 22258,
+			"rank": 20,
+			"rs": 1.2,
+			"tbp": 52.2,
+			"tips": 1.6,
+			"played": 5
+		},
+		{
+			"team": 14254,
+			"rank": 21,
+			"rs": 1.2,
+			"tbp": 44.6,
+			"tips": 1,
+			"played": 5
+		},
+		{
+			"team": 11980,
+			"rank": 22,
+			"rs": 1.2,
+			"tbp": 39.8,
+			"tips": 0.8,
+			"played": 5
+		},
+		{
+			"team": 10984,
+			"rank": 23,
+			"rs": 1,
+			"tbp": 42,
+			"tips": 1,
+			"played": 5
+		},
+		{
+			"team": 38444,
+			"rank": 24,
+			"rs": 0.6,
+			"tbp": 46.8,
+			"tips": 1.2,
+			"played": 5
+		},
+		{
+			"team": 18625,
+			"rank": 25,
+			"rs": 0.4,
+			"tbp": 35.2,
+			"tips": 1,
+			"played": 5
+		},
+		{
+			"team": 10246,
+			"rank": 26,
+			"rs": 0.4,
+			"tbp": 33.6,
+			"tips": 0.6,
+			"played": 5
+		},
+		{
+			"team": 32040,
+			"rank": 27,
+			"rs": 0.2,
+			"tbp": 35,
+			"tips": 0.8,
+			"played": 5
+		}
+	],
+	"alliances": [
+		[
+			26670,
+			18421
+		],
+		[
+			18420,
+			25620
+		],
+		[
+			21579,
+			26128
+		],
+		[
+			15058,
+			15135
+		],
+		[
+			14624,
+			2844
+		],
+		[
+			37557,
+			12841
+		]
+	]
+}
