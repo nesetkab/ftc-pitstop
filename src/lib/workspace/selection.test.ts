@@ -17,7 +17,8 @@ import {
 	parkAverages,
 	refreshInterval,
 	selectionTable,
-	takenLabel
+	takenLabel,
+	takenLabels
 } from '#lib/workspace/selection.ts';
 import { fixture, fixtureFetch, scoutFetch } from '../../../tests/data/helpers.ts';
 
@@ -185,20 +186,34 @@ describe('refreshing', () => {
 		expect(refreshInterval('upcoming')).toBeNull();
 	});
 
-	it('notices when a pick or a result changes', () => {
+	it('notices when a pick or the phase changes', () => {
 		const before = bundleSignature({ ...bundle, alliances: afterRound(1, 2, 3, 4) });
 		expect(bundleSignature({ ...bundle, alliances: afterRound(1, 2, 3, 4) })).toBe(before);
 		expect(bundleSignature({ ...bundle, alliances: afterRound(1, 2, 3, 4, 5) })).not.toBe(before);
 		expect(
-			bundleSignature({
-				...bundle,
-				alliances: afterRound(1, 2, 3, 4),
-				matches: bundle.matches.slice(0, 10)
-			})
-		).not.toBe(before);
-		expect(
 			bundleSignature({ ...bundle, alliances: afterRound(1, 2, 3, 4), phase: 'playoffs' })
 		).not.toBe(before);
+	});
+
+	it('only follows match results once the playoffs start', () => {
+		const some = bundle.matches.slice(0, 10);
+		const during = { ...bundle, phase: 'selection' as const };
+		expect(bundleSignature({ ...during, matches: some })).toBe(
+			bundleSignature({ ...during, matches: bundle.matches })
+		);
+		const playoffs = { ...bundle, phase: 'playoffs' as const };
+		expect(bundleSignature({ ...playoffs, matches: some })).not.toBe(
+			bundleSignature({ ...playoffs, matches: bundle.matches })
+		);
+	});
+
+	it('labels every taken team for the pick list', () => {
+		const labels = takenLabels(deriveSelection(afterRound(1, 2, 3, 4)));
+		expect(labels.get(26670)).toBe('Captain of alliance 1');
+		expect(labels.get(18421)).toBe('Picked by alliance 1');
+		expect(labels.get(14624)).toBe('Captain of alliance 5');
+		expect(labels.has(37557)).toBe(false);
+		expect(labels.size).toBe(9);
 	});
 });
 

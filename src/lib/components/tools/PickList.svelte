@@ -24,9 +24,18 @@
 		lookupName?: (team: number) => Promise<string | null>;
 		share?: Snippet;
 		title?: string;
+		showEvent?: boolean;
 	}
 
-	let { list, update, auto, lookupName, share, title = 'Pick list' }: Props = $props();
+	let {
+		list,
+		update,
+		auto,
+		lookupName,
+		share,
+		title = 'Pick list',
+		showEvent = true
+	}: Props = $props();
 
 	interface Drag {
 		team: number;
@@ -264,7 +273,7 @@
 		{/if}
 	{/if}
 
-	{#if update || list.event}
+	{#if showEvent && (update || list.event)}
 		<div class="event">
 			<label class="ctl-label" for="{id}-event">Event code</label>
 			{#if update}
@@ -297,6 +306,7 @@
 
 <style>
 	.picklist {
+		container-type: inline-size;
 		display: grid;
 		gap: 12px;
 		align-content: start;
@@ -452,7 +462,7 @@
 		font-size: 14px;
 	}
 
-	@media (max-width: 640px) {
+	@container (max-width: 520px) {
 		.row {
 			grid-template-columns: 22px minmax(0, 1fr) auto;
 			grid-template-areas:

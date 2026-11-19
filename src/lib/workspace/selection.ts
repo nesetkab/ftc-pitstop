@@ -114,7 +114,10 @@ export function refreshInterval(phase: EventPhase): number | null {
 export function bundleSignature(
 	bundle: Pick<EventBundle, 'alliances' | 'matches' | 'phase'>
 ): string {
-	const played = bundle.matches.filter((match) => match.result !== null).length;
+	const played =
+		bundle.phase === 'playoffs'
+			? bundle.matches.filter((match) => match.result !== null).length
+			: 0;
 	return JSON.stringify([bundle.phase, played, bundle.alliances]);
 }
 
