@@ -1,11 +1,9 @@
-import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vitest/config';
 import adapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
 
 export default defineConfig({
 	plugins: [
-		tailwindcss(),
 		sveltekit({
 			compilerOptions: {
 				runes: ({ filename }) =>
