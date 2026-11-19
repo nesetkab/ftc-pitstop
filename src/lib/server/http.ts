@@ -4,6 +4,7 @@ export const CACHE_CONTROL = {
 	live: 'public, s-maxage=30, stale-while-revalidate=300',
 	finished: 'public, s-maxage=86400',
 	list: 'public, s-maxage=3600, stale-while-revalidate=86400',
+	ratings: 'public, s-maxage=900, stale-while-revalidate=86400',
 	short: 'public, s-maxage=300, stale-while-revalidate=3600',
 	queue: 'public, s-maxage=10, stale-while-revalidate=30',
 	missing: 'public, s-maxage=60',
