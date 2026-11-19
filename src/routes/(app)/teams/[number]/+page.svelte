@@ -64,7 +64,7 @@
 </section>
 
 {#if view.awards.length > 0}
-	<section class="panel" aria-labelledby="awards-title">
+	<section class="panel awards" aria-labelledby="awards-title">
 		<h2 class="sec-title" id="awards-title">Awards</h2>
 		<TeamAwards rows={view.awards} />
 	</section>
@@ -87,6 +87,7 @@
 
 	.panel {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: 10px;
 		align-content: start;
 		min-width: 0;
@@ -94,6 +95,10 @@
 
 	.previous {
 		max-width: 520px;
+	}
+
+	.awards {
+		max-width: 720px;
 	}
 
 	@media (max-width: 1060px) {

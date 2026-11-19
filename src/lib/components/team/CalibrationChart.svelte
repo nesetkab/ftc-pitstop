@@ -89,29 +89,31 @@
 	</ul>
 
 	{#if table}
-		<table class="visually-hidden">
-			<caption>{label}</caption>
-			<thead>
-				<tr>
-					<th scope="col">Series</th>
-					<th scope="col">Predicted</th>
-					<th scope="col">Actual</th>
-					<th scope="col">Matches</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each series as entry (entry.label)}
-					{#each entry.bins as bin, index (index)}
-						<tr>
-							<td>{entry.label}</td>
-							<td>{fixed(bin.predicted * 100, 1)}%</td>
-							<td>{fixed(bin.observed * 100, 1)}%</td>
-							<td>{integer(bin.n)}</td>
-						</tr>
+		<div class="visually-hidden">
+			<table>
+				<caption>{label}</caption>
+				<thead>
+					<tr>
+						<th scope="col">Series</th>
+						<th scope="col">Predicted</th>
+						<th scope="col">Actual</th>
+						<th scope="col">Matches</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each series as entry (entry.label)}
+						{#each entry.bins as bin, index (index)}
+							<tr>
+								<td>{entry.label}</td>
+								<td>{fixed(bin.predicted * 100, 1)}%</td>
+								<td>{fixed(bin.observed * 100, 1)}%</td>
+								<td>{integer(bin.n)}</td>
+							</tr>
+						{/each}
 					{/each}
-				{/each}
-			</tbody>
-		</table>
+				</tbody>
+			</table>
+		</div>
 	{/if}
 </div>
 

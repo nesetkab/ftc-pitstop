@@ -31,7 +31,7 @@
 		</dd>
 	</div>
 	<div>
-		<dt>Events</dt>
+		<dt>Events played</dt>
 		<dd>{stats.events}</dd>
 	</div>
 </dl>
@@ -65,5 +65,11 @@
 		font-size: 13px;
 		font-weight: 500;
 		color: var(--text-2);
+	}
+
+	@media (max-width: 600px) {
+		.stats {
+			gap: 12px 20px;
+		}
 	}
 </style>

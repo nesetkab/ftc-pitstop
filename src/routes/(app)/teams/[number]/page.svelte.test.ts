@@ -158,7 +158,7 @@ describe('team page', () => {
 		expect(stat('Season OPR')).toHaveTextContent('58.2');
 		expect(stat('World rank by OPR')).toHaveTextContent('214 of 3,272');
 		expect(stat('Record')).toHaveTextContent('5-0-0');
-		expect(stat('Events')).toHaveTextContent('1');
+		expect(stat('Events played')).toHaveTextContent('1');
 	});
 
 	it('links to the pit display and the phone view', () => {

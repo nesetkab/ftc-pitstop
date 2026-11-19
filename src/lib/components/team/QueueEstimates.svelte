@@ -51,25 +51,25 @@
 				</th>
 			</tr>
 			<tr>
-				<td class="l">Our estimate</td>
+				<td class="l wrap label">Our estimate</td>
 				{#each group.data.estimator as value, index (index)}
 					<td>{fixed(value, 1)}</td>
 				{/each}
 			</tr>
 			<tr>
-				<td class="l">Printed schedule plus current delay</td>
+				<td class="l wrap label">Printed schedule plus current delay</td>
 				{#each group.data.delay as value, index (index)}
 					<td>{fixed(value, 1)}</td>
 				{/each}
 			</tr>
 			<tr>
-				<td class="l">Printed schedule</td>
+				<td class="l wrap label">Printed schedule</td>
 				{#each group.data.scheduled as value, index (index)}
 					<td>{fixed(value, 1)}</td>
 				{/each}
 			</tr>
 			<tr class="dim">
-				<td class="l">Estimates measured</td>
+				<td class="l wrap label">Estimates measured</td>
 				{#each group.data.n as value, index (index)}
 					<td>{integer(value)}</td>
 				{/each}
@@ -79,6 +79,10 @@
 </Table>
 
 <style>
+	td.label {
+		min-width: 9em;
+	}
+
 	th.section {
 		padding: 22px 10px 8px;
 		font-size: 14px;

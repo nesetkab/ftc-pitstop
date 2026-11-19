@@ -94,6 +94,7 @@
 
 	section {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: 10px;
 		align-content: start;
 	}

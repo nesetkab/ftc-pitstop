@@ -55,7 +55,7 @@
 	<section aria-labelledby="your-teams">
 		<h2 class="sec-title" id="your-teams">Your teams</h2>
 		{#if teams.length === 0}
-			<p class="muted">Follow a team from its page and it will show up here.</p>
+			<p class="muted hint">Follow a team from its page and it will show up here.</p>
 		{:else}
 			<Table>
 				<thead>
@@ -101,7 +101,12 @@
 <style>
 	section {
 		display: grid;
+		grid-template-columns: minmax(0, 1fr);
 		gap: 10px;
+	}
+
+	.hint {
+		font-size: 14px;
 	}
 
 	.faint {

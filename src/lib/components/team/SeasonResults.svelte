@@ -41,7 +41,7 @@
 				{@const result = season.models[model.id]}
 				{#if result}
 					<tr class:chosen={model.id === chosen}>
-						<td class="l wrap">
+						<td class="l wrap model">
 							{model.label}
 							{#if model.id === chosen}
 								<span class="tag">Used on this site</span>
@@ -73,8 +73,19 @@
 		font-weight: 400;
 	}
 
+	td.model {
+		min-width: 12em;
+	}
+
 	tr.chosen td {
 		background: var(--accent-wash);
+	}
+
+	@media (max-width: 640px) {
+		th.season span {
+			display: block;
+			margin: 2px 0 0;
+		}
 	}
 
 	.tag {

@@ -174,6 +174,15 @@ describe('leaderboard page', () => {
 		expect(screen.queryByRole('table')).not.toBeInTheDocument();
 	});
 
+	it('leaves out the events column when the source has no event counts', () => {
+		show({ rows: base.rows.map((entry) => ({ ...entry, events: null })) });
+		const headers = within(screen.getByRole('table'))
+			.getAllByRole('columnheader')
+			.map((cell) => cell.textContent);
+		expect(headers).not.toContain('Events');
+		expect(bodyRows()[0].querySelectorAll('td')).toHaveLength(8);
+	});
+
 	it('explains the partial list when season ratings are missing', () => {
 		show({ source: 'scout', population: 480 });
 		expect(screen.getByText(/only the top 480 teams are listed/)).toBeInTheDocument();
