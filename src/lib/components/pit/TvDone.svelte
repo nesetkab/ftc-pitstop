@@ -20,7 +20,7 @@
 
 <div class="cols" style:--cols="31em minmax(0, 1fr) 23em">
 	<section>
-		<span class="label">Final rank</span>
+		<span class="tv-label">Final rank</span>
 		{#if ranking}
 			<div class="hero">
 				<b>{ordinal(ranking.rank)}</b>
@@ -39,7 +39,7 @@
 			<p class="sub">Advancing to {view.advancesTo}.</p>
 		{/if}
 		{#if view.awards.length > 0}
-			<span class="label">Our awards</span>
+			<span class="tv-label">Our awards</span>
 			<ul class="ours">
 				{#each view.awards as award (`${award.id}-${award.placement}`)}
 					<li>{awardName(award.name)}</li>
@@ -48,7 +48,7 @@
 		{/if}
 	</section>
 	<section>
-		<span class="label">Awards</span>
+		<span class="tv-label">Awards</span>
 		{#if view.eventAwards.length > 0}
 			<ul class="awards">
 				{#each view.eventAwards as award (`${award.id}-${award.placement}-${award.team}`)}
@@ -66,7 +66,7 @@
 		{/if}
 	</section>
 	<section>
-		<span class="label">Final rankings</span>
+		<span class="tv-label">Final rankings</span>
 		{#if rows.length > 0}
 			<RankTable {rows} team={view.team} names={view.names} caption="Final rankings" />
 		{/if}

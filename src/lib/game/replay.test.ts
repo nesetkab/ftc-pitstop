@@ -125,6 +125,18 @@ describe('replayBundle', () => {
 		expect(after.phase).toBe('playoffs');
 	});
 
+	it('adds playoff matches once the teams in them are known', () => {
+		const keys = (time: number) =>
+			replayBundle(bundle, time)
+				.matches.filter((match) => match.level === 'playoff')
+				.map((match) => match.key);
+		const window = selectionWindow(bundle)!;
+		expect(keys(window.end)).toEqual(['p1', 'p2']);
+		expect(keys(at('M1'))).toEqual(['p1', 'p2', 'p3']);
+		expect(keys(at('M4'))).toEqual(['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7']);
+		expect(keys(at('M10'))).toHaveLength(10);
+	});
+
 	it('plays out the playoffs and ends with the awards', () => {
 		const playoffs = replayBundle(bundle, at('M5'));
 		expect(playoffs.phase).toBe('playoffs');

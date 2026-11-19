@@ -24,7 +24,7 @@
 
 <div class="cols" style:--cols="31em 23em minmax(0, 1fr)">
 	<section>
-		<span class="label">Alliance selection</span>
+		<span class="tv-label">Alliance selection</span>
 		<p class={['status', { picked }]}>{roleText(view)}</p>
 		{#if standingText(view)}
 			<p class="sub">{standingText(view)}</p>
@@ -33,7 +33,7 @@
 			<p class="sub">Alliance {view.picking} is picking.</p>
 		{/if}
 		{#if view.alliance}
-			<span class="label">Our alliance</span>
+			<span class="tv-label">Our alliance</span>
 			<ul class="members">
 				{#each members(view.alliance.seed) as number (number)}
 					<li>
@@ -43,11 +43,11 @@
 				{/each}
 			</ul>
 		{/if}
-		<span class="label">This event</span>
+		<span class="tv-label">This event</span>
 		<Facts facts={eventFacts(view)} />
 	</section>
 	<section>
-		<span class="label">Alliances</span>
+		<span class="tv-label">Alliances</span>
 		{#if view.alliances.length > 0}
 			<ol class="alliances">
 				{#each view.alliances as alliance (alliance.seed)}
@@ -74,7 +74,7 @@
 		{/if}
 	</section>
 	<section>
-		<span class="label">Available teams</span>
+		<span class="tv-label">Available teams</span>
 		<table class="available">
 			<caption class="visually-hidden">Available teams</caption>
 			<thead>

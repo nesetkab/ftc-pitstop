@@ -26,7 +26,7 @@
 		{#if view.next}
 			<NextHero next={view.next} {call} {now} {timeZone} delaySeconds={view.delaySeconds} />
 		{:else}
-			<span class="label">Next match</span>
+			<span class="tv-label">Next match</span>
 			<p class="done">Our qualification matches are done.</p>
 			<p class="sub">
 				{view.qualsPlayed} of {view.qualsTotal} qualification matches are posted. Alliance selection comes
@@ -35,7 +35,7 @@
 		{/if}
 	</section>
 	<section>
-		<span class="label">{rankLabel}</span>
+		<span class="tv-label">{rankLabel}</span>
 		{#if rows.length > 0}
 			<RankTable {rows} team={view.team} names={view.names} caption={rankLabel} />
 		{:else}
@@ -43,16 +43,16 @@
 		{/if}
 	</section>
 	<section>
-		<span class="label">Our matches</span>
+		<span class="tv-label">Our matches</span>
 		{#if view.matches.length > 0}
 			<MatchList items={matchItems(view.matches, view.next?.key ?? null, timeZone, 7)} />
 		{:else}
 			<p class="sub">No matches scheduled for {view.team}.</p>
 		{/if}
-		<span class="label">This event</span>
+		<span class="tv-label">This event</span>
 		<Facts facts={eventFacts(view)} />
 		{#if view.lastResult}
-			<span class="label">Last result</span>
+			<span class="tv-label">Last result</span>
 			<MatchList items={[lastResultItem(view.lastResult)]} />
 		{/if}
 	</section>

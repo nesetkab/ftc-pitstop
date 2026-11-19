@@ -212,12 +212,28 @@ export function computeRankings(matches: Match[], teams: number[] = []): Ranking
 	return rows.map((row, index) => ({ rank: index + 1, ...row }));
 }
 
+function teamsOf(match: Match): number[] {
+	return [...match.red, ...match.blue].map((slot) => slot.team);
+}
+
+function playoffKnown(bundle: EventBundle, match: Match, at: number): boolean {
+	const teams = new Set(teamsOf(match));
+	return bundle.matches.every((earlier) => {
+		if (earlier.level !== 'playoff' || earlier.series >= match.series) return true;
+		if (!teamsOf(earlier).some((team) => teams.has(team))) return true;
+		const posted = earlier.result ? revealTime(earlier) : null;
+		return posted !== null && posted <= at;
+	});
+}
+
 export function replayBundle(bundle: EventBundle, at: number): EventBundle {
 	const window = selectionWindow(bundle);
 	const alliances = replayAlliances(bundle.alliances, window, at);
 	const playoffsVisible = window !== null && at >= window.end;
 	const matches = bundle.matches
-		.filter((match) => match.level === 'qual' || playoffsVisible)
+		.filter(
+			(match) => match.level === 'qual' || (playoffsVisible && playoffKnown(bundle, match, at))
+		)
 		.map((match) => replayMatch(match, at));
 	const quals = matches.filter((match) => match.level === 'qual');
 	const allQualsPosted = quals.length > 0 && quals.every((match) => match.result !== null);

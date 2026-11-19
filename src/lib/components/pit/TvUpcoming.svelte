@@ -22,7 +22,7 @@
 
 <div class="cols" style:--cols="31em minmax(0, 1fr) 21em">
 	<section>
-		<span class="label">{dateRange(event.start, event.end)}</span>
+		<span class="tv-label">{dateRange(event.start, event.end)}</span>
 		<div class="team">
 			<b>{view.team}</b>
 			{#if view.teamName}<span>{view.teamName}</span>{/if}
@@ -30,15 +30,16 @@
 		<p class="event">{event.name}</p>
 		{#if where}<p class="sub">{where}</p>{/if}
 		<div class="first">
+			{#if first}<span class="tv-label">First match</span>{/if}
 			{#if first && first.scheduled !== null}
-				<b>First match {first.label} at {time(first.scheduled, event.timezone)}</b>
+				<b>{first.label} at {time(first.scheduled, event.timezone)}</b>
 				<span>
 					{colorName(first.alliance)} alliance{first.partners.length > 0
 						? ` with ${first.partners.join(', ')}`
 						: ''}.
 				</span>
 			{:else if first}
-				<b>First match {first.label}</b>
+				<b>{first.label}</b>
 			{:else}
 				<b>The match schedule hasn't been posted yet.</b>
 				<span>This screen fills in on its own once it is.</span>
@@ -46,7 +47,7 @@
 		</div>
 	</section>
 	<section>
-		<span class="label">Our matches</span>
+		<span class="tv-label">Our matches</span>
 		{#if view.matches.length > 0}
 			<MatchList items={matchItems(view.matches, first?.key ?? null, event.timezone, 10)} />
 		{:else}

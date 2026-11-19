@@ -1,3 +1,4 @@
+import { untrack } from 'svelte';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayClock, type ReplaySettings } from '#lib/game/replay.ts';
 import type { EventBundle, QueueStatusSnapshot } from '#lib/types.ts';
@@ -94,7 +95,7 @@ export class PitSession {
 			nexus: options.nexus,
 			fetch: options.fetch
 		});
-		this.#version = this.bundle ? bundleSignature(this.bundle) : null;
+		this.#version = untrack(() => this.signature);
 	}
 
 	dismiss() {

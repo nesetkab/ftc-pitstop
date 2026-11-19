@@ -38,7 +38,7 @@
 				<p class="sub">{playoff.position}</p>
 			{/if}
 		{:else}
-			<span class="label">Playoffs</span>
+			<span class="tv-label">Playoffs</span>
 			<p class={['status', { won: playoff?.state === 'won' }]}>
 				{result ?? 'Waiting for the next match'}
 			</p>
@@ -48,7 +48,7 @@
 		{/if}
 	</section>
 	<section>
-		<span class="label">Our alliance</span>
+		<span class="tv-label">Our alliance</span>
 		{#if playoff?.alliance}
 			<p class="seed">Alliance {playoff.alliance.seed}</p>
 			<ul class="members">
@@ -68,12 +68,12 @@
 			<p class="sub">{view.team} is not on a playoff alliance.</p>
 		{/if}
 		{#if playoff && playoff.matches.length > 0}
-			<span class="label">Our playoff matches</span>
+			<span class="tv-label">Our playoff matches</span>
 			<MatchList items={matchItems(playoff.matches, next?.key ?? null, timeZone)} />
 		{/if}
 	</section>
 	<section>
-		<span class="label">Alliances</span>
+		<span class="tv-label">Alliances</span>
 		<ol class="standings">
 			{#each view.standings as standing (standing.seed)}
 				<li class={{ mine: standing.seed === playoff?.alliance?.seed, out: standing.out }}>
@@ -90,7 +90,7 @@
 			{/each}
 		</ol>
 		{#if view.lastResult}
-			<span class="label">Last result</span>
+			<span class="tv-label">Last result</span>
 			<MatchList items={[lastResultItem(view.lastResult)]} />
 		{/if}
 	</section>

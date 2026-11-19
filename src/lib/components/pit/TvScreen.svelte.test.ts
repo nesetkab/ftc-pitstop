@@ -46,6 +46,7 @@ describe('TvScreen', () => {
 			screen.getByRole('img', { name: 'QR code for ftcpitstop.com/14624' })
 		).toBeInTheDocument();
 		expect(text(container)).toContain('First match Q5 at 10:56 AM');
+		expect(text(container)).not.toContain('The match schedule');
 		expect(text(container)).toContain('Red alliance with 15058.');
 		expect(text(container)).toContain('ftcpitstop.com/14624');
 		expect(text(container)).toContain('Matches start at 10:30 AM.');
@@ -141,16 +142,20 @@ describe('TvScreen', () => {
 });
 
 describe('PhoneScreen', () => {
-	it('shows the next match, standing and alerts', () => {
+	const phone = (permission: 'default' | 'granted') => {
 		const base = props(at('Q22'));
-		const { container } = render(PhoneScreen, {
+		return render(PhoneScreen, {
 			props: {
 				...base,
 				matches: replayBundle(full, at('Q22')).matches,
 				alerts: DEFAULT_ALERTS,
-				permission: 'default' as const
+				permission
 			}
 		});
+	};
+
+	it('shows the next match and standing', () => {
+		const { container } = phone('default');
 		const content = text(container);
 		expect(content).toContain('Next match');
 		expect(content).toContain('Scheduled for 1:58 PM');
@@ -159,9 +164,17 @@ describe('PhoneScreen', () => {
 			(item) => item.textContent
 		);
 		expect(facts).toEqual(['Rank', '8 of 27', 'Record', '3-0-0', 'Ranking score', '3.33']);
-		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).toBeChecked();
-		expect(screen.getByRole('switch', { name: 'Our rank changes' })).not.toBeChecked();
 		expect(screen.getByRole('link', { name: 'Event' })).toHaveAttribute('href', '/events/USAZGIQ');
 		expect(screen.getByRole('link', { name: 'Tools' })).toHaveAttribute('href', '/w');
+	});
+
+	it('shows alerts as on only once notifications are allowed', () => {
+		phone('default');
+		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).not.toBeChecked();
+		expect(screen.getByText('Alerts arrive while this page is open.')).toBeInTheDocument();
+		cleanup();
+		phone('granted');
+		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).toBeChecked();
+		expect(screen.getByRole('switch', { name: 'Our rank changes' })).not.toBeChecked();
 	});
 });

@@ -128,7 +128,7 @@
 		border-left: 1px solid var(--line);
 	}
 
-	.tv :global(.label) {
+	.tv :global(.tv-label) {
 		font-size: 0.8em;
 		font-weight: 500;
 		color: var(--text-2);
@@ -161,7 +161,7 @@
 	@media (orientation: portrait) {
 		.tv {
 			grid-template-rows: 2.6em minmax(max-content, 1fr) 2.1em;
-			font-size: max(10px, min(2.25vw, 1.4vh));
+			font-size: max(10px, min(2.45vw, 1.45vh));
 			overflow-y: auto;
 		}
 

@@ -74,7 +74,9 @@
 		const ranking = view.ranking;
 		const list: KeyValueItem[] = [];
 		if (ranking) {
-			list.push({ key: 'Rank', value: `${ranking.rank} of ${view.teamCount}` });
+			if (view.phase !== 'done') {
+				list.push({ key: 'Rank', value: `${ranking.rank} of ${view.teamCount}` });
+			}
 			list.push({ key: 'Record', value: record(ranking.wins, ranking.losses, ranking.ties) });
 			list.push({ key: 'Ranking score', value: fixed(ranking.rs, 2) });
 		}
@@ -229,7 +231,7 @@
 				{#each ALERT_OPTIONS as option (option.key)}
 					<Toggle
 						label={option.label}
-						checked={alerts[option.key]}
+						checked={alerts[option.key] && permission === 'granted'}
 						disabled={blocked}
 						onchange={(on) => onalert(option.key, on)}
 					/>
