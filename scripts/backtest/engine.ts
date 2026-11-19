@@ -111,7 +111,8 @@ export function run(seasons: PEvent[][], models: Model[], opts: EngineOptions): 
 						local.s += y;
 						local.ss += y * y;
 					}
-					for (const t of [...match.redUpd, ...match.blueUpd]) played.set(t, (played.get(t) ?? 0) + 1);
+					for (const t of [...match.redUpd, ...match.blueUpd])
+						played.set(t, (played.get(t) ?? 0) + 1);
 					seen++;
 				}
 				models.forEach((m) => m.endEvent(event, stats(snapshot, local, day)));

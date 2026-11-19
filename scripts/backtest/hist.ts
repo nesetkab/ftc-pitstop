@@ -33,7 +33,12 @@ export type HistEvent = {
 	matches: HistMatch[];
 };
 
-export type HistSeason = { season: number; fetchedAt: string; fields: string[]; events: HistEvent[] };
+export type HistSeason = {
+	season: number;
+	fetchedAt: string;
+	fields: string[];
+	events: HistEvent[];
+};
 
 export const HIST_ROOT = join(import.meta.dirname, '..', '..', '.cache', 'hist');
 

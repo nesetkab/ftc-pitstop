@@ -86,7 +86,16 @@ export const CANDIDATES: Candidate[] = [
 		id: 'opr-ridge-mean',
 		label: 'Ridge OPR toward the season mean',
 		family: 'opr',
-		base: { ...MAP_BASE, history: false, lamNew: 1.6, lamPrevSeason: 1.6, beta: 0, rhoNew: 0.4, rhoPrev: 0.4, qWeek: 0 },
+		base: {
+			...MAP_BASE,
+			history: false,
+			lamNew: 1.6,
+			lamPrevSeason: 1.6,
+			beta: 0,
+			rhoNew: 0.4,
+			rhoPrev: 0.4,
+			qWeek: 0
+		},
 		space: {
 			lamNew: [0.4, 0.8, 1.2, 1.6, 2.4, 3.2],
 			rhoNew: [0.2, 0.4, 0.6, 0.8, 1]

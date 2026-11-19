@@ -2,7 +2,13 @@ import type { PEvent, PMatch } from './prep.ts';
 
 export type Ctx = { mean: number; sd: number; day: number };
 
-export type Pred = { red: number; blue: number; varFactor: number; redScore: number; blueScore: number };
+export type Pred = {
+	red: number;
+	blue: number;
+	varFactor: number;
+	redScore: number;
+	blueScore: number;
+};
 
 export interface Model {
 	name: string;
@@ -50,7 +56,14 @@ export type EpaParams = {
 	clip: number;
 };
 
-type TeamState = { mu: number; nu: number; prec: number; meanRef: number; rel: number; day: number };
+type TeamState = {
+	mu: number;
+	nu: number;
+	prec: number;
+	meanRef: number;
+	rel: number;
+	day: number;
+};
 
 function eventTeams(event: PEvent): number[] {
 	const set = new Set<number>();
@@ -293,7 +306,13 @@ export class Epa implements Model {
 		let s = this.teams.get(team);
 		if (!s) {
 			const { rel, relScore } = startRel(this.prevRel.get(team), p);
-			s = { r: (ctx.mean / 2) * rel, s: (ctx.mean / 2) * relScore, n: 0, meanRef: ctx.mean, event: this.code };
+			s = {
+				r: (ctx.mean / 2) * rel,
+				s: (ctx.mean / 2) * relScore,
+				n: 0,
+				meanRef: ctx.mean,
+				event: this.code
+			};
 			this.teams.set(team, s);
 			return s;
 		}
@@ -340,7 +359,14 @@ export class Epa implements Model {
 		const redErrS = clip(m.redNp - sumS(m.redUpd));
 		const blueErrS = clip(m.blueNp - sumS(m.blueUpd));
 		const M = this.p.margin;
-		const apply = (ts: number[], own: number, opp: number, ownS: number, oppS: number, ok: boolean) => {
+		const apply = (
+			ts: number[],
+			own: number,
+			opp: number,
+			ownS: number,
+			oppS: number,
+			ok: boolean
+		) => {
 			if (!ok || !ts.length) return;
 			const delta = (own - M * opp) / (1 + M) / ts.length;
 			const deltaS = (ownS - M * oppS) / (1 + M) / ts.length;
@@ -365,7 +391,9 @@ export class Epa implements Model {
 	}
 
 	endSeason(): Map<number, number> {
-		return new Map([...this.teams].filter(([, s]) => s.n > 0).map(([t, s]) => [t, relToMean(s.r, s.meanRef)]));
+		return new Map(
+			[...this.teams].filter(([, s]) => s.n > 0).map(([t, s]) => [t, relToMean(s.r, s.meanRef)])
+		);
 	}
 }
 

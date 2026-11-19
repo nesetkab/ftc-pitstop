@@ -40,7 +40,9 @@ export type PEvent = {
 const LEVEL_RANK: Record<string, number> = { Quals: 0, Semis: 1, Finals: 2, DoubleElim: 1 };
 
 function playing(teams: HistTeam[]): HistTeam[] {
-	const onStation = teams.filter((t) => t.s === 1 || t.s === 2).sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
+	const onStation = teams
+		.filter((t) => t.s === 1 || t.s === 2)
+		.sort((a, b) => (a.s ?? 0) - (b.s ?? 0));
 	return onStation.length ? onStation : teams.filter((t) => !t.off).slice(0, 2);
 }
 
@@ -90,14 +92,17 @@ function prepMatch(event: HistEvent, m: HistMatch): PMatch | null {
 }
 
 function orderMatches(matches: HistMatch[]): HistMatch[] {
-	const quals = matches.filter((m) => m.level === 'Quals').sort((a, b) => a.num - b.num || a.id - b.id);
+	const quals = matches
+		.filter((m) => m.level === 'Quals')
+		.sort((a, b) => a.num - b.num || a.id - b.id);
 	const playoffs = matches.filter((m) => m.level !== 'Quals');
 	const timed = playoffs.every((m) => m.actual);
 	playoffs.sort((a, b) => {
 		if (timed) return Date.parse(a.actual!) - Date.parse(b.actual!) || a.id - b.id;
 		const la = LEVEL_RANK[a.level] ?? 1;
 		const lb = LEVEL_RANK[b.level] ?? 1;
-		if (a.level === 'DoubleElim' && b.level === 'DoubleElim') return a.series - b.series || a.num - b.num;
+		if (a.level === 'DoubleElim' && b.level === 'DoubleElim')
+			return a.series - b.series || a.num - b.num;
 		return la - lb || a.num - b.num || a.series - b.series;
 	});
 	return [...quals, ...playoffs];

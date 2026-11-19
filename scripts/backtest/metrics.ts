@@ -45,7 +45,7 @@ export function score(rec: Records, model: number, map: Mapping, filter: Filter)
 		logloss -= y * Math.log(pc) + (1 - y) * Math.log(1 - pc);
 		if (y !== 0.5) {
 			decided++;
-			correct += p === 0.5 ? 0.5 : (p > 0.5) === (y === 1) ? 1 : 0;
+			correct += p === 0.5 ? 0.5 : p > 0.5 === (y === 1) ? 1 : 0;
 		}
 		const o = (r * M + model) * STRIDE;
 		mae += Math.abs(rec.pred[o + 3] - rec.redNp[r]) + Math.abs(rec.pred[o + 4] - rec.blueNp[r]);
@@ -102,7 +102,12 @@ export function rowsOf(rec: Records, filter: Filter): Int32Array {
 
 export type FitOptions = { links?: Link[]; etas?: number[]; gammas?: number[] };
 
-export function fitMapping(rec: Records, model: number, rows: Int32Array, opts: FitOptions = {}): Mapping {
+export function fitMapping(
+	rec: Records,
+	model: number,
+	rows: Int32Array,
+	opts: FitOptions = {}
+): Mapping {
 	let best: Mapping = { link: 'probit', kappa: 1, eta: 0, gamma: 0 };
 	let bestLoss = Infinity;
 	for (const link of opts.links ?? ['probit']) {
@@ -125,13 +130,30 @@ export function fitMapping(rec: Records, model: number, rows: Int32Array, opts: 
 	return best;
 }
 
-export function trainBrier(rec: Records, model: number, rows: Int32Array, opts: FitOptions = {}): number {
+export function trainBrier(
+	rec: Records,
+	model: number,
+	rows: Int32Array,
+	opts: FitOptions = {}
+): number {
 	return brierOnly(rec, model, fitMapping(rec, model, rows, opts), rows);
 }
 
-export type CalibrationBin = { lo: number; hi: number; n: number; predicted: number; observed: number };
+export type CalibrationBin = {
+	lo: number;
+	hi: number;
+	n: number;
+	predicted: number;
+	observed: number;
+};
 
-export function calibration(rec: Records, model: number, map: Mapping, filter: Filter, bins = 10): CalibrationBin[] {
+export function calibration(
+	rec: Records,
+	model: number,
+	map: Mapping,
+	filter: Filter,
+	bins = 10
+): CalibrationBin[] {
 	const out: CalibrationBin[] = Array.from({ length: bins }, (_, i) => ({
 		lo: i / bins,
 		hi: (i + 1) / bins,

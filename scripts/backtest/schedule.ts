@@ -54,7 +54,10 @@ function evaluate(list: Phase[], options: ScheduleOptions): Errors {
 				if (!target || target.actual === null || target.scheduled === null) return;
 				errors.estimator[a].push(Math.abs(est[j].start - target.actual) / MINUTE);
 				errors.scheduled[a].push(Math.abs(target.scheduled - target.actual) / MINUTE);
-				errors.delay[a].push(Math.abs(target.scheduled + (current.actual! - current.scheduled!) - target.actual) / MINUTE);
+				errors.delay[a].push(
+					Math.abs(target.scheduled + (current.actual! - current.scheduled!) - target.actual) /
+						MINUTE
+				);
 			});
 		}
 	}

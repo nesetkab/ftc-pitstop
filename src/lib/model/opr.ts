@@ -31,7 +31,10 @@ const DETAIL_KEY: Record<Component, keyof AllianceDetail> = {
 const STRENGTH = 0;
 const OPR = 1;
 const SIZE = COMPONENTS.length + 2;
-const OWN_SCALE = new Set<number>([COMPONENTS.indexOf('tips') + 2, COMPONENTS.indexOf('fouls') + 2]);
+const OWN_SCALE = new Set<number>([
+	COMPONENTS.indexOf('tips') + 2,
+	COMPONENTS.indexOf('fouls') + 2
+]);
 
 function trackIndex(track: Track): number {
 	if (track === 'strength') return STRENGTH;
@@ -67,7 +70,7 @@ export const OPR_PARAMS: OprParams = {
 	drift: 0.25
 };
 
-export const SCORE_SIGMA = 0.8;
+export const SCORE_SIGMA = 0.55;
 
 export type SeasonStats = { mean: number; sd: number; parts: number[]; matches: number };
 
@@ -154,7 +157,8 @@ export function priorFor(
 			prec: prev === undefined ? p.lamNew : p.lamReturning
 		};
 	}
-	const ratio = (c: number) => (state.refs[c] > 0 && m[c] > 0 ? (m[c] / state.refs[c]) ** p.drift : 1);
+	const ratio = (c: number) =>
+		state.refs[c] > 0 && m[c] > 0 ? (m[c] / state.refs[c]) ** p.drift : 1;
 	const values = state.values.map((v, c) => {
 		const scale = OWN_SCALE.has(c) ? ratio(c) : ratio(STRENGTH);
 		return (p.carry * v + (1 - p.carry) * (state.refs[c] / 2)) * scale;
@@ -176,7 +180,13 @@ export class EventRater {
 	private stats: () => SeasonStats;
 	private day: number;
 
-	constructor(code: string, teams: number[], priors: Priors, stats: () => SeasonStats, day: number) {
+	constructor(
+		code: string,
+		teams: number[],
+		priors: Priors,
+		stats: () => SeasonStats,
+		day: number
+	) {
 		this.code = code;
 		this.priors = priors;
 		this.stats = stats;
@@ -248,10 +258,9 @@ export class EventRater {
 			strength: this.sum(teams, STRENGTH),
 			score: this.sum(teams, OPR),
 			variance: this.quad(this.weights(teams)) + 1,
-			components: Object.fromEntries(COMPONENTS.map((c, k) => [c, this.sum(teams, k + 2)])) as Record<
-				Component,
-				number
-			>
+			components: Object.fromEntries(
+				COMPONENTS.map((c, k) => [c, this.sum(teams, k + 2)])
+			) as Record<Component, number>
 		});
 		let uncertainty = 0;
 		for (const t of [...red, ...blue]) uncertainty += 1 / (1 + this.played[this.index.get(t)!]);
@@ -338,7 +347,10 @@ export class EventRater {
 			strength: this.mu[STRENGTH][i],
 			sd: sigma * Math.sqrt(Math.max(this.P[i * this.n + i], 0)),
 			matches: this.played[i],
-			components: Object.fromEntries(COMPONENTS.map((c, k) => [c, this.mu[k + 2][i]])) as Record<Component, number>
+			components: Object.fromEntries(COMPONENTS.map((c, k) => [c, this.mu[k + 2][i]])) as Record<
+				Component,
+				number
+			>
 		};
 	}
 
@@ -367,7 +379,12 @@ function statsOf(a: Sums, b: Sums): SeasonStats {
 	if (w <= 0) return { mean: 0, sd: 1, parts: COMPONENTS.map(() => 0), matches: 0 };
 	const mean = (a.s + b.s) / w;
 	const variance = Math.max((a.ss + b.ss) / w - mean * mean, 1e-6);
-	return { mean, sd: Math.sqrt(variance), parts: a.parts.map((p, k) => (p + b.parts[k]) / w), matches: w };
+	return {
+		mean,
+		sd: Math.sqrt(variance),
+		parts: a.parts.map((p, k) => (p + b.parts[k]) / w),
+		matches: w
+	};
 }
 
 function addSums(into: Sums, from: Sums): void {
@@ -392,7 +409,10 @@ export function orderMatches(matches: ModelMatch[]): ModelMatch[] {
 		.sort((a, b) => (a.number ?? a.time) - (b.number ?? b.time) || a.time - b.time);
 	const playoffs = matches
 		.filter((m) => m.level === 'playoff')
-		.sort((a, b) => a.time - b.time || (a.series ?? 0) - (b.series ?? 0) || (a.number ?? 0) - (b.number ?? 0));
+		.sort(
+			(a, b) =>
+				a.time - b.time || (a.series ?? 0) - (b.series ?? 0) || (a.number ?? 0) - (b.number ?? 0)
+		);
 	return [...quals, ...playoffs];
 }
 
@@ -490,5 +510,11 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 		}
 		addSums(global, added);
 	}
-	return { events: out, states: priors.states, stats: statsOf(global, emptySums()), latest, relative };
+	return {
+		events: out,
+		states: priors.states,
+		stats: statsOf(global, emptySums()),
+		latest,
+		relative
+	};
 }

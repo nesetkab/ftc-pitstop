@@ -1,4 +1,8 @@
-import { rateSeason, type Forecast, type OprParams as ProdParams } from '../../src/lib/model/opr.ts';
+import {
+	rateSeason,
+	type Forecast,
+	type OprParams as ProdParams
+} from '../../src/lib/model/opr.ts';
 import type { AllianceDetail, ModelEvent, ModelMatch } from '../../src/lib/model/types.ts';
 import { STRIDE, type Records } from './engine.ts';
 import type { OprParams } from './models.ts';
@@ -20,7 +24,10 @@ export function toProdParams(p: OprParams): ProdParams {
 	};
 }
 
-export function detailOf(s: Record<string, number>, stations: (1 | 2)[]): AllianceDetail | undefined {
+export function detailOf(
+	s: Record<string, number>,
+	stations: (1 | 2)[]
+): AllianceDetail | undefined {
 	if (s.tips === undefined) return undefined;
 	return {
 		autoPoints: s.autoPoints,
@@ -32,7 +39,9 @@ export function detailOf(s: Record<string, number>, stations: (1 | 2)[]): Allian
 		gardenPoints: s.dcGardenPoints,
 		flowerPoints: s.dcFlowerPoints,
 		fouls: s.penaltyPointsCommitted,
-		robotSwarm: stations.map((k) => s[`autoLeave${k}`] + s[`autoParkPoints${k}`] + s[`dcParkPoints${k}`])
+		robotSwarm: stations.map(
+			(k) => s[`autoLeave${k}`] + s[`autoParkPoints${k}`] + s[`dcParkPoints${k}`]
+		)
 	};
 }
 
@@ -88,7 +97,12 @@ export function productionForecasts(seasons: PEvent[][], params: OprParams): Map
 	return out;
 }
 
-export function productionRecords(rec: Records, seasons: PEvent[][], params: OprParams, name: string): Records {
+export function productionRecords(
+	rec: Records,
+	seasons: PEvent[][],
+	params: OprParams,
+	name: string
+): Records {
 	const forecasts = productionForecasts(seasons, params);
 	const pred = new Float64Array(rec.n * STRIDE);
 	for (let r = 0; r < rec.n; r++) {

@@ -95,9 +95,14 @@ function search(
 	return best;
 }
 
-function tune(c: Candidate, train: PEvent[][], start: OprParams | EpaParams): OprParams | EpaParams {
+function tune(
+	c: Candidate,
+	train: PEvent[][],
+	start: OprParams | EpaParams
+): OprParams | EpaParams {
 	let best = search(c, { ...start }, c.space, (models) => objective(train, models), 'brier');
-	if (c.scoreSpace) best = search(c, best, c.scoreSpace, (models) => maeObjective(train, models), 'mae');
+	if (c.scoreSpace)
+		best = search(c, best, c.scoreSpace, (models) => maeObjective(train, models), 'mae');
 	return resolve(c, best as OprParams);
 }
 
@@ -105,10 +110,17 @@ function tuneBlend(train: PEvent[][], stored: Stored, oprId: string, epaId: stri
 	const opr = CANDIDATES.find((c) => c.id === oprId)!;
 	const epa = CANDIDATES.find((c) => c.id === epaId)!;
 	const models = BLEND_WEIGHTS.map((w) =>
-		blend(`blend-${w}`, build(opr, stored.candidates[oprId]), build(epa, stored.candidates[epaId]), w)
+		blend(
+			`blend-${w}`,
+			build(opr, stored.candidates[oprId]),
+			build(epa, stored.candidates[epaId]),
+			w
+		)
 	);
 	const losses = objective(train, models);
-	console.log(`blend ${oprId}+${epaId}: ${BLEND_WEIGHTS.map((w, i) => `${w}=${losses[i].toFixed(5)}`).join(' ')}`);
+	console.log(
+		`blend ${oprId}+${epaId}: ${BLEND_WEIGHTS.map((w, i) => `${w}=${losses[i].toFixed(5)}`).join(' ')}`
+	);
 	return BLEND_WEIGHTS[losses.indexOf(Math.min(...losses))];
 }
 
@@ -128,7 +140,14 @@ function metricsOf(s: Scores) {
 
 function table(title: string, rows: [string, Scores][]): void {
 	console.log(`\n${title}`);
-	console.log('model'.padEnd(18), 'n'.padStart(7), 'brier'.padStart(8), 'logloss'.padStart(8), 'acc'.padStart(7), 'mae'.padStart(7));
+	console.log(
+		'model'.padEnd(18),
+		'n'.padStart(7),
+		'brier'.padStart(8),
+		'logloss'.padStart(8),
+		'acc'.padStart(7),
+		'mae'.padStart(7)
+	);
 	for (const [name, s] of rows) {
 		console.log(
 			name.padEnd(18),
@@ -144,8 +163,13 @@ function table(title: string, rows: [string, Scores][]): void {
 async function main(): Promise<void> {
 	const args = process.argv.slice(2);
 	const tuneAll = args.includes('--tune');
-	const tuneOnly = args.find((a) => a.startsWith('--tune='))?.slice(7).split(',');
-	const stored: Stored = JSON.parse(await readFile(PARAMS_PATH, 'utf8').catch(() => '{"candidates":{}}'));
+	const tuneOnly = args
+		.find((a) => a.startsWith('--tune='))
+		?.slice(7)
+		.split(',');
+	const stored: Stored = JSON.parse(
+		await readFile(PARAMS_PATH, 'utf8').catch(() => '{"candidates":{}}')
+	);
 	const train = await loadSeasons(TRAIN);
 
 	for (const c of CANDIDATES) {
@@ -153,11 +177,18 @@ async function main(): Promise<void> {
 		if (wanted) stored.candidates[c.id] = tune(c, train, stored.candidates[c.id] ?? c.base);
 	}
 
-	const trainLoss = (id: string) => objective(train, [build(CANDIDATES.find((c) => c.id === id)!, stored.candidates[id])])[0];
+	const trainLoss = (id: string) =>
+		objective(train, [
+			build(
+				CANDIDATES.find((c) => c.id === id)!,
+				stored.candidates[id]
+			)
+		])[0];
 	if (tuneAll || tuneOnly || !stored.blend) {
 		const oprIds = CANDIDATES.filter((c) => c.family === 'opr').map((c) => c.id);
 		const epaIds = CANDIDATES.filter((c) => c.family === 'epa').map((c) => c.id);
-		const bestOf = (ids: string[]) => ids.map((id) => [id, trainLoss(id)] as const).sort((a, b) => a[1] - b[1])[0][0];
+		const bestOf = (ids: string[]) =>
+			ids.map((id) => [id, trainLoss(id)] as const).sort((a, b) => a[1] - b[1])[0][0];
 		const opr = bestOf(oprIds);
 		const epa = bestOf(epaIds);
 		stored.blend = { opr, epa, w: tuneBlend(train, stored, opr, epa) };
@@ -169,7 +200,14 @@ async function main(): Promise<void> {
 	const b = stored.blend!;
 	const oprC = CANDIDATES.find((c) => c.id === b.opr)!;
 	const epaC = CANDIDATES.find((c) => c.id === b.epa)!;
-	models.push(blend('blend', build(oprC, stored.candidates[b.opr]), build(epaC, stored.candidates[b.epa]), b.w));
+	models.push(
+		blend(
+			'blend',
+			build(oprC, stored.candidates[b.opr]),
+			build(epaC, stored.candidates[b.epa]),
+			b.w
+		)
+	);
 	const ids = models.map((m) => m.name);
 	const labels: Record<string, string> = Object.fromEntries(CANDIDATES.map((c) => [c.id, c.label]));
 	labels.blend = `Blend: ${Math.round(b.w * 100)}% ${b.opr} + ${Math.round((1 - b.w) * 100)}% ${b.epa}`;
@@ -183,10 +221,14 @@ async function main(): Promise<void> {
 	const inValid = seasonFilter(rec, VALID);
 	const inTest = seasonFilter(rec, TEST);
 	const inTrain = seasonFilter(rec, TRAIN);
-	const pooled = (filter: (r: number) => boolean) => models.map((_, k) => score(rec, k, maps[k], filter));
+	const pooled = (filter: (r: number) => boolean) =>
+		models.map((_, k) => score(rec, k, maps[k], filter));
 
 	const validScores = pooled(inValid);
-	const chosenIndex = validScores.reduce((best, s, k) => (s.brier < validScores[best].brier ? k : best), 0);
+	const chosenIndex = validScores.reduce(
+		(best, s, k) => (s.brier < validScores[best].brier ? k : best),
+		0
+	);
 	const chosen = ids[chosenIndex];
 
 	const familyOf = (id: string) => CANDIDATES.find((c) => c.id === id)?.family ?? 'blend';
@@ -198,11 +240,22 @@ async function main(): Promise<void> {
 		.sort((a, b) => validScores[a].brier - validScores[b].brier);
 	const runnerUp = rivals[0];
 	const gap = pairedGap(rec, chosenIndex, runnerUp, maps[chosenIndex], maps[runnerUp], inValid);
-	console.log(`validation Brier gap ${ids[chosenIndex]} vs ${ids[runnerUp]}: ${gap.diff.toFixed(5)} +/- ${gap.se.toFixed(5)}`);
+	console.log(
+		`validation Brier gap ${ids[chosenIndex]} vs ${ids[runnerUp]}: ${gap.diff.toFixed(5)} +/- ${gap.se.toFixed(5)}`
+	);
 
-	table('train 2021-2023', pooled(inTrain).map((s, k) => [ids[k], s]));
-	table('validation 2024-2025', validScores.map((s, k) => [ids[k], s]));
-	table('test 2026', pooled(inTest).map((s, k) => [ids[k], s]));
+	table(
+		'train 2021-2023',
+		pooled(inTrain).map((s, k) => [ids[k], s])
+	);
+	table(
+		'validation 2024-2025',
+		validScores.map((s, k) => [ids[k], s])
+	);
+	table(
+		'test 2026',
+		pooled(inTest).map((s, k) => [ids[k], s])
+	);
 	console.log(`\nchosen on validation Brier: ${chosen}`);
 
 	const groups: Record<string, (r: number) => boolean> = {
@@ -257,10 +310,16 @@ async function main(): Promise<void> {
 		let maxDiff = 0;
 		const M = models.length;
 		for (let r = 0; r < rec.n; r++) {
-			for (let j = 0; j < 5; j++) maxDiff = Math.max(maxDiff, Math.abs(rec.pred[(r * M + chosenIndex) * 5 + j] - prod.pred[r * 5 + j]));
+			for (let j = 0; j < 5; j++)
+				maxDiff = Math.max(
+					maxDiff,
+					Math.abs(rec.pred[(r * M + chosenIndex) * 5 + j] - prod.pred[r * 5 + j])
+				);
 		}
 		production = { brier: round(p.brier - a.brier, 9), mae: round(p.mae - a.mae, 9), maxDiff };
-		console.log(`production code check: brier diff ${production.brier}, mae diff ${production.mae}, max prediction diff ${maxDiff}`);
+		console.log(
+			`production code check: brier diff ${production.brier}, mae diff ${production.mae}, max prediction diff ${maxDiff}`
+		);
 	}
 	const existing = JSON.parse(await readFile(OUT_PATH, 'utf8').catch(() => '{}'));
 	const result = {
@@ -275,13 +334,24 @@ async function main(): Promise<void> {
 		chosen: {
 			id: chosen,
 			label: labels[chosen],
-			params: chosen === 'blend' ? { ...b, opr: stored.candidates[b.opr], epa: stored.candidates[b.epa] } : stored.candidates[chosen],
+			params:
+				chosen === 'blend'
+					? { ...b, opr: stored.candidates[b.opr], epa: stored.candidates[b.epa] }
+					: stored.candidates[chosen],
 			mapping: { ...maps[chosenIndex], kappa: round(maps[chosenIndex].kappa, 5) }
 		},
-		models: ids.map((id, k) => ({ id, label: labels[id], mapping: { ...maps[k], kappa: round(maps[k].kappa, 5) } })),
+		models: ids.map((id, k) => ({
+			id,
+			label: labels[id],
+			mapping: { ...maps[k], kappa: round(maps[k].kappa, 5) }
+		})),
 		pooled: {
-			train: Object.fromEntries(pooled(inTrain).map((s, k) => [ids[k], { n: s.n, ...metricsOf(s) }])),
-			validation: Object.fromEntries(validScores.map((s, k) => [ids[k], { n: s.n, ...metricsOf(s) }])),
+			train: Object.fromEntries(
+				pooled(inTrain).map((s, k) => [ids[k], { n: s.n, ...metricsOf(s) }])
+			),
+			validation: Object.fromEntries(
+				validScores.map((s, k) => [ids[k], { n: s.n, ...metricsOf(s) }])
+			),
 			test: Object.fromEntries(pooled(inTest).map((s, k) => [ids[k], { n: s.n, ...metricsOf(s) }]))
 		},
 		seasons: seasonRows,

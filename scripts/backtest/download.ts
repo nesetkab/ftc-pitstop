@@ -55,14 +55,21 @@ type RawMatch = {
 	actualStartTime: string | null;
 	postResultTime: string | null;
 	teams: RawTeam[];
-	scores: { red?: Record<string, number | boolean>; blue?: Record<string, number | boolean> } | null;
+	scores: {
+		red?: Record<string, number | boolean>;
+		blue?: Record<string, number | boolean>;
+	} | null;
 };
 
 type RawEvent = { code: string; matches: RawMatch[] };
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function gql<T>(name: string, query: string, variables: Record<string, unknown> = {}): Promise<T> {
+async function gql<T>(
+	name: string,
+	query: string,
+	variables: Record<string, unknown> = {}
+): Promise<T> {
 	let lastError: unknown;
 	for (let attempt = 0; attempt < 5; attempt++) {
 		if (attempt > 0) await sleep(2000 * 2 ** attempt);
@@ -111,7 +118,10 @@ function scoresType(season: number): string {
 	return season === 2021 ? 'MatchScores2021Trad' : `MatchScores${season}`;
 }
 
-type IntrospectedField = { name: string; type: { kind: string; name: string | null; ofType: { name: string | null } | null } };
+type IntrospectedField = {
+	name: string;
+	type: { kind: string; name: string | null; ofType: { name: string | null } | null };
+};
 
 async function scoreFields(season: number): Promise<string[]> {
 	const data = await gql<{ __type: { fields: IntrospectedField[] } | null }>(
@@ -164,12 +174,15 @@ function dayDiff(a: string, b: string): number {
 }
 
 function windows(events: EventListItem[]): EventListItem[][] {
-	const sorted = [...events].sort((a, b) => a.start.localeCompare(b.start) || a.code.localeCompare(b.code));
+	const sorted = [...events].sort(
+		(a, b) => a.start.localeCompare(b.start) || a.code.localeCompare(b.code)
+	);
 	const out: EventListItem[][] = [];
 	let current: EventListItem[] = [];
 	for (const event of sorted) {
 		const first = current[0];
-		const full = current.length >= WINDOW_EVENTS && current[current.length - 1].start !== event.start;
+		const full =
+			current.length >= WINDOW_EVENTS && current[current.length - 1].start !== event.start;
 		if (first && (full || dayDiff(first.start, event.start) >= WINDOW_DAYS)) {
 			out.push(current);
 			current = [];
@@ -215,12 +228,16 @@ async function fetchWindow(
 			if (one.eventByCode) events.push(one.eventByCode);
 		}
 		await writeFile(path, JSON.stringify(events));
-		console.log(`  ${season} ${start}..${end}: ${events.length} events, ${missing.length} fetched one by one`);
+		console.log(
+			`  ${season} ${start}..${end}: ${events.length} events, ${missing.length} fetched one by one`
+		);
 	}
 	return new Map(events.map((e) => [e.code, e]));
 }
 
-function compactScores(raw: Record<string, number | boolean> | undefined): Record<string, number> | null {
+function compactScores(
+	raw: Record<string, number | boolean> | undefined
+): Record<string, number> | null {
 	if (!raw) return null;
 	const out: Record<string, number> = {};
 	for (const [key, value] of Object.entries(raw)) {
@@ -262,10 +279,13 @@ async function downloadSeason(season: number, refresh: boolean): Promise<void> {
 	await mkdir(join(ROOT, String(season)), { recursive: true });
 	const fields = await scoreFields(season);
 	const list = (await eventList(season, refresh)).filter((e) => !e.remote);
-	console.log(`${season}: ${list.length} traditional events with matches, fields ${fields.join(',')}`);
+	console.log(
+		`${season}: ${list.length} traditional events with matches, fields ${fields.join(',')}`
+	);
 	const raw = new Map<string, RawEvent>();
 	for (const group of windows(list)) {
-		for (const [code, event] of await fetchWindow(season, group, fields, refresh)) raw.set(code, event);
+		for (const [code, event] of await fetchWindow(season, group, fields, refresh))
+			raw.set(code, event);
 	}
 	const events: HistEvent[] = list
 		.map((e) => ({
@@ -283,7 +303,10 @@ async function downloadSeason(season: number, refresh: boolean): Promise<void> {
 			matches: (raw.get(e.code)?.matches ?? []).map(compactMatch).sort((a, b) => a.id - b.id)
 		}))
 		.filter((e) => e.matches.length > 0)
-		.sort((a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end) || a.code.localeCompare(b.code));
+		.sort(
+			(a, b) =>
+				a.start.localeCompare(b.start) || a.end.localeCompare(b.end) || a.code.localeCompare(b.code)
+		);
 	const out: HistSeason = { season, fetchedAt: new Date().toISOString(), fields, events };
 	await writeFile(join(ROOT, `${season}.json`), JSON.stringify(out));
 	const matches = events.reduce((n, e) => n + e.matches.length, 0);
