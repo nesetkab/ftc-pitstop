@@ -137,7 +137,7 @@
 <style>
 	.layout {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) 300px;
+		grid-template-columns: minmax(0, 1fr) 390px;
 		gap: 28px;
 		align-items: start;
 	}
@@ -159,7 +159,7 @@
 		letter-spacing: 0;
 	}
 
-	@media (max-width: 1060px) {
+	@media (max-width: 1120px) {
 		.layout {
 			grid-template-columns: minmax(0, 1fr);
 		}
