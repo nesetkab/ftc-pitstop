@@ -1,0 +1,124 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "USUTSAS1",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USUTSAS1",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 20515,
+			"schoolName": null,
+			"fullTeamName": "DoW Stem/Utah STEM Action Center/Motorola Solutions/Gene Haas Foundation/Utah FIRST Robotics&Home School",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USUTSAS1",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 3747,
+			"schoolName": null,
+			"fullTeamName": "Beehive Science and Technology Academy/Motorola Solutions/Parker Hannifin/Gene Haas/DoD STEM/Jacobsen Innovations/The Layshia Clarendon Foundation/Utah STEM Action Center&Beehive Sci & Technology Acad",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USUTSAS1",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 99999,
+			"schoolName": null,
+			"fullTeamName": "Off-Season Demo Team",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USUTSAS1",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 19389,
+			"schoolName": null,
+			"fullTeamName": "Gene Haas Foundation/Utah Fits All Scholarship/The Home Depot/Salt Lake Scientific/Donut Star/Harmon's/Domino's/Costco/Trader Joe's/Whole Foods&Home School",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USUTSAS1",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USUTSAS1",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USUTSAS1",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USUTSAS1",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USUTSAS1",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USUTSAS1",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USUTSAS1",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}

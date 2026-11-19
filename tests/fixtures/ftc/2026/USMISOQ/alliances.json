@@ -1,0 +1,93 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": {
+				"teamNumber": 10136,
+				"displayTeamNumber": "10136",
+				"teamName": "Frost RoboFalcons"
+			},
+			"round1": {
+				"teamNumber": 23392,
+				"displayTeamNumber": "23392",
+				"teamName": "Viking Innovators"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": {
+				"teamNumber": 30612,
+				"displayTeamNumber": "30612",
+				"teamName": "Quantum Vikings"
+			},
+			"round1": { "teamNumber": 7215, "displayTeamNumber": "7215", "teamName": "Turning Gears" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 3,
+			"name": "Alliance Seed 3",
+			"captain": { "teamNumber": 5237, "displayTeamNumber": "5237", "teamName": "Loose Screws" },
+			"round1": {
+				"teamNumber": 10016,
+				"displayTeamNumber": "10016",
+				"teamName": "Clarkston RoboWolves"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 4,
+			"name": "Alliance Seed 4",
+			"captain": { "teamNumber": 34672, "displayTeamNumber": "34672", "teamName": "Snack Time" },
+			"round1": {
+				"teamNumber": 21482,
+				"displayTeamNumber": "21482",
+				"teamName": "Robo Challengers"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 5,
+			"name": "Alliance Seed 5",
+			"captain": {
+				"teamNumber": 30837,
+				"displayTeamNumber": "30837",
+				"teamName": "Ann Arbor Androids"
+			},
+			"round1": { "teamNumber": 31261, "displayTeamNumber": "31261", "teamName": "Hack Attack" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 6,
+			"name": "Alliance Seed 6",
+			"captain": {
+				"teamNumber": 21564,
+				"displayTeamNumber": "21564",
+				"teamName": "Tech Titans Burgundy"
+			},
+			"round1": { "teamNumber": 16883, "displayTeamNumber": "16883", "teamName": "DinoByte!" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 6
+}

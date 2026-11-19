@@ -1,0 +1,810 @@
+{
+	"schedule": [
+		{
+			"description": "Qualification 1",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 1,
+			"startTime": "2026-10-24T09:30:00",
+			"actualStartTime": "2026-10-24T09:33:37.971",
+			"postResultTime": "2026-10-24T09:39:27.483",
+			"videoURL": null,
+			"scoreRedFinal": 60,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 5,
+			"scoreBlueFinal": 20,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 20,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 51,
+					"displayTeamNumber": "51",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd Singularity"
+				},
+				{
+					"teamNumber": 49,
+					"displayTeamNumber": "49",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd 7^2"
+				},
+				{
+					"teamNumber": 38782,
+					"displayTeamNumber": "38782",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ROBOCOLTS"
+				},
+				{
+					"teamNumber": 24176,
+					"displayTeamNumber": "24176",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CYBER-NAUTS"
+				}
+			]
+		},
+		{
+			"description": "Qualification 2",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 2,
+			"startTime": "2026-10-24T09:38:00",
+			"actualStartTime": "2026-10-24T09:50:21.664",
+			"postResultTime": "2026-10-24T09:55:51.276",
+			"videoURL": null,
+			"scoreRedFinal": 37,
+			"scoreRedFoul": 20,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 30,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 26600,
+					"displayTeamNumber": "26600",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robopirates"
+				},
+				{
+					"teamNumber": 32151,
+					"displayTeamNumber": "32151",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Saxon"
+				},
+				{
+					"teamNumber": 37141,
+					"displayTeamNumber": "37141",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Navy Nova"
+				},
+				{
+					"teamNumber": 15305,
+					"displayTeamNumber": "15305",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cerritos Dons"
+				}
+			]
+		},
+		{
+			"description": "Qualification 3",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 3,
+			"startTime": "2026-10-24T09:46:00",
+			"actualStartTime": "2026-10-24T10:02:44.745",
+			"postResultTime": "2026-10-24T10:07:08.016",
+			"videoURL": null,
+			"scoreRedFinal": 63,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 23,
+			"scoreBlueFinal": 23,
+			"scoreBlueFoul": 5,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 38782,
+					"displayTeamNumber": "38782",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ROBOCOLTS"
+				},
+				{
+					"teamNumber": 24777,
+					"displayTeamNumber": "24777",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Electric Wolves"
+				},
+				{
+					"teamNumber": 32151,
+					"displayTeamNumber": "32151",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Saxon"
+				},
+				{
+					"teamNumber": 37079,
+					"displayTeamNumber": "37079",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Code Mech"
+				}
+			]
+		},
+		{
+			"description": "Qualification 4",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 4,
+			"startTime": "2026-10-24T09:54:00",
+			"actualStartTime": "2026-10-24T10:12:43.51",
+			"postResultTime": "2026-10-24T10:17:37.854",
+			"videoURL": null,
+			"scoreRedFinal": 10,
+			"scoreRedFoul": 10,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 43,
+			"scoreBlueFoul": 10,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 24176,
+					"displayTeamNumber": "24176",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CYBER-NAUTS"
+				},
+				{
+					"teamNumber": 15305,
+					"displayTeamNumber": "15305",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cerritos Dons"
+				},
+				{
+					"teamNumber": 37079,
+					"displayTeamNumber": "37079",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Code Mech"
+				},
+				{
+					"teamNumber": 51,
+					"displayTeamNumber": "51",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd Singularity"
+				}
+			]
+		},
+		{
+			"description": "Qualification 5",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 5,
+			"startTime": "2026-10-24T10:02:00",
+			"actualStartTime": "2026-10-24T10:23:12.878",
+			"postResultTime": "2026-10-24T10:29:46.122",
+			"videoURL": null,
+			"scoreRedFinal": 44,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 24,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 26600,
+					"displayTeamNumber": "26600",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robopirates"
+				},
+				{
+					"teamNumber": 37141,
+					"displayTeamNumber": "37141",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Navy Nova"
+				},
+				{
+					"teamNumber": 49,
+					"displayTeamNumber": "49",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd 7^2"
+				},
+				{
+					"teamNumber": 24777,
+					"displayTeamNumber": "24777",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Electric Wolves"
+				}
+			]
+		},
+		{
+			"description": "Qualification 6",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 6,
+			"startTime": "2026-10-24T10:10:00",
+			"actualStartTime": "2026-10-24T10:36:36.155",
+			"postResultTime": "2026-10-24T10:41:36.957",
+			"videoURL": null,
+			"scoreRedFinal": 62,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 26,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 16,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 51,
+					"displayTeamNumber": "51",
+					"station": "Red1",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd Singularity"
+				},
+				{
+					"teamNumber": 37141,
+					"displayTeamNumber": "37141",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Navy Nova"
+				},
+				{
+					"teamNumber": 26600,
+					"displayTeamNumber": "26600",
+					"station": "Blue1",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robopirates"
+				},
+				{
+					"teamNumber": 37079,
+					"displayTeamNumber": "37079",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Code Mech"
+				}
+			]
+		},
+		{
+			"description": "Qualification 7",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 7,
+			"startTime": "2026-10-24T10:18:00",
+			"actualStartTime": "2026-10-24T10:45:53.058",
+			"postResultTime": "2026-10-24T10:49:47.589",
+			"videoURL": null,
+			"scoreRedFinal": 13,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 59,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 38782,
+					"displayTeamNumber": "38782",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ROBOCOLTS"
+				},
+				{
+					"teamNumber": 49,
+					"displayTeamNumber": "49",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd 7^2"
+				},
+				{
+					"teamNumber": 24777,
+					"displayTeamNumber": "24777",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Electric Wolves"
+				},
+				{
+					"teamNumber": 15305,
+					"displayTeamNumber": "15305",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cerritos Dons"
+				}
+			]
+		},
+		{
+			"description": "Qualification 8",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 8,
+			"startTime": "2026-10-24T10:26:00",
+			"actualStartTime": "2026-10-24T10:57:25.287",
+			"postResultTime": "2026-10-24T11:00:56.692",
+			"videoURL": null,
+			"scoreRedFinal": 39,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 18,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 26600,
+					"displayTeamNumber": "26600",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robopirates"
+				},
+				{
+					"teamNumber": 24176,
+					"displayTeamNumber": "24176",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CYBER-NAUTS"
+				},
+				{
+					"teamNumber": 24777,
+					"displayTeamNumber": "24777",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Electric Wolves"
+				},
+				{
+					"teamNumber": 32151,
+					"displayTeamNumber": "32151",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Saxon"
+				}
+			]
+		},
+		{
+			"description": "Qualification 9",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 9,
+			"startTime": "2026-10-24T10:34:00",
+			"actualStartTime": "2026-10-24T11:07:19.589",
+			"postResultTime": "2026-10-24T11:13:45.476",
+			"videoURL": null,
+			"scoreRedFinal": 30,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 27,
+			"scoreBlueFoul": 10,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 24176,
+					"displayTeamNumber": "24176",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CYBER-NAUTS"
+				},
+				{
+					"teamNumber": 37141,
+					"displayTeamNumber": "37141",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Navy Nova"
+				},
+				{
+					"teamNumber": 15305,
+					"displayTeamNumber": "15305",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cerritos Dons"
+				},
+				{
+					"teamNumber": 38782,
+					"displayTeamNumber": "38782",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ROBOCOLTS"
+				}
+			]
+		},
+		{
+			"description": "Qualification 10",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 10,
+			"startTime": "2026-10-24T10:42:00",
+			"actualStartTime": "2026-10-24T11:19:09.762",
+			"postResultTime": "2026-10-24T11:22:49.268",
+			"videoURL": null,
+			"scoreRedFinal": 44,
+			"scoreRedFoul": 5,
+			"scoreRedAuto": 6,
+			"scoreBlueFinal": 87,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 28,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 49,
+					"displayTeamNumber": "49",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd 7^2"
+				},
+				{
+					"teamNumber": 37079,
+					"displayTeamNumber": "37079",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Code Mech"
+				},
+				{
+					"teamNumber": 32151,
+					"displayTeamNumber": "32151",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Saxon"
+				},
+				{
+					"teamNumber": 51,
+					"displayTeamNumber": "51",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd Singularity"
+				}
+			]
+		},
+		{
+			"description": "Qualification 11",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 11,
+			"startTime": "2026-10-24T10:50:00",
+			"actualStartTime": "2026-10-24T11:34:02.63",
+			"postResultTime": "2026-10-24T11:38:23.855",
+			"videoURL": null,
+			"scoreRedFinal": 50,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 54,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 51,
+					"displayTeamNumber": "51",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd Singularity"
+				},
+				{
+					"teamNumber": 24176,
+					"displayTeamNumber": "24176",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CYBER-NAUTS"
+				},
+				{
+					"teamNumber": 37141,
+					"displayTeamNumber": "37141",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Navy Nova"
+				},
+				{
+					"teamNumber": 32151,
+					"displayTeamNumber": "32151",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Saxon"
+				}
+			]
+		},
+		{
+			"description": "Qualification 12",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 12,
+			"startTime": "2026-10-24T10:58:00",
+			"actualStartTime": "2026-10-24T11:42:21.583",
+			"postResultTime": "2026-10-24T11:46:05.914",
+			"videoURL": null,
+			"scoreRedFinal": 59,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 26,
+			"scoreBlueFinal": 76,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 37079,
+					"displayTeamNumber": "37079",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Code Mech"
+				},
+				{
+					"teamNumber": 38782,
+					"displayTeamNumber": "38782",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ROBOCOLTS"
+				},
+				{
+					"teamNumber": 26600,
+					"displayTeamNumber": "26600",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robopirates"
+				},
+				{
+					"teamNumber": 49,
+					"displayTeamNumber": "49",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd 7^2"
+				}
+			]
+		},
+		{
+			"description": "Qualification 13",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 13,
+			"startTime": "2026-10-24T11:06:00",
+			"actualStartTime": "2026-10-24T11:51:38.123",
+			"postResultTime": "2026-10-24T11:56:20.544",
+			"videoURL": null,
+			"scoreRedFinal": 56,
+			"scoreRedFoul": 5,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 31,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 26600,
+					"displayTeamNumber": "26600",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robopirates"
+				},
+				{
+					"teamNumber": 24777,
+					"displayTeamNumber": "24777",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Electric Wolves"
+				},
+				{
+					"teamNumber": 15305,
+					"displayTeamNumber": "15305",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cerritos Dons"
+				},
+				{
+					"teamNumber": 51,
+					"displayTeamNumber": "51",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "NerdHerd Singularity"
+				}
+			]
+		}
+	]
+}

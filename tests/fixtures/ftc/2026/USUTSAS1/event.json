@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "61285227-eaf2-8141-9c3e-898ddac5f117",
+			"code": "USUTSAS1",
+			"divisionCode": null,
+			"name": "Robot in 7 Days Scrimmage",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 1,
+			"published": true,
+			"type": "0",
+			"typeName": "Non-Advancement",
+			"regionCode": "USUT",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "Beehive Science & Technology Academy",
+			"address": "2165 E 9400 S",
+			"city": "Sandy",
+			"stateprov": "UT",
+			"country": "USA",
+			"website": "https://www.utahftc.org/kickoff",
+			"liveStreamUrl": "https://www.youtube.com/live/E53OUghEmlg",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=80751",
+			"coordinates": { "type": "Point", "coordinates": [-111.82956, 40.58156] },
+			"webcasts": null,
+			"timezone": "America/Denver",
+			"dateStart": "2026-09-19T00:00:00",
+			"dateEnd": "2026-09-19T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

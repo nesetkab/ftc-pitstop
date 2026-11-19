@@ -1,0 +1,686 @@
+{
+	"schedule": [
+		{
+			"description": "Upper Bracket  Round 1 Match 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:10:00",
+			"actualStartTime": "2026-11-07T17:17:06.617",
+			"postResultTime": "2026-11-07T17:22:45.097",
+			"videoURL": null,
+			"scoreRedFinal": 127,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 102,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 56,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 34672,
+					"displayTeamNumber": "34672",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Snack Time"
+				},
+				{
+					"teamNumber": 21482,
+					"displayTeamNumber": "21482",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robo Challengers"
+				},
+				{
+					"teamNumber": 30837,
+					"displayTeamNumber": "30837",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Ann Arbor Androids"
+				},
+				{
+					"teamNumber": 31261,
+					"displayTeamNumber": "31261",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Hack Attack"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 1 Match 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 2,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:16:00",
+			"actualStartTime": "2026-11-07T17:24:36.624",
+			"postResultTime": "2026-11-07T17:32:42.853",
+			"videoURL": null,
+			"scoreRedFinal": 176,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 56,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 5237,
+					"displayTeamNumber": "5237",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Loose Screws"
+				},
+				{
+					"teamNumber": 10016,
+					"displayTeamNumber": "10016",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Clarkston RoboWolves"
+				},
+				{
+					"teamNumber": 21564,
+					"displayTeamNumber": "21564",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tech Titans Burgundy"
+				},
+				{
+					"teamNumber": 16883,
+					"displayTeamNumber": "16883",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "DinoByte!"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 3",
+			"tournamentLevel": "PLAYOFF",
+			"series": 3,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:22:00",
+			"actualStartTime": "2026-11-07T17:33:00.708",
+			"postResultTime": "2026-11-07T17:38:16.493",
+			"videoURL": null,
+			"scoreRedFinal": 173,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 48,
+			"scoreBlueFinal": 95,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 23392,
+					"displayTeamNumber": "23392",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Innovators"
+				},
+				{
+					"teamNumber": 21482,
+					"displayTeamNumber": "21482",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robo Challengers"
+				},
+				{
+					"teamNumber": 34672,
+					"displayTeamNumber": "34672",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Snack Time"
+				},
+				{
+					"teamNumber": 10136,
+					"displayTeamNumber": "10136",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Frost RoboFalcons"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 4",
+			"tournamentLevel": "PLAYOFF",
+			"series": 4,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:28:00",
+			"actualStartTime": "2026-11-07T17:39:37.966",
+			"postResultTime": "2026-11-07T17:43:34.31",
+			"videoURL": null,
+			"scoreRedFinal": 85,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 130,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 10016,
+					"displayTeamNumber": "10016",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Clarkston RoboWolves"
+				},
+				{
+					"teamNumber": 5237,
+					"displayTeamNumber": "5237",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Loose Screws"
+				},
+				{
+					"teamNumber": 30612,
+					"displayTeamNumber": "30612",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Quantum Vikings"
+				},
+				{
+					"teamNumber": 7215,
+					"displayTeamNumber": "7215",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Turning Gears"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 5",
+			"tournamentLevel": "PLAYOFF",
+			"series": 5,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:34:00",
+			"actualStartTime": "2026-11-07T17:46:00.248",
+			"postResultTime": "2026-11-07T17:51:11.585",
+			"videoURL": null,
+			"scoreRedFinal": 91,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 16,
+			"scoreBlueFinal": 49,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 34672,
+					"displayTeamNumber": "34672",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Snack Time"
+				},
+				{
+					"teamNumber": 21482,
+					"displayTeamNumber": "21482",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robo Challengers"
+				},
+				{
+					"teamNumber": 21564,
+					"displayTeamNumber": "21564",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tech Titans Burgundy"
+				},
+				{
+					"teamNumber": 16883,
+					"displayTeamNumber": "16883",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "DinoByte!"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 6",
+			"tournamentLevel": "PLAYOFF",
+			"series": 6,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:40:00",
+			"actualStartTime": "2026-11-07T17:52:38.856",
+			"postResultTime": "2026-11-07T18:02:44.909",
+			"videoURL": null,
+			"scoreRedFinal": 107,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 16,
+			"scoreBlueFinal": 61,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 23,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 30612,
+					"displayTeamNumber": "30612",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Quantum Vikings"
+				},
+				{
+					"teamNumber": 7215,
+					"displayTeamNumber": "7215",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Turning Gears"
+				},
+				{
+					"teamNumber": 30837,
+					"displayTeamNumber": "30837",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Ann Arbor Androids"
+				},
+				{
+					"teamNumber": 31261,
+					"displayTeamNumber": "31261",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Hack Attack"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 4 Match 7",
+			"tournamentLevel": "PLAYOFF",
+			"series": 7,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:46:00",
+			"actualStartTime": "2026-11-07T18:04:16.811",
+			"postResultTime": "2026-11-07T18:08:05.886",
+			"videoURL": null,
+			"scoreRedFinal": 173,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 48,
+			"scoreBlueFinal": 143,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 10136,
+					"displayTeamNumber": "10136",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Frost RoboFalcons"
+				},
+				{
+					"teamNumber": 23392,
+					"displayTeamNumber": "23392",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Innovators"
+				},
+				{
+					"teamNumber": 5237,
+					"displayTeamNumber": "5237",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Loose Screws"
+				},
+				{
+					"teamNumber": 10016,
+					"displayTeamNumber": "10016",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Clarkston RoboWolves"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 4 Match 8",
+			"tournamentLevel": "PLAYOFF",
+			"series": 8,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T17:52:00",
+			"actualStartTime": "2026-11-07T18:11:45.993",
+			"postResultTime": "2026-11-07T18:15:19.889",
+			"videoURL": null,
+			"scoreRedFinal": 97,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 16,
+			"scoreBlueFinal": 94,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 30612,
+					"displayTeamNumber": "30612",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Quantum Vikings"
+				},
+				{
+					"teamNumber": 7215,
+					"displayTeamNumber": "7215",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Turning Gears"
+				},
+				{
+					"teamNumber": 34672,
+					"displayTeamNumber": "34672",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Snack Time"
+				},
+				{
+					"teamNumber": 21482,
+					"displayTeamNumber": "21482",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Robo Challengers"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 5 Match 9",
+			"tournamentLevel": "PLAYOFF",
+			"series": 9,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T18:10:00",
+			"actualStartTime": "2026-11-07T18:28:47.424",
+			"postResultTime": "2026-11-07T18:47:06.07",
+			"videoURL": null,
+			"scoreRedFinal": 131,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 56,
+			"scoreBlueFinal": 117,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 10016,
+					"displayTeamNumber": "10016",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Clarkston RoboWolves"
+				},
+				{
+					"teamNumber": 5237,
+					"displayTeamNumber": "5237",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Loose Screws"
+				},
+				{
+					"teamNumber": 7215,
+					"displayTeamNumber": "7215",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Turning Gears"
+				},
+				{
+					"teamNumber": 30612,
+					"displayTeamNumber": "30612",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Quantum Vikings"
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 6 Match 10",
+			"tournamentLevel": "PLAYOFF",
+			"series": 10,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T18:28:00",
+			"actualStartTime": "2026-11-07T18:54:22.63",
+			"postResultTime": "2026-11-07T18:59:15.743",
+			"videoURL": null,
+			"scoreRedFinal": 144,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 172,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 10136,
+					"displayTeamNumber": "10136",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Frost RoboFalcons"
+				},
+				{
+					"teamNumber": 23392,
+					"displayTeamNumber": "23392",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Innovators"
+				},
+				{
+					"teamNumber": 5237,
+					"displayTeamNumber": "5237",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Loose Screws"
+				},
+				{
+					"teamNumber": 10016,
+					"displayTeamNumber": "10016",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Clarkston RoboWolves"
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 7 Match 11",
+			"tournamentLevel": "PLAYOFF",
+			"series": 11,
+			"matchNumber": 1,
+			"startTime": "2026-11-07T18:46:00",
+			"actualStartTime": "2026-11-07T19:08:45.017",
+			"postResultTime": "2026-11-07T19:12:46.109",
+			"videoURL": null,
+			"scoreRedFinal": 121,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 153,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 16,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 10136,
+					"displayTeamNumber": "10136",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Frost RoboFalcons"
+				},
+				{
+					"teamNumber": 10016,
+					"displayTeamNumber": "10016",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Clarkston RoboWolves"
+				},
+				{
+					"teamNumber": 5237,
+					"displayTeamNumber": "5237",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Loose Screws"
+				},
+				{
+					"teamNumber": 23392,
+					"displayTeamNumber": "23392",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Innovators"
+				}
+			]
+		}
+	]
+}

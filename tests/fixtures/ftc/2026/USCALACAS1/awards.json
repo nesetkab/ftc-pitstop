@@ -1,0 +1,124 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "USCALACAS1",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USCALACAS1",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USCALACAS1",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USCALACAS1",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USCALACAS1",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USCALACAS1",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USCALACAS1",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USCALACAS1",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USCALACAS1",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USCALACAS1",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USCALACAS1",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USCALACAS1",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}

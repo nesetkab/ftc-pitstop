@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "63ed1d34-98e5-b94b-9f3c-a1ca13caa85e",
+			"code": "KZASN2",
+			"divisionCode": null,
+			"name": "Astana FIRST Scrimmage",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 1,
+			"published": true,
+			"type": "0",
+			"typeName": "Non-Advancement",
+			"regionCode": "KZ",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "K.E.R.N. School",
+			"address": "Zhoshy Khan Street, 10B",
+			"city": "Astana",
+			"stateprov": "AST",
+			"country": "Kazakhstan",
+			"website": null,
+			"liveStreamUrl": null,
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=82564",
+			"coordinates": null,
+			"webcasts": null,
+			"timezone": "Asia/Almaty",
+			"dateStart": "2026-10-31T00:00:00",
+			"dateEnd": "2026-10-31T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

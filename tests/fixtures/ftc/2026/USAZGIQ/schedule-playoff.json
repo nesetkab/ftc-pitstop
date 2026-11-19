@@ -1,0 +1,624 @@
+{
+	"schedule": [
+		{
+			"description": "Upper Bracket  Round 1 Match 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T15:35:00",
+			"actualStartTime": "2026-11-14T15:38:43.404",
+			"postResultTime": "2026-11-14T15:42:05.171",
+			"videoURL": null,
+			"scoreRedFinal": 48,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 13,
+			"scoreBlueFinal": 51,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 28,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 2844,
+					"displayTeamNumber": "2844",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Valley X Robotics"
+				},
+				{
+					"teamNumber": 14624,
+					"displayTeamNumber": "14624",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cat-Astrophic Byte "
+				},
+				{
+					"teamNumber": 15135,
+					"displayTeamNumber": "15135",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Venom"
+				},
+				{
+					"teamNumber": 15058,
+					"displayTeamNumber": "15058",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "RoboJags"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 1 Match 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 2,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T15:41:00",
+			"actualStartTime": "2026-11-14T15:43:20.822",
+			"postResultTime": "2026-11-14T15:46:40.555",
+			"videoURL": null,
+			"scoreRedFinal": 67,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 54,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 28,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 21579,
+					"displayTeamNumber": "21579",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Testing is Optional"
+				},
+				{
+					"teamNumber": 26128,
+					"displayTeamNumber": "26128",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Wrightly Reconfigured Robots"
+				},
+				{
+					"teamNumber": 37557,
+					"displayTeamNumber": "37557",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Grape Nerds"
+				},
+				{
+					"teamNumber": 12841,
+					"displayTeamNumber": "12841",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "+3 Robotics"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 3",
+			"tournamentLevel": "PLAYOFF",
+			"series": 3,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T15:47:00",
+			"actualStartTime": "2026-11-14T15:51:49.528",
+			"postResultTime": "2026-11-14T15:55:55.014",
+			"videoURL": null,
+			"scoreRedFinal": 130,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 31,
+			"scoreBlueFinal": 76,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 26670,
+					"displayTeamNumber": "26670",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SCA Iron Eagles "
+				},
+				{
+					"teamNumber": 18421,
+					"displayTeamNumber": "18421",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Unscheduled Disassembly"
+				},
+				{
+					"teamNumber": 14624,
+					"displayTeamNumber": "14624",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cat-Astrophic Byte "
+				},
+				{
+					"teamNumber": 2844,
+					"displayTeamNumber": "2844",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Valley X Robotics"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 4",
+			"tournamentLevel": "PLAYOFF",
+			"series": 4,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T15:53:00",
+			"actualStartTime": "2026-11-14T15:57:25.893",
+			"postResultTime": "2026-11-14T16:01:06.45",
+			"videoURL": null,
+			"scoreRedFinal": 106,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 72,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 13,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 18420,
+					"displayTeamNumber": "18420",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Metal Masters"
+				},
+				{
+					"teamNumber": 25620,
+					"displayTeamNumber": "25620",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Hexadecimal Nibble"
+				},
+				{
+					"teamNumber": 21579,
+					"displayTeamNumber": "21579",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Testing is Optional"
+				},
+				{
+					"teamNumber": 26128,
+					"displayTeamNumber": "26128",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Wrightly Reconfigured Robots"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 5",
+			"tournamentLevel": "PLAYOFF",
+			"series": 5,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T15:59:00",
+			"actualStartTime": "2026-11-14T16:04:42.372",
+			"postResultTime": "2026-11-14T16:08:26.357",
+			"videoURL": null,
+			"scoreRedFinal": 58,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 31,
+			"scoreBlueFinal": 68,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 14624,
+					"displayTeamNumber": "14624",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cat-Astrophic Byte "
+				},
+				{
+					"teamNumber": 12841,
+					"displayTeamNumber": "12841",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "+3 Robotics"
+				},
+				{
+					"teamNumber": 2844,
+					"displayTeamNumber": "2844",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Valley X Robotics"
+				},
+				{
+					"teamNumber": 37557,
+					"displayTeamNumber": "37557",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Grape Nerds"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 6",
+			"tournamentLevel": "PLAYOFF",
+			"series": 6,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T16:05:00",
+			"actualStartTime": "2026-11-14T16:10:26.023",
+			"postResultTime": "2026-11-14T16:14:22.399",
+			"videoURL": null,
+			"scoreRedFinal": 94,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 33,
+			"scoreBlueFinal": 47,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 13,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 21579,
+					"displayTeamNumber": "21579",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Testing is Optional"
+				},
+				{
+					"teamNumber": 26128,
+					"displayTeamNumber": "26128",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Wrightly Reconfigured Robots"
+				},
+				{
+					"teamNumber": 15058,
+					"displayTeamNumber": "15058",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "RoboJags"
+				},
+				{
+					"teamNumber": 15135,
+					"displayTeamNumber": "15135",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Venom"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 4 Match 7",
+			"tournamentLevel": "PLAYOFF",
+			"series": 7,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T16:11:00",
+			"actualStartTime": "2026-11-14T16:17:17.934",
+			"postResultTime": "2026-11-14T16:21:00.157",
+			"videoURL": null,
+			"scoreRedFinal": 97,
+			"scoreRedFoul": 20,
+			"scoreRedAuto": 31,
+			"scoreBlueFinal": 156,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 26670,
+					"displayTeamNumber": "26670",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SCA Iron Eagles "
+				},
+				{
+					"teamNumber": 18421,
+					"displayTeamNumber": "18421",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Unscheduled Disassembly"
+				},
+				{
+					"teamNumber": 18420,
+					"displayTeamNumber": "18420",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Metal Masters"
+				},
+				{
+					"teamNumber": 25620,
+					"displayTeamNumber": "25620",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Hexadecimal Nibble"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 4 Match 8",
+			"tournamentLevel": "PLAYOFF",
+			"series": 8,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T16:17:00",
+			"actualStartTime": "2026-11-14T16:22:49.335",
+			"postResultTime": "2026-11-14T16:26:09.527",
+			"videoURL": null,
+			"scoreRedFinal": 80,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 68,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 26128,
+					"displayTeamNumber": "26128",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Wrightly Reconfigured Robots"
+				},
+				{
+					"teamNumber": 37557,
+					"displayTeamNumber": "37557",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Grape Nerds"
+				},
+				{
+					"teamNumber": 12841,
+					"displayTeamNumber": "12841",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "+3 Robotics"
+				},
+				{
+					"teamNumber": 21579,
+					"displayTeamNumber": "21579",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Testing is Optional"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 5 Match 9",
+			"tournamentLevel": "PLAYOFF",
+			"series": 9,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T16:35:00",
+			"actualStartTime": "2026-11-14T16:39:14.958",
+			"postResultTime": "2026-11-14T16:42:33.061",
+			"videoURL": null,
+			"scoreRedFinal": 86,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 58,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 26128,
+					"displayTeamNumber": "26128",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Wrightly Reconfigured Robots"
+				},
+				{
+					"teamNumber": 21579,
+					"displayTeamNumber": "21579",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Testing is Optional"
+				},
+				{
+					"teamNumber": 18421,
+					"displayTeamNumber": "18421",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Unscheduled Disassembly"
+				},
+				{
+					"teamNumber": 26670,
+					"displayTeamNumber": "26670",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SCA Iron Eagles "
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 6 Match 10",
+			"tournamentLevel": "PLAYOFF",
+			"series": 10,
+			"matchNumber": 1,
+			"startTime": "2026-11-14T16:53:00",
+			"actualStartTime": "2026-11-14T16:54:00.884",
+			"postResultTime": "2026-11-14T16:57:27.113",
+			"videoURL": null,
+			"scoreRedFinal": 178,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 81,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 18420,
+					"displayTeamNumber": "18420",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Metal Masters"
+				},
+				{
+					"teamNumber": 25620,
+					"displayTeamNumber": "25620",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Hexadecimal Nibble"
+				},
+				{
+					"teamNumber": 26670,
+					"displayTeamNumber": "26670",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SCA Iron Eagles "
+				},
+				{
+					"teamNumber": 18421,
+					"displayTeamNumber": "18421",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Unscheduled Disassembly"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,872 @@
+{
+	"schedule": [
+		{
+			"description": "Qualification 1",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 1,
+			"startTime": "2026-10-24T10:15:00",
+			"actualStartTime": "2026-10-24T10:16:17.864",
+			"postResultTime": "2026-10-24T10:20:38.155",
+			"videoURL": null,
+			"scoreRedFinal": 24,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 28,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 6,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 7842,
+					"displayTeamNumber": "7842",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Browncoats"
+				},
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				},
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				},
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				}
+			]
+		},
+		{
+			"description": "Qualification 2",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 2,
+			"startTime": "2026-10-24T10:28:00",
+			"actualStartTime": "2026-10-24T10:25:15.646",
+			"postResultTime": "2026-10-24T10:29:56.157",
+			"videoURL": null,
+			"scoreRedFinal": 8,
+			"scoreRedFoul": 5,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 37,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 27305,
+					"displayTeamNumber": "27305",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SOS (Surgeons 0f Steel)"
+				},
+				{
+					"teamNumber": 18664,
+					"displayTeamNumber": "18664",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Robotics 18664"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				},
+				{
+					"teamNumber": 25114,
+					"displayTeamNumber": "25114",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Lovelace's Legacy"
+				}
+			]
+		},
+		{
+			"description": "Qualification 3",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 3,
+			"startTime": "2026-10-24T10:41:00",
+			"actualStartTime": "2026-10-24T10:37:32.708",
+			"postResultTime": "2026-10-24T10:40:54.996",
+			"videoURL": null,
+			"scoreRedFinal": 24,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 6,
+			"scoreBlueFinal": 17,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				},
+				{
+					"teamNumber": 18664,
+					"displayTeamNumber": "18664",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Robotics 18664"
+				},
+				{
+					"teamNumber": 7842,
+					"displayTeamNumber": "7842",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Browncoats"
+				},
+				{
+					"teamNumber": 30403,
+					"displayTeamNumber": "30403",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tell Your Dog We Said HI"
+				}
+			]
+		},
+		{
+			"description": "Qualification 4",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 4,
+			"startTime": "2026-10-24T10:54:00",
+			"actualStartTime": "2026-10-24T10:48:19.017",
+			"postResultTime": "2026-10-24T10:51:36.698",
+			"videoURL": null,
+			"scoreRedFinal": 21,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 35,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 30403,
+					"displayTeamNumber": "30403",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tell Your Dog We Said HI"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				},
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				},
+				{
+					"teamNumber": 27305,
+					"displayTeamNumber": "27305",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SOS (Surgeons 0f Steel)"
+				}
+			]
+		},
+		{
+			"description": "Qualification 5",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 5,
+			"startTime": "2026-10-24T11:07:00",
+			"actualStartTime": "2026-10-24T10:56:32.488",
+			"postResultTime": "2026-10-24T10:59:44.826",
+			"videoURL": null,
+			"scoreRedFinal": 10,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 64,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 25114,
+					"displayTeamNumber": "25114",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Lovelace's Legacy"
+				},
+				{
+					"teamNumber": 18664,
+					"displayTeamNumber": "18664",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Robotics 18664"
+				},
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				},
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				}
+			]
+		},
+		{
+			"description": "Qualification 6",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 6,
+			"startTime": "2026-10-24T11:20:00",
+			"actualStartTime": "2026-10-24T11:21:33.85",
+			"postResultTime": "2026-10-24T11:25:05.119",
+			"videoURL": null,
+			"scoreRedFinal": 34,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 41,
+			"scoreBlueFoul": 10,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 30403,
+					"displayTeamNumber": "30403",
+					"station": "Red1",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tell Your Dog We Said HI"
+				},
+				{
+					"teamNumber": 7842,
+					"displayTeamNumber": "7842",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Browncoats"
+				},
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				},
+				{
+					"teamNumber": 25114,
+					"displayTeamNumber": "25114",
+					"station": "Blue2",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Lovelace's Legacy"
+				}
+			]
+		},
+		{
+			"description": "Qualification 7",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 7,
+			"startTime": "2026-10-24T11:33:00",
+			"actualStartTime": "2026-10-24T11:30:50.159",
+			"postResultTime": "2026-10-24T11:34:11.061",
+			"videoURL": null,
+			"scoreRedFinal": 38,
+			"scoreRedFoul": 5,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 28,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 27305,
+					"displayTeamNumber": "27305",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SOS (Surgeons 0f Steel)"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				},
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				},
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				}
+			]
+		},
+		{
+			"description": "Qualification 8",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 8,
+			"startTime": "2026-10-24T11:46:00",
+			"actualStartTime": "2026-10-24T11:38:02.359",
+			"postResultTime": "2026-10-24T11:41:19.499",
+			"videoURL": null,
+			"scoreRedFinal": 24,
+			"scoreRedFoul": 5,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 33,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 27305,
+					"displayTeamNumber": "27305",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SOS (Surgeons 0f Steel)"
+				},
+				{
+					"teamNumber": 25114,
+					"displayTeamNumber": "25114",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Lovelace's Legacy"
+				},
+				{
+					"teamNumber": 7842,
+					"displayTeamNumber": "7842",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Browncoats"
+				},
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				}
+			]
+		},
+		{
+			"description": "Qualification 9",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 9,
+			"startTime": "2026-10-24T12:45:00",
+			"actualStartTime": "2026-10-24T12:43:17.825",
+			"postResultTime": "2026-10-24T12:46:44.873",
+			"videoURL": null,
+			"scoreRedFinal": 52,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 6,
+			"scoreBlueFinal": 27,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				},
+				{
+					"teamNumber": 18664,
+					"displayTeamNumber": "18664",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Robotics 18664"
+				},
+				{
+					"teamNumber": 30403,
+					"displayTeamNumber": "30403",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tell Your Dog We Said HI"
+				}
+			]
+		},
+		{
+			"description": "Qualification 10",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 10,
+			"startTime": "2026-10-24T12:58:00",
+			"actualStartTime": "2026-10-24T12:56:12.159",
+			"postResultTime": "2026-10-24T13:02:53.292",
+			"videoURL": null,
+			"scoreRedFinal": 50,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 24,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				},
+				{
+					"teamNumber": 25114,
+					"displayTeamNumber": "25114",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Lovelace's Legacy"
+				},
+				{
+					"teamNumber": 30403,
+					"displayTeamNumber": "30403",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tell Your Dog We Said HI"
+				}
+			]
+		},
+		{
+			"description": "Qualification 11",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 11,
+			"startTime": "2026-10-24T13:11:00",
+			"actualStartTime": "2026-10-24T13:07:03.996",
+			"postResultTime": "2026-10-24T13:11:53.452",
+			"videoURL": null,
+			"scoreRedFinal": 25,
+			"scoreRedFoul": 20,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 59,
+			"scoreBlueFoul": 5,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 27305,
+					"displayTeamNumber": "27305",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SOS (Surgeons 0f Steel)"
+				},
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				},
+				{
+					"teamNumber": 7842,
+					"displayTeamNumber": "7842",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Browncoats"
+				},
+				{
+					"teamNumber": 18664,
+					"displayTeamNumber": "18664",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Robotics 18664"
+				}
+			]
+		},
+		{
+			"description": "Qualification 12",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 12,
+			"startTime": "2026-10-24T13:24:00",
+			"actualStartTime": "2026-10-24T13:14:33.058",
+			"postResultTime": "2026-10-24T13:18:06.935",
+			"videoURL": null,
+			"scoreRedFinal": 22,
+			"scoreRedFoul": 20,
+			"scoreRedAuto": 6,
+			"scoreBlueFinal": 72,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				},
+				{
+					"teamNumber": 27305,
+					"displayTeamNumber": "27305",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SOS (Surgeons 0f Steel)"
+				},
+				{
+					"teamNumber": 30403,
+					"displayTeamNumber": "30403",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tell Your Dog We Said HI"
+				},
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				}
+			]
+		},
+		{
+			"description": "Qualification 13",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 13,
+			"startTime": "2026-10-24T13:37:00",
+			"actualStartTime": "2026-10-24T13:24:58.944",
+			"postResultTime": "2026-10-24T13:28:24.828",
+			"videoURL": null,
+			"scoreRedFinal": 35,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 30,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 25114,
+					"displayTeamNumber": "25114",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Lovelace's Legacy"
+				},
+				{
+					"teamNumber": 7842,
+					"displayTeamNumber": "7842",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Browncoats"
+				},
+				{
+					"teamNumber": 18664,
+					"displayTeamNumber": "18664",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Viking Robotics 18664"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				}
+			]
+		},
+		{
+			"description": "Qualification 14",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 14,
+			"startTime": "2026-10-24T13:50:00",
+			"actualStartTime": "2026-10-24T13:43:12.756",
+			"postResultTime": "2026-10-24T13:46:53.682",
+			"videoURL": null,
+			"scoreRedFinal": 49,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 13,
+			"scoreBlueFinal": 32,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				},
+				{
+					"teamNumber": 30403,
+					"displayTeamNumber": "30403",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tell Your Dog We Said HI"
+				},
+				{
+					"teamNumber": 25114,
+					"displayTeamNumber": "25114",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Lovelace's Legacy"
+				},
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				}
+			]
+		}
+	]
+}

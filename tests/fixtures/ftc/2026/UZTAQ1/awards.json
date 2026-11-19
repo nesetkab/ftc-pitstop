@@ -1,0 +1,154 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "UZTAQ1",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": 34750,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "UZTAQ1",
+			"name": "Inspire Award 2nd Place",
+			"series": 2,
+			"teamNumber": 38120,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "UZTAQ1",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 19163,
+			"schoolName": null,
+			"fullTeamName": "Prometheus",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "UZTAQ1",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 33030,
+			"schoolName": null,
+			"fullTeamName": "Home School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "UZTAQ1",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 38244,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "UZTAQ1",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 35577,
+			"schoolName": null,
+			"fullTeamName": "Qarshi state school",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "UZTAQ1",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": 19163,
+			"schoolName": null,
+			"fullTeamName": "Prometheus",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "UZTAQ1",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": 38244,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "UZTAQ1",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": 39503,
+			"schoolName": null,
+			"fullTeamName": "Sehriyo school",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "UZTAQ1",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": 35406,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "UZTAQ1",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": 35407,
+			"schoolName": null,
+			"fullTeamName": "Olmaliq State university & Olmaliq State university",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "UZTAQ1",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": 35577,
+			"schoolName": null,
+			"fullTeamName": "Qarshi state school",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "UZTAQ1",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": 33030,
+			"schoolName": null,
+			"fullTeamName": "Home School",
+			"person": null
+		},
+		{
+			"awardId": 1,
+			"eventCode": "UZTAQ1",
+			"name": "Judges' Choice Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 10,
+			"eventCode": "UZTAQ1",
+			"name": "<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}

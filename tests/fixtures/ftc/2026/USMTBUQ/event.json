@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "f71de661-cc42-2e4b-be48-d7e059c07850",
+			"code": "USMTBUQ",
+			"divisionCode": null,
+			"name": "Montana Qualifier - Butte MT-Tech",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 2,
+			"published": false,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "USMT",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "East Middle School",
+			"address": "2600 Grand Ave, Butte, MT",
+			"city": "Butte",
+			"stateprov": "MT",
+			"country": "USA",
+			"website": "https://www.mtroboticsalliance.org/programs/first-tech-challenge-ftc/ftc-qualifier-butte",
+			"liveStreamUrl": "https://www.youtube.com/@mtra-stream/streams",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=81398",
+			"coordinates": { "type": "Point", "coordinates": [-112.49679, 45.99939] },
+			"webcasts": null,
+			"timezone": "America/Denver",
+			"dateStart": "2026-11-20T00:00:00",
+			"dateEnd": "2026-11-21T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

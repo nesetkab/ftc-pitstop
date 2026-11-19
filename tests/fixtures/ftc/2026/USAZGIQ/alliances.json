@@ -1,0 +1,93 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": {
+				"teamNumber": 26670,
+				"displayTeamNumber": "26670",
+				"teamName": "SCA Iron Eagles "
+			},
+			"round1": {
+				"teamNumber": 18421,
+				"displayTeamNumber": "18421",
+				"teamName": "Unscheduled Disassembly"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": { "teamNumber": 18420, "displayTeamNumber": "18420", "teamName": "Metal Masters" },
+			"round1": {
+				"teamNumber": 25620,
+				"displayTeamNumber": "25620",
+				"teamName": "Hexadecimal Nibble"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 3,
+			"name": "Alliance Seed 3",
+			"captain": {
+				"teamNumber": 21579,
+				"displayTeamNumber": "21579",
+				"teamName": "Testing is Optional"
+			},
+			"round1": {
+				"teamNumber": 26128,
+				"displayTeamNumber": "26128",
+				"teamName": "Wrightly Reconfigured Robots"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 4,
+			"name": "Alliance Seed 4",
+			"captain": { "teamNumber": 15058, "displayTeamNumber": "15058", "teamName": "RoboJags" },
+			"round1": { "teamNumber": 15135, "displayTeamNumber": "15135", "teamName": "Venom" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 5,
+			"name": "Alliance Seed 5",
+			"captain": {
+				"teamNumber": 14624,
+				"displayTeamNumber": "14624",
+				"teamName": "Cat-Astrophic Byte "
+			},
+			"round1": {
+				"teamNumber": 2844,
+				"displayTeamNumber": "2844",
+				"teamName": "Valley X Robotics"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 6,
+			"name": "Alliance Seed 6",
+			"captain": { "teamNumber": 37557, "displayTeamNumber": "37557", "teamName": "Grape Nerds" },
+			"round1": { "teamNumber": 12841, "displayTeamNumber": "12841", "teamName": "+3 Robotics" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 6
+}

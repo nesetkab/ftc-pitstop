@@ -1,0 +1,500 @@
+{
+	"schedule": [
+		{
+			"description": "Qualification 1",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 1,
+			"startTime": "2026-10-31T12:00:00",
+			"actualStartTime": "2026-10-31T12:21:21.545",
+			"postResultTime": "2026-10-31T12:25:18.076",
+			"videoURL": null,
+			"scoreRedFinal": 53,
+			"scoreRedFoul": 20,
+			"scoreRedAuto": 23,
+			"scoreBlueFinal": 126,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 28,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 33595,
+					"displayTeamNumber": "33595",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TOLQYN"
+				},
+				{
+					"teamNumber": 21062,
+					"displayTeamNumber": "21062",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "QUANT"
+				},
+				{
+					"teamNumber": 34350,
+					"displayTeamNumber": "34350",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "OZGE"
+				},
+				{
+					"teamNumber": 37721,
+					"displayTeamNumber": "37721",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "AQQU"
+				}
+			]
+		},
+		{
+			"description": "Qualification 2",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 2,
+			"startTime": "2026-10-31T12:09:00",
+			"actualStartTime": "2026-10-31T12:29:05.381",
+			"postResultTime": "2026-10-31T12:34:27.104",
+			"videoURL": null,
+			"scoreRedFinal": 114,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 85,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 21062,
+					"displayTeamNumber": "21062",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "QUANT"
+				},
+				{
+					"teamNumber": 34730,
+					"displayTeamNumber": "34730",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "sipisix"
+				},
+				{
+					"teamNumber": 36969,
+					"displayTeamNumber": "36969",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Astrobot"
+				},
+				{
+					"teamNumber": 34350,
+					"displayTeamNumber": "34350",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "OZGE"
+				}
+			]
+		},
+		{
+			"description": "Qualification 3",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 3,
+			"startTime": "2026-10-31T12:18:00",
+			"actualStartTime": "2026-10-31T12:38:05.941",
+			"postResultTime": "2026-10-31T12:42:08.069",
+			"videoURL": null,
+			"scoreRedFinal": 29,
+			"scoreRedFoul": 40,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 131,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 33595,
+					"displayTeamNumber": "33595",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TOLQYN"
+				},
+				{
+					"teamNumber": 34730,
+					"displayTeamNumber": "34730",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "sipisix"
+				},
+				{
+					"teamNumber": 37721,
+					"displayTeamNumber": "37721",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "AQQU"
+				},
+				{
+					"teamNumber": 36969,
+					"displayTeamNumber": "36969",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Astrobot"
+				}
+			]
+		},
+		{
+			"description": "Qualification 4",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 4,
+			"startTime": "2026-10-31T12:27:00",
+			"actualStartTime": "2026-10-31T12:48:50.036",
+			"postResultTime": "2026-10-31T12:52:32.419",
+			"videoURL": null,
+			"scoreRedFinal": 57,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 25,
+			"scoreBlueFinal": 87,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 16,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 34350,
+					"displayTeamNumber": "34350",
+					"station": "Red1",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "OZGE"
+				},
+				{
+					"teamNumber": 33595,
+					"displayTeamNumber": "33595",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TOLQYN"
+				},
+				{
+					"teamNumber": 21062,
+					"displayTeamNumber": "21062",
+					"station": "Blue1",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "QUANT"
+				},
+				{
+					"teamNumber": 36969,
+					"displayTeamNumber": "36969",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Astrobot"
+				}
+			]
+		},
+		{
+			"description": "Qualification 5",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 5,
+			"startTime": "2026-10-31T12:36:00",
+			"actualStartTime": "2026-10-31T12:57:30.711",
+			"postResultTime": "2026-10-31T13:03:02.901",
+			"videoURL": null,
+			"scoreRedFinal": 63,
+			"scoreRedFoul": 40,
+			"scoreRedAuto": 5,
+			"scoreBlueFinal": 138,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 36969,
+					"displayTeamNumber": "36969",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Astrobot"
+				},
+				{
+					"teamNumber": 34350,
+					"displayTeamNumber": "34350",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "OZGE"
+				},
+				{
+					"teamNumber": 37721,
+					"displayTeamNumber": "37721",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "AQQU"
+				},
+				{
+					"teamNumber": 34730,
+					"displayTeamNumber": "34730",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "sipisix"
+				}
+			]
+		},
+		{
+			"description": "Qualification 6",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 6,
+			"startTime": "2026-10-31T12:45:00",
+			"actualStartTime": "2026-10-31T13:05:51.404",
+			"postResultTime": "2026-10-31T13:11:00.457",
+			"videoURL": null,
+			"scoreRedFinal": 149,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 66,
+			"scoreBlueFoul": 40,
+			"scoreBlueAuto": 28,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 21062,
+					"displayTeamNumber": "21062",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "QUANT"
+				},
+				{
+					"teamNumber": 37721,
+					"displayTeamNumber": "37721",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "AQQU"
+				},
+				{
+					"teamNumber": 34730,
+					"displayTeamNumber": "34730",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "sipisix"
+				},
+				{
+					"teamNumber": 33595,
+					"displayTeamNumber": "33595",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TOLQYN"
+				}
+			]
+		},
+		{
+			"description": "Qualification 7",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 7,
+			"startTime": "2026-10-31T12:54:00",
+			"actualStartTime": "2026-10-31T13:17:58.853",
+			"postResultTime": "2026-10-31T13:22:02.274",
+			"videoURL": null,
+			"scoreRedFinal": 123,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 35,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 28,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 21062,
+					"displayTeamNumber": "21062",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "QUANT"
+				},
+				{
+					"teamNumber": 34350,
+					"displayTeamNumber": "34350",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "OZGE"
+				},
+				{
+					"teamNumber": 37721,
+					"displayTeamNumber": "37721",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "AQQU"
+				},
+				{
+					"teamNumber": 36969,
+					"displayTeamNumber": "36969",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Astrobot"
+				}
+			]
+		},
+		{
+			"description": "Qualification 8",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 8,
+			"startTime": "2026-10-31T13:03:00",
+			"actualStartTime": "2026-10-31T13:24:58.768",
+			"postResultTime": "2026-10-31T13:31:20.358",
+			"videoURL": null,
+			"scoreRedFinal": 229,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 30,
+			"scoreBlueFinal": 73,
+			"scoreBlueFoul": 140,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 34730,
+					"displayTeamNumber": "34730",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "sipisix"
+				},
+				{
+					"teamNumber": 34350,
+					"displayTeamNumber": "34350",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "OZGE"
+				},
+				{
+					"teamNumber": 33595,
+					"displayTeamNumber": "33595",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TOLQYN"
+				},
+				{
+					"teamNumber": 21062,
+					"displayTeamNumber": "21062",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "QUANT"
+				}
+			]
+		}
+	]
+}

@@ -1,0 +1,47 @@
+{
+	"advancesTo": "USALCMP",
+	"slots": 5,
+	"fcmpReserved": 0,
+	"advancement": [
+		{
+			"team": 19459,
+			"displayTeam": "19459",
+			"slot": 1,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 35722,
+			"displayTeam": "35722",
+			"slot": 2,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 25114,
+			"displayTeam": "25114",
+			"slot": 3,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 24378,
+			"displayTeam": "24378",
+			"slot": 4,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 21830,
+			"displayTeam": "21830",
+			"slot": 5,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		}
+	]
+}

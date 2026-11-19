@@ -1,0 +1,51 @@
+{
+	"code": "USUTSAS1",
+	"note": "scrimmage with only playoff matches played 1 v 1",
+	"recordedAt": "2026-11-19T07:20:02.775Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USUTSAS1", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USUTSAS1", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USUTSAS1", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USUTSAS1/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:37:41 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USUTSAS1/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:37:41 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/USUTSAS1?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:37:41 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USUTSAS1?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:37:41 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/USUTSAS1/qual",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:37:41 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/USUTSAS1/playoff",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:37:41 GMT"
+		},
+		"alliances": {
+			"path": "alliances/USUTSAS1",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:20:02 GMT"
+		},
+		"awards": {
+			"path": "awards/USUTSAS1",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:37:41 GMT"
+		},
+		"advancement": { "path": "advancement/USUTSAS1", "status": 200, "lastModified": null }
+	}
+}

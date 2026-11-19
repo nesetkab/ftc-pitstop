@@ -1,0 +1,124 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "KZASN2",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "KZASN2",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 34350,
+			"schoolName": null,
+			"fullTeamName": "Astana Polytechnic",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "KZASN2",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 37721,
+			"schoolName": null,
+			"fullTeamName": "ARNA",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "KZASN2",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 21062,
+			"schoolName": null,
+			"fullTeamName": "Quantum STEM School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "KZASN2",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 34730,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "KZASN2",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "KZASN2",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "KZASN2",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "KZASN2",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "KZASN2",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "KZASN2",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "KZASN2",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}

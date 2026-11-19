@@ -1,0 +1,244 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "USAZGIQ",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": 25620,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USAZGIQ",
+			"name": "Inspire Award 2nd Place",
+			"series": 2,
+			"teamNumber": 18420,
+			"schoolName": null,
+			"fullTeamName": "WyrFree/Stadium Technology Solutions/Eicite/Extreme Print Lab/FRC Tees&Glendale Preparatory Academy",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USAZGIQ",
+			"name": "Inspire Award 3rd Place",
+			"series": 3,
+			"teamNumber": 2844,
+			"schoolName": null,
+			"fullTeamName": "Valley Christian Schools/Rainey Renovations/Solidworks&Valley Christian High School",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USAZGIQ",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 18420,
+			"schoolName": null,
+			"fullTeamName": "WyrFree/Stadium Technology Solutions/Eicite/Extreme Print Lab/FRC Tees&Glendale Preparatory Academy",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USAZGIQ",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 25620,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USAZGIQ",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 26670,
+			"schoolName": null,
+			"fullTeamName": "Scottsdale Christian Academy/Wesley Family Foundation/Lanphar Mechanical/APSEF (Arizona Private Education Scholarship Fund)&Scottsdale Christian Academy",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USAZGIQ",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 18421,
+			"schoolName": null,
+			"fullTeamName": "Glendale Preparatory Academy",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USAZGIQ",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": 18625,
+			"schoolName": null,
+			"fullTeamName": "Great Hearts Academies - Trivium Prep",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USAZGIQ",
+			"name": "Think Award 2nd Place",
+			"series": 2,
+			"teamNumber": 38444,
+			"schoolName": null,
+			"fullTeamName": "LAUNCH TEAM Robotics&Empower College Prep High School",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USAZGIQ",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": 14254,
+			"schoolName": null,
+			"fullTeamName": "Trivium Preparatory Academy",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USAZGIQ",
+			"name": "Connect Award 2nd Place",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USAZGIQ",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": 10984,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USAZGIQ",
+			"name": "Sustain Award 2nd Place",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USAZGIQ",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": 26128,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USAZGIQ",
+			"name": "Innovate Award sponsored by RTX 2nd Place",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USAZGIQ",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": 35849,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USAZGIQ",
+			"name": "Control Award 2nd Place",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USAZGIQ",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": 15058,
+			"schoolName": null,
+			"fullTeamName": "Canyon View High School",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USAZGIQ",
+			"name": "Reach Award 2nd Place",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USAZGIQ",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": 22258,
+			"schoolName": null,
+			"fullTeamName": "Heritage Academy Gateway",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USAZGIQ",
+			"name": "Design Award 2nd Place",
+			"series": 2,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 1,
+			"eventCode": "USAZGIQ",
+			"name": "Judges' Choice Award",
+			"series": 1,
+			"teamNumber": 11980,
+			"schoolName": null,
+			"fullTeamName": "Caterpillar Inc.&San Miguel Cristo Rey Cath HS",
+			"person": null
+		},
+		{
+			"awardId": 10,
+			"eventCode": "USAZGIQ",
+			"name": "<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 19,
+			"eventCode": "USAZGIQ",
+			"name": "Volunteer Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": "Hunter Kotora"
+		}
+	]
+}

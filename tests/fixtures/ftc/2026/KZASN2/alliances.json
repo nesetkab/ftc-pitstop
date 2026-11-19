@@ -1,0 +1,25 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": { "teamNumber": 34350, "displayTeamNumber": "34350", "teamName": "OZGE" },
+			"round1": { "teamNumber": 37721, "displayTeamNumber": "37721", "teamName": "AQQU" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": { "teamNumber": 21062, "displayTeamNumber": "21062", "teamName": "QUANT" },
+			"round1": { "teamNumber": 34730, "displayTeamNumber": "34730", "teamName": "sipisix" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 2
+}

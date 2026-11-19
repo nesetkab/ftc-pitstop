@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "0266a5c8-e0dc-1b42-8941-ec83fb578317",
+			"code": "USMISOQ",
+			"divisionCode": null,
+			"name": "Southgate Qualifier",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 2,
+			"published": true,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "USMI",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "Anderson High School",
+			"address": "15475 Leroy St",
+			"city": "Southgate",
+			"stateprov": "MI",
+			"country": "USA",
+			"website": "https://firstinmichigan.us/FTC/events/",
+			"liveStreamUrl": "https://fimav.us/live/2026/USMISOQ",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=81814",
+			"coordinates": { "type": "Point", "coordinates": [-83.21225, 42.18959] },
+			"webcasts": null,
+			"timezone": "America/New_York",
+			"dateStart": "2026-11-06T00:00:00",
+			"dateEnd": "2026-11-07T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

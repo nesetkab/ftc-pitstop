@@ -1,0 +1,376 @@
+{
+	"schedule": [
+		{
+			"description": "Upper Bracket  Round 1 Match 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"startTime": "2026-11-15T14:20:00",
+			"actualStartTime": "2026-11-15T14:28:15.825",
+			"postResultTime": "2026-11-15T14:32:19.816",
+			"videoURL": null,
+			"scoreRedFinal": 166,
+			"scoreRedFoul": 60,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 104,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19163,
+					"displayTeamNumber": "19163",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "MLP"
+				},
+				{
+					"teamNumber": 33030,
+					"displayTeamNumber": "33030",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Nyancat."
+				},
+				{
+					"teamNumber": 35406,
+					"displayTeamNumber": "35406",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ANDIJAN TEAM"
+				},
+				{
+					"teamNumber": 39503,
+					"displayTeamNumber": "39503",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Buzz lighter"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 1 Match 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 2,
+			"matchNumber": 1,
+			"startTime": "2026-11-15T14:26:00",
+			"actualStartTime": "2026-11-15T14:37:21.936",
+			"postResultTime": "2026-11-15T14:41:00.012",
+			"videoURL": null,
+			"scoreRedFinal": 52,
+			"scoreRedFoul": 40,
+			"scoreRedAuto": 13,
+			"scoreBlueFinal": 137,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 38120,
+					"displayTeamNumber": "38120",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Olimjon "
+				},
+				{
+					"teamNumber": 35577,
+					"displayTeamNumber": "35577",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "GSR - Ghost Simon Riley Robotics"
+				},
+				{
+					"teamNumber": 38244,
+					"displayTeamNumber": "38244",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "JSM - John Soap MacTavish Robotics"
+				},
+				{
+					"teamNumber": 35407,
+					"displayTeamNumber": "35407",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ASTRYX"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 2 Match 3",
+			"tournamentLevel": "PLAYOFF",
+			"series": 3,
+			"matchNumber": 1,
+			"startTime": "2026-11-15T14:37:00",
+			"actualStartTime": "2026-11-15T14:46:29.474",
+			"postResultTime": "2026-11-15T14:49:37.526",
+			"videoURL": null,
+			"scoreRedFinal": 78,
+			"scoreRedFoul": 20,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 66,
+			"scoreBlueFoul": 40,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 39503,
+					"displayTeamNumber": "39503",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Buzz lighter"
+				},
+				{
+					"teamNumber": 38120,
+					"displayTeamNumber": "38120",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Olimjon "
+				},
+				{
+					"teamNumber": 35407,
+					"displayTeamNumber": "35407",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ASTRYX"
+				},
+				{
+					"teamNumber": 35406,
+					"displayTeamNumber": "35406",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ANDIJAN TEAM"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 4",
+			"tournamentLevel": "PLAYOFF",
+			"series": 4,
+			"matchNumber": 1,
+			"startTime": "2026-11-15T14:43:00",
+			"actualStartTime": "2026-11-15T14:53:49.999",
+			"postResultTime": "2026-11-15T14:57:26.203",
+			"videoURL": null,
+			"scoreRedFinal": 112,
+			"scoreRedFoul": 40,
+			"scoreRedAuto": 56,
+			"scoreBlueFinal": 102,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 16,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19163,
+					"displayTeamNumber": "19163",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "MLP"
+				},
+				{
+					"teamNumber": 33030,
+					"displayTeamNumber": "33030",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Nyancat."
+				},
+				{
+					"teamNumber": 38244,
+					"displayTeamNumber": "38244",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "JSM - John Soap MacTavish Robotics"
+				},
+				{
+					"teamNumber": 35577,
+					"displayTeamNumber": "35577",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "GSR - Ghost Simon Riley Robotics"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 5",
+			"tournamentLevel": "PLAYOFF",
+			"series": 5,
+			"matchNumber": 1,
+			"startTime": "2026-11-15T15:01:00",
+			"actualStartTime": "2026-11-15T15:07:31.725",
+			"postResultTime": "2026-11-15T15:11:38.826",
+			"videoURL": null,
+			"scoreRedFinal": 163,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 16,
+			"scoreBlueFinal": 31,
+			"scoreBlueFoul": 65,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 38244,
+					"displayTeamNumber": "38244",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "JSM - John Soap MacTavish Robotics"
+				},
+				{
+					"teamNumber": 35577,
+					"displayTeamNumber": "35577",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "GSR - Ghost Simon Riley Robotics"
+				},
+				{
+					"teamNumber": 35406,
+					"displayTeamNumber": "35406",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "ANDIJAN TEAM"
+				},
+				{
+					"teamNumber": 39503,
+					"displayTeamNumber": "39503",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Buzz lighter"
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 4 Match 6",
+			"tournamentLevel": "PLAYOFF",
+			"series": 6,
+			"matchNumber": 1,
+			"startTime": "2026-11-15T15:19:00",
+			"actualStartTime": "2026-11-15T15:21:56.017",
+			"postResultTime": "2026-11-15T15:28:05.353",
+			"videoURL": null,
+			"scoreRedFinal": 163,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 48,
+			"scoreBlueFinal": 63,
+			"scoreBlueFoul": 25,
+			"scoreBlueAuto": 26,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19163,
+					"displayTeamNumber": "19163",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "MLP"
+				},
+				{
+					"teamNumber": 33030,
+					"displayTeamNumber": "33030",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Nyancat."
+				},
+				{
+					"teamNumber": 38244,
+					"displayTeamNumber": "38244",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "JSM - John Soap MacTavish Robotics"
+				},
+				{
+					"teamNumber": 35577,
+					"displayTeamNumber": "35577",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "GSR - Ghost Simon Riley Robotics"
+				}
+			]
+		}
+	]
+}

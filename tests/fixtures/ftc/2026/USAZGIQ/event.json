@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "23e34c1b-7ee2-6e4a-9ff2-972549578a81",
+			"code": "USAZGIQ",
+			"divisionCode": null,
+			"name": "Roadrunner - Gilbert Qualifier",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 2,
+			"published": true,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "USAZ",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "Gilbert Christian High School",
+			"address": "3632 E Jasper Drc",
+			"city": "Gilbert",
+			"stateprov": "AZ",
+			"country": "USA",
+			"website": "https://aznmfirsttechchallenge.blogspot.com/",
+			"liveStreamUrl": "https://www.youtube.com/live/uCS9NfIiQf8",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=81477",
+			"coordinates": { "type": "Point", "coordinates": [-111.71191, 33.32656] },
+			"webcasts": null,
+			"timezone": "America/Phoenix",
+			"dateStart": "2026-11-14T00:00:00",
+			"dateEnd": "2026-11-14T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

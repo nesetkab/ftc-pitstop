@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "b052ab7f-dba1-144d-9371-beb80e8abf9a",
+			"code": "USCALACAS1",
+			"divisionCode": null,
+			"name": "SoCal - G - Scrimmage 0",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 1,
+			"published": true,
+			"type": "0",
+			"typeName": "Non-Advancement",
+			"regionCode": "USCALA",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "California Academy of Math and Science",
+			"address": "1000 East Victory Street",
+			"city": "Carson",
+			"stateprov": "CA",
+			"country": "USA",
+			"website": "https://socalftc.org/",
+			"liveStreamUrl": null,
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=80812",
+			"coordinates": null,
+			"webcasts": null,
+			"timezone": "America/Los_Angeles",
+			"dateStart": "2026-10-24T00:00:00",
+			"dateEnd": "2026-10-24T00:00:00"
+		}
+	],
+	"eventCount": 1
+}
