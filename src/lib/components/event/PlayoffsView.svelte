@@ -46,7 +46,7 @@
 	{/if}
 	{#if bracket}
 		<section class="panel" aria-labelledby="bracket-title">
-			<h2 class="sec-title" id="bracket-title">Bracket</h2>
+			<h2 class="visually-hidden" id="bracket-title">Bracket</h2>
 			<Bracket code={bundle.event.code} {bracket} timezone={bundle.event.timezone} {followed} />
 		</section>
 	{/if}

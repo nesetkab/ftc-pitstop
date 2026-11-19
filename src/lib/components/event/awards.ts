@@ -47,7 +47,7 @@ export function groupAwards(awards: Award[]): AwardGroup[] {
 			.filter((item) => item.team !== null || item.person !== null)
 			.sort((a, b) => a.placement - b.placement);
 		if (given.length === 0) continue;
-		const placements = new Set(group.items.map((item) => item.placement));
+		const placements = new Set(given.map((item) => item.placement));
 		result.push({
 			id,
 			name: group.name,

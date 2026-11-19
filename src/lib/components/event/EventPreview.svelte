@@ -96,7 +96,7 @@
 		<caption class="visually-hidden">Teams at this event</caption>
 		<thead>
 			<tr>
-				<th class="l" scope="col">#</th>
+				{#if rated}<th class="l" scope="col">#</th>{/if}
 				<th class="l" scope="col">Team</th>
 				{#if rated}
 					<th scope="col">Starting OPR</th>
@@ -113,7 +113,7 @@
 		<tbody>
 			{#each rows as row, index (row.team.number)}
 				<tr class:me={followed.has(row.team.number)}>
-					<td class="l">{index + 1}</td>
+					{#if rated}<td class="l">{index + 1}</td>{/if}
 					<td class="team">
 						<TeamCell
 							number={row.team.number}

@@ -101,7 +101,7 @@
 	}
 
 	th.match {
-		padding: 9px 10px;
+		padding: 11px 10px 9px;
 		border-bottom: 1px solid var(--line);
 		font-size: 14px;
 		color: var(--text);
