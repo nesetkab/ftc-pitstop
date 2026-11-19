@@ -286,9 +286,10 @@ describe('season loaders', () => {
 		});
 		const result = await data.loadSeasonMatches({ from: '2026-09-13', to: '2026-09-20' });
 		expect(data.scoutCalls.map((call) => call.variables)).toEqual([
-			{ season: 2026, start: '2026-09-13', end: '2026-09-26' },
-			{ season: 2026, start: '2026-09-20', end: '2026-10-03' }
+			{ season: 2026, start: '2026-09-13', end: '2026-09-23' },
+			{ season: 2026, start: '2026-09-20', end: '2026-09-30' }
 		]);
+		expect(result.missing).toEqual([]);
 		expect(result.matches.map((match) => `${match.eventCode} ${match.key}`)).toEqual([
 			'USUTSAS1 p1',
 			'USUTSAS1 p2'

@@ -115,6 +115,11 @@ export function robotCategory(points: number): number {
 	return best;
 }
 
+export type SwarmState = {
+	totals: number[];
+	teams: Record<number, { counts: number[]; event: string }>;
+};
+
 export class SwarmBook {
 	private counts = new Map<number, Float64Array>();
 	private totals = new Float64Array(ROBOT_POINTS.length);
@@ -123,6 +128,25 @@ export class SwarmBook {
 
 	constructor(model: SwarmModel = SWARM_MODEL) {
 		this.model = model;
+	}
+
+	static from(state: SwarmState, model: SwarmModel = SWARM_MODEL): SwarmBook {
+		const book = new SwarmBook(model);
+		book.totals = Float64Array.from(state.totals);
+		for (const [team, entry] of Object.entries(state.teams)) {
+			book.counts.set(Number(team), Float64Array.from(entry.counts));
+			book.seen.set(Number(team), entry.event);
+		}
+		return book;
+	}
+
+	snapshot(teams: Iterable<number>): SwarmState {
+		const out: SwarmState['teams'] = {};
+		for (const team of teams) {
+			const counts = this.counts.get(team);
+			if (counts) out[team] = { counts: Array.from(counts), event: this.seen.get(team) ?? '' };
+		}
+		return { totals: Array.from(this.totals), teams: out };
 	}
 
 	private base(): Float64Array {

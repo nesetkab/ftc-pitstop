@@ -277,13 +277,20 @@ export interface TeamSeason {
 export interface SeasonMatchAlliance {
 	teams: number[];
 	surrogates: number[];
+	noShows: number[];
+	dqs: number[];
 	total: number;
 	preFoulTotal: number;
 	auto: number;
 	teleop: number;
+	hive: number;
+	flower: number;
+	garden: number;
+	park: number;
 	foulPoints: number;
 	tips: number;
 	leavePark: number;
+	robots: number[];
 	rp: {
 		swarm: boolean;
 		pollinator1: boolean;
@@ -294,7 +301,9 @@ export interface SeasonMatchAlliance {
 export interface SeasonMatch {
 	eventCode: string;
 	eventType: EventType;
+	region: string | null;
 	date: string;
+	end: string;
 	time: number | null;
 	key: string;
 	level: TournamentLevel;

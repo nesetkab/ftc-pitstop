@@ -376,11 +376,11 @@ export class EventRater {
 	}
 }
 
-type Sums = { w: number; s: number; ss: number; parts: number[] };
+export type Sums = { w: number; s: number; ss: number; parts: number[] };
 
-const emptySums = (): Sums => ({ w: 0, s: 0, ss: 0, parts: COMPONENTS.map(() => 0) });
+export const emptySums = (): Sums => ({ w: 0, s: 0, ss: 0, parts: COMPONENTS.map(() => 0) });
 
-function statsOf(a: Sums, b: Sums): SeasonStats {
+export function statsOf(a: Sums, b: Sums = emptySums()): SeasonStats {
 	const w = a.w + b.w;
 	if (w <= 0) return { mean: 0, sd: 1, parts: COMPONENTS.map(() => 0), matches: 0 };
 	const mean = (a.s + b.s) / w;
@@ -393,7 +393,7 @@ function statsOf(a: Sums, b: Sums): SeasonStats {
 	};
 }
 
-function addSums(into: Sums, from: Sums): void {
+export function addSums(into: Sums, from: Sums): void {
 	into.w += from.w;
 	into.s += from.s;
 	into.ss += from.ss;
@@ -443,6 +443,9 @@ export type SeasonRatings = {
 
 export type SeasonOptions = {
 	previous?: Map<number, number>;
+	states?: Map<number, TeamState>;
+	sums?: Sums;
+	swarm?: SwarmBook;
 	params?: OprParams;
 	sigma?: number;
 	onForecast?: (event: ModelEvent, match: ModelMatch, forecast: Forecast) => void;
@@ -463,19 +466,26 @@ function credits(m: ModelMatch): [number, AllianceDetail | undefined][] {
 	return out;
 }
 
+export function matchSums(matches: ModelMatch[]): Sums {
+	const sums = emptySums();
+	for (const m of matches) for (const [np, detail] of credits(m)) addSide(sums, np, detail);
+	return sums;
+}
+
 export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): SeasonRatings {
 	const priors: Priors = {
 		params: options.params ?? OPR_PARAMS,
-		states: new Map(),
+		states: new Map(options.states ?? []),
 		previous: options.previous ?? new Map()
 	};
 	const sigmaRel = options.sigma ?? SCORE_SIGMA;
 	const global = emptySums();
+	if (options.sums) addSums(global, options.sums);
 	const out = new Map<string, EventRatings>();
 	const latest = new Map<number, Rating>();
 	const relative = new Map<number, number>();
 	const ordered = orderEvents(events);
-	const swarm = new SwarmBook();
+	const swarm = options.swarm ?? new SwarmBook();
 	let i = 0;
 	while (i < ordered.length) {
 		const day = dayNumber(ordered[i].start);

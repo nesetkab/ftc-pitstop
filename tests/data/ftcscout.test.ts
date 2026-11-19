@@ -113,20 +113,28 @@ describe('FTCScout client', () => {
 			createFtcScoutClient({ fetch: fake.fetch })
 		);
 		expect(fake.bodies[0].query).toContain('hasMatches: true');
+		expect(fake.bodies[0].query).toContain('dcParkPoints2');
 		expect(matches[0]).toMatchObject({
 			eventCode: 'USUTSAS1',
 			eventType: 'NonAdvancement',
+			region: 'USUT',
+			end: '2026-09-19',
 			key: 'p1',
 			red: {
+				teams: [20515],
+				noShows: [],
 				total: 39,
 				preFoulTotal: 39,
 				auto: 3,
 				teleop: 36,
+				hive: 26,
+				park: 10,
 				tips: 1,
 				leavePark: 13,
+				robots: [8],
 				rp: { swarm: false }
 			},
-			blue: { total: 29, leavePark: 18, rp: { swarm: true } }
+			blue: { total: 29, garden: 3, leavePark: 18, robots: [13], rp: { swarm: true } }
 		});
 	});
 
