@@ -1,3 +1,6 @@
+import type { Sums, TeamState } from '#lib/model/opr.ts';
+import type { SwarmState } from '#lib/model/rp.ts';
+
 export type Alliance = 'red' | 'blue';
 
 export type RatingParts = {
@@ -16,6 +19,7 @@ export type TeamRating = {
 	matches: number;
 	rank: number;
 	prior: number;
+	sd?: number;
 	history: { key: string; time: number; opr: number }[];
 };
 
@@ -133,4 +137,29 @@ export type SeasonRating = {
 export type SeasonRatings = {
 	generatedAt: number;
 	teams: SeasonRating[];
+};
+
+export type AnalysisContext = {
+	teams: number[];
+	states: Record<number, TeamState>;
+	previous: Record<number, number>;
+	sums: Sums;
+	swarm: SwarmState;
+};
+
+export type RatingPoint = { event: string; key: string; time: number; opr: number };
+
+export type TeamEventRating = {
+	code: string;
+	start: string;
+	prior: number;
+	opr: number;
+	matches: number;
+};
+
+export type TeamRatingHistory = {
+	team: number;
+	generatedAt: number;
+	events: TeamEventRating[];
+	points: RatingPoint[];
 };

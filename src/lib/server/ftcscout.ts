@@ -195,6 +195,15 @@ const summaryAlliance = z.object({
 	autoLeavePoints: z.number(),
 	autoParkPoints: z.number(),
 	dcParkPoints: z.number(),
+	dcHivePoints: z.number(),
+	dcFlowerPoints: z.number(),
+	dcGardenPoints: z.number(),
+	autoLeave1: z.number(),
+	autoLeave2: z.number(),
+	autoParkPoints1: z.number(),
+	autoParkPoints2: z.number(),
+	dcParkPoints1: z.number(),
+	dcParkPoints2: z.number(),
 	tips: z.number(),
 	swarmRp: z.boolean(),
 	pollinator1Rp: z.boolean(),
@@ -202,7 +211,7 @@ const summaryAlliance = z.object({
 });
 
 const SUMMARY_ALLIANCE_FIELDS =
-	'totalPoints totalPointsNp autoPoints dcPoints penaltyPointsByOpp autoLeavePoints autoParkPoints dcParkPoints tips swarmRp pollinator1Rp pollinator2Rp';
+	'totalPoints totalPointsNp autoPoints dcPoints penaltyPointsByOpp autoLeavePoints autoParkPoints dcParkPoints dcHivePoints dcFlowerPoints dcGardenPoints autoLeave1 autoLeave2 autoParkPoints1 autoParkPoints2 dcParkPoints1 dcParkPoints2 tips swarmRp pollinator1Rp pollinator2Rp';
 
 const matchTeam = z.object({
 	teamNumber: z.number(),
@@ -610,6 +619,8 @@ const seasonMatchesSchema = z.object({
 			type: z.string(),
 			start: z.string(),
 			end: z.string(),
+			regionCode: z.string().nullish(),
+			remote: z.boolean().nullish(),
 			matches: z.array(
 				z.object({
 					tournamentLevel: z.string(),
@@ -672,22 +683,43 @@ export function mapTeamSeason(data: z.output<typeof teamSeason>): ScoutTeamSeaso
 	};
 }
 
+const SEATS: Record<string, 1 | 2> = { One: 1, Two: 2 };
+
 function seasonAlliance(
 	teams: z.output<typeof matchTeam>[],
 	color: AllianceColor,
 	score: z.output<typeof summaryAlliance>
 ): SeasonMatchAlliance {
 	const mine = teams.filter((team) => team.alliance.toLowerCase() === color);
+	const seated = mine
+		.filter((team) => SEATS[team.station])
+		.sort((a, b) => SEATS[a.station] - SEATS[b.station]);
+	const playing = seated.length
+		? seated
+		: mine.filter((team) => team.onField !== false && team.station !== 'NotOnField').slice(0, 2);
+	const numbers = (flag: (team: z.output<typeof matchTeam>) => boolean | null | undefined) =>
+		playing.filter(flag).map((team) => team.teamNumber);
+	const robot = (seat: 1 | 2) =>
+		seat === 1
+			? score.autoLeave1 + score.autoParkPoints1 + score.dcParkPoints1
+			: score.autoLeave2 + score.autoParkPoints2 + score.dcParkPoints2;
 	return {
-		teams: mine.map((team) => team.teamNumber),
-		surrogates: mine.filter((team) => team.surrogate).map((team) => team.teamNumber),
+		teams: playing.map((team) => team.teamNumber),
+		surrogates: numbers((team) => team.surrogate),
+		noShows: numbers((team) => team.noShow),
+		dqs: numbers((team) => team.dq),
 		total: score.totalPoints,
 		preFoulTotal: score.totalPointsNp,
 		auto: score.autoPoints,
 		teleop: score.dcPoints,
+		hive: score.dcHivePoints,
+		flower: score.dcFlowerPoints,
+		garden: score.dcGardenPoints,
+		park: score.dcParkPoints,
 		foulPoints: score.penaltyPointsByOpp,
 		tips: score.tips,
 		leavePark: score.autoLeavePoints + score.autoParkPoints + score.dcParkPoints,
+		robots: playing.map((team) => robot(SEATS[team.station] ?? 1)),
 		rp: { swarm: score.swarmRp, pollinator1: score.pollinator1Rp, pollinator2: score.pollinator2Rp }
 	};
 }
@@ -695,6 +727,7 @@ function seasonAlliance(
 export function mapSeasonMatches(data: z.output<typeof seasonMatchesSchema>): SeasonMatch[] {
 	const matches: SeasonMatch[] = [];
 	for (const event of data.eventsSearch) {
+		if (event.remote) continue;
 		for (const match of event.matches) {
 			const red = match.scores?.red;
 			const blue = match.scores?.blue;
@@ -703,7 +736,9 @@ export function mapSeasonMatches(data: z.output<typeof seasonMatchesSchema>): Se
 			matches.push({
 				eventCode: event.code.toUpperCase(),
 				eventType: eventTypeFromName(event.type),
+				region: clean(event.regionCode),
 				date: event.start.slice(0, 10),
+				end: event.end.slice(0, 10),
 				time: epoch(match.actualStartTime),
 				key,
 				level,
@@ -819,7 +854,7 @@ export async function fetchSeasonMatches(
 ): Promise<SeasonMatch[]> {
 	const document = `query EventsSearch($season: Int!, $start: Date, $end: Date) {
 		eventsSearch(season: $season, hasMatches: true, start: $start, end: $end) {
-			code type start end
+			code type start end regionCode remote
 			matches {
 				tournamentLevel series matchNum hasBeenPlayed actualStartTime
 				teams { ${MATCH_TEAM_FIELDS} }

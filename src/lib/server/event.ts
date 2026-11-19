@@ -546,38 +546,56 @@ export function createLoaders(deps: LoaderDeps) {
 		return result;
 	}
 
-	async function loadSeasonMatches(
-		options: { from?: string; to?: string } = {}
-	): Promise<{ matches: SeasonMatch[]; fetchedAt: number; stale: boolean }> {
+	async function loadSeasonWeek(start: string, today: string) {
+		const end = addDays(start, 10);
+		const policy =
+			end < addDays(today, -7)
+				? { ttl: DAY_SECONDS, maxStale: 30 * DAY_SECONDS }
+				: { ttl: 600, maxStale: DAY_SECONDS };
+		return cache.get(`scout:${SEASON}:matches:v2:${start}`, policy, async () => ({
+			status: 'ok',
+			body: await fetchSeasonMatches({ season: SEASON, start, end }, scout)
+		}));
+	}
+
+	async function loadSeasonMatches(options: { from?: string; to?: string } = {}): Promise<{
+		matches: SeasonMatch[];
+		fetchedAt: number;
+		stale: boolean;
+		missing: string[];
+	}> {
 		const today = localDate(now(), 'UTC');
 		const from = options.from ?? `${SEASON}-09-01`;
 		const to = options.to ?? today;
+		const weeks: string[] = [];
+		for (let start = from; start <= to; start = addDays(start, 7)) weeks.push(start);
+		const loaded = await Promise.all(
+			weeks.map((start) => loadSeasonWeek(start, today).catch(() => null))
+		);
 		const matches = new Map<string, SeasonMatch>();
 		let fetchedAt = now();
 		let stale = false;
-		for (let start = from; start <= to; start = addDays(start, 7)) {
-			const weekEnd = addDays(start, 6);
-			const end = addDays(start, 13);
-			const settled = end < addDays(today, -7);
-			const policy = settled
-				? { ttl: DAY_SECONDS, maxStale: 30 * DAY_SECONDS }
-				: { ttl: 600, maxStale: DAY_SECONDS };
-			try {
-				const value = await cache.get(`scout:${SEASON}:matches:${start}`, policy, async () => ({
-					status: 'ok',
-					body: await fetchSeasonMatches({ season: SEASON, start, end }, scout)
-				}));
-				fetchedAt = Math.min(fetchedAt, value.fetchedAt);
-				stale ||= value.stale;
-				for (const match of value.body) {
-					if (match.date < start || match.date > weekEnd) continue;
-					matches.set(`${match.eventCode}:${match.key}`, match);
-				}
-			} catch {
-				stale = true;
+		const missing: string[] = [];
+		weeks.forEach((start, i) => {
+			const value = loaded[i];
+			if (!value) {
+				missing.push(start);
+				return;
 			}
-		}
-		return { matches: [...matches.values()], fetchedAt, stale };
+			fetchedAt = Math.min(fetchedAt, value.fetchedAt);
+			stale ||= value.stale;
+			const weekEnd = addDays(start, 6);
+			for (const match of value.body) {
+				if (match.date < start || match.date > weekEnd) continue;
+				matches.set(`${match.eventCode}:${match.key}`, match);
+			}
+		});
+		return {
+			matches: [...matches.values()],
+			fetchedAt,
+			stale: stale || missing.length > 0,
+			missing
+		};
 	}
 
 	return {
