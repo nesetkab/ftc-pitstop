@@ -1,0 +1,85 @@
+table.t {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+	font-size: 14px;
+	font-variant-numeric: tabular-nums;
+}
+
+table.t caption {
+	text-align: left;
+	font-size: 15px;
+	font-weight: 600;
+	padding-bottom: 10px;
+}
+
+table.t th {
+	padding: 0 10px 8px;
+	border-bottom: 1px solid var(--line-2);
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--text-3);
+	text-align: right;
+	white-space: nowrap;
+	vertical-align: bottom;
+}
+
+table.t thead tr:not(:last-child) th:not(.group) {
+	border-bottom-color: transparent;
+}
+
+table.t thead td {
+	padding: 0;
+	border-bottom: 0;
+}
+
+table.t th.group {
+	padding-bottom: 6px;
+	border-bottom: 1px solid var(--line);
+	color: var(--text-2);
+	text-align: center;
+}
+
+table.t td {
+	padding: 9px 10px;
+	border-bottom: 1px solid var(--line);
+	text-align: right;
+	white-space: nowrap;
+}
+
+table.t .l,
+table.t td.team {
+	text-align: left;
+}
+
+table.t td.wrap {
+	white-space: normal;
+}
+
+table.t .sep {
+	border-left: 1px solid var(--line-2);
+}
+
+table.t tr.me td {
+	background: var(--accent-wash);
+}
+
+table.t tr.dim td,
+table.t td.dim {
+	color: var(--text-3);
+}
+
+table.t a {
+	text-decoration: none;
+}
+
+table.t a:hover {
+	text-decoration: underline;
+}
+
+table.t.sticky thead {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: var(--bg);
+}

@@ -1,0 +1,52 @@
+<script lang="ts">
+	import { relative, secondsBetween } from '#lib/format/relative.ts';
+	import { timeWithSeconds, toDate, type DateInput } from '#lib/format/time.ts';
+
+	interface Props {
+		updated: DateInput | null | undefined;
+		staleAfter?: number;
+		prefix?: string;
+		timeZone?: string;
+	}
+
+	let { updated, staleAfter = 120, prefix = 'Updated', timeZone }: Props = $props();
+
+	let now = $state(Date.now());
+
+	$effect(() => {
+		now = Date.now();
+		const timer = setInterval(() => (now = Date.now()), 1000);
+		return () => clearInterval(timer);
+	});
+
+	const date = $derived(updated == null ? null : toDate(updated));
+	const seen = $derived(date && !Number.isNaN(date.getTime()) ? date : null);
+	const age = $derived(seen ? Math.max(0, secondsBetween(seen, now)) : 0);
+	const stale = $derived(seen !== null && age > staleAfter);
+</script>
+
+{#if seen}
+	<time
+		class={['stale-notice', { stale }]}
+		datetime={seen.toISOString()}
+		title={timeWithSeconds(seen, timeZone)}
+	>
+		{prefix}
+		{relative(now - age * 1000, now)}
+	</time>
+{/if}
+
+<style>
+	.stale-notice {
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+
+	.stale {
+		margin-inline: -4px;
+		padding: 1px 4px;
+		border-radius: var(--radius-chip);
+		background: var(--accent-wash);
+		color: var(--text);
+	}
+</style>
