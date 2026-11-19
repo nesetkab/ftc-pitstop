@@ -1,3 +1,4 @@
+import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
 import { getRedis } from '#lib/server/redis.ts';
 import { createWorkspaceApi, type WorkspaceApi } from '#lib/workspace/api.ts';
 import { createLimiter } from '#lib/workspace/limit.ts';
@@ -15,6 +16,10 @@ export function workspaceApi(): WorkspaceApi | null {
 
 export function sharedWorkspaces(): boolean {
 	return workspaceApi() !== null;
+}
+
+export function notShared(): Response {
+	return jsonResponse({ error: 'Shared workspaces are not turned on' }, CACHE_CONTROL.none, 404);
 }
 
 export function clientAddress(getClientAddress: () => string): string {
