@@ -88,6 +88,22 @@ export function takenLabel(status: TeamStatus): string | null {
 	return null;
 }
 
+export function takenLabels(state: SelectionState): Map<number, string> {
+	const labels = new Map<number, string>();
+	for (const alliance of state.alliances) {
+		const teams = [
+			alliance.captain,
+			...alliance.picks,
+			...(alliance.backup ? [alliance.backup] : [])
+		];
+		for (const team of teams) {
+			const label = takenLabel(state.status(team));
+			if (label) labels.set(team, label);
+		}
+	}
+	return labels;
+}
+
 export function refreshInterval(phase: EventPhase): number | null {
 	if (phase === 'selection') return 10_000;
 	if (phase === 'quals') return 30_000;
