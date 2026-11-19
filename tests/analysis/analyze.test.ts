@@ -27,7 +27,11 @@ function expectRanksConsistent(analysis: EventAnalysis) {
 		expect(analysis.ratings[i - 1].opr).toBeGreaterThanOrEqual(analysis.ratings[i].opr);
 }
 
-function run(bundle: EventBundle, code = bundle.event.code, now = Date.parse('2026-11-19T12:00:00Z')) {
+function run(
+	bundle: EventBundle,
+	code = bundle.event.code,
+	now = Date.parse('2026-11-19T12:00:00Z')
+) {
 	return analyzeEvent(bundle, contexts[code], { now });
 }
 
@@ -82,7 +86,10 @@ describe('analyzeEvent on the finished Gilbert qualifier', async () => {
 	it('reports averages and finished timing', () => {
 		const { parts, score, matches } = analysis.averages;
 		expect(matches).toBe(44);
-		expect(parts.auto + parts.hive + parts.flower + parts.garden + parts.park).toBeCloseTo(score, 0);
+		expect(parts.auto + parts.hive + parts.flower + parts.garden + parts.park).toBeCloseTo(
+			score,
+			0
+		);
 		expect(analysis.timing.next).toBeNull();
 		expect(analysis.timing.onField).toBeNull();
 		expect(analysis.timing.cycleSeconds).toBeGreaterThan(60);
@@ -125,7 +132,8 @@ describe('replaying Gilbert after Q22', async () => {
 	});
 
 	it('keeps forecasts for played matches identical to the full event', () => {
-		for (let n = 1; n <= 22; n++) expect(analysis.forecasts[`q${n}`]).toEqual(full.forecasts[`q${n}`]);
+		for (let n = 1; n <= 22; n++)
+			expect(analysis.forecasts[`q${n}`]).toEqual(full.forecasts[`q${n}`]);
 	});
 
 	it('projects the final rankings', () => {

@@ -248,7 +248,11 @@ function lineup(alliance: AllianceSelection): number[] {
 	);
 }
 
-type Seeds = { size: AllianceCount; members: Map<number, number[]>; lineups: Map<number, number[]> };
+type Seeds = {
+	size: AllianceCount;
+	members: Map<number, number[]>;
+	lineups: Map<number, number[]>;
+};
 
 function formedSeeds(alliances: AllianceSelection[], minimum: number): Seeds | null {
 	const size = allianceSize(alliances.length);
@@ -281,7 +285,11 @@ function inferredSeeds(playoffs: Match[]): Seeds | null {
 			const source = row[color];
 			if (!('seed' in source) || found.has(source.seed)) continue;
 			const m = playoffs.find((x) => bracketNumber(x, size) === row.match && x[color].length);
-			if (m) found.set(source.seed, playingTeams(m[color]).map((t) => t.team));
+			if (m)
+				found.set(
+					source.seed,
+					playingTeams(m[color]).map((t) => t.team)
+				);
 		}
 	}
 	if (found.size !== size) return null;
@@ -497,9 +505,7 @@ export function analyzeEvent(
 		const m = byKey.get(match.key);
 		if (!m) continue;
 		const step = steps.get(m.key);
-		const prediction = step
-			? predictMatch(step.forecast, { swarm: step.swarm })
-			: predictNow(m);
+		const prediction = step ? predictMatch(step.forecast, { swarm: step.swarm }) : predictNow(m);
 		forecasts[m.key] = matchForecast(
 			m.key,
 			prediction,
@@ -547,7 +553,8 @@ export function analyzeEvent(
 	}));
 
 	const playoffMatches = bundle.matches.filter((m) => m.level === 'playoff');
-	const ranked = bundle.rankings.length || new Set(quals.flatMap((m) => [...m.red, ...m.blue])).size;
+	const ranked =
+		bundle.rankings.length || new Set(quals.flatMap((m) => [...m.red, ...m.blue])).size;
 	const expected = playoffMatches.length > 0 ? 0 : allianceCountFor(ranked);
 	const seeds =
 		formedSeeds(bundle.alliances, expected) ??

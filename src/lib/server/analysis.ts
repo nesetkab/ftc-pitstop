@@ -128,7 +128,9 @@ export function createAnalysis(deps: AnalysisDeps) {
 		}
 		if (current && time < current.model.generatedAt + DAY_SECONDS * 1000) {
 			pending.catch((error: unknown) =>
-				console.warn(`season ratings refresh failed: ${error instanceof Error ? error.message : error}`)
+				console.warn(
+					`season ratings refresh failed: ${error instanceof Error ? error.message : error}`
+				)
 			);
 			return Promise.resolve(current.model);
 		}

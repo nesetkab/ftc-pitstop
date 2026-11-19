@@ -42,7 +42,10 @@ describe('season model', () => {
 		const fromBundle = rateSeason([toModelEvent(gilbert)], { previous }).events.get('USAZGIQ')!;
 		for (const team of fromBundle.rater.teams) {
 			expect(fromSeason.rater.value(team)).toBeCloseTo(fromBundle.rater.value(team), 9);
-			expect(fromSeason.rater.value(team, 'hive')).toBeCloseTo(fromBundle.rater.value(team, 'hive'), 9);
+			expect(fromSeason.rater.value(team, 'hive')).toBeCloseTo(
+				fromBundle.rater.value(team, 'hive'),
+				9
+			);
 		}
 	});
 });
