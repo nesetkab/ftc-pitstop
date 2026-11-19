@@ -103,3 +103,69 @@ export function splitNote(split: string): string {
 export function baseRateBrier(rate: number): number {
 	return rate * (1 - rate);
 }
+
+function sameMetrics(a: ModelMetrics | undefined, b: ModelMetrics | undefined): boolean {
+	return Boolean(
+		a &&
+		b &&
+		a.brier === b.brier &&
+		a.logloss === b.logloss &&
+		a.accuracy === b.accuracy &&
+		a.mae === b.mae
+	);
+}
+
+function trimRp(result: RpResult | undefined): RpResult | undefined {
+	if (!result) return undefined;
+	const { n, brier, logloss, rate, calibration } = result;
+	return { n, brier, logloss, rate, calibration };
+}
+
+function trimErrors(errors: ScheduleErrors | undefined): ScheduleErrors | undefined {
+	if (!errors) return undefined;
+	const { estimator, scheduled, delay, n } = errors;
+	return { estimator, scheduled, delay, n };
+}
+
+export function prepareReport(report: AccuracyReport): AccuracyReport {
+	const chosen = report.chosen.id;
+	const models = report.models.filter(
+		(model) =>
+			model.id === chosen ||
+			!report.seasons.every((season) => sameMetrics(season.models[model.id], season.models[chosen]))
+	);
+	const { method, calibration, rp, schedule } = report;
+	return {
+		generatedAt: report.generatedAt,
+		method: { train: method.train, validation: method.validation, test: method.test },
+		chosen: { id: chosen, label: report.chosen.label },
+		models: models.map(({ id, label }) => ({ id, label })),
+		seasons: report.seasons.map(({ season, game, split, n, models: results }) => ({
+			season,
+			game,
+			split,
+			n,
+			models: Object.fromEntries(
+				models.flatMap((model) => (results[model.id] ? [[model.id, results[model.id]]] : []))
+			)
+		})),
+		calibration: calibration && {
+			model: calibration.model,
+			validation: calibration.validation,
+			test: calibration.test
+		},
+		rp: rp && {
+			season: rp.season,
+			alliances: rp.alliances,
+			swarm: trimRp(rp.swarm),
+			pollinator1: trimRp(rp.pollinator1),
+			pollinator2: trimRp(rp.pollinator2)
+		},
+		schedule: schedule && {
+			ahead: schedule.ahead,
+			quals: trimErrors(schedule.quals),
+			playoffs: trimErrors(schedule.playoffs),
+			events: schedule.events
+		}
+	};
+}

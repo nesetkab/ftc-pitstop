@@ -69,7 +69,9 @@
 
 	@media (max-width: 600px) {
 		.stats {
-			gap: 12px 20px;
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 14px 20px;
 		}
 	}
 </style>

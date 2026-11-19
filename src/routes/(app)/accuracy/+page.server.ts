@@ -1,5 +1,9 @@
 import type { Config } from '@sveltejs/adapter-vercel';
-import { isAccuracyReport, type AccuracyReport } from '#lib/components/team/accuracy.ts';
+import {
+	isAccuracyReport,
+	prepareReport,
+	type AccuracyReport
+} from '#lib/components/team/accuracy.ts';
 import sample from '#lib/components/team/accuracy-sample.json';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
@@ -16,7 +20,7 @@ export const load: PageServerLoad = ({
 }): { report: AccuracyReport | null; sample: boolean } => {
 	setHeaders({ 'cache-control': CACHE_CONTROL.list });
 	const [real] = Object.values(published);
-	if (isAccuracyReport(real)) return { report: real, sample: false };
+	if (isAccuracyReport(real)) return { report: prepareReport(real), sample: false };
 	const fallback: unknown = sample;
-	return { report: isAccuracyReport(fallback) ? fallback : null, sample: true };
+	return { report: isAccuracyReport(fallback) ? prepareReport(fallback) : null, sample: true };
 };
