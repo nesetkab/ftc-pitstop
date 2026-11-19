@@ -1,0 +1,29 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": { "teamNumber": 20515, "displayTeamNumber": "20515", "teamName": "Cubed ETs" },
+			"round1": { "teamNumber": 3747, "displayTeamNumber": "3747", "teamName": "The Hive" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": {
+				"teamNumber": 99999,
+				"displayTeamNumber": "99999",
+				"teamName": "Off-Season Demo Team"
+			},
+			"round1": { "teamNumber": 19389, "displayTeamNumber": "19389", "teamName": "Angry Aliens" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 2
+}

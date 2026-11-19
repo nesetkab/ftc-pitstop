@@ -1,0 +1,128 @@
+{
+	"schedule": [
+		{
+			"description": "Finals 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"startTime": "2026-09-19T14:15:00",
+			"actualStartTime": "2026-09-19T14:16:50.525",
+			"postResultTime": "2026-09-19T14:20:09.971",
+			"videoURL": null,
+			"scoreRedFinal": 39,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 29,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 20515,
+					"displayTeamNumber": "20515",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cubed ETs"
+				},
+				{
+					"teamNumber": 3747,
+					"displayTeamNumber": "3747",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Hive"
+				},
+				{
+					"teamNumber": 99999,
+					"displayTeamNumber": "99999",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Off-Season Demo Team"
+				},
+				{
+					"teamNumber": 19389,
+					"displayTeamNumber": "19389",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Angry Aliens"
+				}
+			]
+		},
+		{
+			"description": "Finals 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 2,
+			"startTime": "2026-09-19T14:26:00",
+			"actualStartTime": "2026-09-19T14:28:22.521",
+			"postResultTime": "2026-09-19T14:31:39.33",
+			"videoURL": null,
+			"scoreRedFinal": 37,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 33,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 16,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 20515,
+					"displayTeamNumber": "20515",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cubed ETs"
+				},
+				{
+					"teamNumber": 3747,
+					"displayTeamNumber": "3747",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Hive"
+				},
+				{
+					"teamNumber": 99999,
+					"displayTeamNumber": "99999",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Off-Season Demo Team"
+				},
+				{
+					"teamNumber": 19389,
+					"displayTeamNumber": "19389",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Angry Aliens"
+				}
+			]
+		}
+	]
+}

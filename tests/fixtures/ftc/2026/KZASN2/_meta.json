@@ -1,0 +1,51 @@
+{
+	"code": "KZASN2",
+	"note": "non-advancement scrimmage with 2 alliances and surrogates",
+	"recordedAt": "2026-11-19T07:19:56.066Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=KZASN2", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=KZASN2", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/KZASN2", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/KZASN2/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sat, 31 Oct 2026 09:41:04 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/KZASN2/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sat, 31 Oct 2026 09:41:04 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/KZASN2?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sat, 31 Oct 2026 09:41:04 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/KZASN2?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sat, 31 Oct 2026 09:41:04 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/KZASN2/qual",
+			"status": 200,
+			"lastModified": "Sat, 31 Oct 2026 09:41:04 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/KZASN2/playoff",
+			"status": 200,
+			"lastModified": "Sat, 31 Oct 2026 09:41:04 GMT"
+		},
+		"alliances": {
+			"path": "alliances/KZASN2",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:19:55 GMT"
+		},
+		"awards": {
+			"path": "awards/KZASN2",
+			"status": 200,
+			"lastModified": "Sat, 31 Oct 2026 09:41:05 GMT"
+		},
+		"advancement": { "path": "advancement/KZASN2", "status": 200, "lastModified": null }
+	}
+}

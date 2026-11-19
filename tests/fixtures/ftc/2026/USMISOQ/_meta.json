@@ -1,0 +1,51 @@
+{
+	"code": "USMISOQ",
+	"note": "qualifier with 6 alliances and 11 playoff matches",
+	"recordedAt": "2026-11-19T07:20:01.211Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USMISOQ", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USMISOQ", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USMISOQ", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USMISOQ/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 08 Nov 2026 00:32:56 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USMISOQ/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 08 Nov 2026 00:32:57 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/USMISOQ?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 08 Nov 2026 00:32:56 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USMISOQ?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sun, 08 Nov 2026 00:32:57 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/USMISOQ/qual",
+			"status": 200,
+			"lastModified": "Sun, 08 Nov 2026 00:32:56 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/USMISOQ/playoff",
+			"status": 200,
+			"lastModified": "Sun, 08 Nov 2026 00:32:57 GMT"
+		},
+		"alliances": {
+			"path": "alliances/USMISOQ",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:20:00 GMT"
+		},
+		"awards": {
+			"path": "awards/USMISOQ",
+			"status": 200,
+			"lastModified": "Sun, 08 Nov 2026 00:32:57 GMT"
+		},
+		"advancement": { "path": "advancement/USMISOQ", "status": 200, "lastModified": null }
+	}
+}

@@ -1,0 +1,48 @@
+{
+	"matches": [
+		{
+			"actualStartTime": "2026-10-24T14:37:03.776",
+			"description": "Finals 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"scoreRedFinal": 68,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 37,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"postResultTime": "2026-10-24T14:40:59.093",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 19459, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 35722, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 24378, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 21830, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-10-25T04:35:49.053"
+		},
+		{
+			"actualStartTime": "2026-10-24T14:51:56.149",
+			"description": "Finals 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 2,
+			"scoreRedFinal": 59,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 38,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"postResultTime": "2026-10-24T14:56:58.815",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 19459, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 35722, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 24378, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 21830, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-10-25T04:35:49.044"
+		}
+	]
+}

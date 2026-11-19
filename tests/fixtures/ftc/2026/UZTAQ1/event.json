@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "ee2d3c4e-0ba0-de40-a790-c6b98cdf716d",
+			"code": "UZTAQ1",
+			"divisionCode": null,
+			"name": "Tashkent FIRST Regional",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 1,
+			"published": true,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "UZ",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": null,
+			"address": null,
+			"city": "Tashkent",
+			"stateprov": "TK",
+			"country": "Uzbekistan",
+			"website": null,
+			"liveStreamUrl": null,
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=82899",
+			"coordinates": null,
+			"webcasts": null,
+			"timezone": "Asia/Tashkent",
+			"dateStart": "2026-11-14T00:00:00",
+			"dateEnd": "2026-11-16T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

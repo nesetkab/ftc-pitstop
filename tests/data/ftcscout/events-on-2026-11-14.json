@@ -1,0 +1,1603 @@
+{
+	"data": {
+		"eventsOnDate": [
+			{
+				"code": "USMIRHQ",
+				"name": "Rochester Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-13",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USMI",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Rochester High School",
+					"city": "Rochester Hills",
+					"state": "MI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMIOTQ",
+				"name": "Lake Orion Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-13",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USMI",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Waldon Middle School",
+					"city": "Orion Township",
+					"state": "MI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMIKEQ",
+				"name": "Kentwood Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-13",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USMI",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "East Kentwood Freshman Campus",
+					"city": "Kentwood",
+					"state": "MI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMICHQ",
+				"name": "Chelsea Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-13",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USMI",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Chelsea High School",
+					"city": "Chelsea",
+					"state": "MI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMSBIQ",
+				"name": "Biloxi Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-13",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMS",
+				"leagueCode": null,
+				"hasMatches": false,
+				"location": {
+					"venue": "St. Patrick's Catholic High School",
+					"city": "Biloxi",
+					"state": "MS",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USIAZINM2",
+				"name": "Zinnia Iowa City West",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIA",
+				"leagueCode": "ZIN",
+				"hasMatches": true,
+				"location": {
+					"venue": "West High School",
+					"city": "Iowa City",
+					"state": "IA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USIAWINBM1",
+				"name": "Winterberry Waverly",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIA",
+				"leagueCode": "WINB",
+				"hasMatches": true,
+				"location": {
+					"venue": "Waverly-Shell Rock High School",
+					"city": "Waverly",
+					"state": "IA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USORMVM1",
+				"name": "Willamette Valley League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USOR",
+				"leagueCode": "MV",
+				"hasMatches": true,
+				"location": {
+					"venue": "Philomath MS",
+					"city": "Philomath",
+					"state": "OR",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMIWMM6",
+				"name": "West Michigan Meet 6",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USMI",
+				"leagueCode": "WM",
+				"hasMatches": true,
+				"location": {
+					"venue": "GVSU Shape IDC",
+					"city": "Grand Rapids",
+					"state": "MI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMIWMM5",
+				"name": "West Michigan Meet 5",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USMI",
+				"leagueCode": "WM",
+				"hasMatches": true,
+				"location": {
+					"venue": "GVSU Shape IDC",
+					"city": "Grand Rapids",
+					"state": "MI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USKYCENTM3",
+				"name": "UK League Meet",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USKY",
+				"leagueCode": "CENT",
+				"hasMatches": true,
+				"location": {
+					"venue": "University of Kentucky Pigman College of Engineering",
+					"city": "Lexington",
+					"state": "KY",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USORTSM1",
+				"name": "Three Sisters League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USOR",
+				"leagueCode": "TS",
+				"hasMatches": true,
+				"location": {
+					"venue": "North Eugene HS",
+					"city": "Eugene",
+					"state": "OR",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "UZTAQ1",
+				"name": "Tashkent FIRST Regional",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-16",
+				"timezone": "Asia/Tashkent",
+				"regionCode": "UZ",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": { "venue": null, "city": "Tashkent", "state": "TK", "country": "Uzbekistan" }
+			},
+			{
+				"code": "USIASUNM5",
+				"name": "Sunflower Lenox",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIA",
+				"leagueCode": "SUN",
+				"hasMatches": false,
+				"location": {
+					"venue": "Lenox High School",
+					"city": "Lenox",
+					"state": "IA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USIASUNM6",
+				"name": "Sunflower Lenox",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIA",
+				"leagueCode": "SUN",
+				"hasMatches": true,
+				"location": {
+					"venue": "Lenox High School",
+					"city": "Lenox",
+					"state": "IA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USFLSCM1",
+				"name": "Space Coast Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USFL",
+				"leagueCode": "SC",
+				"hasMatches": true,
+				"location": {
+					"venue": "Ovideo High School",
+					"city": "Oviedo",
+					"state": "FL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USFLSWM1",
+				"name": "Southwest Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USFL",
+				"leagueCode": "SW",
+				"hasMatches": true,
+				"location": {
+					"venue": "Charlotte Performing Arts Center, Charlotte HS",
+					"city": "Punta Gorda",
+					"state": "FL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USAKJUN2",
+				"name": "Southeast Scrimmage #2",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Anchorage",
+				"regionCode": "USAK",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Juneau Douglas High School",
+					"city": "Juneau",
+					"state": "AK",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "AUWAQ",
+				"name": "South Australia Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-15",
+				"timezone": "Australia/Adelaide",
+				"regionCode": "AU",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "RoboRoos",
+					"city": "Wayville",
+					"state": "SA",
+					"country": "Australia"
+				}
+			},
+			{
+				"code": "USCALALAS6",
+				"name": "SoCal - W - Scrimmage 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCALA",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Girls Academic Leadership Academy",
+					"city": "Los Angeles",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCALACAS3",
+				"name": "SoCal - S - Scrimmage 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCALA",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Viewpoint School",
+					"city": "Calabasas",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCALAMVS6",
+				"name": "SoCal - O - Scrimmage 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCALA",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Dana Hills High School",
+					"city": "Dana Point",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCALALCS4",
+				"name": "SoCal - C2 - Scrimmage 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCALA",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "La Cañada High School",
+					"city": "La Cañada",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCALALCS3",
+				"name": "SoCal - C1 - Scrimmage 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCALA",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "La Cañada High School",
+					"city": "La Cañada",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCALACOS2",
+				"name": "SoCal - B - Scrimmage 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCALA",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "C-TECH Academy",
+					"city": "Compton",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCALALAS5",
+				"name": "SoCal - A - Scrimmage 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCALA",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Marlborough School",
+					"city": "Los Angeles",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USORSFM1",
+				"name": "Silicon Forest League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USOR",
+				"leagueCode": "SF",
+				"hasMatches": true,
+				"location": {
+					"venue": "Hillsboro HS",
+					"city": "Hillsboro",
+					"state": "OR",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "DESTN",
+				"name": "Scrimmage Stuttgart",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "Europe/Berlin",
+				"regionCode": "DE",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Königin-Katharina-Stift",
+					"city": "Stuttgart",
+					"state": "BW",
+					"country": "Germany"
+				}
+			},
+			{
+				"code": "USWASAM2",
+				"name": "Salk League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USWA",
+				"leagueCode": "SA",
+				"hasMatches": true,
+				"location": {
+					"venue": "Charles Wright Academy Tarrier Dome",
+					"city": "Tacoma",
+					"state": "WA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USORSOM1",
+				"name": "SOAR League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USOR",
+				"leagueCode": "SO",
+				"hasMatches": true,
+				"location": { "venue": "Fremont MS", "city": "Roseburg", "state": "OR", "country": "USA" }
+			},
+			{
+				"code": "USORRCM1",
+				"name": "Rose City League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USOR",
+				"leagueCode": "RC",
+				"hasMatches": true,
+				"location": { "venue": "McDaniel HS", "city": "Portland", "state": "OR", "country": "USA" }
+			},
+			{
+				"code": "USMOKSSTLMM1",
+				"name": "Rolla Meet @ 10 AM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "STLM",
+				"hasMatches": true,
+				"location": {
+					"venue": "Missouri Protoplex",
+					"city": "Rolla",
+					"state": "MO",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USAZGIQ",
+				"name": "Roadrunner - Gilbert Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Phoenix",
+				"regionCode": "USAZ",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Gilbert Christian High School",
+					"city": "Gilbert",
+					"state": "AZ",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USFLROM2",
+				"name": "ROBOT League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USFL",
+				"leagueCode": "RO",
+				"hasMatches": true,
+				"location": {
+					"venue": "Middleton High School",
+					"city": "Tampa",
+					"state": "FL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMOKSKCWM6",
+				"name": "Piper Meet @ 8 AM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "KCW",
+				"hasMatches": true,
+				"location": {
+					"venue": "Piper High School",
+					"city": "Kansas City",
+					"state": "KS",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMOKSKCMM6",
+				"name": "Piper Meet @ 10:30 AM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "KCM",
+				"hasMatches": true,
+				"location": {
+					"venue": "Piper High School",
+					"city": "Kansas City",
+					"state": "KS",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMOKSKCWM7",
+				"name": "Piper Meet @ 1 PM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "KCW",
+				"hasMatches": true,
+				"location": {
+					"venue": "Piper High School",
+					"city": "Kansas City",
+					"state": "KS",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMABRN",
+				"name": "Penguin Coding Scrimmage",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USMA",
+				"leagueCode": null,
+				"hasMatches": false,
+				"location": {
+					"venue": "St. Mary's Assumption School",
+					"city": "Brookline",
+					"state": "MA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USGAPDM3",
+				"name": "Paulding-Dallas Meet #3",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USGA",
+				"leagueCode": "PD",
+				"hasMatches": true,
+				"location": {
+					"venue": "North Paulding High School",
+					"city": "Dallas",
+					"state": "GA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USGAPDM2",
+				"name": "Paulding-Dallas Meet #2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USGA",
+				"leagueCode": "PD",
+				"hasMatches": true,
+				"location": {
+					"venue": "North Paulding High School",
+					"city": "Dallas",
+					"state": "GA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USNHMAN",
+				"name": "Parkside Scrimmage (Manchester)",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USNH",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Parkside Middle School",
+					"city": "Manchester",
+					"state": "NH",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USNJNEM4",
+				"name": "P2-1 Northeast League Meet",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USNJ",
+				"leagueCode": "NE",
+				"hasMatches": true,
+				"location": {
+					"venue": "Dumont High School",
+					"city": "Dumont",
+					"state": "NJ",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USFLORM1",
+				"name": "Orlando Robotics Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USFL",
+				"leagueCode": "OR",
+				"hasMatches": true,
+				"location": {
+					"venue": "Trinity Preparatory School",
+					"city": "Winter Park",
+					"state": "FL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXWPODM1",
+				"name": "Odessa League Meet #1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXWP",
+				"leagueCode": "OD",
+				"hasMatches": true,
+				"location": {
+					"venue": "Andrews High School",
+					"city": "Andrews",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "LTVIN1",
+				"name": "November Scrimmage",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "Europe/Vilnius",
+				"regionCode": "LT",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": { "venue": "TECHIN", "city": "Vilnius", "state": "VL", "country": "Lithuania" }
+			},
+			{
+				"code": "USCOWIS",
+				"name": "Northern Scrimmage",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Denver",
+				"regionCode": "USCO",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Windsor High School",
+					"city": "Windsor",
+					"state": "CO",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USGANM2",
+				"name": "North Georgia Meet #2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USGA",
+				"leagueCode": "N",
+				"hasMatches": true,
+				"location": {
+					"venue": "East Jackson Comprehensive HS",
+					"city": "Commerce",
+					"state": "GA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCANOPNM1",
+				"name": "NorCal PN Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCANO",
+				"leagueCode": "PN",
+				"hasMatches": true,
+				"location": {
+					"venue": "Sequoia High School",
+					"city": "Redwood City",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USCANONEM1",
+				"name": "NorCal NE Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USCANO",
+				"leagueCode": "NE",
+				"hasMatches": true,
+				"location": {
+					"venue": "Sonoma Country Day School",
+					"city": "Santa Rosa",
+					"state": "CA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USWANOM2",
+				"name": "Noddack League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USWA",
+				"leagueCode": "NO",
+				"hasMatches": true,
+				"location": {
+					"venue": "Hazen High School",
+					"city": "Renton",
+					"state": "WA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXSOMIQ1",
+				"name": "Newton Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXSO",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "World Scholars Academy",
+					"city": "Edinburg",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USWINOSLM4",
+				"name": "Nerds of Steel League Meet 4",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USWI",
+				"leagueCode": "NOSL",
+				"hasMatches": true,
+				"location": {
+					"venue": "Wanek Center of Innovation",
+					"city": "LaCrosse",
+					"state": "WI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USWINOSLM3",
+				"name": "Nerds of Steel League Meet 3",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USWI",
+				"leagueCode": "NOSL",
+				"hasMatches": true,
+				"location": {
+					"venue": "Wanek Center of Innovation",
+					"city": "LaCrosse",
+					"state": "WI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXNODTQ1",
+				"name": "NTX Fall Qualifier #2",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXNO",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "UNT Engineering (Discovery Park)",
+					"city": "Denton, Texas",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USOHNEOHM1",
+				"name": "NEOH League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USOH",
+				"leagueCode": "NEOH",
+				"hasMatches": true,
+				"location": {
+					"venue": "Gilmour Academy",
+					"city": "Gates Mills",
+					"state": "OH",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMNMLM2",
+				"name": "Mille Lacs League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMN",
+				"leagueCode": "ML",
+				"hasMatches": true,
+				"location": {
+					"venue": "Holy Family Catholic High School",
+					"city": "Victoria",
+					"state": "MN",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USIAMILKM4",
+				"name": "Milkweed Davenport",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIA",
+				"leagueCode": null,
+				"hasMatches": false,
+				"location": {
+					"venue": "West High School",
+					"city": "Davenport",
+					"state": "IA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXWPMDM1",
+				"name": "Midland League Meet #1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXWP",
+				"leagueCode": "MD",
+				"hasMatches": true,
+				"location": { "venue": "TankLogix", "city": "Odessa", "state": "TX", "country": "USA" }
+			},
+			{
+				"code": "USTXHOMJM1",
+				"name": "Mary Jackson Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXHO",
+				"leagueCode": "MJ",
+				"hasMatches": true,
+				"location": {
+					"venue": "Hogg Middle School",
+					"city": "Houston",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXHOMM1",
+				"name": "Marshall Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXHO",
+				"leagueCode": "M",
+				"hasMatches": true,
+				"location": {
+					"venue": "Pearland Junior High South",
+					"city": "Pearland",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USGAMWM2",
+				"name": "Marietta-Wheeler Meet #2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USGA",
+				"leagueCode": "MW",
+				"hasMatches": true,
+				"location": {
+					"venue": "Wheeler High School",
+					"city": "Marietta",
+					"state": "GA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXWPLAM1",
+				"name": "Lubbock-A League Meet #1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXWP",
+				"leagueCode": "LA",
+				"hasMatches": true,
+				"location": {
+					"venue": "Lubbock High School",
+					"city": "Lubbock",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMIBCQ",
+				"name": "Lakeview Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-15",
+				"timezone": "America/New_York",
+				"regionCode": "USMI",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Lakeview Middle School",
+					"city": "Battle Creek",
+					"state": "MI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USWICLN",
+				"name": "Lakeshore Scrimmage Day 1",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USWI",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Lakeshore College",
+					"city": "Cleveland",
+					"state": "WI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXHOKM1",
+				"name": "Kennedy Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXHO",
+				"leagueCode": "K",
+				"hasMatches": true,
+				"location": {
+					"venue": "Palacios High School",
+					"city": "Palacios",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXHOKJM1",
+				"name": "Katherine Johnson Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXHO",
+				"leagueCode": "KJ",
+				"hasMatches": true,
+				"location": {
+					"venue": "Hogg Middle School",
+					"city": "Houston",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMOKSSEM2",
+				"name": "Jackson Meet @ 10 AM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "SE",
+				"hasMatches": true,
+				"location": {
+					"venue": "Jackson High School",
+					"city": "Jackson",
+					"state": "MO",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USORIRM1",
+				"name": "Iron Mountain League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Los_Angeles",
+				"regionCode": "USOR",
+				"leagueCode": "IR",
+				"hasMatches": true,
+				"location": {
+					"venue": "Meridian Creek Middle School",
+					"city": "Wilsonville",
+					"state": "OR",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USIAIRISM4",
+				"name": "Iris Parkersburg",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIA",
+				"leagueCode": "IRIS",
+				"hasMatches": true,
+				"location": {
+					"venue": "Aplington-Parkersburg High School",
+					"city": "Parkersburg",
+					"state": "IA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USOKOKHGM2",
+				"name": "Herrington League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USOK",
+				"leagueCode": "OKHG",
+				"hasMatches": true,
+				"location": {
+					"venue": "Tulsa Robotics Center",
+					"city": "Tulsa",
+					"state": "OK",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USHIUSHIM4",
+				"name": "Hawaii League #4 @ Punahou School",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "Pacific/Honolulu",
+				"regionCode": "USHI",
+				"leagueCode": "USHI",
+				"hasMatches": true,
+				"location": {
+					"venue": "Punahou School",
+					"city": "Honolulu",
+					"state": "HI",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USALORQ",
+				"name": "HCMS Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USAL",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Hampton Cove Middle School",
+					"city": "Owens Cross Roads",
+					"state": "AL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USFLGCM1",
+				"name": "Gulf Coast Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USFL",
+				"leagueCode": "GC",
+				"hasMatches": true,
+				"location": {
+					"venue": "Osceola High School",
+					"city": "Seminole",
+					"state": "FL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMOKSSTLSM6",
+				"name": "Gateway STEM Meet @ 8 AM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "STLS",
+				"hasMatches": true,
+				"location": {
+					"venue": "Gateway STEM High Sschool",
+					"city": "St. Louis",
+					"state": "MO",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USILFSM1",
+				"name": "Fox Valley South Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIL",
+				"leagueCode": "FS",
+				"hasMatches": true,
+				"location": {
+					"venue": "Wheaton Academy",
+					"city": "West Chicago",
+					"state": "IL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "CAONSCN",
+				"name": "Fall Fiesta Scrimmage",
+				"type": "NonAdvancement",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Toronto",
+				"regionCode": "CAON",
+				"leagueCode": null,
+				"hasMatches": false,
+				"location": {
+					"venue": "Dr. Norman Bethune CI",
+					"city": "Scarborough",
+					"state": "ON",
+					"country": "Canada"
+				}
+			},
+			{
+				"code": "USFLFNM1",
+				"name": "FUN League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USFL",
+				"leagueCode": "FN",
+				"hasMatches": true,
+				"location": {
+					"venue": "Jupiter Christian School",
+					"city": "Jupiter",
+					"state": "FL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXWPEPM1",
+				"name": "El Paso League Meet #1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Denver",
+				"regionCode": "USTXWP",
+				"leagueCode": "EP",
+				"hasMatches": true,
+				"location": {
+					"venue": "El Dorado High School",
+					"city": "El Paso",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USGADM2",
+				"name": "Douglasville-DCHS Meet #2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USGA",
+				"leagueCode": "D",
+				"hasMatches": true,
+				"location": {
+					"venue": "Douglas County High School",
+					"city": "Douglasville",
+					"state": "GA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USOKOKDVM2",
+				"name": "DaVinci League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USOK",
+				"leagueCode": "OKDV",
+				"hasMatches": true,
+				"location": { "venue": "TBD", "city": "TBD", "state": "OK", "country": "USA" }
+			},
+			{
+				"code": "CAABCYM1",
+				"name": "Coyote Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Edmonton",
+				"regionCode": "CAAB",
+				"leagueCode": "CY",
+				"hasMatches": true,
+				"location": {
+					"venue": "École Lindsay Thurber Comprehensive High School",
+					"city": "Red Deer",
+					"state": "AB",
+					"country": "Canada"
+				}
+			},
+			{
+				"code": "USIACONEM2",
+				"name": "Coneflower Sioux City",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIA",
+				"leagueCode": "CONE",
+				"hasMatches": true,
+				"location": {
+					"venue": "Sioux City East Middle School",
+					"city": "Sioux City",
+					"state": "IA",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "CNSHQ1",
+				"name": "China Shanghai #1 Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "Asia/Shanghai",
+				"regionCode": "CN",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "华东师范大学第二附属中学",
+					"city": "Shanghai",
+					"state": "SH",
+					"country": "China"
+				}
+			},
+			{
+				"code": "USILCCM1",
+				"name": "Chicago Meet 1 - Northside",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIL",
+				"leagueCode": "CC",
+				"hasMatches": true,
+				"location": {
+					"venue": "Northside College Preparatory High School",
+					"city": "Chicago",
+					"state": "IL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USOHCOHM2",
+				"name": "Central Ohio League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USOH",
+				"leagueCode": "COH",
+				"hasMatches": true,
+				"location": {
+					"venue": "Centennial High School",
+					"city": "Columbus",
+					"state": "OH",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USILCIM7",
+				"name": "Central Meet 1 - Urbana",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USIL",
+				"leagueCode": "CI",
+				"hasMatches": true,
+				"location": {
+					"venue": "Electrical and Computer Engineering Building",
+					"city": "Urbana",
+					"state": "IL",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USOKOKCRM2",
+				"name": "Carver League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USOK",
+				"leagueCode": "OKCR",
+				"hasMatches": true,
+				"location": {
+					"venue": "Mustang Central Middle School",
+					"city": "Mustang",
+					"state": "OK",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USMOKSSWM1",
+				"name": "Camdenton Meet #1  @ 10 AM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "SW",
+				"hasMatches": true,
+				"location": {
+					"venue": "Camdenton Middle School",
+					"city": "Camdenton",
+					"state": "MO",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXCEXBM1",
+				"name": "CTX X-Stream B League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXCE",
+				"leagueCode": "XB",
+				"hasMatches": true,
+				"location": {
+					"venue": "KIPP Austin Collegiate",
+					"city": "Austin",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXCEXAM1",
+				"name": "CTX X-Stream A League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXCE",
+				"leagueCode": "XA",
+				"hasMatches": true,
+				"location": {
+					"venue": "KIPP Austin Collegiate",
+					"city": "Austin",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXCEHLM1",
+				"name": "CTX HSI Lobos League Meet 1",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXCE",
+				"leagueCode": "HL",
+				"hasMatches": true,
+				"location": {
+					"venue": "Harmony School of Innovation",
+					"city": "San Antonio",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXCEGEM2",
+				"name": "CTX GEMS Emerald League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXCE",
+				"leagueCode": "GE",
+				"hasMatches": true,
+				"location": {
+					"venue": "Westwood High School",
+					"city": "Austin",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USTXCEGDM2",
+				"name": "CTX GEMS Diamond League Meet 2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USTXCE",
+				"leagueCode": "GD",
+				"hasMatches": true,
+				"location": {
+					"venue": "Westwood High School",
+					"city": "Austin",
+					"state": "TX",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "AUBRQ2",
+				"name": "Brisbane North Qualifier",
+				"type": "Qualifier",
+				"start": "2026-11-14",
+				"end": "2026-11-15",
+				"timezone": "Australia/Brisbane",
+				"regionCode": "AU",
+				"leagueCode": null,
+				"hasMatches": true,
+				"location": {
+					"venue": "Grace Lutheran College",
+					"city": "Brisbane",
+					"state": "QLD",
+					"country": "Australia"
+				}
+			},
+			{
+				"code": "USMOKSSTLNM7",
+				"name": "Battle Meet @ 10 AM",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/Chicago",
+				"regionCode": "USMOKS",
+				"leagueCode": "STLN",
+				"hasMatches": true,
+				"location": {
+					"venue": "Battle High School",
+					"city": "Columbia",
+					"state": "MO",
+					"country": "USA"
+				}
+			},
+			{
+				"code": "USGAATLM2",
+				"name": "Atlanta-Marist Meet #2",
+				"type": "LeagueMeet",
+				"start": "2026-11-14",
+				"end": "2026-11-14",
+				"timezone": "America/New_York",
+				"regionCode": "USGA",
+				"leagueCode": "ATL",
+				"hasMatches": true,
+				"location": { "venue": "Marist School", "city": "Atlanta", "state": "GA", "country": "USA" }
+			}
+		]
+	}
+}

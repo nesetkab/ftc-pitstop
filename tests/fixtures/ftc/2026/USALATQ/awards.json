@@ -1,0 +1,144 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "USALATQ",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": 25114,
+			"schoolName": null,
+			"fullTeamName": "New Century Tech High Scool",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USALATQ",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 19459,
+			"schoolName": null,
+			"fullTeamName": "Athens Renaissance School",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USALATQ",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 35722,
+			"schoolName": null,
+			"fullTeamName": "Athens Renaissance School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USALATQ",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 24378,
+			"schoolName": null,
+			"fullTeamName": "New Century Tech High Scool",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USALATQ",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 21830,
+			"schoolName": null,
+			"fullTeamName": "Athens Renaissance School",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USALATQ",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": 7842,
+			"schoolName": null,
+			"fullTeamName": "Boeing/Gene Hass Foundation/AUVSI Pathfinder Chapter/Huntsville Hamfest/American Filliment/PPG Foundation&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USALATQ",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USALATQ",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": 21830,
+			"schoolName": null,
+			"fullTeamName": "Athens Renaissance School",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USALATQ",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USALATQ",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USALATQ",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USALATQ",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": 24378,
+			"schoolName": null,
+			"fullTeamName": "New Century Tech High Scool",
+			"person": null
+		},
+		{
+			"awardId": 1,
+			"eventCode": "USALATQ",
+			"name": "Judges' Choice Award",
+			"series": 1,
+			"teamNumber": 30403,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 10,
+			"eventCode": "USALATQ",
+			"name": "<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}

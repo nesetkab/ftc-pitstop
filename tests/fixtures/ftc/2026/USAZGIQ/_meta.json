@@ -1,0 +1,51 @@
+{
+	"code": "USAZGIQ",
+	"note": "finished qualifier with 6 alliances and a surrogate",
+	"recordedAt": "2026-11-19T07:19:43.780Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USAZGIQ", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USAZGIQ", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USAZGIQ", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USAZGIQ/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 00:17:42 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USAZGIQ/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 00:17:42 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/USAZGIQ?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 00:17:42 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USAZGIQ?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 00:17:42 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/USAZGIQ/qual",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 00:17:42 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/USAZGIQ/playoff",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 00:17:42 GMT"
+		},
+		"alliances": {
+			"path": "alliances/USAZGIQ",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:19:43 GMT"
+		},
+		"awards": {
+			"path": "awards/USAZGIQ",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 00:17:42 GMT"
+		},
+		"advancement": { "path": "advancement/USAZGIQ", "status": 200, "lastModified": null }
+	}
+}

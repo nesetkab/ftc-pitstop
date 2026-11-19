@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "fae69574-b4c8-0648-892b-43feb2d57e4a",
+			"code": "USFLORM1",
+			"divisionCode": null,
+			"name": "Orlando Robotics Meet 1",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 2,
+			"published": true,
+			"type": "1",
+			"typeName": "League Meet",
+			"regionCode": "USFL",
+			"leagueCode": "OR",
+			"districtCode": "",
+			"venue": "Trinity Preparatory School",
+			"address": "5700 Trinity Prep Lane",
+			"city": "Winter Park",
+			"stateprov": "FL",
+			"country": "USA",
+			"website": "https://flfirst.org",
+			"liveStreamUrl": "",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=81278",
+			"coordinates": { "type": "Point", "coordinates": [-81.27109, 28.61124] },
+			"webcasts": null,
+			"timezone": "America/New_York",
+			"dateStart": "2026-11-14T00:00:00",
+			"dateEnd": "2026-11-14T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

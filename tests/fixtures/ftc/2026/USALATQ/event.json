@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "373e9a86-015d-df49-b8f9-ffdeba439a0c",
+			"code": "USALATQ",
+			"divisionCode": null,
+			"name": "Athens Qualifier",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 1,
+			"published": true,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "USAL",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "Athens Renaissance School",
+			"address": "601 S Clinton St",
+			"city": "Athens",
+			"stateprov": "AL",
+			"country": "USA",
+			"website": "https://www.firstinalabama.org/events",
+			"liveStreamUrl": "https://youtube.com/live/4tScR8RexiA?feature=share",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=81245",
+			"coordinates": { "type": "Point", "coordinates": [-86.96898, 34.79714] },
+			"webcasts": null,
+			"timezone": "America/Chicago",
+			"dateStart": "2026-10-24T00:00:00",
+			"dateEnd": "2026-10-24T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

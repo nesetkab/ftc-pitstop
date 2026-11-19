@@ -1,0 +1,246 @@
+{
+	"matches": [
+		{
+			"actualStartTime": "2026-11-07T17:17:06.617",
+			"description": "Upper Bracket  Round 1 Match 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"scoreRedFinal": 127,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 102,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 56,
+			"postResultTime": "2026-11-07T17:22:45.097",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 34672, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 21482, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 30837, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 31261, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.913"
+		},
+		{
+			"actualStartTime": "2026-11-07T17:24:36.624",
+			"description": "Upper Bracket  Round 1 Match 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 2,
+			"matchNumber": 1,
+			"scoreRedFinal": 176,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 56,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"postResultTime": "2026-11-07T17:32:42.853",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 5237, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 10016, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 21564, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 16883, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.903"
+		},
+		{
+			"actualStartTime": "2026-11-07T17:33:00.708",
+			"description": "Upper Bracket  Round 2 Match 3",
+			"tournamentLevel": "PLAYOFF",
+			"series": 3,
+			"matchNumber": 1,
+			"scoreRedFinal": 173,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 48,
+			"scoreBlueFinal": 95,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"postResultTime": "2026-11-07T17:38:16.493",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 23392, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 21482, "station": "Blue2", "dq": false, "onField": true },
+				{ "teamNumber": 34672, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 10136, "station": "Red1", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.989"
+		},
+		{
+			"actualStartTime": "2026-11-07T17:39:37.966",
+			"description": "Upper Bracket  Round 2 Match 4",
+			"tournamentLevel": "PLAYOFF",
+			"series": 4,
+			"matchNumber": 1,
+			"scoreRedFinal": 85,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 130,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"postResultTime": "2026-11-07T17:43:34.31",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 10016, "station": "Blue2", "dq": false, "onField": true },
+				{ "teamNumber": 5237, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 30612, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 7215, "station": "Red2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.893"
+		},
+		{
+			"actualStartTime": "2026-11-07T17:46:00.248",
+			"description": "Lower Bracket  Round 3 Match 5",
+			"tournamentLevel": "PLAYOFF",
+			"series": 5,
+			"matchNumber": 1,
+			"scoreRedFinal": 91,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 16,
+			"scoreBlueFinal": 49,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"postResultTime": "2026-11-07T17:51:11.585",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 34672, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 21482, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 21564, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 16883, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.944"
+		},
+		{
+			"actualStartTime": "2026-11-07T17:52:38.856",
+			"description": "Lower Bracket  Round 3 Match 6",
+			"tournamentLevel": "PLAYOFF",
+			"series": 6,
+			"matchNumber": 1,
+			"scoreRedFinal": 107,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 16,
+			"scoreBlueFinal": 61,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 23,
+			"postResultTime": "2026-11-07T18:02:44.909",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 30612, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 7215, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 30837, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 31261, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.975"
+		},
+		{
+			"actualStartTime": "2026-11-07T18:04:16.811",
+			"description": "Upper Bracket  Round 4 Match 7",
+			"tournamentLevel": "PLAYOFF",
+			"series": 7,
+			"matchNumber": 1,
+			"scoreRedFinal": 173,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 48,
+			"scoreBlueFinal": 143,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"postResultTime": "2026-11-07T18:08:05.886",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 10136, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 23392, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 5237, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 10016, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:57.005"
+		},
+		{
+			"actualStartTime": "2026-11-07T18:11:45.993",
+			"description": "Lower Bracket  Round 4 Match 8",
+			"tournamentLevel": "PLAYOFF",
+			"series": 8,
+			"matchNumber": 1,
+			"scoreRedFinal": 97,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 16,
+			"scoreBlueFinal": 94,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"postResultTime": "2026-11-07T18:15:19.889",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 30612, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 7215, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 34672, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 21482, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.884"
+		},
+		{
+			"actualStartTime": "2026-11-07T18:28:47.424",
+			"description": "Lower Bracket  Round 5 Match 9",
+			"tournamentLevel": "PLAYOFF",
+			"series": 9,
+			"matchNumber": 1,
+			"scoreRedFinal": 131,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 56,
+			"scoreBlueFinal": 117,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"postResultTime": "2026-11-07T18:47:06.07",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 10016, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 5237, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 7215, "station": "Blue2", "dq": false, "onField": true },
+				{ "teamNumber": 30612, "station": "Blue1", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.923"
+		},
+		{
+			"actualStartTime": "2026-11-07T18:54:22.63",
+			"description": "Final Bracket  Round 6 Match 10",
+			"tournamentLevel": "PLAYOFF",
+			"series": 10,
+			"matchNumber": 1,
+			"scoreRedFinal": 144,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 172,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"postResultTime": "2026-11-07T18:59:15.743",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 10136, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 23392, "station": "Red2", "dq": false, "onField": true },
+				{ "teamNumber": 5237, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 10016, "station": "Blue2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.934"
+		},
+		{
+			"actualStartTime": "2026-11-07T19:08:45.017",
+			"description": "Final Bracket  Round 7 Match 11",
+			"tournamentLevel": "PLAYOFF",
+			"series": 11,
+			"matchNumber": 1,
+			"scoreRedFinal": 121,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 153,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 16,
+			"postResultTime": "2026-11-07T19:12:46.109",
+			"videoURL": null,
+			"teams": [
+				{ "teamNumber": 10136, "station": "Red1", "dq": false, "onField": true },
+				{ "teamNumber": 10016, "station": "Blue2", "dq": false, "onField": true },
+				{ "teamNumber": 5237, "station": "Blue1", "dq": false, "onField": true },
+				{ "teamNumber": 23392, "station": "Red2", "dq": false, "onField": true }
+			],
+			"modifiedOn": "2026-11-08T00:32:56.964"
+		}
+	]
+}

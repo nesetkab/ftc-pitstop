@@ -1,0 +1,51 @@
+{
+	"code": "UZTAQ1",
+	"note": "qualifier with 4 alliances, many no-shows and surrogates",
+	"recordedAt": "2026-11-19T07:19:59.315Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=UZTAQ1", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=UZTAQ1", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/UZTAQ1", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/UZTAQ1/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 18:21:30 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/UZTAQ1/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 18:21:30 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/UZTAQ1?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 18:21:30 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/UZTAQ1?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 18:21:30 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/UZTAQ1/qual",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 18:21:30 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/UZTAQ1/playoff",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 18:21:30 GMT"
+		},
+		"alliances": {
+			"path": "alliances/UZTAQ1",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:19:59 GMT"
+		},
+		"awards": {
+			"path": "awards/UZTAQ1",
+			"status": 200,
+			"lastModified": "Sun, 15 Nov 2026 18:21:30 GMT"
+		},
+		"advancement": { "path": "advancement/UZTAQ1", "status": 200, "lastModified": null }
+	}
+}

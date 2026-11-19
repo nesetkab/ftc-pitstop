@@ -1,0 +1,43 @@
+{
+	"code": "USFLORM1",
+	"note": "league meet with surrogates and a no-show",
+	"recordedAt": "2026-11-19T07:19:53.010Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USFLORM1", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USFLORM1", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USFLORM1", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USFLORM1/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sat, 14 Nov 2026 21:41:26 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USFLORM1/playoff/hybrid",
+			"status": 200,
+			"lastModified": null
+		},
+		"matches-qual": {
+			"path": "matches/USFLORM1?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sat, 14 Nov 2026 21:41:26 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USFLORM1?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": null
+		},
+		"scores-qual": {
+			"path": "scores/USFLORM1/qual",
+			"status": 200,
+			"lastModified": "Sat, 14 Nov 2026 21:41:26 GMT"
+		},
+		"scores-playoff": { "path": "scores/USFLORM1/playoff", "status": 200, "lastModified": null },
+		"alliances": {
+			"path": "alliances/USFLORM1",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:19:52 GMT"
+		},
+		"awards": { "path": "awards/USFLORM1", "status": 200, "lastModified": null },
+		"advancement": { "path": "advancement/USFLORM1", "status": 200, "lastModified": null }
+	}
+}

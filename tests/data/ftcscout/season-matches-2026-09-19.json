@@ -1,0 +1,128 @@
+{
+	"data": {
+		"eventsSearch": [
+			{
+				"code": "USUTSAS1",
+				"type": "NonAdvancement",
+				"start": "2026-09-19",
+				"end": "2026-09-19",
+				"matches": [
+					{
+						"tournamentLevel": "Finals",
+						"series": 0,
+						"matchNum": 1,
+						"hasBeenPlayed": true,
+						"actualStartTime": "2026-09-19T20:16:50.525Z",
+						"teams": [
+							{
+								"teamNumber": 20515,
+								"alliance": "Red",
+								"station": "Two",
+								"surrogate": false,
+								"noShow": false,
+								"dq": false,
+								"onField": true
+							},
+							{
+								"teamNumber": 19389,
+								"alliance": "Blue",
+								"station": "Two",
+								"surrogate": false,
+								"noShow": false,
+								"dq": false,
+								"onField": true
+							}
+						],
+						"scores": {
+							"red": {
+								"totalPoints": 39,
+								"totalPointsNp": 39,
+								"autoPoints": 3,
+								"dcPoints": 36,
+								"penaltyPointsByOpp": 0,
+								"autoLeavePoints": 3,
+								"autoParkPoints": 0,
+								"dcParkPoints": 10,
+								"tips": 1,
+								"swarmRp": false,
+								"pollinator1Rp": false,
+								"pollinator2Rp": false
+							},
+							"blue": {
+								"totalPoints": 29,
+								"totalPointsNp": 29,
+								"autoPoints": 8,
+								"dcPoints": 21,
+								"penaltyPointsByOpp": 0,
+								"autoLeavePoints": 3,
+								"autoParkPoints": 5,
+								"dcParkPoints": 10,
+								"tips": 0,
+								"swarmRp": true,
+								"pollinator1Rp": false,
+								"pollinator2Rp": false
+							}
+						}
+					},
+					{
+						"tournamentLevel": "Finals",
+						"series": 0,
+						"matchNum": 2,
+						"hasBeenPlayed": true,
+						"actualStartTime": "2026-09-19T20:28:22.521Z",
+						"teams": [
+							{
+								"teamNumber": 20515,
+								"alliance": "Red",
+								"station": "Two",
+								"surrogate": false,
+								"noShow": false,
+								"dq": false,
+								"onField": true
+							},
+							{
+								"teamNumber": 19389,
+								"alliance": "Blue",
+								"station": "Two",
+								"surrogate": false,
+								"noShow": false,
+								"dq": false,
+								"onField": true
+							}
+						],
+						"scores": {
+							"red": {
+								"totalPoints": 37,
+								"totalPointsNp": 37,
+								"autoPoints": 3,
+								"dcPoints": 34,
+								"penaltyPointsByOpp": 0,
+								"autoLeavePoints": 3,
+								"autoParkPoints": 0,
+								"dcParkPoints": 10,
+								"tips": 1,
+								"swarmRp": false,
+								"pollinator1Rp": false,
+								"pollinator2Rp": false
+							},
+							"blue": {
+								"totalPoints": 33,
+								"totalPointsNp": 33,
+								"autoPoints": 16,
+								"dcPoints": 17,
+								"penaltyPointsByOpp": 0,
+								"autoLeavePoints": 6,
+								"autoParkPoints": 10,
+								"dcParkPoints": 10,
+								"tips": 0,
+								"swarmRp": true,
+								"pollinator1Rp": false,
+								"pollinator2Rp": false
+							}
+						}
+					}
+				]
+			}
+		]
+	}
+}

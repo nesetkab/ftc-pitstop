@@ -1,0 +1,53 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": { "teamNumber": 19163, "displayTeamNumber": "19163", "teamName": "MLP" },
+			"round1": { "teamNumber": 33030, "displayTeamNumber": "33030", "teamName": "Nyancat." },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": { "teamNumber": 38120, "displayTeamNumber": "38120", "teamName": "Olimjon " },
+			"round1": { "teamNumber": 35407, "displayTeamNumber": "35407", "teamName": "ASTRYX" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 3,
+			"name": "Alliance Seed 3",
+			"captain": {
+				"teamNumber": 38244,
+				"displayTeamNumber": "38244",
+				"teamName": "JSM - John Soap MacTavish Robotics"
+			},
+			"round1": {
+				"teamNumber": 35577,
+				"displayTeamNumber": "35577",
+				"teamName": "GSR - Ghost Simon Riley Robotics"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 4,
+			"name": "Alliance Seed 4",
+			"captain": { "teamNumber": 35406, "displayTeamNumber": "35406", "teamName": "ANDIJAN TEAM" },
+			"round1": { "teamNumber": 39503, "displayTeamNumber": "39503", "teamName": "Buzz lighter" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 4
+}

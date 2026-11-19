@@ -1,0 +1,51 @@
+{
+	"code": "USALATQ",
+	"note": "qualifier with 2 alliances",
+	"recordedAt": "2026-11-19T07:19:57.772Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USALATQ", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USALATQ", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USALATQ", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USALATQ/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:35:49 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USALATQ/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:35:49 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/USALATQ?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:35:49 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USALATQ?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:35:49 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/USALATQ/qual",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:35:49 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/USALATQ/playoff",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:35:49 GMT"
+		},
+		"alliances": {
+			"path": "alliances/USALATQ",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:19:57 GMT"
+		},
+		"awards": {
+			"path": "awards/USALATQ",
+			"status": 200,
+			"lastModified": "Sun, 25 Oct 2026 04:35:49 GMT"
+		},
+		"advancement": { "path": "advancement/USALATQ", "status": 200, "lastModified": null }
+	}
+}

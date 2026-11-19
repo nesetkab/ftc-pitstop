@@ -1,0 +1,41 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": {
+				"teamNumber": 19459,
+				"displayTeamNumber": "19459",
+				"teamName": "Titanium Renaissance Rockets"
+			},
+			"round1": {
+				"teamNumber": 35722,
+				"displayTeamNumber": "35722",
+				"teamName": "Radiant Renaissance"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": {
+				"teamNumber": 24378,
+				"displayTeamNumber": "24378",
+				"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+			},
+			"round1": {
+				"teamNumber": 21830,
+				"displayTeamNumber": "21830",
+				"teamName": "Renaissance Raptors"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 2
+}

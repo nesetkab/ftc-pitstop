@@ -1,0 +1,47 @@
+{
+	"code": "USCALACAS1",
+	"note": "non-advancement scrimmage without playoffs",
+	"recordedAt": "2026-11-19T07:19:54.485Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USCALACAS1", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USCALACAS1", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USCALACAS1", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USCALACAS1/qual/hybrid",
+			"status": 200,
+			"lastModified": "Mon, 26 Oct 2026 15:58:44 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USCALACAS1/playoff/hybrid",
+			"status": 200,
+			"lastModified": null
+		},
+		"matches-qual": {
+			"path": "matches/USCALACAS1?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Mon, 26 Oct 2026 15:58:44 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USCALACAS1?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": null
+		},
+		"scores-qual": {
+			"path": "scores/USCALACAS1/qual",
+			"status": 200,
+			"lastModified": "Mon, 26 Oct 2026 15:58:44 GMT"
+		},
+		"scores-playoff": { "path": "scores/USCALACAS1/playoff", "status": 200, "lastModified": null },
+		"alliances": {
+			"path": "alliances/USCALACAS1",
+			"status": 200,
+			"lastModified": "Thu, 19 Nov 2026 07:19:54 GMT"
+		},
+		"awards": {
+			"path": "awards/USCALACAS1",
+			"status": 200,
+			"lastModified": "Mon, 26 Oct 2026 15:58:45 GMT"
+		},
+		"advancement": { "path": "advancement/USCALACAS1", "status": 200, "lastModified": null }
+	}
+}

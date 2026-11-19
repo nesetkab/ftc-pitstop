@@ -1,0 +1,128 @@
+{
+	"schedule": [
+		{
+			"description": "Finals 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"startTime": "2026-10-24T14:30:00",
+			"actualStartTime": "2026-10-24T14:37:03.776",
+			"postResultTime": "2026-10-24T14:40:59.093",
+			"videoURL": null,
+			"scoreRedFinal": 68,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 37,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				},
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				},
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				}
+			]
+		},
+		{
+			"description": "Finals 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 2,
+			"startTime": "2026-10-24T14:48:00",
+			"actualStartTime": "2026-10-24T14:51:56.149",
+			"postResultTime": "2026-10-24T14:56:58.815",
+			"videoURL": null,
+			"scoreRedFinal": 59,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 38,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19459,
+					"displayTeamNumber": "19459",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Titanium Renaissance Rockets"
+				},
+				{
+					"teamNumber": 35722,
+					"displayTeamNumber": "35722",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Radiant Renaissance"
+				},
+				{
+					"teamNumber": 24378,
+					"displayTeamNumber": "24378",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Super Cool Autonomous Mach1nes (SCAM)"
+				},
+				{
+					"teamNumber": 21830,
+					"displayTeamNumber": "21830",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Renaissance Raptors"
+				}
+			]
+		}
+	]
+}

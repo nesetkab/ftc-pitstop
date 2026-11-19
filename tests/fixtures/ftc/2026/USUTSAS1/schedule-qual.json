@@ -1,0 +1,810 @@
+{
+	"schedule": [
+		{
+			"description": "Qualification 1",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 1,
+			"startTime": "2026-09-19T11:00:00",
+			"actualStartTime": "2026-09-19T11:05:55.947",
+			"postResultTime": "2026-09-19T11:10:31.749",
+			"videoURL": null,
+			"scoreRedFinal": 5,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 42,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 19389,
+					"displayTeamNumber": "19389",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Angry Aliens"
+				},
+				{
+					"teamNumber": 30534,
+					"displayTeamNumber": "30534",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Odyssey Rovers"
+				},
+				{
+					"teamNumber": 5026,
+					"displayTeamNumber": "5026",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tesla Coils"
+				},
+				{
+					"teamNumber": 32272,
+					"displayTeamNumber": "32272",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Eagle Works"
+				}
+			]
+		},
+		{
+			"description": "Qualification 2",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 2,
+			"startTime": "2026-09-19T11:08:00",
+			"actualStartTime": "2026-09-19T11:14:53.134",
+			"postResultTime": "2026-09-19T11:18:42.768",
+			"videoURL": null,
+			"scoreRedFinal": 16,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 13,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 3747,
+					"displayTeamNumber": "3747",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Hive"
+				},
+				{
+					"teamNumber": 20515,
+					"displayTeamNumber": "20515",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cubed ETs"
+				},
+				{
+					"teamNumber": 36546,
+					"displayTeamNumber": "36546",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Koalafied"
+				},
+				{
+					"teamNumber": 24087,
+					"displayTeamNumber": "24087",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Elevate"
+				}
+			]
+		},
+		{
+			"description": "Qualification 3",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 3,
+			"startTime": "2026-09-19T11:16:00",
+			"actualStartTime": "2026-09-19T11:30:43.147",
+			"postResultTime": "2026-09-19T11:34:40.214",
+			"videoURL": null,
+			"scoreRedFinal": 16,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 12,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 32272,
+					"displayTeamNumber": "32272",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Eagle Works"
+				},
+				{
+					"teamNumber": 99999,
+					"displayTeamNumber": "99999",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Off-Season Demo Team"
+				},
+				{
+					"teamNumber": 31683,
+					"displayTeamNumber": "31683",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": false,
+					"teamName": "Euclid's Engineers"
+				},
+				{
+					"teamNumber": 30534,
+					"displayTeamNumber": "30534",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Odyssey Rovers"
+				}
+			]
+		},
+		{
+			"description": "Qualification 4",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 4,
+			"startTime": "2026-09-19T11:24:00",
+			"actualStartTime": "2026-09-19T11:40:52.286",
+			"postResultTime": "2026-09-19T11:44:21.542",
+			"videoURL": null,
+			"scoreRedFinal": 14,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 25,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 19389,
+					"displayTeamNumber": "19389",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": false,
+					"teamName": "Angry Aliens"
+				},
+				{
+					"teamNumber": 36546,
+					"displayTeamNumber": "36546",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Koalafied"
+				},
+				{
+					"teamNumber": 20515,
+					"displayTeamNumber": "20515",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cubed ETs"
+				},
+				{
+					"teamNumber": 99999,
+					"displayTeamNumber": "99999",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Off-Season Demo Team"
+				}
+			]
+		},
+		{
+			"description": "Qualification 5",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 5,
+			"startTime": "2026-09-19T11:32:00",
+			"actualStartTime": "2026-09-19T11:49:59.866",
+			"postResultTime": "2026-09-19T11:53:36.693",
+			"videoURL": null,
+			"scoreRedFinal": 54,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 50,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 31683,
+					"displayTeamNumber": "31683",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Euclid's Engineers"
+				},
+				{
+					"teamNumber": 5026,
+					"displayTeamNumber": "5026",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tesla Coils"
+				},
+				{
+					"teamNumber": 3747,
+					"displayTeamNumber": "3747",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Hive"
+				},
+				{
+					"teamNumber": 24087,
+					"displayTeamNumber": "24087",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Elevate"
+				}
+			]
+		},
+		{
+			"description": "Qualification 6",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 6,
+			"startTime": "2026-09-19T11:40:00",
+			"actualStartTime": "2026-09-19T12:00:59.268",
+			"postResultTime": "2026-09-19T12:04:51.033",
+			"videoURL": null,
+			"scoreRedFinal": 6,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 16,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 31683,
+					"displayTeamNumber": "31683",
+					"station": "Blue1",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Euclid's Engineers"
+				},
+				{
+					"teamNumber": 19389,
+					"displayTeamNumber": "19389",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Angry Aliens"
+				},
+				{
+					"teamNumber": 36546,
+					"displayTeamNumber": "36546",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Koalafied"
+				},
+				{
+					"teamNumber": 30534,
+					"displayTeamNumber": "30534",
+					"station": "Red1",
+					"surrogate": true,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Odyssey Rovers"
+				}
+			]
+		},
+		{
+			"description": "Qualification 7",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 7,
+			"startTime": "2026-09-19T11:48:00",
+			"actualStartTime": "2026-09-19T12:08:14.141",
+			"postResultTime": "2026-09-19T12:12:07.848",
+			"videoURL": null,
+			"scoreRedFinal": 76,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 11,
+			"scoreBlueFinal": 16,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 5026,
+					"displayTeamNumber": "5026",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tesla Coils"
+				},
+				{
+					"teamNumber": 3747,
+					"displayTeamNumber": "3747",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Hive"
+				},
+				{
+					"teamNumber": 32272,
+					"displayTeamNumber": "32272",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Eagle Works"
+				},
+				{
+					"teamNumber": 20515,
+					"displayTeamNumber": "20515",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cubed ETs"
+				}
+			]
+		},
+		{
+			"description": "Qualification 8",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 8,
+			"startTime": "2026-09-19T12:45:00",
+			"actualStartTime": "2026-09-19T13:01:44.604",
+			"postResultTime": "2026-09-19T13:05:31.707",
+			"videoURL": null,
+			"scoreRedFinal": 16,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 3,
+			"scoreBlueFinal": 22,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 36546,
+					"displayTeamNumber": "36546",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Koalafied"
+				},
+				{
+					"teamNumber": 99999,
+					"displayTeamNumber": "99999",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Off-Season Demo Team"
+				},
+				{
+					"teamNumber": 24087,
+					"displayTeamNumber": "24087",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Elevate"
+				},
+				{
+					"teamNumber": 32272,
+					"displayTeamNumber": "32272",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Eagle Works"
+				}
+			]
+		},
+		{
+			"description": "Qualification 9",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 9,
+			"startTime": "2026-09-19T12:53:00",
+			"actualStartTime": "2026-09-19T13:12:38.927",
+			"postResultTime": "2026-09-19T13:16:58.417",
+			"videoURL": null,
+			"scoreRedFinal": 12,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 46,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 5,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 3747,
+					"displayTeamNumber": "3747",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Hive"
+				},
+				{
+					"teamNumber": 19389,
+					"displayTeamNumber": "19389",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Angry Aliens"
+				},
+				{
+					"teamNumber": 30534,
+					"displayTeamNumber": "30534",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Odyssey Rovers"
+				},
+				{
+					"teamNumber": 24087,
+					"displayTeamNumber": "24087",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Elevate"
+				}
+			]
+		},
+		{
+			"description": "Qualification 10",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 10,
+			"startTime": "2026-09-19T13:01:00",
+			"actualStartTime": "2026-09-19T13:20:56.306",
+			"postResultTime": "2026-09-19T13:25:13.953",
+			"videoURL": null,
+			"scoreRedFinal": 39,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 50,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 99999,
+					"displayTeamNumber": "99999",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Off-Season Demo Team"
+				},
+				{
+					"teamNumber": 31683,
+					"displayTeamNumber": "31683",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Euclid's Engineers"
+				},
+				{
+					"teamNumber": 5026,
+					"displayTeamNumber": "5026",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tesla Coils"
+				},
+				{
+					"teamNumber": 20515,
+					"displayTeamNumber": "20515",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cubed ETs"
+				}
+			]
+		},
+		{
+			"description": "Qualification 11",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 11,
+			"startTime": "2026-09-19T13:09:00",
+			"actualStartTime": "2026-09-19T13:30:49.251",
+			"postResultTime": "2026-09-19T13:35:15.168",
+			"videoURL": null,
+			"scoreRedFinal": 38,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 23,
+			"scoreBlueFinal": 36,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 16,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 31683,
+					"displayTeamNumber": "31683",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Euclid's Engineers"
+				},
+				{
+					"teamNumber": 3747,
+					"displayTeamNumber": "3747",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Hive"
+				},
+				{
+					"teamNumber": 99999,
+					"displayTeamNumber": "99999",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Off-Season Demo Team"
+				},
+				{
+					"teamNumber": 19389,
+					"displayTeamNumber": "19389",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Angry Aliens"
+				}
+			]
+		},
+		{
+			"description": "Qualification 12",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 12,
+			"startTime": "2026-09-19T13:17:00",
+			"actualStartTime": "2026-09-19T13:38:22.984",
+			"postResultTime": "2026-09-19T13:42:05.993",
+			"videoURL": null,
+			"scoreRedFinal": 20,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 0,
+			"scoreBlueFinal": 14,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 3,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 20515,
+					"displayTeamNumber": "20515",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Cubed ETs"
+				},
+				{
+					"teamNumber": 24087,
+					"displayTeamNumber": "24087",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Elevate"
+				},
+				{
+					"teamNumber": 30534,
+					"displayTeamNumber": "30534",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Odyssey Rovers"
+				},
+				{
+					"teamNumber": 32272,
+					"displayTeamNumber": "32272",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Eagle Works"
+				}
+			]
+		},
+		{
+			"description": "Qualification 13",
+			"tournamentLevel": "QUALIFICATION",
+			"series": 0,
+			"matchNumber": 13,
+			"startTime": "2026-09-19T13:25:00",
+			"actualStartTime": "2026-09-19T13:49:15.643",
+			"postResultTime": "2026-09-19T13:53:19.319",
+			"videoURL": null,
+			"scoreRedFinal": 39,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 16,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 0,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 5026,
+					"displayTeamNumber": "5026",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Tesla Coils"
+				},
+				{
+					"teamNumber": 30534,
+					"displayTeamNumber": "30534",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Odyssey Rovers"
+				},
+				{
+					"teamNumber": 36546,
+					"displayTeamNumber": "36546",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Koalafied"
+				},
+				{
+					"teamNumber": 31683,
+					"displayTeamNumber": "31683",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Euclid's Engineers"
+				}
+			]
+		}
+	]
+}

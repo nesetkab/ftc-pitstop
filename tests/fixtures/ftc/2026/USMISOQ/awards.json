@@ -1,0 +1,234 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "USMISOQ",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": 34672,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USMISOQ",
+			"name": "Inspire Award 2nd Place",
+			"series": 2,
+			"teamNumber": 30451,
+			"schoolName": null,
+			"fullTeamName": "Boulan Park Middle School",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USMISOQ",
+			"name": "Inspire Award 3rd Place",
+			"series": 3,
+			"teamNumber": 21482,
+			"schoolName": null,
+			"fullTeamName": "DETROIT DIESEL/leidos/UMA LEARNING LABS&East Middle School",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USMISOQ",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 5237,
+			"schoolName": null,
+			"fullTeamName": "Boeing/FEDCO/Michigan Department of Education/Sidelines/Vistra (Davis Besse )/International Brotherhood of Electrical Workers Local 8/AIS construction Equipment/OCESA Local 11/ProTow/Victory Auto/TW Baldwin Scholarship/Sommers Family/HLH Orthodontics/Gerdau Steel/Precious & Free/Salon 23/RL Wealth Advisor Solutions/Glass City Roofing/Pallet Siblings/Laramie's Sports Shop/Pallet Moms/Gathered Creations/E'bot Easton/Mike Smith/Secor Dental&Bedford Junior High School",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USMISOQ",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 10016,
+			"schoolName": null,
+			"fullTeamName": "Cedar Lodge 60 Masons of Clarkston/Team RUSH 27/GM/Stacy Taylor Realty Group/X-Tier, Inc/BLK MKT Cards/Crestwood Dental Group/Hamlin Pub/Oakland University/Pita Way/Planet Oil Change/Steve Craft Allstate Agency/The Print Shop/Viking Insurance/Waterfall Jewelers/Mazza Auto Parts/5th Tavern Clarkston/Tenuta's Market/Ace Hardware of Clarkston/Clintonville Pharmacy/Jester's Gallery/RE/MAX Eclipse&Sashabaw Middle School&Clarkston Junior High School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USMISOQ",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 10136,
+			"schoolName": null,
+			"fullTeamName": "Frost Middle School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USMISOQ",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 23392,
+			"schoolName": null,
+			"fullTeamName": "Van Hoosen Middle School",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USMISOQ",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": 16883,
+			"schoolName": null,
+			"fullTeamName": "BAE Systems/Commonwealth Rolled Products/Patel Brothers&Baker Middle School",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USMISOQ",
+			"name": "Think Award 2nd Place",
+			"series": 2,
+			"teamNumber": 30612,
+			"schoolName": null,
+			"fullTeamName": "Aptiv/Brose/Salesforce/BECHEM/DoW STEM/AdamBots #245&Van Hoosen Middle School",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USMISOQ",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": 22738,
+			"schoolName": null,
+			"fullTeamName": "ACFSearch, LLC/Johnson Matthey &East Middle School",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USMISOQ",
+			"name": "Connect Award 2nd Place",
+			"series": 2,
+			"teamNumber": 19940,
+			"schoolName": null,
+			"fullTeamName": "Trine University/IEP Urgent Care/Precision Task Group/BRIGHTSharks Engineering/Care4You Pediatrics/Smile Centers PC/VOIP OFFICE/Inovision/Michigan Department of Education/Marimba Auto/V2 Soft&Hillside Middle School&Meads Mill Middle School",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USMISOQ",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": 10136,
+			"schoolName": null,
+			"fullTeamName": "Frost Middle School",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USMISOQ",
+			"name": "Sustain Award 2nd Place",
+			"series": 2,
+			"teamNumber": 8777,
+			"schoolName": null,
+			"fullTeamName": "Young Basile Hanlon & MacFarlane P.C./Jibbs Jigs&Brownstown Middle School",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USMISOQ",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": 5237,
+			"schoolName": null,
+			"fullTeamName": "Boeing/FEDCO/Michigan Department of Education/Sidelines/Vistra (Davis Besse )/International Brotherhood of Electrical Workers Local 8/AIS construction Equipment/OCESA Local 11/ProTow/Victory Auto/TW Baldwin Scholarship/Sommers Family/HLH Orthodontics/Gerdau Steel/Precious & Free/Salon 23/RL Wealth Advisor Solutions/Glass City Roofing/Pallet Siblings/Laramie's Sports Shop/Pallet Moms/Gathered Creations/E'bot Easton/Mike Smith/Secor Dental&Bedford Junior High School",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USMISOQ",
+			"name": "Innovate Award sponsored by RTX 2nd Place",
+			"series": 2,
+			"teamNumber": 10016,
+			"schoolName": null,
+			"fullTeamName": "Cedar Lodge 60 Masons of Clarkston/Team RUSH 27/GM/Stacy Taylor Realty Group/X-Tier, Inc/BLK MKT Cards/Crestwood Dental Group/Hamlin Pub/Oakland University/Pita Way/Planet Oil Change/Steve Craft Allstate Agency/The Print Shop/Viking Insurance/Waterfall Jewelers/Mazza Auto Parts/5th Tavern Clarkston/Tenuta's Market/Ace Hardware of Clarkston/Clintonville Pharmacy/Jester's Gallery/RE/MAX Eclipse&Sashabaw Middle School&Clarkston Junior High School",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USMISOQ",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": 30837,
+			"schoolName": null,
+			"fullTeamName": "The Future Innovators Academy/Toyota&The Future Innovators Academy",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USMISOQ",
+			"name": "Control Award 2nd Place",
+			"series": 2,
+			"teamNumber": 21790,
+			"schoolName": null,
+			"fullTeamName": "Magna, Analog Devices, Schoolcraft College, Kawasaki Robotics/Ibiden, Speaking Masters, Toyota, Autodesk, Associa support kids, Hantz Financial, KPIT, Mad science, Grant Millman & Johnson, Delta Hotels, Accelerate KID, Pediatric Dentistry of Milford/Novi Middle School&Novi Middle School",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USMISOQ",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": 22918,
+			"schoolName": null,
+			"fullTeamName": "Dean Kamen Foundation/Michigan Department of Education/REV Robotics/Keith Wesley/WSB Troy - Bunao's office/Joanne Cruz Mind, Body and Soul practice/Savers wholesale printing/BIGGBY of Troy/Victor International/Ford/Brose/FANUC America/Arconic Foundation/GM/DTE Energy/ally/BATTELLE/Cruz Family/Ms. L. Karg of Troy/Friends and Family of the Girl Botz Team/Crispellis Troy/Qdoba - Big Beaver/Michigan Quickly Boba/Ally/Texas Roadhouse Restaurant - Madison Heights, MI/Highest Honors/La Marza Mediterranean Cuisine/Benito's Pizza of Troy/Konjo me Restaurant/Marco's Pizza/Green Lantern Pizza/Cruz Family, Jayaraman Family, Kim Family, Wesley Family, Mutia Family, Sanchez Family, Chandra Family/Crispelli's Bakery/Bunao Family/Troy School District/Dr Ernie Mac/Bill Ristov/MSGCU&Larson Middle School",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USMISOQ",
+			"name": "Reach Award 2nd Place",
+			"series": 2,
+			"teamNumber": 6079,
+			"schoolName": null,
+			"fullTeamName": "Buck & Knobby/Shinkles/The Karmol Family&Bedford Junior High School",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USMISOQ",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": 21564,
+			"schoolName": null,
+			"fullTeamName": "Southgate Community School District/Bosch&Davidson Middle School",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USMISOQ",
+			"name": "Design Award 2nd Place",
+			"series": 2,
+			"teamNumber": 31261,
+			"schoolName": null,
+			"fullTeamName": "The Future Innovators Academy/Toyota&The Future Innovators Academy",
+			"person": null
+		},
+		{
+			"awardId": 1,
+			"eventCode": "USMISOQ",
+			"name": "Judges' Choice Award",
+			"series": 1,
+			"teamNumber": 31913,
+			"schoolName": null,
+			"fullTeamName": "Southgate Community School District/Bosch&Davidson Middle School",
+			"person": null
+		},
+		{
+			"awardId": 10,
+			"eventCode": "USMISOQ",
+			"name": "<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}
