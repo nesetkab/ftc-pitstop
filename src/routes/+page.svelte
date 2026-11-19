@@ -1,9 +1,2 @@
-<script lang="ts">
-	import Dash from '$lib/dash.svelte';
-	import Header from '$lib/header.svelte';
-</script>
-
-<div class="min-h-screen min-w-screen flex flex-col">
-	<Header />
-	<Dash />
-</div>
+<h1>Welcome to SvelteKit</h1>
+<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
