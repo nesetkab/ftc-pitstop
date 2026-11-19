@@ -1,0 +1,138 @@
+<script lang="ts">
+	import { breakdownParts } from '#lib/game/biobuzz.ts';
+	import type { AllianceColor, AllianceScore, Match } from '#lib/types.ts';
+	import Table from '#lib/ui/Table.svelte';
+	import TeamChip from '#lib/ui/TeamChip.svelte';
+	import { matchHref } from './matches.ts';
+
+	type Order = 'asc' | 'desc';
+
+	interface Props {
+		code: string;
+		matches: Match[];
+		followed?: ReadonlySet<number>;
+		order?: Order;
+	}
+
+	let { code, matches, followed = new Set(), order = $bindable('asc') }: Props = $props();
+
+	const played = $derived(matches.filter((match) => match.result !== null));
+	const rows = $derived(order === 'asc' ? played : [...played].reverse());
+
+	const parts = ['auto', 'hive', 'flower', 'garden', 'park'] as const;
+
+	function sides(match: Match): { color: AllianceColor; score: AllianceScore }[] {
+		if (!match.result) return [];
+		return [
+			{ color: 'red', score: match.result.red },
+			{ color: 'blue', score: match.result.blue }
+		];
+	}
+
+	function flip() {
+		order = order === 'asc' ? 'desc' : 'asc';
+	}
+</script>
+
+<Table>
+	<caption class="visually-hidden">Match results</caption>
+	<thead>
+		<tr>
+			<th class="l" scope="col" aria-sort={order === 'asc' ? 'ascending' : 'descending'}>
+				<button type="button" class="sort" onclick={flip}>
+					Match <span aria-hidden="true">{order === 'asc' ? '↑' : '↓'}</span>
+					<span class="visually-hidden"
+						>, sorted {order === 'asc' ? 'first to last' : 'last to first'}</span
+					>
+				</button>
+			</th>
+			<th class="l" scope="col">Teams</th>
+			<th scope="col">Auto</th>
+			<th scope="col">Hive</th>
+			<th scope="col">Flowers</th>
+			<th scope="col">Garden</th>
+			<th scope="col">Park</th>
+			<th scope="col">Fouls</th>
+			<th scope="col">Total</th>
+		</tr>
+	</thead>
+	{#each rows as match (match.key)}
+		<tbody>
+			{#each sides(match) as { color, score }, index (color)}
+				{@const split = breakdownParts(score)}
+				{@const detailed = score.breakdown !== null}
+				<tr class={['side', color, { first: index === 0 }]}>
+					{#if index === 0}
+						<th class="l match" rowspan="2" scope="rowgroup">
+							<a href={matchHref(code, match)}>{match.label}</a>
+						</th>
+					{/if}
+					<td class="l">
+						<span class="chips">
+							{#each match[color] as entry (entry.team)}
+								<TeamChip number={entry.team} alliance={color} me={followed.has(entry.team)} />
+							{/each}
+						</span>
+					</td>
+					{#each parts as part (part)}
+						<td>{detailed || part === 'auto' ? split[part] : '—'}</td>
+					{/each}
+					<td>{split.fouls}</td>
+					<td class={['total', { won: match.result?.winner === color }]}>{score.total}</td>
+				</tr>
+			{/each}
+		</tbody>
+	{/each}
+</Table>
+
+<style>
+	.sort {
+		display: inline-flex;
+		gap: 4px;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: inherit;
+		font: inherit;
+	}
+
+	.sort:hover {
+		color: var(--text);
+	}
+
+	th.match {
+		padding: 11px 10px 9px;
+		border-bottom: 1px solid var(--line);
+		font-size: 14px;
+		color: var(--text);
+		vertical-align: top;
+		text-align: left;
+	}
+
+	th.match a {
+		font-weight: 600;
+	}
+
+	tr.first td {
+		padding-bottom: 3px;
+		border-bottom-color: transparent;
+	}
+
+	tr.side:not(.first) td {
+		padding-top: 3px;
+	}
+
+	.chips {
+		display: inline-flex;
+		gap: 4px;
+	}
+
+	.total {
+		color: var(--text-2);
+	}
+
+	.total.won {
+		color: var(--text);
+		font-weight: 600;
+	}
+</style>
