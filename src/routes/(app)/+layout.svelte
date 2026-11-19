@@ -1,6 +1,7 @@
 <script lang="ts">
 	import AppBar from '#lib/ui/AppBar.svelte';
 	import SearchDialog from '#lib/ui/SearchDialog.svelte';
+	import ThemeSwitch from '#lib/ui/ThemeSwitch.svelte';
 	import { searchDialog } from '#lib/ui/search.svelte.ts';
 	import type { LayoutProps } from './$types';
 
@@ -21,6 +22,9 @@
 		<nav aria-label="Footer">
 			<a href="/accuracy">Prediction accuracy</a>
 		</nav>
+		<div class="footer-theme">
+			<ThemeSwitch />
+		</div>
 	</footer>
 </div>
 
@@ -90,5 +94,16 @@
 
 	footer a:hover {
 		color: var(--text-2);
+	}
+
+	.footer-theme {
+		display: none;
+		flex-basis: 100%;
+	}
+
+	@media (max-width: 600px) {
+		.footer-theme {
+			display: block;
+		}
 	}
 </style>

@@ -39,7 +39,7 @@
 			onclick={onsearch}
 		>
 			<span>Search teams and events</span>
-			<kbd>/</kbd>
+			<kbd aria-hidden="true">/</kbd>
 		</button>
 		<div class="theme">
 			<ThemeSwitch />
@@ -125,6 +125,7 @@
 
 	.theme {
 		grid-area: theme;
+		justify-self: end;
 	}
 
 	@media (max-width: 900px) {
@@ -142,7 +143,19 @@
 		}
 	}
 
-	@media (hover: none), (max-width: 600px) {
+	@media (max-width: 600px) {
+		.inner {
+			grid-template-areas:
+				'home nav'
+				'search search';
+		}
+
+		.theme {
+			display: none;
+		}
+	}
+
+	@media (hover: none) {
 		.search kbd {
 			display: none;
 		}
