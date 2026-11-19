@@ -1,0 +1,74 @@
+{
+	"data": {
+		"teamByNumber": {
+			"number": 2844,
+			"name": "Valley X Robotics",
+			"schoolName": "Valley Christian High School",
+			"rookieYear": 2008,
+			"location": { "city": "Chandler", "state": "AZ", "country": "USA" },
+			"quickStats": {
+				"season": 2026,
+				"tot": { "value": 47.36150152134671, "rank": 345 },
+				"auto": { "value": 24.524382662727714, "rank": 99 },
+				"dc": { "value": 22.837118858618982, "rank": 799 },
+				"eg": { "value": 3.6443297579883756, "rank": 2222 },
+				"count": 3272
+			},
+			"previous": {
+				"season": 2025,
+				"tot": { "value": 63.599963374526595, "rank": 1689 },
+				"auto": { "value": 20.75568106265168, "rank": 1555 },
+				"dc": { "value": 45.95488048235991, "rank": 1806 },
+				"eg": { "value": 12.340435860567583, "rank": 371 },
+				"count": 8368
+			},
+			"awards": [
+				{
+					"eventCode": "USAZGIQ",
+					"type": "Inspire",
+					"placement": 3,
+					"teamNumber": 2844,
+					"personName": null
+				}
+			],
+			"events": [
+				{
+					"eventCode": "USAZGIQ",
+					"stats": {
+						"rank": 16,
+						"rp": 1.8,
+						"tb1": 64,
+						"tb2": 2.2,
+						"wins": 2,
+						"losses": 3,
+						"ties": 0,
+						"dqs": 0,
+						"qualMatchesPlayed": 5,
+						"opr": {
+							"totalPointsNp": 47.36150152134671,
+							"autoPoints": 24.524382662727714,
+							"dcPoints": 22.837118858618982
+						}
+					},
+					"event": {
+						"code": "USAZGIQ",
+						"name": "Roadrunner - Gilbert Qualifier",
+						"type": "Qualifier",
+						"start": "2026-11-14",
+						"end": "2026-11-14",
+						"timezone": "America/Phoenix",
+						"regionCode": "USAZ",
+						"leagueCode": null,
+						"hasMatches": true,
+						"location": {
+							"venue": "Gilbert Christian High School",
+							"city": "Gilbert",
+							"state": "AZ",
+							"country": "USA"
+						}
+					}
+				}
+			]
+		}
+	}
+}
