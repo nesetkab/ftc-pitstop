@@ -1,0 +1,26 @@
+<script lang="ts">
+	import { page } from '$app/state';
+	import Button from '#lib/ui/Button.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import { searchDialog } from '#lib/ui/search.svelte.ts';
+
+	const missing = $derived(page.status === 404);
+	const title = $derived(missing ? 'Team not found' : 'Team data is unavailable');
+	const meta = $derived(
+		missing
+			? 'No team has this number. Check the number or search by name.'
+			: 'The team could not be loaded. Try again in a moment.'
+	);
+</script>
+
+<svelte:head>
+	<title>{title} - PitStop</title>
+	<meta name="robots" content="noindex" />
+</svelte:head>
+
+<PageHeader {title} {meta}>
+	{#snippet actions()}
+		<Button onclick={() => (searchDialog.open = true)}>Search teams and events</Button>
+		<Button variant="secondary" href="/leaderboards">Leaderboards</Button>
+	{/snippet}
+</PageHeader>
