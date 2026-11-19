@@ -1,0 +1,167 @@
+import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
+import { fixtureBundle } from './fixtures.ts';
+import PhoneScreen from './PhoneScreen.svelte';
+import { DEFAULT_ALERTS } from './alerts.ts';
+import { queueCall } from './queue.ts';
+import TvScreen from './TvScreen.svelte';
+import { pitView } from './view.ts';
+
+const TEAM = 14624;
+const full = fixtureBundle('USAZGIQ');
+const at = (label: string) => replayStart(label, full)!;
+const match = (key: string) => full.matches.find((item) => item.key === key)!;
+
+function props(time: number, extra: Record<string, unknown> = {}) {
+	const bundle = replayBundle(full, time);
+	const view = pitView({ bundle, analysis: null, queue: null, team: TEAM });
+	const call = queueCall(view.next, time);
+	return {
+		view,
+		event: bundle.event,
+		now: time,
+		call,
+		takeover: null,
+		connection: 'connected' as const,
+		updated: bundle.fetchedAt,
+		source: bundle.source,
+		stale: false,
+		phoneUrl: 'ftcpitstop.com/14624',
+		...extra
+	};
+}
+
+const text = (container: HTMLElement) => container.textContent?.replace(/\s+/g, ' ') ?? '';
+
+afterEach(() => cleanup());
+
+describe('TvScreen', () => {
+	it('shows the QR code and first match before the event starts', () => {
+		const { container } = render(TvScreen, {
+			props: props(Date.parse('2026-11-14T17:00:00Z'))
+		});
+		expect(container.querySelector('[data-phase="upcoming"]')).not.toBeNull();
+		expect(
+			screen.getByRole('img', { name: 'QR code for ftcpitstop.com/14624' })
+		).toBeInTheDocument();
+		expect(text(container)).toContain('First match Q5 at 10:56 AM');
+		expect(text(container)).toContain('Red alliance with 15058.');
+		expect(text(container)).toContain('ftcpitstop.com/14624');
+		expect(text(container)).toContain('Matches start at 10:30 AM.');
+	});
+
+	it('lays out qualifications like the spec', () => {
+		const { container } = render(TvScreen, { props: props(at('Q22')) });
+		const content = text(container);
+		expect(container.querySelector('[data-phase="quals"]')).not.toBeNull();
+		expect(content).toContain('Next match');
+		expect(content).toContain('Q26');
+		expect(content).toContain('Red alliance');
+		expect(content).toContain('Scheduled for 1:58 PM');
+		expect(content).toContain('3 matches from now. The field is running 2 minutes behind.');
+		expect(content).toContain('Rankings after Q22');
+		expect(content).toContain('Teams and rank');
+		expect(content).not.toContain('Win chance');
+		const mine = [...container.querySelectorAll('tr.me td')].map((cell) => cell.textContent);
+		expect(mine).toEqual(['8', '14624', 'Cat-Astrophic Byte', '3.33', '3-0-0']);
+		expect(container.querySelectorAll('table tbody tr')).toHaveLength(27);
+		expect(content).toContain('Q22 Blue won 26670, 18421 97–45');
+		expect(content).toContain('Connected');
+		expect(content).toContain('Updated 1:39:30 PM from FTC Events');
+		expect(content).toContain('Q23 is next');
+		expect(content).toContain('14624 Cat-Astrophic Byte');
+	});
+
+	it('takes over the screen at queue time until tapped', async () => {
+		const time = match('q23').actualTime!;
+		const base = props(time);
+		const ondismiss = vi.fn();
+		const { container } = render(TvScreen, {
+			props: { ...base, takeover: base.call, ondismiss }
+		});
+		const takeover = screen.getByRole('button', { name: /Queue now/ });
+		expect(takeover.textContent?.replace(/\s+/g, ' ')).toContain('Queue now Q26, red alliance');
+		expect(text(container)).toContain('Q23 is on the field');
+		await fireEvent.click(takeover);
+		expect(ondismiss).toHaveBeenCalledOnce();
+	});
+
+	it('warns when the data is stale', () => {
+		const { container } = render(TvScreen, {
+			props: props(at('Q22'), { stale: true, connection: 'retrying', now: at('Q22') + 240_000 })
+		});
+		expect(container.querySelector('footer.stale')).not.toBeNull();
+		expect(text(container)).toContain('Reconnecting');
+		expect(text(container)).toContain('4 minutes ago');
+	});
+
+	it('follows alliance selection', () => {
+		const window = selectionWindow(full)!;
+		const { container } = render(TvScreen, {
+			props: props(window.start + (window.end - window.start) * 0.5)
+		});
+		const content = text(container);
+		expect(container.querySelector('[data-phase="selection"]')).not.toBeNull();
+		expect(content).toContain('Alliance selection');
+		expect(content).toContain('Not on an alliance yet');
+		expect(content).toContain('Alliance 4 is picking.');
+		expect(content).toContain('Available teams');
+		expect(container.querySelectorAll('.alliances li')).toHaveLength(4);
+	});
+
+	it('shows our alliance and next playoff match', () => {
+		const { container } = render(TvScreen, { props: props(at('M1')) });
+		const content = text(container);
+		expect(container.querySelector('[data-phase="playoffs"]')).not.toBeNull();
+		expect(content).toContain('M3');
+		expect(content).toContain('Upper bracket round 2');
+		expect(content).toContain('Alliance 5');
+		expect(content).toContain('Playoff record 1-0.');
+	});
+
+	it('wraps up with the final rank and awards', () => {
+		const { container } = render(TvScreen, { props: props(at('M10') + 20 * 60_000) });
+		const content = text(container);
+		expect(container.querySelector('[data-phase="done"]')).not.toBeNull();
+		expect(content).toContain('Final rank');
+		expect(content).toContain('6th of 27');
+		expect(content).toContain('5-0-0 with an RS of 3.60');
+		expect(content).toContain('Out after M5');
+		expect(content).toContain('Inspire Award');
+		expect(content).toContain('Final rankings');
+	});
+
+	it('says when the team is not at the event', () => {
+		const bundle = replayBundle(full, at('Q22'));
+		const view = pitView({ bundle, analysis: null, queue: null, team: 99999 });
+		const { container } = render(TvScreen, { props: { ...props(at('Q22')), view } });
+		expect(text(container)).toContain('99999 is not on the team list for this event.');
+	});
+});
+
+describe('PhoneScreen', () => {
+	it('shows the next match, standing and alerts', () => {
+		const base = props(at('Q22'));
+		const { container } = render(PhoneScreen, {
+			props: {
+				...base,
+				matches: replayBundle(full, at('Q22')).matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default' as const
+			}
+		});
+		const content = text(container);
+		expect(content).toContain('Next match');
+		expect(content).toContain('Scheduled for 1:58 PM');
+		expect(content).toContain('3 matches from now. Field is 2 min behind.');
+		const facts = [...container.querySelectorAll('dl.kv dt, dl.kv dd')].map(
+			(item) => item.textContent
+		);
+		expect(facts).toEqual(['Rank', '8 of 27', 'Record', '3-0-0', 'Ranking score', '3.33']);
+		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).toBeChecked();
+		expect(screen.getByRole('switch', { name: 'Our rank changes' })).not.toBeChecked();
+		expect(screen.getByRole('link', { name: 'Event' })).toHaveAttribute('href', '/events/USAZGIQ');
+		expect(screen.getByRole('link', { name: 'Tools' })).toHaveAttribute('href', '/w');
+	});
+});

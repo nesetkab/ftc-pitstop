@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { detectPhase } from '#lib/game/phase.ts';
 import {
 	mapAdvancement,
@@ -12,7 +12,7 @@ import {
 } from '#lib/server/ftc/mappers.ts';
 import type { EventBundle } from '#lib/types.ts';
 
-const ROOT = fileURLToPath(new URL('../../../../tests/fixtures/ftc/2026/', import.meta.url));
+const ROOT = join(process.cwd(), 'tests/fixtures/ftc/2026/');
 
 function read<T>(code: string, name: string): T {
 	return JSON.parse(readFileSync(`${ROOT}${code}/${name}.json`, 'utf8')) as T;
