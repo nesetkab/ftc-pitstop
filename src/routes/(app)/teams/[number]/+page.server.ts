@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { localDay } from '#lib/components/team/dates.ts';
 import { buildTeamPage } from '#lib/components/team/team-view.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
-import { loadEventAnalysis, loadSeasonRatings } from '#lib/server/analysis.ts';
+import { loadEventAnalysis, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import { DataError } from '#lib/server/errors.ts';
 import { loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
@@ -39,7 +39,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 		.slice(-MAX_PLAYOFF_EVENTS);
 
 	const [ratings, analysisList, bundleList] = await Promise.all([
-		settled(loadSeasonRatings()),
+		settled(loadSeasonRatingsWithin()),
 		Promise.all(started.map((entry) => settled(loadEventAnalysis(entry.event.code)))),
 		Promise.all(withPlayoffs.map((entry) => settled(loadEventBundle(entry.event.code))))
 	]);

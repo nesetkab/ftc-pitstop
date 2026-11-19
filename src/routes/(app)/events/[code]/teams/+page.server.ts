@@ -1,5 +1,5 @@
 import type { Config } from '@sveltejs/adapter-vercel';
-import { loadSeasonRatings } from '#lib/server/analysis.ts';
+import { loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import type { PageServerLoad } from './$types';
 
 export const config: Config = { isr: { expiration: 60 } };
@@ -7,7 +7,7 @@ export const config: Config = { isr: { expiration: 60 } };
 export const load: PageServerLoad = async ({ parent }) => {
 	const [{ bundle }, ratings] = await Promise.all([
 		parent(),
-		loadSeasonRatings().catch(() => null)
+		loadSeasonRatingsWithin().catch(() => null)
 	]);
 	if (!ratings || ratings.teams.length === 0) return { season: null, seasonCount: null };
 	const here = new Set(bundle.teams.map((team) => team.number));

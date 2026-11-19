@@ -203,9 +203,31 @@ export function createAnalysis(deps: AnalysisDeps) {
 		return teamHistory(await loadSeasonModel(), team);
 	}
 
+	async function settleWithin<T>(task: Promise<T>, ms: number): Promise<T | null> {
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		const timeout = new Promise<null>((resolve) => {
+			timer = setTimeout(() => resolve(null), ms);
+		});
+		const result = await Promise.race([task.catch(() => null), timeout]);
+		clearTimeout(timer);
+		if (result === null) background(task);
+		return result;
+	}
+
+	function loadSeasonRatingsWithin(ms: number = budget): Promise<SeasonRatings | null> {
+		return settleWithin(loadSeasonRatings(), ms);
+	}
+
+	function loadTeamRatingHistoryWithin(
+		number: number | string,
+		ms: number = budget
+	): Promise<TeamRatingHistory | null> {
+		return settleWithin(loadTeamRatingHistory(number), ms);
+	}
+
 	async function priorsForTeams(numbers: number[], beforeTime: number): Promise<AnalysisContext> {
 		const teams = [...new Set(numbers)].sort((a, b) => a - b);
-		const model = await loadSeasonModel().catch(() => null);
+		const model = await settleWithin(loadSeasonModel(), budget);
 		return contextFor(model, teams, dayNumber(new Date(beforeTime).toISOString()), previous);
 	}
 
@@ -214,7 +236,9 @@ export function createAnalysis(deps: AnalysisDeps) {
 		loadEventAnalysis,
 		loadEventAnalysisEntry,
 		loadSeasonRatings,
+		loadSeasonRatingsWithin,
 		loadTeamRatingHistory,
+		loadTeamRatingHistoryWithin,
 		priorsForTeams
 	};
 }
@@ -227,6 +251,8 @@ export const {
 	loadEventAnalysis,
 	loadEventAnalysisEntry,
 	loadSeasonRatings,
+	loadSeasonRatingsWithin,
 	loadTeamRatingHistory,
+	loadTeamRatingHistoryWithin,
 	priorsForTeams
 } = analysis;

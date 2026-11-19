@@ -4,12 +4,12 @@ import type { LeaderboardRow } from '#lib/components/team/leaderboard.ts';
 import { load } from './+page.server.ts';
 
 const server = vi.hoisted(() => ({
-	loadSeasonRatings: vi.fn(),
+	loadSeasonRatingsWithin: vi.fn(),
 	searchIndex: vi.fn(),
 	scoutLoad: vi.fn()
 }));
 
-vi.mock('#lib/server/analysis.ts', () => ({ loadSeasonRatings: server.loadSeasonRatings }));
+vi.mock('#lib/server/analysis.ts', () => ({ loadSeasonRatingsWithin: server.loadSeasonRatingsWithin }));
 vi.mock('#lib/server/event.ts', () => ({ searchIndex: server.searchIndex }));
 vi.mock('./scout.server.ts', () => ({ scoutLeaderboard: { load: server.scoutLoad } }));
 
@@ -62,14 +62,14 @@ const directory = {
 
 beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
-	server.loadSeasonRatings.mockResolvedValue(null);
+	server.loadSeasonRatingsWithin.mockResolvedValue(null);
 	server.searchIndex.mockResolvedValue(directory);
 	server.scoutLoad.mockRejectedValue(new Error('down'));
 });
 
 describe('leaderboards load with season ratings', () => {
 	it('ranks teams by OPR, adds names and leaves out teams with no matches', async () => {
-		server.loadSeasonRatings.mockResolvedValue(ratings(120, 10));
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 10));
 		const { result, setHeaders } = call();
 		const data = await result;
 		expect(data.source).toBe('ratings');
@@ -87,7 +87,7 @@ describe('leaderboards load with season ratings', () => {
 	});
 
 	it('pages the list and numbers the ranks from the start of the page', async () => {
-		server.loadSeasonRatings.mockResolvedValue(ratings(200, 20));
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(200, 20));
 		const data = await call('?page=2').result;
 		expect(data).toMatchObject({ page: 2, start: 50 });
 		expect(data.rows).toHaveLength(50);
@@ -95,7 +95,7 @@ describe('leaderboards load with season ratings', () => {
 	});
 
 	it('filters by region and minimum matches', async () => {
-		server.loadSeasonRatings.mockResolvedValue(ratings(120, 30));
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 30));
 		const data = await call('?region=USAZ&min=10').result;
 		expect(data.filters).toMatchObject({ region: 'USAZ', min: 10 });
 		expect(data.rows.length).toBeGreaterThan(0);
@@ -103,7 +103,7 @@ describe('leaderboards load with season ratings', () => {
 	});
 
 	it('offers the states of the chosen country', async () => {
-		server.loadSeasonRatings.mockResolvedValue(ratings(120, 40));
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 40));
 		expect((await call().result).states).toEqual([]);
 		const data = await call('?country=USA&state=AZ').result;
 		expect(data.states).toEqual([
@@ -114,7 +114,7 @@ describe('leaderboards load with season ratings', () => {
 	});
 
 	it('still ranks teams when the team directory is unavailable', async () => {
-		server.loadSeasonRatings.mockResolvedValue(ratings(60, 50));
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(60, 50));
 		server.searchIndex.mockRejectedValue(new Error('down'));
 		const data = await call().result;
 		expect(data.rows[0]).toMatchObject({ team: 1001, name: null, city: null });
@@ -163,7 +163,7 @@ describe('leaderboards load without season ratings', () => {
 	});
 
 	it('uses FTCScout when ratings exist but no team has played', async () => {
-		server.loadSeasonRatings.mockResolvedValue({
+		server.loadSeasonRatingsWithin.mockResolvedValue({
 			generatedAt: 1,
 			teams: ratings(5).teams.map((team) => ({ ...team, matches: 0 }))
 		});

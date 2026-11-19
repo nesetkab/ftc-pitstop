@@ -8,7 +8,7 @@ import { load } from './+page.server.ts';
 const server = vi.hoisted(() => ({
 	loadTeamSeason: vi.fn(),
 	loadEventBundle: vi.fn(),
-	loadSeasonRatings: vi.fn(),
+	loadSeasonRatingsWithin: vi.fn(),
 	loadEventAnalysis: vi.fn()
 }));
 
@@ -18,7 +18,7 @@ vi.mock('#lib/server/event.ts', () => ({
 }));
 
 vi.mock('#lib/server/analysis.ts', () => ({
-	loadSeasonRatings: server.loadSeasonRatings,
+	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin,
 	loadEventAnalysis: server.loadEventAnalysis
 }));
 
@@ -71,7 +71,7 @@ const ratings: SeasonRatings = {
 
 beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
-	server.loadSeasonRatings.mockResolvedValue(null);
+	server.loadSeasonRatingsWithin.mockResolvedValue(null);
 	server.loadEventAnalysis.mockResolvedValue(null);
 	server.loadEventBundle.mockRejectedValue(new DataError(503, 'down'));
 });
@@ -102,7 +102,7 @@ describe('team page load', () => {
 
 	it('uses season ratings when they exist', async () => {
 		server.loadTeamSeason.mockResolvedValue(season([played('AAA', '2026-11-07')]));
-		server.loadSeasonRatings.mockResolvedValue(ratings);
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings);
 		const { view } = await call().result;
 		expect(view.source).toBe('ratings');
 		expect(view.stats).toMatchObject({ rank: 3, of: 3 });
@@ -110,7 +110,7 @@ describe('team page load', () => {
 
 	it('charts rating history from event analysis', async () => {
 		server.loadTeamSeason.mockResolvedValue(season([played('AAA', '2026-11-07')]));
-		server.loadSeasonRatings.mockResolvedValue(ratings);
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings);
 		const analysis = {
 			code: 'AAA',
 			ratings: [
@@ -153,7 +153,7 @@ describe('team page load', () => {
 
 	it('still renders when the event details cannot be loaded', async () => {
 		server.loadTeamSeason.mockResolvedValue(season([played('QUAL', '2026-11-14')]));
-		server.loadSeasonRatings.mockRejectedValue(new Error('broken'));
+		server.loadSeasonRatingsWithin.mockRejectedValue(new Error('broken'));
 		server.loadEventAnalysis.mockRejectedValue(new Error('broken'));
 		const { view } = await call().result;
 		expect(view.source).toBe('scout');

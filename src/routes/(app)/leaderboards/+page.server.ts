@@ -9,7 +9,7 @@ import {
 	type LeaderboardDataset
 } from '#lib/components/team/leaderboard.ts';
 import { ratedTeams } from '#lib/components/team/team-view.ts';
-import { loadSeasonRatings } from '#lib/server/analysis.ts';
+import { loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import { searchIndex } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
@@ -35,7 +35,7 @@ function remember(key: string, build: () => Omit<Source, 'key'>): Source {
 }
 
 async function loadSource(): Promise<Source> {
-	const ratings = await loadSeasonRatings().catch(() => null);
+	const ratings = await loadSeasonRatingsWithin(20_000).catch(() => null);
 	if (ratings && ratedTeams(ratings).length > 0) {
 		const directory = await searchIndex().catch(() => null);
 		return remember(`ratings:${ratings.generatedAt}:${directory?.fetchedAt ?? 0}`, () => ({
@@ -55,7 +55,7 @@ async function loadSource(): Promise<Source> {
 export const load: PageServerLoad = async ({ url, setHeaders }) => {
 	const filters = parseFilters(url.searchParams);
 	const source = await loadSource().catch(() =>
-		error(503, 'Leaderboards are unavailable right now')
+		error(503, 'Season ratings are still loading. Try again in a minute.')
 	);
 	const { dataset } = source;
 	const result = paginate(filterRows(dataset.rows, filters), filters.page);
