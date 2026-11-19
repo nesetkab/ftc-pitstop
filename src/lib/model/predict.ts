@@ -1,9 +1,10 @@
 import type { Component, Forecast } from './opr.ts';
 import { SCORE_SIGMA } from './opr.ts';
 import {
+	calibratedSwarm,
+	calibratedTips,
 	expectedRp,
 	RP_RULES,
-	tipChances,
 	type RpChances,
 	type RpRules,
 	type TipModel,
@@ -89,11 +90,11 @@ export function predictMatch(forecast: Forecast, options: PredictOptions = {}): 
 		const f = forecast[own];
 		const other = forecast[own === 'red' ? 'blue' : 'red'];
 		const fouls = Math.max(other.components.fouls, 0);
-		const t = tipChances(f.components.tips, rules, tips);
+		const t = calibratedTips(f.components.tips, rules, tips);
 		const chances: RpChances = {
 			win: own === 'red' ? odds.red : odds.blue,
 			tie: odds.tie,
-			swarm: options.swarm?.[own] ?? 0,
+			swarm: options.swarm ? calibratedSwarm(options.swarm[own]) : 0,
 			pollinator1: t.pollinator1,
 			pollinator2: t.pollinator2
 		};

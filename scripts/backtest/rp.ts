@@ -2,11 +2,19 @@ import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { orderEvents, orderMatches, rateSeason, type Forecast } from '../../src/lib/model/opr.ts';
 import { marginScale, WIN_PARAMS } from '../../src/lib/model/predict.ts';
-import { RP_RULES, SwarmBook, swarmFromMean, tipChances } from '../../src/lib/model/rp.ts';
+import {
+	recalibrate,
+	RP_CALIBRATION,
+	RP_RULES,
+	SwarmBook,
+	swarmFromMean,
+	tipChances,
+	type Platt
+} from '../../src/lib/model/rp.ts';
 import type { ModelEvent, ModelMatch } from '../../src/lib/model/types.ts';
 import { loadSeason } from './hist.ts';
 import { prepSeason } from './prep.ts';
-import { toModelEvent } from './production.ts';
+import { previousFor, toModelEvent } from './production.ts';
 
 const OUT_PATH = join(import.meta.dirname, '..', '..', 'src', 'lib', 'model', 'accuracy.json');
 const round = (x: number, d = 4) => Number(x.toFixed(d));
@@ -54,6 +62,44 @@ function bins(samples: Sample[], count = 10) {
 		.map((b) => ({ ...b, predicted: round(b.predicted / b.n), observed: round(b.observed / b.n) }));
 }
 
+function fitPlatt(samples: Sample[]): Platt {
+	let a = 0;
+	let b = 1;
+	const xs = samples.map(({ p }) => {
+		const q = Math.min(Math.max(p, 1e-6), 1 - 1e-6);
+		return Math.log(q / (1 - q));
+	});
+	for (let iter = 0; iter < 50; iter++) {
+		let ga = 0;
+		let gb = 0;
+		let haa = 0;
+		let hab = 0;
+		let hbb = 0;
+		samples.forEach(({ y }, i) => {
+			const x = xs[i];
+			const p = 1 / (1 + Math.exp(-(a + b * x)));
+			const w = p * (1 - p);
+			ga += p - y;
+			gb += (p - y) * x;
+			haa += w;
+			hab += w * x;
+			hbb += w * x * x;
+		});
+		const det = haa * hbb - hab * hab;
+		if (Math.abs(det) < 1e-12) break;
+		const da = (hbb * ga - hab * gb) / det;
+		const db = (haa * gb - hab * ga) / det;
+		a -= da;
+		b -= db;
+		if (Math.abs(da) + Math.abs(db) < 1e-10) break;
+	}
+	return { a: round(a, 4), b: round(b, 4) };
+}
+
+function calibrated(samples: Sample[], c: Platt): Sample[] {
+	return samples.map(({ p, y }) => ({ p: recalibrate(p, c), y }));
+}
+
 type Row = {
 	match: ModelMatch;
 	forecast: Forecast;
@@ -87,13 +133,13 @@ function collect(
 }
 
 async function main(): Promise<void> {
-	const prior = rateSeason(prepSeason(await loadSeason(2025)).map(toModelEvent));
+	const previous = await previousFor(2026);
 	const events = prepSeason(await loadSeason(2026)).map(toModelEvent);
 	const settings: Record<string, { prior: number; carry: number }> = {};
 	for (const p of [1, 1.5, 2, 3, 5])
 		for (const c of [0, 0.1, 0.2, 0.3, 0.4, 0.6]) settings[`${p}/${c}`] = { prior: p, carry: c };
 	const books = Object.fromEntries(Object.entries(settings).map(([k, v]) => [k, new SwarmBook(v)]));
-	const rows = collect(events, prior.relative, books).filter((r) => r.match.level === 'qual');
+	const rows = collect(events, previous, books).filter((r) => r.match.level === 'qual');
 	const sides = rows.flatMap((r) =>
 		(['red', 'blue'] as const).map((own) => ({
 			row: r,
@@ -186,6 +232,32 @@ async function main(): Promise<void> {
 		p: tipChances(s.f.components.tips, RP_RULES, { size: tip.size }).pollinator2,
 		y: (s.detail.tips ?? 0) >= RP_RULES.pollinator2 ? 1 : 0
 	}));
+	const split = '2026-11-08';
+	const starts = new Map(events.map((e) => [e.code, e.start]));
+	const early = sides.map((s) => (starts.get(s.row.match.eventCode) ?? '') < split);
+	const holdout = (samples: Sample[]) => {
+		const fit = fitPlatt(samples.filter((_, i) => early[i]));
+		const later = samples.filter((_, i) => !early[i]);
+		return {
+			fitOn: `events before ${split}`,
+			n: later.length,
+			raw: scores(later).brier,
+			calibrated: scores(calibrated(later, fit)).brier
+		};
+	};
+	const fits = {
+		swarm: fitPlatt(swarmSamples),
+		pollinator1: fitPlatt(p1Samples),
+		pollinator2: fitPlatt(p2Samples)
+	};
+	console.log('platt', JSON.stringify(fits), 'shipped', JSON.stringify(RP_CALIBRATION));
+	const pack = (samples: Sample[], c: Platt) => ({
+		raw: scores(samples),
+		...scores(calibrated(samples, c)),
+		platt: c,
+		holdout: holdout(samples),
+		calibration: bins(calibrated(samples, c))
+	});
 	const result = {
 		season: 2026,
 		alliances: sides.length,
@@ -196,15 +268,14 @@ async function main(): Promise<void> {
 				swarmChoice === 'robots'
 					? { model: 'normal', sd: normal[0].sd, brier: normal[0].brier }
 					: { model: 'robots', ...settings[robotKey], brier: bestRobot.brier },
-			...scores(swarmSamples),
-			calibration: bins(swarmSamples)
+			...pack(swarmSamples, RP_CALIBRATION.swarm)
 		},
 		tips: {
 			model: Number.isFinite(tip.size) ? 'negative binomial' : 'poisson',
 			size: Number.isFinite(tip.size) ? tip.size : null
 		},
-		pollinator1: { ...scores(p1Samples), calibration: bins(p1Samples) },
-		pollinator2: { ...scores(p2Samples), calibration: bins(p2Samples) },
+		pollinator1: pack(p1Samples, RP_CALIBRATION.pollinator1),
+		pollinator2: pack(p2Samples, RP_CALIBRATION.pollinator2),
 		tie: round(tie),
 		scoreSigma: round(scoreSigma)
 	};

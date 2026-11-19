@@ -1,3 +1,4 @@
+import { SwarmBook } from './rp.ts';
 import type { AllianceDetail, ModelEvent, ModelMatch } from './types.ts';
 
 export const COMPONENTS = [
@@ -109,6 +110,7 @@ export type RatingStep = {
 	key: string;
 	time: number;
 	forecast: Forecast;
+	swarm: { red: number; blue: number };
 	ratings: { team: number; before: number; after: number }[];
 };
 
@@ -124,6 +126,10 @@ export type Priors = {
 	states: Map<number, TeamState>;
 	previous: Map<number, number>;
 };
+
+export function previousFrom(teams: Record<string, number>): Map<number, number> {
+	return new Map(Object.entries(teams).map(([team, rel]) => [Number(team), rel]));
+}
 
 export function dayNumber(date: string): number {
 	return Math.round(Date.parse(`${date.slice(0, 10)}T00:00:00Z`) / 86_400_000);
@@ -432,6 +438,7 @@ export type SeasonRatings = {
 	stats: SeasonStats;
 	latest: Map<number, Rating>;
 	relative: Map<number, number>;
+	swarm: SwarmBook;
 };
 
 export type SeasonOptions = {
@@ -468,6 +475,7 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 	const latest = new Map<number, Rating>();
 	const relative = new Map<number, number>();
 	const ordered = orderEvents(events);
+	const swarm = new SwarmBook();
 	let i = 0;
 	while (i < ordered.length) {
 		const day = dayNumber(ordered[i].start);
@@ -480,6 +488,7 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 			const matches = orderMatches(event.matches);
 			const teams = [...new Set(matches.flatMap((m) => [...m.red, ...m.blue]))];
 			const rater = new EventRater(event.code, teams, priors, stats, day);
+			swarm.enterEvent(event.code, teams);
 			const steps: RatingStep[] = [];
 			for (const m of matches) {
 				if (m.redNp === null || m.blueNp === null) continue;
@@ -487,11 +496,14 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 				options.onForecast?.(event, m, forecast);
 				const members = [...m.red, ...m.blue];
 				const before = members.map((t) => rater.value(t));
+				const chances = { red: swarm.chance(m.red), blue: swarm.chance(m.blue) };
 				rater.update(m);
+				swarm.update(m);
 				steps.push({
 					key: m.key,
 					time: m.time,
 					forecast,
+					swarm: chances,
 					ratings: members.map((team, k) => ({ team, before: before[k], after: rater.value(team) }))
 				});
 				for (const [np, detail] of credits(m)) addSide(local, np, detail);
@@ -515,6 +527,7 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 		states: priors.states,
 		stats: statsOf(global, emptySums()),
 		latest,
-		relative
+		relative,
+		swarm
 	};
 }

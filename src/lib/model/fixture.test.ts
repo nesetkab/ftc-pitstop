@@ -60,7 +60,12 @@ describe('Gilbert qualifier 2026 (USAZGIQ)', () => {
 		expect(top[0].opr).toBeCloseTo(64.77, 2);
 		expect(top[0].strength).toBeCloseTo(62.22, 2);
 		expect(top[0].components.tips).toBeCloseTo(2.582, 3);
-		const final = predictMatch(ev.steps.find((s) => s.key === 'p10')!.forecast);
+		const result = rateSeason([event]);
+		expect(result.swarm.chance([18420, 25620])).toBeCloseTo(0.8058, 4);
+		expect(result.swarm.chance([10246, 10984])).toBeCloseTo(0.3762, 4);
+		const step = ev.steps.find((s) => s.key === 'p10')!;
+		expect(step.swarm.red).toBeCloseTo(0.7729, 4);
+		const final = predictMatch(step.forecast, { swarm: step.swarm });
 		expect(final.redWin).toBeCloseTo(0.6588, 4);
 		expect(final.red.score).toBeCloseTo(105.16, 2);
 	});

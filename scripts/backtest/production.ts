@@ -6,7 +6,8 @@ import {
 import type { AllianceDetail, ModelEvent, ModelMatch } from '../../src/lib/model/types.ts';
 import { STRIDE, type Records } from './engine.ts';
 import type { OprParams } from './models.ts';
-import type { PEvent, PMatch } from './prep.ts';
+import { loadSeason } from './hist.ts';
+import { prepSeason, type PEvent, type PMatch } from './prep.ts';
 
 export function toProdParams(p: OprParams): ProdParams {
 	return {
@@ -116,4 +117,12 @@ export function productionRecords(
 		pred[o + 4] = f.blue.score;
 	}
 	return { ...rec, models: [name], pred };
+}
+
+export async function previousFor(season: number, first = 2021): Promise<Map<number, number>> {
+	let previous = new Map<number, number>();
+	for (let s = first; s < season; s++) {
+		previous = rateSeason(prepSeason(await loadSeason(s)).map(toModelEvent), { previous }).relative;
+	}
+	return previous;
 }

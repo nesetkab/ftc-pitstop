@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { COMPONENTS, type Component, type Forecast } from './opr.ts';
 import { outcomeChances, predictMatch, redChance, WIN_PARAMS } from './predict.ts';
-import { poissonAtLeast } from './stats.ts';
+import { calibratedSwarm, calibratedTips } from './rp.ts';
 
 function components(values: Partial<Record<Component, number>>): Record<Component, number> {
 	return Object.fromEntries(COMPONENTS.map((c) => [c, values[c] ?? 0])) as Record<
@@ -57,12 +57,16 @@ describe('predictMatch', () => {
 		expect(p.marginSd).toBeGreaterThan(p.red.sd);
 	});
 
-	it('sums ranking points from each source', () => {
+	it('sums calibrated ranking point chances from each source', () => {
 		const p = predictMatch(forecast(60, 60, { tips: 3 }), { swarm: { red: 0.5, blue: 0.25 } });
-		const p1 = poissonAtLeast(4, 3);
-		const p2 = poissonAtLeast(7, 3);
-		expect(p.red.rp.pollinator1).toBeCloseTo(p1, 10);
-		expect(p.red.rp.expected).toBeCloseTo(3 * p.redWin + p.tie + 0.5 + p1 + p2, 10);
-		expect(p.blue.rp.swarm).toBe(0.25);
+		const tips = calibratedTips(3);
+		expect(p.red.rp.pollinator1).toBeCloseTo(tips.pollinator1, 10);
+		expect(p.red.rp.pollinator2).toBeLessThanOrEqual(p.red.rp.pollinator1);
+		expect(p.red.rp.swarm).toBeCloseTo(calibratedSwarm(0.5), 10);
+		expect(p.red.rp.expected).toBeCloseTo(
+			3 * p.redWin + p.tie + calibratedSwarm(0.5) + tips.pollinator1 + tips.pollinator2,
+			10
+		);
+		expect(p.blue.rp.swarm).toBeCloseTo(calibratedSwarm(0.25), 10);
 	});
 });

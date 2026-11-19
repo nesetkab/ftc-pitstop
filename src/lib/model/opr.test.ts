@@ -3,6 +3,7 @@ import {
 	COMPONENTS,
 	OPR_PARAMS,
 	orderMatches,
+	previousFrom,
 	priorFor,
 	rateSeason,
 	type OprParams
@@ -189,6 +190,15 @@ describe('rateSeason', () => {
 		const result = rateSeason([]);
 		expect(result.events.size).toBe(0);
 		expect(result.stats.matches).toBe(0);
+	});
+});
+
+describe('previousFrom', () => {
+	it('turns a stored record into a team map', () => {
+		const map = previousFrom({ '123': 1.5, '9': 0.4 });
+		expect(map.get(123)).toBe(1.5);
+		expect(map.get(9)).toBe(0.4);
+		expect(map.size).toBe(2);
 	});
 });
 

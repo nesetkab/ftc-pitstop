@@ -1,5 +1,5 @@
 import { RP_RULES, type RpRules } from './rp.ts';
-import { countPmf, mulberry32, normalQuantile, normalSampler } from './stats.ts';
+import { mulberry32, normalQuantile, normalSampler } from './stats.ts';
 import type { ModelMatch } from './types.ts';
 
 export type Tally = {
@@ -24,6 +24,10 @@ export type SimMatch = {
 	blueSd: number;
 	redTips: number;
 	blueTips: number;
+	redPollinator1: number;
+	redPollinator2: number;
+	bluePollinator1: number;
+	bluePollinator2: number;
 	redSwarm: number;
 	blueSwarm: number;
 	redAuto: number;
@@ -35,7 +39,6 @@ export type SimInput = {
 	current: Tally[];
 	remaining: SimMatch[];
 	rules?: RpRules;
-	tipSize?: number;
 };
 
 export type SimOptions = { sims?: number; seed?: number };
@@ -48,39 +51,6 @@ export type RankProjection = {
 	expectedRs: number;
 	expectedRank: number;
 };
-
-const MAX_TIPS = 24;
-
-type TipBins = { p1: number; p2: number; low: number; mid: number; high: number };
-
-function tipBins(mean: number, size: number, rules: RpRules): TipBins {
-	const pmf = countPmf(Math.max(mean, 0), size, MAX_TIPS);
-	let low = 0;
-	let lowW = 0;
-	let mid = 0;
-	let midW = 0;
-	let high = 0;
-	let highW = 0;
-	for (let k = 0; k <= MAX_TIPS; k++) {
-		if (k < rules.pollinator1) {
-			low += k * pmf[k];
-			lowW += pmf[k];
-		} else if (k < rules.pollinator2) {
-			mid += k * pmf[k];
-			midW += pmf[k];
-		} else {
-			high += k * pmf[k];
-			highW += pmf[k];
-		}
-	}
-	return {
-		p1: midW + highW,
-		p2: highW,
-		low: lowW > 0 ? low / lowW : 0,
-		mid: midW > 0 ? mid / midW : rules.pollinator1,
-		high: highW > 0 ? high / highW : rules.pollinator2
-	};
-}
 
 export function tallyResults(matches: ModelMatch[], rules: RpRules = RP_RULES): Tally[] {
 	const out = new Map<number, Tally>();
@@ -146,7 +116,6 @@ export function simulateRankings(input: SimInput, options: SimOptions = {}): Ran
 		baseCount[i] = t.counted;
 	}
 	const M = input.remaining.length;
-	const tipSize = input.tipSize ?? Infinity;
 	const plan = input.remaining.map((m) => {
 		const surrogates = new Set(m.surrogates ?? []);
 		const counted = (ts: number[]) =>
@@ -166,8 +135,12 @@ export function simulateRankings(input: SimInput, options: SimOptions = {}): Ran
 			blueMean: mid - shift,
 			redSd: m.redSd,
 			blueSd: m.blueSd,
-			redTips: tipBins(m.redTips, tipSize, rules),
-			blueTips: tipBins(m.blueTips, tipSize, rules),
+			redTips: m.redTips,
+			blueTips: m.blueTips,
+			redP1: m.redPollinator1,
+			redP2: Math.min(m.redPollinator2, m.redPollinator1),
+			blueP1: m.bluePollinator1,
+			blueP2: Math.min(m.bluePollinator2, m.bluePollinator1),
 			redSwarm: m.redSwarm,
 			blueSwarm: m.blueSwarm,
 			redAuto: m.redAuto,
@@ -208,20 +181,18 @@ export function simulateRankings(input: SimInput, options: SimOptions = {}): Ran
 			const blueWins = !isTie && !redWins;
 			const ru = rng();
 			const bu = rng();
-			const rt = m.redTips;
-			const bt = m.blueTips;
-			const redTips = ru < rt.p2 ? rt.high : ru < rt.p1 ? rt.mid : rt.low;
-			const blueTips = bu < bt.p2 ? bt.high : bu < bt.p1 ? bt.mid : bt.low;
+			const redTips = m.redTips;
+			const blueTips = m.blueTips;
 			const redRp =
 				(redWins ? rules.win : isTie ? rules.tie : 0) +
 				(rng() < m.redSwarm ? 1 : 0) +
-				(ru < rt.p1 ? 1 : 0) +
-				(ru < rt.p2 ? 1 : 0);
+				(ru < m.redP1 ? 1 : 0) +
+				(ru < m.redP2 ? 1 : 0);
 			const blueRp =
 				(blueWins ? rules.win : isTie ? rules.tie : 0) +
 				(rng() < m.blueSwarm ? 1 : 0) +
-				(bu < bt.p1 ? 1 : 0) +
-				(bu < bt.p2 ? 1 : 0);
+				(bu < m.blueP1 ? 1 : 0) +
+				(bu < m.blueP2 ? 1 : 0);
 			for (let j = 0; j < m.red.length; j++) {
 				const i = m.red[j];
 				rp[i] += redRp;

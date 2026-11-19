@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+	calibratedSwarm,
+	calibratedTips,
 	expectedRp,
+	recalibrate,
 	robotCategory,
 	ROBOT_POINTS,
 	RP_RULES,
@@ -70,6 +73,18 @@ describe('pollinator', () => {
 		expect(t.pollinator2).toBeCloseTo(poissonAtLeast(7, 3.2), 12);
 		expect(tipChances(-1).pollinator1).toBeGreaterThan(0);
 		expect(tipChances(-1).pollinator1).toBeLessThan(1e-6);
+	});
+});
+
+describe('recalibration', () => {
+	it('is the identity for a neutral map and keeps pollinator 2 below 1', () => {
+		expect(recalibrate(0.3, { a: 0, b: 1 })).toBeCloseTo(0.3, 12);
+		expect(recalibrate(0.5, { a: 1, b: 1 })).toBeCloseTo(1 / (1 + Math.exp(-1)), 12);
+		for (const mean of [0, 0.5, 2, 5, 9]) {
+			const t = calibratedTips(mean);
+			expect(t.pollinator2).toBeLessThanOrEqual(t.pollinator1);
+		}
+		expect(calibratedSwarm(0.9)).toBeGreaterThan(calibratedSwarm(0.2));
 	});
 });
 

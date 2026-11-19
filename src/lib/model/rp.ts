@@ -21,6 +21,37 @@ export type SwarmModel = { prior: number; carry: number };
 
 export const SWARM_MODEL: SwarmModel = { prior: 1.5, carry: 0.1 };
 
+export type Platt = { a: number; b: number };
+
+export const RP_CALIBRATION: { swarm: Platt; pollinator1: Platt; pollinator2: Platt } = {
+	swarm: { a: 0.2496, b: 1.0491 },
+	pollinator1: { a: 1.0793, b: 1.6114 },
+	pollinator2: { a: 0.6465, b: 1.1286 }
+};
+
+export function recalibrate(p: number, c: Platt): number {
+	const q = clamp(p, 1e-6, 1 - 1e-6);
+	return 1 / (1 + Math.exp(-(c.a + c.b * Math.log(q / (1 - q)))));
+}
+
+export function calibratedTips(
+	meanTips: number,
+	rules: RpRules = RP_RULES,
+	model: TipModel = TIP_MODEL,
+	cal = RP_CALIBRATION
+): { pollinator1: number; pollinator2: number } {
+	const raw = tipChances(meanTips, rules, model);
+	const pollinator1 = recalibrate(raw.pollinator1, cal.pollinator1);
+	return {
+		pollinator1,
+		pollinator2: Math.min(recalibrate(raw.pollinator2, cal.pollinator2), pollinator1)
+	};
+}
+
+export function calibratedSwarm(raw: number, cal = RP_CALIBRATION): number {
+	return recalibrate(raw, cal.swarm);
+}
+
 export type RpChances = {
 	win: number;
 	tie: number;
