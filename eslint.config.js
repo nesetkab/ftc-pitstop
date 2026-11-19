@@ -36,6 +36,16 @@ export default defineConfig(
 	{
 		// Override or add rule settings here, such as:
 		// 'svelte/button-has-type': 'error'
-		rules: {}
+		rules: {
+			'svelte/no-navigation-without-resolve': 'off',
+			'@typescript-eslint/no-unused-vars': [
+				'error',
+				{ argsIgnorePattern: '^_', varsIgnorePattern: '^_' }
+			]
+		}
+	},
+	{
+		files: ['src/lib/components/pit/feed.svelte.ts', 'src/lib/components/pit/notify.svelte.ts'],
+		rules: { 'svelte/prefer-svelte-reactivity': 'off' }
 	}
 );

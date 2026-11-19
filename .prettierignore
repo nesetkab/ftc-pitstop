@@ -7,3 +7,7 @@ bun.lockb
 
 # Miscellaneous
 /static/
+tests/fixtures/
+tests/data/
+src/lib/model/*.json
+src/lib/analysis/*.json

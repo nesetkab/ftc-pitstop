@@ -21,8 +21,7 @@
 		matchItem,
 		phoneDetail,
 		playoffResult,
-		roleText,
-		standingText
+		roleText
 	} from './copy.ts';
 	import type { Permission } from './notify.svelte.ts';
 	import type { Connection } from './poll.ts';
