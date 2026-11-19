@@ -7,6 +7,11 @@
 
 	const view = getEventView();
 	const bundle = $derived(data.bundle);
+	const note = $derived(
+		data.season
+			? `${bundle.teams.length} teams. Season OPR and world rank cover every BIOBUZZ match played so far.`
+			: `${bundle.teams.length} teams.`
+	);
 	const ratings = $derived(
 		data.analysis && data.analysis.ratings.length > 0 ? data.analysis.ratings : null
 	);
@@ -27,8 +32,5 @@
 		seasonCount={data.seasonCount}
 		followed={view.followed}
 	/>
-	<p class="note">
-		{bundle.teams.length} teams.{#if data.season}
-			Season OPR and world rank cover every BIOBUZZ match played so far.{/if}
-	</p>
+	<p class="note">{note}</p>
 {/if}

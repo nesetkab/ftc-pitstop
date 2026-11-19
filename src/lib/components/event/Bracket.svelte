@@ -154,6 +154,7 @@
 		display: grid;
 		gap: 10px;
 		align-content: start;
+		min-width: 0;
 	}
 
 	.upper {
@@ -270,6 +271,7 @@
 	}
 
 	.series {
+		justify-self: start;
 		border-collapse: separate;
 		border-spacing: 0;
 		border: 1px solid var(--line);
@@ -344,16 +346,23 @@
 
 	@media (max-width: 900px) {
 		.bracket {
-			grid-template-columns: max-content;
+			grid-template-columns: minmax(0, 1fr);
 			grid-template-areas:
 				'upper'
 				'lower'
 				'finals';
 			align-items: start;
+			overflow-x: visible;
+		}
+
+		.rounds {
+			overflow-x: auto;
+			padding-bottom: 4px;
 		}
 
 		.finals {
 			align-self: start;
+			min-width: 0;
 		}
 	}
 </style>

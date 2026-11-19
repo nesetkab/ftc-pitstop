@@ -36,6 +36,11 @@
 			null
 		)
 	);
+	const scheduleLine = $derived(
+		first === null
+			? `${integer(quals.length)} matches are scheduled.`
+			: `${integer(quals.length)} matches are scheduled, starting ${weekday(first, timezone)} at ${time(first, timezone)}.`
+	);
 	const rated = $derived(
 		ratings && ratings.length > 0
 			? new Map(ratings.map((rating) => [rating.team, rating as RatingWithRange]))
@@ -81,11 +86,7 @@
 	</EmptyState>
 {:else}
 	<EmptyState title="Qualification matches haven't started yet.">
-		{integer(quals.length)} matches are scheduled{#if first !== null}, starting {weekday(
-				first,
-				timezone
-			)}
-			at {time(first, timezone)}{/if}. <a href="/events/{code}/schedule">See the schedule</a>.
+		{scheduleLine} <a href="/events/{code}/schedule">See the schedule</a>.
 	</EmptyState>
 {/if}
 

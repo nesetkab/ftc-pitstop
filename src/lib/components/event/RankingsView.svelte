@@ -19,6 +19,18 @@
 	const projections = $derived(remaining > 0 ? (analysis?.projections ?? null) : null);
 	const ratings = $derived(analysis && analysis.ratings.length > 0 ? analysis.ratings : null);
 	const strength = $derived(analysis?.strength ?? []);
+	const note = $derived(
+		[
+			'RS is the average ranking points per match.',
+			'TBP is the average match score without penalties.',
+			ratings ? "OPR is each team's estimated share of its alliance's score." : null,
+			projections
+				? `Projections play out the ${remaining} remaining qualification ${remaining === 1 ? 'match' : 'matches'}.`
+				: null
+		]
+			.filter(Boolean)
+			.join(' ')
+	);
 </script>
 
 {#if bundle.rankings.length === 0}
@@ -34,12 +46,7 @@
 		qualCount={qualMatches.length}
 		{followed}
 	/>
-	<p class="note">
-		RS is the average ranking points per match. TBP is the average match score without penalties.{#if ratings}
-			OPR is each team's estimated share of its alliance's score.{/if}{#if projections}
-			Projections play out the {remaining} remaining qualification
-			{remaining === 1 ? 'match' : 'matches'}.{/if}
-	</p>
+	<p class="note">{note}</p>
 	{#if strength.length > 0}
 		<section class="panel" aria-labelledby="strength-title">
 			<h2 class="sec-title" id="strength-title">Schedule so far</h2>
