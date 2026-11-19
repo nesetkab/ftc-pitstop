@@ -9,7 +9,9 @@ const server = vi.hoisted(() => ({
 	scoutLoad: vi.fn()
 }));
 
-vi.mock('#lib/server/analysis.ts', () => ({ loadSeasonRatingsWithin: server.loadSeasonRatingsWithin }));
+vi.mock('#lib/server/analysis.ts', () => ({
+	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin
+}));
 vi.mock('#lib/server/event.ts', () => ({ searchIndex: server.searchIndex }));
 vi.mock('./scout.server.ts', () => ({ scoutLeaderboard: { load: server.scoutLoad } }));
 
