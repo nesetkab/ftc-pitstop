@@ -177,7 +177,7 @@ export class Workspace {
 
 	#settle() {
 		const busy = this.names.some((name) => this.#queued(name) > 0 || this.#running.has(name));
-		if (!busy) this.sync = 'saved';
+		if (!busy && this.sync !== 'failed') this.sync = 'saved';
 	}
 
 	#apply(snapshot: Snapshot, confirmed: boolean) {
