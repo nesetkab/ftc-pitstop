@@ -1,3 +1,4 @@
+import { toSearchResults } from './search-results.ts';
 export type SearchResult = {
 	type: 'team' | 'event';
 	label: string;
@@ -23,7 +24,5 @@ function isResult(value: unknown): value is SearchResult {
 export async function searchApi(query: string, signal?: AbortSignal): Promise<SearchResult[]> {
 	const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal });
 	if (!response.ok) return [];
-	const body: unknown = await response.json();
-	const list = Array.isArray(body) ? body : (body as { results?: unknown } | null)?.results;
-	return Array.isArray(list) ? list.filter(isResult) : [];
+	return toSearchResults(await response.json());
 }

@@ -1,7 +1,7 @@
 import { dateRange } from '#lib/format/index.ts';
 import type { EventSummary, SearchTeam } from '#lib/types.ts';
 import type { SearchResult } from '#lib/ui/search.svelte.ts';
-import { placeName } from './places.ts';
+import { placeName } from '#lib/components/team/places.ts';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);

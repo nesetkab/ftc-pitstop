@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { eventSummary } from './fixtures.ts';
+import { eventSummary } from '#lib/components/team/fixtures.ts';
 import { toSearchResults } from './search-results.ts';
 
 const team = {
