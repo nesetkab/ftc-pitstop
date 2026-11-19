@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { MISSING } from '#lib/format/index.ts';
 import { eventSummary, match, ranking } from './fixtures.ts';
 import { FOLLOW_KEY, follows } from './follow.svelte.ts';
 import FollowedTeams from './FollowedTeams.svelte';
@@ -122,7 +123,7 @@ describe('followed teams', () => {
 		responses.delete('/api/events/USAZGIQ');
 		render(FollowedTeams);
 		await screen.findByText('Roadrunner - Gilbert Qualifier');
-		expect(within(rowFor(26670)).getAllByText('—')).toHaveLength(2);
+		expect(within(rowFor(26670)).getAllByText(MISSING)).toHaveLength(2);
 	});
 
 	it('lists a limited number of teams and says how many are hidden', async () => {

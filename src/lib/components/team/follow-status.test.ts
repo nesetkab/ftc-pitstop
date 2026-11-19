@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { MISSING } from '#lib/format/index.ts';
 import { followedBundle, match, ranking, teamEvent, teamSeason } from './fixtures.ts';
 import { chooseEvent, followedRow, nextMatch, standing, unavailableRow } from './follow-status.ts';
 
@@ -69,7 +70,7 @@ describe('nextMatch and standing', () => {
 
 	it('writes rank and record', () => {
 		expect(standing(bundle, 14624)).toBe('2 of 2, 2-1-0');
-		expect(standing(bundle, 99999)).toBe('—');
+		expect(standing(bundle, 99999)).toBe(MISSING);
 	});
 });
 
@@ -99,8 +100,8 @@ describe('followedRow', () => {
 		const upcoming = teamSeason(26670, 'SCA Iron Eagles', [later]);
 		expect(followedRow(upcoming, chooseEvent(upcoming, NOW), null)).toMatchObject({
 			when: 'Starts Dec 5',
-			next: '—',
-			rank: '—'
+			next: MISSING,
+			rank: MISSING
 		});
 		const done = teamSeason(26670, 'SCA Iron Eagles', [earlier]);
 		expect(followedRow(done, chooseEvent(done, NOW), null).when).toBe('Ended Nov 7');

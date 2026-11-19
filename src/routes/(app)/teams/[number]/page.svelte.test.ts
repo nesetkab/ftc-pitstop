@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { MISSING } from '#lib/format/index.ts';
 import { follows } from '#lib/components/team/follow.svelte.ts';
 import { match, teamEvent, teamSeason } from '#lib/components/team/fixtures.ts';
 import { buildTeamPage, type TeamPageData } from '#lib/components/team/team-view.ts';
@@ -206,7 +207,15 @@ describe('team page', () => {
 		]);
 		expect(within(rows[0]).getByRole('link')).toHaveAttribute('href', '/events/USAZGIQ');
 		const second = [...rows[1].querySelectorAll('td')].map((cell) => cell.textContent);
-		expect(second).toEqual(['Phoenix Qualifier', 'Dec 5 and 6', '—', '—', '—', 'Upcoming', '—']);
+		expect(second).toEqual([
+			'Phoenix Qualifier',
+			'Dec 5 and 6',
+			MISSING,
+			MISSING,
+			MISSING,
+			'Upcoming',
+			MISSING
+		]);
 	});
 
 	it('lists awards and last season', () => {
