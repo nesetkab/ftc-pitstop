@@ -1,4 +1,4 @@
-import type { EventAnalysis, SeasonRatings } from '#lib/analysis/types';
+import type { EventAnalysis, SeasonRatings } from '#lib/analysis/types.ts';
 
 export async function loadEventAnalysis(code: string): Promise<EventAnalysis | null> {
 	void code;
