@@ -20,6 +20,7 @@ export interface RemoteStoreOptions {
 	fetch?: typeof fetch;
 	base?: string;
 	interval?: number;
+	idleInterval?: number;
 	isVisible?: () => boolean;
 }
 
@@ -44,6 +45,8 @@ function failure(response: Response): WorkspaceError {
 export function createRemoteStore(options: RemoteStoreOptions = {}): WorkspaceStore {
 	const base = options.base ?? '/api/workspace';
 	const interval = options.interval ?? 10_000;
+	const idleInterval = Math.max(interval, options.idleInterval ?? 30_000);
+	const nudges = new Set<() => void>();
 	const isVisible =
 		options.isVisible ?? (() => typeof document === 'undefined' || !document.hidden);
 
@@ -97,6 +100,7 @@ export function createRemoteStore(options: RemoteStoreOptions = {}): WorkspaceSt
 			data: DocMap[K],
 			baseVersion?: number | null
 		): Promise<WriteResult<K>> {
+			for (const nudge of nudges) nudge();
 			const payload = JSON.stringify({ data, base: baseVersion });
 			const response = await call(`/${code}/${doc}`, {
 				method: 'PUT',
@@ -123,28 +127,49 @@ export function createRemoteStore(options: RemoteStoreOptions = {}): WorkspaceSt
 			if (typeof document === 'undefined') return () => {};
 			let stopped = false;
 			let timer: ReturnType<typeof setTimeout> | undefined;
+			let delay = interval;
+			let nudged = false;
+
+			function schedule(wait: number) {
+				clearTimeout(timer);
+				if (!stopped) timer = setTimeout(tick, wait);
+			}
 
 			async function tick() {
 				if (stopped) return;
 				if (isVisible()) {
 					const snapshot = await store.load(code, request()).catch(() => null);
-					if (!stopped && hasDocs(snapshot)) onChange(snapshot);
+					if (stopped) return;
+					const changed = hasDocs(snapshot);
+					if (changed) onChange(snapshot);
+					delay = changed || nudged ? interval : Math.min(idleInterval, Math.round(delay * 1.5));
+					nudged = false;
 				}
-				if (!stopped) timer = setTimeout(tick, interval);
+				schedule(delay);
 			}
 
 			function wake() {
 				if (stopped || !isVisible()) return;
+				delay = interval;
 				clearTimeout(timer);
 				void tick();
 			}
 
+			function nudge() {
+				nudged = true;
+				if (delay === interval) return;
+				delay = interval;
+				schedule(interval);
+			}
+
+			nudges.add(nudge);
 			document.addEventListener('visibilitychange', wake);
 			window.addEventListener('online', wake);
-			timer = setTimeout(tick, interval);
+			schedule(interval);
 			return () => {
 				stopped = true;
 				clearTimeout(timer);
+				nudges.delete(nudge);
 				document.removeEventListener('visibilitychange', wake);
 				window.removeEventListener('online', wake);
 			};
