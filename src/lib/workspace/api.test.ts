@@ -321,6 +321,31 @@ describe('workspace api', () => {
 		expect((await api.write(own, code, 'checklist', IP)).status).toBe(200);
 	});
 
+	it('compares the site, not the way the address reached the function', async () => {
+		const { code } = await create();
+		const put = (origin: string, extra: Record<string, string> = {}, url = 'http://pitstop.test') =>
+			api.write(
+				new Request(`${url}/api/workspace/${code}/checklist`, {
+					method: 'PUT',
+					headers: { 'content-type': 'application/json', origin, ...extra },
+					body: JSON.stringify({ data: checklist('x') })
+				}),
+				code,
+				'checklist',
+				IP
+			);
+		expect((await put('https://pitstop.test')).status).toBe(200);
+		expect((await put('https://pitstop.test:8443')).status).toBe(403);
+		expect((await put('https://evil.pitstop.test')).status).toBe(403);
+		expect((await put('https://pitstop.test.evil.example')).status).toBe(403);
+		expect((await put('https://www.pitstop.test')).status).toBe(403);
+		expect(
+			(await put('https://www.pitstop.test', { 'x-forwarded-host': 'www.pitstop.test' })).status
+		).toBe(200);
+		expect((await put('javascript:alert(1)')).status).toBe(403);
+		expect((await put('')).status).toBe(403);
+	});
+
 	it('stops reading a body that is bigger than any document can be', async () => {
 		const { code } = await create();
 		let pulls = 0;

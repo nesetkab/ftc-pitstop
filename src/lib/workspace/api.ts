@@ -97,9 +97,23 @@ async function readJson(request: Request, maxLength: number): Promise<unknown> {
 	}
 }
 
+function comesFromThisSite(request: Request, origin: string): boolean {
+	try {
+		const { host } = new URL(origin);
+		const ours = [
+			new URL(request.url).host,
+			request.headers.get('host'),
+			request.headers.get('x-forwarded-host')
+		];
+		return ours.includes(host);
+	} catch {
+		return false;
+	}
+}
+
 function requireSameOriginJson(request: Request): void {
 	const origin = request.headers.get('origin');
-	if (origin !== null && origin !== new URL(request.url).origin) {
+	if (origin !== null && !comesFromThisSite(request, origin)) {
 		throw new WorkspaceError('forbidden', 'Cross-site requests are not allowed');
 	}
 	const type = request.headers.get('content-type')?.split(';')[0].trim().toLowerCase();
