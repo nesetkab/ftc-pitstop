@@ -1,6 +1,10 @@
+import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vitest/config';
 import adapter from '@sveltejs/adapter-vercel';
 import { sveltekit } from '@sveltejs/kit/vite';
+import { cspDirectives } from './src/lib/server/csp.ts';
+
+const appHtml = readFileSync(new URL('./src/app.html', import.meta.url), 'utf8');
 
 export default defineConfig({
 	plugins: [
@@ -11,6 +15,8 @@ export default defineConfig({
 				experimental: { async: true }
 			},
 			adapter: adapter({ runtime: 'nodejs24.x' }),
+			csp: { mode: 'hash', directives: cspDirectives(appHtml) },
+			csrf: { trustedOrigins: [] },
 			experimental: { remoteFunctions: true }
 		})
 	],
