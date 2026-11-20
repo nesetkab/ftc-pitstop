@@ -7,8 +7,8 @@ const server = vi.hoisted(() => ({
 	loadEventAnalysis: vi.fn()
 }));
 
-vi.mock('#lib/server/event.ts', async () => ({
-	DataError: (await import('#lib/server/errors.ts')).DataError,
+vi.mock('#lib/server/event.ts', async (importOriginal) => ({
+	...(await importOriginal<typeof import('#lib/server/event.ts')>()),
 	loadEventBundle: server.loadEventBundle
 }));
 
@@ -54,16 +54,23 @@ describe('event layout', () => {
 		});
 	});
 
-	it.each(['..', '//evil.example', 'a b', 'x'.repeat(25), '%2F%2Fevil', '', 'é1'])(
-		'answers 404 for the code %j without loading anything',
-		async (code) => {
-			await expect(run(code, `/events/${encodeURIComponent(code)}`)).rejects.toMatchObject({
-				status: 404
-			});
-			expect(server.loadEventBundle).not.toHaveBeenCalled();
-			expect(server.loadEventAnalysis).not.toHaveBeenCalled();
-		}
-	);
+	it.each([
+		'..',
+		'//evil.example',
+		'a b',
+		' usazgiq',
+		'USAZGIQ\n',
+		'x'.repeat(25),
+		'%2F%2Fevil',
+		'',
+		'é1'
+	])('answers 404 for the code %j without loading anything', async (code) => {
+		await expect(run(code, `/events/${encodeURIComponent(code)}`)).rejects.toMatchObject({
+			status: 404
+		});
+		expect(server.loadEventBundle).not.toHaveBeenCalled();
+		expect(server.loadEventAnalysis).not.toHaveBeenCalled();
+	});
 
 	it('maps missing events to 404 and other trouble to 503', async () => {
 		server.loadEventBundle.mockRejectedValue(new DataError(404, 'Event not found'));

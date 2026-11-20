@@ -339,7 +339,20 @@ describe('loadQueueStatus', () => {
 });
 
 describe('input validation', () => {
-	it.each(['', ' ', 'A', '../etc', 'US/AZ', 'USAZ?x=1', 'USAZ#', 'US AZ!', 'a'.repeat(25), 'é1'])(
+	it.each([
+		'',
+		' ',
+		'A',
+		'../etc',
+		'US/AZ',
+		'USAZ?x=1',
+		'USAZ#',
+		'US AZ!',
+		' USAZGIQ',
+		'USAZGIQ\n',
+		'a'.repeat(25),
+		'é1'
+	])(
 		'refuses the event code %j before any upstream call',
 		async (code) => {
 			const data = setup({ now: '2026-11-19T12:00:00Z', nexusFetch: vi.fn() as never });

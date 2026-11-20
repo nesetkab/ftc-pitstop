@@ -53,13 +53,13 @@ import type {
 	SeasonMatch,
 	TeamSeason
 } from '#lib/types.ts';
-import { parseEventCode } from '#lib/workspace/code.ts';
 
 const HOUR = 3_600_000;
 const DAY_SECONDS = 86_400;
 const MISS_MS = 5 * 60_000;
 const LIST_RETRY_MS = 30_000;
 const EVENT_LIST_POLICY: CachePolicy = { ttl: 3600, maxStale: 7 * DAY_SECONDS };
+const EVENT_CODE_PATTERN = /^[A-Z0-9]{2,24}$/;
 const TEAM_NUMBER_PATTERN = /^[1-9]\d{0,4}$/;
 
 class TeamMissing extends Error {
@@ -135,8 +135,8 @@ export function cacheControlFor(tier: EventTier, phase: EventPhase): string {
 }
 
 export function normalizeEventCode(input: string): string {
-	const code = parseEventCode(input);
-	if (!code) throw notFound('Event not found');
+	const code = input.toUpperCase();
+	if (!EVENT_CODE_PATTERN.test(code)) throw notFound('Event not found');
 	return code;
 }
 
