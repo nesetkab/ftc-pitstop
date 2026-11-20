@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { loadEventAnalysis } from '#lib/server/analysis.ts';
 import { DataError, loadEventBundle, normalizeEventCode } from '#lib/server/event.ts';
+import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { LayoutServerLoad } from './$types';
 
 function failure(cause: unknown): never {
@@ -9,7 +10,7 @@ function failure(cause: unknown): never {
 	error(503, 'Event data is unavailable right now');
 }
 
-export const load: LayoutServerLoad = async ({ params, depends, url, untrack }) => {
+export const load: LayoutServerLoad = async ({ params, depends, url, untrack, setHeaders }) => {
 	depends('event:live');
 	let code: string;
 	try {
@@ -27,5 +28,7 @@ export const load: LayoutServerLoad = async ({ params, depends, url, untrack }) 
 		loadEventBundle(code).catch(failure),
 		loadEventAnalysis(code).catch(() => null)
 	]);
+	const live = bundle.phase !== 'upcoming' && bundle.phase !== 'done';
+	setHeaders({ 'cache-control': live ? CACHE_CONTROL.live : CACHE_CONTROL.short });
 	return { bundle, analysis };
 };

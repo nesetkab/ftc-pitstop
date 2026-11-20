@@ -1,4 +1,3 @@
-import type { Config } from '@sveltejs/adapter-vercel';
 import { error } from '@sveltejs/kit';
 import {
 	buildRatingRows,
@@ -14,10 +13,6 @@ import { searchIndex } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
 import { scoutLeaderboard } from './scout.server.ts';
-
-export const config: Config = {
-	isr: { expiration: 600, allowQuery: ['region', 'country', 'state', 'min', 'page'] }
-};
 
 interface Source {
 	key: string;

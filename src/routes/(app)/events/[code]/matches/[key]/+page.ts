@@ -1,9 +1,6 @@
 import { error } from '@sveltejs/kit';
-import type { Config } from '@sveltejs/adapter-vercel';
 import { isMatchKey } from '#lib/components/event/matches.ts';
 import type { PageLoad } from './$types';
-
-export const config: Config = { isr: { expiration: 60 } };
 
 export const load: PageLoad = async ({ params, parent }) => {
 	const key = params.key.toLowerCase();

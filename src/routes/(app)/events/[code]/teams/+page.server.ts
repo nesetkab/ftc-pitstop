@@ -1,8 +1,5 @@
-import type { Config } from '@sveltejs/adapter-vercel';
 import { loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import type { PageServerLoad } from './$types';
-
-export const config: Config = { isr: { expiration: 60 } };
 
 export const load: PageServerLoad = async ({ parent }) => {
 	const [{ bundle }, ratings] = await Promise.all([

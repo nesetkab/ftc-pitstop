@@ -1,4 +1,3 @@
-import type { Config } from '@sveltejs/adapter-vercel';
 import { error } from '@sveltejs/kit';
 import { localDay } from '#lib/components/team/dates.ts';
 import { buildTeamPage } from '#lib/components/team/team-view.ts';
@@ -8,8 +7,6 @@ import { DataError } from '#lib/server/errors.ts';
 import { loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
-
-export const config: Config = { isr: { expiration: 300 } };
 
 const MAX_PLAYOFF_EVENTS = 6;
 

@@ -14,22 +14,39 @@ vi.mock('#lib/server/event.ts', async (importOriginal) => ({
 
 vi.mock('#lib/server/analysis.ts', () => ({ loadEventAnalysis: server.loadEventAnalysis }));
 
+const setHeaders = vi.fn();
+
 function run(code: string, path = `/events/${code}`, search = '') {
 	const url = new URL(`http://localhost${path}${search}`);
 	return load({
 		params: { code },
 		url,
+		setHeaders,
 		depends: vi.fn(),
 		untrack: <T>(fn: () => T) => fn()
 	} as never) as Promise<{ bundle: unknown; analysis: unknown }>;
 }
 
 beforeEach(() => {
+	setHeaders.mockReset();
 	server.loadEventBundle.mockReset().mockResolvedValue({ event: { code: 'USAZGIQ' } });
 	server.loadEventAnalysis.mockReset().mockResolvedValue(null);
 });
 
 describe('event layout', () => {
+	it('lets the CDN cache live events briefly and quiet ones longer', async () => {
+		server.loadEventBundle.mockResolvedValue({ event: { code: 'USAZGIQ' }, phase: 'quals' });
+		await run('USAZGIQ');
+		expect(setHeaders).toHaveBeenLastCalledWith({
+			'cache-control': 'public, s-maxage=30, stale-while-revalidate=300'
+		});
+		server.loadEventBundle.mockResolvedValue({ event: { code: 'USAZGIQ' }, phase: 'done' });
+		await run('USAZGIQ');
+		expect(setHeaders).toHaveBeenLastCalledWith({
+			'cache-control': 'public, s-maxage=300, stale-while-revalidate=3600'
+		});
+	});
+
 	it('loads the event for a clean code', async () => {
 		const data = await run('USAZGIQ');
 		expect(data.bundle).toEqual({ event: { code: 'USAZGIQ' } });
