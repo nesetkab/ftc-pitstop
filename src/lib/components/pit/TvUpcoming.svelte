@@ -22,6 +22,7 @@
 	const startDay = $derived(
 		view.startsAt !== null ? relativeDay(view.startsAt, now, event.timezone) : null
 	);
+	const shownUrl = $derived(phoneUrl.replace(/^www\./, ''));
 	const where = $derived(
 		[event.venue, [event.city, event.state].filter(Boolean).join(', ')].filter(Boolean).join(', ')
 	);
@@ -74,7 +75,7 @@
 			<QrCode text={`https://${phoneUrl}`} label={`QR code for ${phoneUrl}`} />
 		</div>
 		<p class="sub">Open on your phone</p>
-		<p class="url">{phoneUrl}</p>
+		<p class="url">{shownUrl}</p>
 	</section>
 </div>
 
@@ -134,8 +135,10 @@
 	}
 
 	.url {
+		max-width: 100%;
 		font-size: 1.6em;
 		font-weight: 600;
 		letter-spacing: -0.01em;
+		overflow-wrap: anywhere;
 	}
 </style>

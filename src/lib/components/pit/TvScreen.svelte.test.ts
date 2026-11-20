@@ -52,6 +52,16 @@ describe('TvScreen', () => {
 		expect(text(container)).toContain('Matches start at 10:30 AM.');
 	});
 
+	it('keeps the phone address short enough to fit under the QR code', () => {
+		const { container } = render(TvScreen, {
+			props: props(Date.parse('2026-11-14T17:00:00Z'), { phoneUrl: 'www.ftcpitstop.com/14624' })
+		});
+		expect(container.querySelector('.url')?.textContent).toBe('ftcpitstop.com/14624');
+		expect(
+			screen.getByRole('img', { name: 'QR code for www.ftcpitstop.com/14624' })
+		).toBeInTheDocument();
+	});
+
 	it('says which day the first match is when it is not today', () => {
 		const evening = Date.parse('2026-11-13T22:00:00Z');
 		const { container } = render(TvScreen, { props: props(evening) });
