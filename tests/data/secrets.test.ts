@@ -21,6 +21,14 @@ const { GET: teamRoute } = await import('../../src/routes/api/teams/[number]/+se
 const { GET: searchRoute } = await import('../../src/routes/api/search/+server.ts');
 const { GET: todayRoute } = await import('../../src/routes/api/today/+server.ts');
 const { GET: nexusRoute } = await import('../../src/routes/api/nexus/[code]/+server.ts');
+const { GET: analysisRoute } =
+	await import('../../src/routes/api/events/[code]/analysis/+server.ts');
+const { GET: ratingsRoute } = await import('../../src/routes/api/ratings/+server.ts');
+const { GET: historyRoute } =
+	await import('../../src/routes/api/teams/[number]/history/+server.ts');
+const { load: eventLayout } = await import('../../src/routes/(app)/events/[code]/+layout.server.ts');
+const { load: teamPage } = await import('../../src/routes/(app)/teams/[number]/+page.server.ts');
+const { load: pitLayout } = await import('../../src/routes/(bare)/[team=team]/+layout.server.ts');
 const { cache } = await import('#lib/server/cache.ts');
 const { ftc } = await import('#lib/server/ftc/index.ts');
 
@@ -69,6 +77,14 @@ async function call(handler: Handler, path: string, params: Record<string, strin
 	};
 }
 
+async function settle(task: () => unknown): Promise<string> {
+	try {
+		return JSON.stringify(await drive(Promise.resolve(task())));
+	} catch (caught) {
+		return `${JSON.stringify(caught)} ${String(caught)} ${(caught as Error).stack ?? ''}`;
+	}
+}
+
 function expectClean(...texts: string[]) {
 	for (const text of texts) for (const secret of secrets) expect(text).not.toContain(secret);
 }
@@ -103,13 +119,47 @@ describe('the FTC key stays on the server', () => {
 				await call(teamRoute, '/api/teams/2844', { number: '2844' }),
 				await call(searchRoute, '/api/search?q=valley'),
 				await call(todayRoute, '/api/today'),
-				await call(nexusRoute, `/api/nexus/LEAK${mode}`, { code: `LEAK${mode}` })
+				await call(nexusRoute, `/api/nexus/LEAK${mode}`, { code: `LEAK${mode}` }),
+				await call(analysisRoute, `/api/events/LEAK${mode}/analysis`, { code: `LEAK${mode}` }),
+				await call(ratingsRoute, '/api/ratings'),
+				await call(historyRoute, '/api/teams/2844/history', { number: '2844' })
 			];
 			for (const result of results) {
 				expect(result.status).toBeGreaterThanOrEqual(400);
 				expect(JSON.parse(result.text).error).toMatch(/^[A-Z][a-z ]+$/);
 				expectClean(result.text, result.headers);
 			}
+			expectClean(...logs);
+		}
+	);
+
+	it.each([0, 1, 2, 3, 4])(
+		'never leaks through page loads when upstream misbehaves (mode %i)',
+		async (mode) => {
+			vi.stubGlobal('fetch', leaky(mode));
+			const outcomes = [
+				await settle(() =>
+					eventLayout({
+						params: { code: `LEAK${mode}` },
+						url: new URL(`http://localhost/events/LEAK${mode}`),
+						depends: () => {},
+						untrack: (fn: () => unknown) => fn()
+					} as never)
+				),
+				await settle(() =>
+					teamPage({ params: { number: '2844' }, setHeaders: () => {} } as never)
+				),
+				await settle(() =>
+					pitLayout({ params: { team: 2844 }, url: new URL('http://localhost/2844') } as never)
+				),
+				await settle(() =>
+					pitLayout({
+						params: { team: 2844 },
+						url: new URL(`http://localhost/2844?event=LEAK${mode}`)
+					} as never)
+				)
+			];
+			for (const outcome of outcomes) expectClean(outcome);
 			expectClean(...logs);
 		}
 	);

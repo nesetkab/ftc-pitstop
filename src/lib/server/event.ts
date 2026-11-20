@@ -2,6 +2,7 @@ import { SEASON } from '#lib/game/biobuzz.ts';
 import { detectPhase } from '#lib/game/phase.ts';
 import {
 	cache as defaultCache,
+	LruMap,
 	type Cache,
 	type CachedValue,
 	type CachePolicy
@@ -55,6 +56,18 @@ import type {
 
 const HOUR = 3_600_000;
 const DAY_SECONDS = 86_400;
+const MISS_MS = 5 * 60_000;
+const LIST_RETRY_MS = 30_000;
+const EVENT_LIST_POLICY: CachePolicy = { ttl: 3600, maxStale: 7 * DAY_SECONDS };
+const EVENT_CODE_PATTERN = /^[A-Z0-9]{2,24}$/;
+const TEAM_NUMBER_PATTERN = /^[1-9]\d{0,4}$/;
+
+class TeamMissing extends Error {
+	constructor() {
+		super('Team not found');
+		this.name = 'TeamMissing';
+	}
+}
 
 export type EventTier = 'upcoming' | 'live' | 'finished';
 
@@ -122,16 +135,15 @@ export function cacheControlFor(tier: EventTier, phase: EventPhase): string {
 }
 
 export function normalizeEventCode(input: string): string {
-	const code = input.trim().toUpperCase();
-	if (!/^[A-Z0-9]{2,24}$/.test(code)) throw notFound('Event not found');
+	const code = input.toUpperCase();
+	if (!EVENT_CODE_PATTERN.test(code)) throw notFound('Event not found');
 	return code;
 }
 
 export function normalizeTeamNumber(input: string | number): number {
-	const number = Number(input);
-	if (!Number.isInteger(number) || number <= 0 || number > 999_999)
-		throw notFound('Team not found');
-	return number;
+	const text = String(input);
+	if (!TEAM_NUMBER_PATTERN.test(text)) throw notFound('Team not found');
+	return Number(text);
 }
 
 interface Settled<T> {
@@ -174,6 +186,18 @@ export function createLoaders(deps: LoaderDeps) {
 	const { ftc, scout, nexus, cache } = deps;
 	const now = deps.now ?? Date.now;
 	const phases = new Map<string, EventPhase>();
+	const misses = new LruMap<number>(500);
+	const listRetryAt = { scout: 0, ftc: 0 };
+	const codeSets = new WeakMap<object, Set<string>>();
+
+	function rememberMiss(key: string) {
+		misses.set(key, now() + MISS_MS);
+	}
+
+	function recentlyMissed(key: string): boolean {
+		const until = misses.get(key);
+		return until !== undefined && until > now();
+	}
 
 	function ftcPart<E extends FtcEndpoint>(
 		endpoint: E,
@@ -183,6 +207,43 @@ export function createLoaders(deps: LoaderDeps) {
 		return cache.get<FtcBody<E>>(`ftc:${SEASON}:${path}`, policy, (previous) =>
 			ftcEndpoint(ftc, endpoint, path, { ifModifiedSince: previous?.lastModified })
 		);
+	}
+
+	function codesOf(list: readonly { code: string }[]): Set<string> {
+		let codes = codeSets.get(list);
+		if (!codes) {
+			codes = new Set(list.map((item) => item.code.toUpperCase()));
+			codeSets.set(list, codes);
+		}
+		return codes;
+	}
+
+	async function listedCodes(source: 'scout' | 'ftc'): Promise<Set<string> | null> {
+		if (now() < listRetryAt[source]) return null;
+		try {
+			if (source === 'scout') return codesOf((await scoutEventList()).body);
+			const value = await ftcPart('event', ftcPaths.seasonEvents(), EVENT_LIST_POLICY);
+			return codesOf(value.body.events);
+		} catch {
+			listRetryAt[source] = now() + LIST_RETRY_MS;
+			return null;
+		}
+	}
+
+	async function isKnownEvent(code: string): Promise<boolean> {
+		const scoutCodes = await listedCodes('scout');
+		if (scoutCodes?.has(code)) return true;
+		const ftcCodes = await listedCodes('ftc');
+		if (ftcCodes?.has(code)) return true;
+		return scoutCodes === null && ftcCodes === null;
+	}
+
+	function scoutEventList() {
+		return cache.get(`scout:${SEASON}:events`, EVENT_LIST_POLICY, async () => {
+			const events = await fetchSeasonEvents(SEASON, scout);
+			if (events.length === 0) throw unavailable('Event list is empty');
+			return { status: 'ok', body: events };
+		});
 	}
 
 	function teamsPart(code: string, policy: CachePolicy) {
@@ -213,7 +274,10 @@ export function createLoaders(deps: LoaderDeps) {
 			throw unavailable('Event data is unavailable right now');
 		}
 		const data = value.body;
-		if (!data) throw notFound('Event not found');
+		if (!data) {
+			rememberMiss(`event:${code}`);
+			throw notFound('Event not found');
+		}
 		const tier = eventTier(data.event, time);
 		const phase = detectPhase({
 			event: data.event,
@@ -242,6 +306,9 @@ export function createLoaders(deps: LoaderDeps) {
 	async function loadEventBundle(input: string): Promise<LoadedBundle> {
 		const code = normalizeEventCode(input);
 		const time = now();
+		if (recentlyMissed(`event:${code}`) || !(await isKnownEvent(code))) {
+			throw notFound('Event not found');
+		}
 		const hint = phases.get(code) ?? null;
 		let eventValue: CachedValue<FtcBody<'event'>>;
 		try {
@@ -251,11 +318,17 @@ export function createLoaders(deps: LoaderDeps) {
 				policyFor('event', cachedEventTier(code, time), hint)
 			);
 		} catch (error) {
-			if (isNotFound(error)) throw notFound('Event not found');
+			if (isNotFound(error)) {
+				rememberMiss(`event:${code}`);
+				throw notFound('Event not found');
+			}
 			return scoutBundle(code, time);
 		}
 		const rawEvent = eventValue.body.events[0];
-		if (!rawEvent) throw notFound('Event not found');
+		if (!rawEvent) {
+			rememberMiss(`event:${code}`);
+			throw notFound('Event not found');
+		}
 		const event = mapEvent(rawEvent);
 		const tier = eventTier(event, time);
 		const policy = (part: BundlePart) => policyFor(part, tier, hint);
@@ -367,10 +440,7 @@ export function createLoaders(deps: LoaderDeps) {
 	}
 
 	async function ftcSeasonEvents(): Promise<EventSummary[]> {
-		const value = await ftcPart('event', ftcPaths.seasonEvents(), {
-			ttl: 3600,
-			maxStale: 7 * DAY_SECONDS
-		});
+		const value = await ftcPart('event', ftcPaths.seasonEvents(), EVENT_LIST_POLICY);
 		if (value.body.events.length === 0) throw unavailable('Event list is empty');
 		return value.body.events.map((raw) => summarizeEvent(mapEvent(raw))).sort(compareEvents);
 	}
@@ -381,15 +451,7 @@ export function createLoaders(deps: LoaderDeps) {
 		stale: boolean;
 	}> {
 		try {
-			const value = await cache.get(
-				`scout:${SEASON}:events`,
-				{ ttl: 3600, maxStale: 7 * DAY_SECONDS },
-				async () => {
-					const events = await fetchSeasonEvents(SEASON, scout);
-					if (events.length === 0) throw unavailable('Event list is empty');
-					return { status: 'ok', body: events };
-				}
-			);
+			const value = await scoutEventList();
 			return { events: value.body, fetchedAt: value.fetchedAt, stale: value.stale };
 		} catch {
 			try {
@@ -445,19 +507,28 @@ export function createLoaders(deps: LoaderDeps) {
 
 	async function loadTeamSeason(input: string | number): Promise<TeamSeason | null> {
 		const number = normalizeTeamNumber(input);
+		if (recentlyMissed(`team:${number}`)) return null;
 		try {
 			const value = await cache.get(
 				`scout:${SEASON}:team:${number}`,
 				{ ttl: 300, maxStale: DAY_SECONDS },
-				async () => ({ status: 'ok', body: await fetchTeamSeason(number, SEASON, scout) })
+				async () => {
+					const body = await fetchTeamSeason(number, SEASON, scout);
+					if (!body) throw new TeamMissing();
+					return { status: 'ok', body };
+				}
 			);
 			if (!value.body) return null;
 			return { ...value.body, fetchedAt: value.fetchedAt, stale: value.stale };
-		} catch {
+		} catch (error) {
+			if (error instanceof TeamMissing) {
+				rememberMiss(`team:${number}`);
+				return null;
+			}
 			try {
 				return await ftcTeamSeason(number);
-			} catch (error) {
-				if (isNotFound(error)) return null;
+			} catch (fallback) {
+				if (isNotFound(fallback)) return null;
 				throw unavailable('Team data is unavailable right now');
 			}
 		}
@@ -503,6 +574,9 @@ export function createLoaders(deps: LoaderDeps) {
 	async function loadQueueStatus(input: string): Promise<QueueStatusSnapshot | null> {
 		const code = normalizeEventCode(input);
 		if (!nexus.configured) return null;
+		if (recentlyMissed(`event:${code}`) || !(await isKnownEvent(code))) {
+			throw notFound('Event not found');
+		}
 		try {
 			const value = await cache.get(
 				`nexus:${SEASON}:${code}`,

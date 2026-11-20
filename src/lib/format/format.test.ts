@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
 	dateRange,
 	fixed,
+	httpUrl,
 	integer,
 	longDate,
 	matchKey,
@@ -202,5 +203,40 @@ describe('match labels', () => {
 			'Finals match 10'
 		);
 		expect(matchTitle({ level: 'playoff', series: 3, game: 2 })).toBe('Playoff match 3, game 2');
+	});
+});
+
+describe('httpUrl', () => {
+	it('keeps web addresses and normalizes them', () => {
+		expect(httpUrl('https://www.youtube.com/live/abc')).toBe('https://www.youtube.com/live/abc');
+		expect(httpUrl('  HTTP://Twitch.tv/pitstop  ')).toBe('http://twitch.tv/pitstop');
+		expect(httpUrl('https://example.com/a b')).toBe('https://example.com/a%20b');
+	});
+
+	it.each([
+		'javascript:alert(1)',
+		'JaVaScRiPt:alert(1)',
+		' javascript:alert(1)',
+		'java\tscript:alert(1)',
+		'data:text/html,<script>alert(1)</script>',
+		'vbscript:msgbox(1)',
+		'file:///etc/passwd',
+		'blob:https://example.com/x',
+		'//evil.example/x',
+		'/relative/path',
+		'www.twitch.tv/no-scheme',
+		'https://user:pass@example.com/',
+		'https://twitch.tv@evil.example/',
+		'https://',
+		'',
+		'   '
+	])('refuses %j', (value) => {
+		expect(httpUrl(value)).toBeNull();
+	});
+
+	it('refuses missing values and absurd lengths', () => {
+		expect(httpUrl(null)).toBeNull();
+		expect(httpUrl(undefined)).toBeNull();
+		expect(httpUrl(`https://example.com/${'a'.repeat(2100)}`)).toBeNull();
 	});
 });

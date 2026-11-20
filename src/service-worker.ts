@@ -1,5 +1,6 @@
 import { version } from '$app/env';
 import { assets, immutable } from '$app/manifest';
+import { isCacheableResponse, isDataRequest } from '#lib/pwa/rules.ts';
 
 interface ExtendableEvent extends Event {
 	waitUntil(promise: Promise<unknown>): void;
@@ -62,9 +63,7 @@ async function networkFirst(request: Request): Promise<Response> {
 	const cache = await caches.open(DATA);
 	try {
 		const response = await fetch(request);
-		if (response.ok && !response.headers.get('cache-control')?.includes('no-store')) {
-			void cache.put(request, response.clone());
-		}
+		if (isCacheableResponse(response)) void cache.put(request, response.clone());
 		return response;
 	} catch (error) {
 		const cached = await cache.match(request);
@@ -96,7 +95,7 @@ worker.addEventListener('fetch', (event) => {
 	if (url.origin !== location.origin) return;
 	if (shell.has(url.pathname)) {
 		event.respondWith(cacheFirst(request));
-	} else if (url.pathname.startsWith(`${scope}api/`) || request.mode === 'navigate') {
+	} else if (isDataRequest(url.pathname, scope, request.mode)) {
 		event.respondWith(networkFirst(request));
 	}
 });

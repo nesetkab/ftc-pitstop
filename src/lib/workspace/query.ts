@@ -22,7 +22,7 @@ export function parseLoadOptions(params: URLSearchParams): LoadOptions {
 		const [name, version] = part.split('.');
 		if (name && isDocName(name) && /^\d{1,16}$/.test(version ?? '')) known[name] = Number(version);
 	}
-	const docs = (params.get('docs') ?? '').split(',').filter(isDocName);
+	const docs = [...new Set((params.get('docs') ?? '').split(',').filter(isDocName))];
 	return {
 		known: params.has('known') ? known : undefined,
 		docs: docs.length > 0 ? docs : undefined

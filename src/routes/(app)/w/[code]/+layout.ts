@@ -6,7 +6,8 @@ export const load: LayoutLoad = ({ params, url }) => {
 	const code = normalizeCode(params.code);
 	if (!code) error(404, 'No workspace uses this code');
 	if (code !== params.code) {
-		redirect(307, `${url.pathname.replace(params.code, code)}${url.search}${url.hash}`);
+		const path = url.pathname.replace(/^\/w\/[^/]+/, `/w/${code}`);
+		redirect(307, `${path}${url.search}${url.hash}`);
 	}
 	return { code };
 };

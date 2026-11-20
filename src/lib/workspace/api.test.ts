@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { createWorkspaceApi, RATE, type WorkspaceApi } from '#lib/workspace/api.ts';
+import { CODE_ALPHABET } from '#lib/workspace/code.ts';
 import { createFakeRedis, type FakeRedis } from '#lib/workspace/fake-redis.ts';
 import { createLimiter } from '#lib/workspace/limit.ts';
 import { createRedisStore } from '#lib/workspace/redis-store.ts';
@@ -29,11 +30,12 @@ async function create(teamNumber: number | null = 14624) {
 	return (await response.json()) as { code: string };
 }
 
-function put(code: string, doc: string, body: unknown) {
+function put(code: string, doc: string, body: unknown, ip = IP) {
 	return api.write(
 		json(body, 'PUT', `https://pitstop.test/api/workspace/${code}/${doc}`),
 		code,
-		doc
+		doc,
+		ip
 	);
 }
 
@@ -63,7 +65,16 @@ describe('workspace api', () => {
 		expect((await api.create(json({ teamNumber: 0 }), IP)).status).toBe(400);
 		expect((await api.create(json({}), IP)).status).toBe(400);
 		expect(
-			(await api.create(new Request('https://x.test', { method: 'POST', body: '{' }), IP)).status
+			(
+				await api.create(
+					new Request('https://x.test', {
+						method: 'POST',
+						headers: { 'content-type': 'application/json' },
+						body: '{'
+					}),
+					IP
+				)
+			).status
 		).toBe(400);
 	});
 
@@ -129,9 +140,14 @@ describe('workspace api', () => {
 		expect(
 			(
 				await api.write(
-					new Request('https://x.test', { method: 'PUT', body: 'nope' }),
+					new Request('https://x.test', {
+						method: 'PUT',
+						headers: { 'content-type': 'application/json' },
+						body: 'nope'
+					}),
 					code,
-					'checklist'
+					'checklist',
+					IP
 				)
 			).status
 		).toBe(400);
@@ -170,7 +186,216 @@ describe('workspace api', () => {
 		expect((await get('ZZZZZZ')).status).toBe(429);
 		const { code } = await create();
 		expect((await get(code)).status).toBe(429);
-		expect((await get(code, '?known=checklist.1')).status).toBe(200);
+		time += 601_000;
+		expect((await get(code)).status).toBe(200);
+	});
+
+	it('counts guesses even when the request claims to be a poll', async () => {
+		for (const query of ['?known=', '?known=checklist.1', '?known=picklist.5,boards.9']) {
+			for (let i = 0; i < RATE.miss.limit / 3; i++) {
+				expect((await get('ZZZZZZ', query)).status).toBe(404);
+			}
+		}
+		expect((await get('ZZZZZZ', '?known=')).status).toBe(429);
+		const { code } = await create();
+		expect((await get(code, '?known=')).status).toBe(429);
+		expect((await get(code, '?known=checklist.1')).status).toBe(429);
+	});
+
+	it('does not answer a guess that is over the limit, even when it is right', async () => {
+		const { code } = await create();
+		await put(code, 'checklist', { data: checklist('secret') });
+		for (let i = 0; i < RATE.miss.limit; i++) await get('ZZZZZZ', '?known=');
+		const blocked = await get(code, '?known=checklist.1');
+		expect(blocked.status).toBe(429);
+		expect(JSON.stringify(await blocked.json())).not.toContain('secret');
+	});
+
+	it('keeps polling for people who can prove they have the workspace', async () => {
+		const { code } = await create();
+		const saved = (await (await put(code, 'checklist', { data: checklist('One') })).json()) as {
+			updatedAt: number;
+		};
+		for (let i = 0; i < RATE.miss.limit; i++) await get('ZZZZZZ');
+		expect((await get('ZZZZZZ')).status).toBe(429);
+		const poll = await get(code, `?known=checklist.${saved.updatedAt}`);
+		expect(poll.status).toBe(200);
+		expect(await poll.json()).toEqual({
+			meta: expect.objectContaining({ code }),
+			docs: {}
+		});
+		expect((await get(code, `?known=checklist.${saved.updatedAt + 1}`)).status).toBe(429);
+	});
+
+	it('does not charge people who open a workspace they have the code for', async () => {
+		const { code } = await create();
+		for (let i = 0; i < RATE.miss.limit * 3; i++) expect((await get(code)).status).toBe(200);
+		for (let i = 0; i < RATE.miss.limit; i++) expect((await get('ZZZZZZ')).status).toBe(404);
+		expect((await get(code)).status).toBe(429);
+	});
+
+	it('never lets the bookkeeping field out', async () => {
+		const { code } = await create();
+		const body = (await (await get(code)).json()) as Record<string, unknown>;
+		expect(Object.keys(body).sort()).toEqual(['docs', 'meta']);
+	});
+
+	it('applies the guessing limit to writes too', async () => {
+		const { code } = await create();
+		for (let i = 0; i < RATE.miss.limit; i++) {
+			const guess = `ZZZZZ${CODE_ALPHABET[i % CODE_ALPHABET.length]}`;
+			expect((await put(guess, 'checklist', { data: {} })).status).toBe(404);
+		}
+		const blocked = await put(code, 'checklist', { data: checklist('late') });
+		expect(blocked.status).toBe(429);
+		expect(await redis.get(`pitstop:ws:${code}:checklist`)).toBeNull();
+		expect(
+			(await put(code, 'checklist', { data: checklist('other') }, '198.51.100.7')).status
+		).toBe(200);
+	});
+
+	it('does not charge writers for writes to their own workspace', async () => {
+		const { code } = await create();
+		for (let i = 0; i < RATE.miss.limit - 1; i++) {
+			expect((await put('ZZZZZZ', 'checklist', { data: checklist('x') })).status).toBe(404);
+		}
+		for (let i = 0; i < 60; i++) {
+			expect((await put(code, 'checklist', { data: checklist(`${i}`) })).status).toBe(200);
+		}
+		expect((await put('ZZZZZZ', 'checklist', { data: checklist('x') })).status).toBe(404);
+		expect((await put('ZZZZZZ', 'checklist', { data: checklist('x') })).status).toBe(429);
+	});
+
+	it('gives back the charge when the workspace is busy, not guessed', async () => {
+		const { code } = await create();
+		for (let i = 0; i < RATE.write.limit; i++)
+			await put(code, 'checklist', { data: checklist('a') });
+		for (let i = 0; i < RATE.miss.limit * 2; i++) {
+			expect((await put(code, 'checklist', { data: checklist('b') })).status).toBe(429);
+		}
+		time += 61_000;
+		expect((await put(code, 'checklist', { data: checklist('c') })).status).toBe(200);
+		expect((await get('ZZZZZZ')).status).toBe(404);
+	});
+
+	it('does not look at the body of a request that is not JSON', async () => {
+		const { code } = await create();
+		const plain = new Request(`https://pitstop.test/api/workspace/${code}/checklist`, {
+			method: 'PUT',
+			headers: { 'content-type': 'text/plain' },
+			body: JSON.stringify({ data: checklist('x') })
+		});
+		expect((await api.write(plain, code, 'checklist', IP)).status).toBe(415);
+		const bare = new Request('https://pitstop.test/api/workspace', {
+			method: 'POST',
+			body: new Blob([JSON.stringify({ teamNumber: 1 })])
+		});
+		expect(bare.headers.get('content-type')).toBeNull();
+		expect((await api.create(bare, IP)).status).toBe(415);
+		expect(redis.keys().filter((key) => key.includes(':checklist'))).toEqual([]);
+	});
+
+	it('refuses requests from other sites', async () => {
+		const { code } = await create();
+		const from = (origin: string, method: 'POST' | 'PUT', path: string, body: unknown) =>
+			new Request(`https://pitstop.test${path}`, {
+				method,
+				headers: { 'content-type': 'application/json', origin },
+				body: JSON.stringify(body)
+			});
+		const foreign = 'https://evil.example';
+		expect(
+			(await api.create(from(foreign, 'POST', '/api/workspace', { teamNumber: 1 }), IP)).status
+		).toBe(403);
+		expect(
+			(await api.create(from('null', 'POST', '/api/workspace', { teamNumber: 1 }), IP)).status
+		).toBe(403);
+		const write = from(foreign, 'PUT', `/api/workspace/${code}/checklist`, {
+			data: checklist('x')
+		});
+		expect((await api.write(write, code, 'checklist', IP)).status).toBe(403);
+		expect(await redis.get(`pitstop:ws:${code}:checklist`)).toBeNull();
+		const own = from('https://pitstop.test', 'PUT', `/api/workspace/${code}/checklist`, {
+			data: checklist('x')
+		});
+		expect((await api.write(own, code, 'checklist', IP)).status).toBe(200);
+	});
+
+	it('compares the site, not the way the address reached the function', async () => {
+		const { code } = await create();
+		const put = (origin: string, extra: Record<string, string> = {}, url = 'http://pitstop.test') =>
+			api.write(
+				new Request(`${url}/api/workspace/${code}/checklist`, {
+					method: 'PUT',
+					headers: { 'content-type': 'application/json', origin, ...extra },
+					body: JSON.stringify({ data: checklist('x') })
+				}),
+				code,
+				'checklist',
+				IP
+			);
+		expect((await put('https://pitstop.test')).status).toBe(200);
+		expect((await put('https://pitstop.test:8443')).status).toBe(403);
+		expect((await put('https://evil.pitstop.test')).status).toBe(403);
+		expect((await put('https://pitstop.test.evil.example')).status).toBe(403);
+		expect((await put('https://www.pitstop.test')).status).toBe(403);
+		expect(
+			(await put('https://www.pitstop.test', { 'x-forwarded-host': 'www.pitstop.test' })).status
+		).toBe(200);
+		expect((await put('javascript:alert(1)')).status).toBe(403);
+		expect((await put('')).status).toBe(403);
+	});
+
+	it('stops reading a body that is bigger than any document can be', async () => {
+		const { code } = await create();
+		let pulls = 0;
+		let cancelled = false;
+		const flood = new ReadableStream<Uint8Array>({
+			pull(controller) {
+				pulls++;
+				controller.enqueue(new TextEncoder().encode('x'.repeat(65_536)));
+			},
+			cancel() {
+				cancelled = true;
+			}
+		});
+		const request = new Request(`https://pitstop.test/api/workspace/${code}/checklist`, {
+			method: 'PUT',
+			headers: { 'content-type': 'application/json' },
+			body: flood,
+			duplex: 'half'
+		} as RequestInit);
+		expect((await api.write(request, code, 'checklist', IP)).status).toBe(413);
+		expect(cancelled).toBe(true);
+		expect(pulls).toBeLessThan(40);
+	});
+
+	it('refuses bodies that announce a size over the limit without reading them', async () => {
+		const { code } = await create();
+		const request = new Request(`https://pitstop.test/api/workspace/${code}/checklist`, {
+			method: 'PUT',
+			headers: { 'content-type': 'application/json', 'content-length': '50000000' },
+			body: '{}'
+		});
+		expect((await api.write(request, code, 'checklist', IP)).status).toBe(413);
+		const small = new Request('https://pitstop.test/api/workspace', {
+			method: 'POST',
+			headers: { 'content-type': 'application/json', 'content-length': '5000' },
+			body: '{"teamNumber":1}'
+		});
+		expect((await api.create(small, IP)).status).toBe(413);
+	});
+
+	it('counts the size of a body in characters the way the store does', async () => {
+		const { code } = await create();
+		const text = '日本語'.repeat(10_000);
+		const wide = { match: text.slice(0, 16), items: [], history: [] };
+		expect((await put(code, 'checklist', { data: wide })).status).toBe(200);
+		const bigNote = { data: { event: null, entries: [{ team: 1, note: text }] } };
+		expect((await put(code, 'picklist', bigNote)).status).toBe(400);
+		expect(
+			(await put(code, 'picklist', { data: { event: null, entries: [] }, pad: text })).status
+		).toBe(200);
 	});
 
 	it('never caches', async () => {
@@ -207,7 +432,7 @@ describe('remote store through the api', () => {
 			const [, , , code, doc] = url.pathname.split('/');
 			const request = new Request(url, init);
 			if (!code) return api.create(request, IP);
-			if (doc) return api.write(request, code, doc);
+			if (doc) return api.write(request, code, doc, IP);
 			return api.load(request, code, IP);
 		};
 		return createRemoteStore({ fetch: route as typeof fetch });

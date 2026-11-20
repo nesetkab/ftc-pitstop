@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { isMatchKey } from '#lib/components/event/matches.ts';
 import { breakdownParts } from '#lib/game/biobuzz.ts';
 import {
 	ftcAdvancementResponse,
@@ -221,6 +222,40 @@ describe('FTC mapper details', () => {
 			key: 'p5-2',
 			label: 'M5-2'
 		});
+	});
+
+	it('only keeps web addresses in the links of an event', () => {
+		const raw = load('USAZGIQ').event.events![0];
+		const event = mapEvent({
+			...raw,
+			liveStreamUrl: 'javascript:alert(document.domain)',
+			website: 'vbscript:msgbox(1)',
+			webcasts: [
+				'data:text/html,<script>alert(1)</script>',
+				' HTTPS://Twitch.tv/pitstop ',
+				'//evil.example/x',
+				'https://twitch.tv@evil.example/',
+				'https://example.com/a b'
+			]
+		});
+		expect(event).toMatchObject({
+			liveStreamUrl: null,
+			website: null,
+			webcasts: ['https://twitch.tv/pitstop', 'https://example.com/a%20b']
+		});
+		expect(mapEvent({ ...raw, liveStreamUrl: 'https://youtu.be/abc' }).liveStreamUrl).toBe(
+			'https://youtu.be/abc'
+		);
+	});
+
+	it('only produces match keys that the match page accepts', () => {
+		const keys = FIXTURE_EVENTS.flatMap((code) => matchesFor(code).map((match) => match.key));
+		expect(keys.length).toBeGreaterThan(100);
+		for (const key of keys) expect(isMatchKey(key), key).toBe(true);
+		for (const key of ['', 'q', 'q1234', 'x1', 'p1-', 'p1-2-3', 'q1/2', '../q1', 'q1 ', 'Q1']) {
+			expect(isMatchKey(key), key).toBe(false);
+		}
+		expect(isMatchKey('p5-2')).toBe(true);
 	});
 
 	it('maps BIOBUZZ score details', () => {

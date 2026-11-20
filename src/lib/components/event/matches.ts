@@ -35,6 +35,10 @@ export function matchHref(code: string, match: Pick<Match, 'key'>): string {
 	return `/events/${code}/matches/${match.key}`;
 }
 
+export function isMatchKey(key: string): boolean {
+	return /^[qp]\d{1,3}(-\d{1,3})?$/.test(key);
+}
+
 export function hasTeam(match: Match, team: number): boolean {
 	return (
 		match.red.some((entry) => entry.team === team) ||

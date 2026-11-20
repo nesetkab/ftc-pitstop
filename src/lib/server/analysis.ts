@@ -10,10 +10,11 @@ import { SEASON } from '#lib/game/biobuzz.ts';
 import { dayNumber, previousFrom } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import { cache as sharedCache, type Cache, type CachePolicy } from '#lib/server/cache.ts';
-import { DataError, unavailable } from '#lib/server/errors.ts';
+import { DataError, describeError, unavailable } from '#lib/server/errors.ts';
 import {
 	eventTier,
 	loaders as defaultLoaders,
+	normalizeEventCode,
 	normalizeTeamNumber,
 	type EventTier,
 	type Loaders
@@ -128,9 +129,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 		}
 		if (current && time < current.model.generatedAt + DAY_SECONDS * 1000) {
 			pending.catch((error: unknown) =>
-				console.warn(
-					`season ratings refresh failed: ${error instanceof Error ? error.message : error}`
-				)
+				console.warn(`season ratings refresh failed: ${describeError(error)}`)
 			);
 			return Promise.resolve(current.model);
 		}
@@ -140,10 +139,11 @@ export function createAnalysis(deps: AnalysisDeps) {
 	async function loadEventAnalysisEntry(
 		input: string
 	): Promise<{ analysis: EventAnalysis; cacheControl: string }> {
+		const code = normalizeEventCode(input);
 		const model = loadSeasonModel();
 		model.catch(() => undefined);
 		const deadline = pending ? Math.max(now(), pendingSince + budget) : now() + budget;
-		const { cacheControl, ...bundle } = await loaders.loadEventBundle(input);
+		const { cacheControl, ...bundle } = await loaders.loadEventBundle(code);
 		const teams = teamsOf(bundle);
 		const day = dayNumber(bundle.event.start);
 		const policy = analysisPolicy(eventTier(bundle.event, now()), bundle.phase);

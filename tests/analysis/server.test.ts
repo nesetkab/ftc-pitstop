@@ -108,7 +108,8 @@ describe('createAnalysis', () => {
 		expect(history.events).toMatchObject([{ code: 'USAZXXQ', start: '2026-11-07' }]);
 		expect(history.points).toHaveLength(history.events[0].matches);
 		expect(history.points.at(-1)!.opr).toBeTypeOf('number');
-		expect(await data.loadTeamRatingHistory(999998)).toBeNull();
+		expect(await data.loadTeamRatingHistory(99998)).toBeNull();
+		await expect(data.loadTeamRatingHistory(999998)).rejects.toMatchObject({ status: 404 });
 		await expect(data.loadTeamRatingHistory('abc')).rejects.toMatchObject({ status: 404 });
 	});
 });

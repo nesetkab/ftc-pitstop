@@ -10,7 +10,7 @@ import {
 	scoutMatchKey,
 	USER_AGENT
 } from '#lib/server/ftcscout.ts';
-import { scoutFetch } from './helpers.ts';
+import { scoutFetch, scoutFixture } from './helpers.ts';
 
 describe('FTCScout client', () => {
 	it('names operations and sends a user agent', async () => {
@@ -23,6 +23,25 @@ describe('FTCScout client', () => {
 		expect(fake.bodies[0].query).toMatch(/^query EventByCode\(/);
 		expect(fake.calls[0].headers['user-agent']).toBe(USER_AGENT);
 		expect(fake.calls[0].url).toBe('https://api.ftcscout.org/graphql');
+	});
+
+	it('only keeps web addresses in the links of an event', async () => {
+		const raw = scoutFixture<{ data: { eventByCode: Record<string, unknown> } }>('event-USAZGIQ');
+		raw.data.eventByCode.liveStreamURL = 'javascript:alert(document.domain)';
+		raw.data.eventByCode.website = 'https://user:pass@example.com/';
+		raw.data.eventByCode.webcasts = [
+			'data:text/html,<script>alert(1)</script>',
+			' HTTPS://Twitch.tv/pitstop ',
+			'vbscript:msgbox(1)',
+			'www.twitch.tv/no-scheme'
+		];
+		const scout = createFtcScoutClient({ fetch: scoutFetch({ EventByCode: raw }).fetch });
+		const event = (await fetchEventByCode('USAZGIQ', 2026, scout))?.event;
+		expect(event).toMatchObject({
+			liveStreamUrl: null,
+			website: null,
+			webcasts: ['https://twitch.tv/pitstop']
+		});
 	});
 
 	it('maps an event with matches, scores, rankings and awards', async () => {

@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { EVENT_TYPE_NAMES, eventTypeFromName } from '#lib/game/event-types.ts';
+import { httpUrl } from '#lib/format/url.ts';
 import { isValidTimeZone } from '#lib/server/time.ts';
 import type {
 	AllianceColor,
@@ -554,9 +555,9 @@ export function mapEventByCode(data: z.output<typeof eventByCode>): ScoutEventDa
 		timezone: isValidTimeZone(raw.timezone) ? raw.timezone : 'UTC',
 		start: raw.start.slice(0, 10),
 		end: raw.end.slice(0, 10),
-		liveStreamUrl: clean(raw.liveStreamURL),
-		webcasts: raw.webcasts ?? [],
-		website: clean(raw.website),
+		liveStreamUrl: httpUrl(raw.liveStreamURL),
+		webcasts: (raw.webcasts ?? []).flatMap((url) => httpUrl(url) ?? []),
+		website: httpUrl(raw.website),
 		fieldCount: raw.fieldCount ?? 1,
 		published: raw.published ?? true,
 		remote: raw.remote ?? false,

@@ -2,6 +2,7 @@ export { MISSING, pct } from './pct.ts';
 export { fixed, signed, integer } from './number.ts';
 export { record } from './record.ts';
 export { ordinal } from './ordinal.ts';
+export { httpUrl } from './url.ts';
 export {
 	toDate,
 	time,

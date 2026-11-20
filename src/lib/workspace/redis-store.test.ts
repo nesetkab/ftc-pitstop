@@ -172,6 +172,7 @@ describe('redis workspace store', () => {
 				(await redis.mget(...keys)).map((raw) => (typeof raw === 'string' ? JSON.parse(raw) : raw)),
 			set: redis.set.bind(redis),
 			incr: redis.incr.bind(redis),
+			decr: redis.decr.bind(redis),
 			expire: redis.expire.bind(redis)
 		};
 		const other = createRedisStore(decoded, { now: () => time });
@@ -197,6 +198,17 @@ describe('rate limiter', () => {
 		await limiter.allow('a', 1, 60);
 		expect(await limiter.allow('b', 1, 60)).toBe(true);
 		expect(await limiter.used('missing', 60)).toBe(0);
+		time += 130_000;
+		expect(redis.keys()).toEqual([]);
+	});
+
+	it('refunds a slot without leaving a key that never expires', async () => {
+		const limiter = createLimiter(redis, { now: () => time });
+		await limiter.allow('key', 1, 60);
+		await limiter.release('key', 60);
+		expect(await limiter.allow('key', 1, 60)).toBe(true);
+		time += 61_000;
+		await limiter.release('key', 60);
 		time += 130_000;
 		expect(redis.keys()).toEqual([]);
 	});
