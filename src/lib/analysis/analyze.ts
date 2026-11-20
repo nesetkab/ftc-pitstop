@@ -194,24 +194,27 @@ function eventTiming(bundle: EventBundle, now: number): EventTiming {
 		if (list.length === 0) continue;
 		const timed = timedMatches(list);
 		const estimates = estimateStarts(timed, options);
+		let frontier = -1;
+		for (let i = 0; i < timed.length; i++) if (timed[i].actual !== null) frontier = i;
 		for (let i = 0; i < list.length; i++) {
 			const m = list[i];
 			const estimate = estimates[i];
 			const done = m.result !== null;
 			const started = done || m.actualTime !== null;
+			const held = !started && i < frontier;
 			if (!done && m.actualTime !== null) onField = m.key;
-			if (!started && next === null) {
+			if (!started && !held && next === null) {
 				next = m.key;
 				delay = m.scheduledTime === null ? null : estimate.start - m.scheduledTime;
 			}
 			matches[m.key] = {
 				key: m.key,
 				scheduled: m.scheduledTime,
-				expectedStart: started ? timed[i].actual : Math.round(estimate.start),
-				queueAt: started ? null : Math.round(estimate.queue),
-				matchesAway: done ? null : unfinished
+				expectedStart: started ? timed[i].actual : held ? null : Math.round(estimate.start),
+				queueAt: started || held ? null : Math.round(estimate.queue),
+				matchesAway: done || held ? null : unfinished
 			};
-			if (!done) unfinished++;
+			if (!done && !held) unfinished++;
 		}
 		if (!active) {
 			cycle = cycleOf(timed, options);
