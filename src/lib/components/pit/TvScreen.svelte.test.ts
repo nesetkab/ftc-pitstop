@@ -52,6 +52,24 @@ describe('TvScreen', () => {
 		expect(text(container)).toContain('Matches start at 10:30 AM.');
 	});
 
+	it('says which day the first match is when it is not today', () => {
+		const evening = Date.parse('2026-11-13T22:00:00Z');
+		const { container } = render(TvScreen, { props: props(evening) });
+		const content = text(container);
+		expect(content).toContain('First match tomorrow Q5 at 10:56 AM');
+		expect(content).toContain('Matches start tomorrow at 10:30 AM.');
+		cleanup();
+		const phone = render(PhoneScreen, {
+			props: {
+				...props(evening),
+				matches: replayBundle(full, evening).matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default' as const
+			}
+		});
+		expect(text(phone.container)).toContain('First match tomorrow Q5');
+	});
+
 	it('lays out qualifications like the spec', () => {
 		const { container } = render(TvScreen, { props: props(at('Q22')) });
 		const content = text(container);

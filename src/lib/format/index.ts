@@ -9,6 +9,7 @@ export {
 	timeWithSeconds,
 	longDate,
 	shortDate,
+	relativeDay,
 	dateRange,
 	type DateInput
 } from './time.ts';

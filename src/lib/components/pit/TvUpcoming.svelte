@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dateRange, time } from '#lib/format/time.ts';
+	import { dateRange, relativeDay, time } from '#lib/format/time.ts';
 	import type { Event } from '#lib/types.ts';
 	import MatchList from '#lib/ui/MatchList.svelte';
 	import QrCode from './QrCode.svelte';
@@ -9,12 +9,19 @@
 	interface Props {
 		view: PitView;
 		event: Event;
+		now: number;
 		phoneUrl: string;
 	}
 
-	let { view, event, phoneUrl }: Props = $props();
+	let { view, event, now, phoneUrl }: Props = $props();
 
 	const first = $derived(view.firstMatch);
+	const firstDay = $derived(
+		first && first.scheduled !== null ? relativeDay(first.scheduled, now, event.timezone) : null
+	);
+	const startDay = $derived(
+		view.startsAt !== null ? relativeDay(view.startsAt, now, event.timezone) : null
+	);
 	const where = $derived(
 		[event.venue, [event.city, event.state].filter(Boolean).join(', ')].filter(Boolean).join(', ')
 	);
@@ -30,7 +37,9 @@
 		<p class="event">{event.name}</p>
 		{#if where}<p class="sub">{where}</p>{/if}
 		<div class="first">
-			{#if first}<span class="tv-label">First match</span>{/if}
+			{#if first}
+				<span class="tv-label">First match{firstDay ? ` ${firstDay}` : ''}</span>
+			{/if}
 			{#if first && first.scheduled !== null}
 				<b>{first.label} at {time(first.scheduled, event.timezone)}</b>
 				<span>
@@ -55,8 +64,8 @@
 		{/if}
 		{#if view.startsAt !== null}
 			<p class="sub">
-				Matches start at {time(view.startsAt, event.timezone)}. {view.qualsTotal} qualification matches
-				in all.
+				Matches start {startDay ? `${startDay} ` : ''}at {time(view.startsAt, event.timezone)}. {view.qualsTotal}
+				qualification matches in all.
 			</p>
 		{/if}
 	</section>
