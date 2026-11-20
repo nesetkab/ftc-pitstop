@@ -137,6 +137,7 @@
 		font-weight: 400;
 		color: var(--text);
 		text-align: left;
+		white-space: normal;
 	}
 
 	tr.item th[scope='row'] {
