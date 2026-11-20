@@ -73,8 +73,8 @@
 					<td>{fixed(standing?.opr)}</td>
 					<td>
 						{#if standing}
-							{integer(standing.rank)}{#if seasonCount}<span class="faint">
-									of {integer(seasonCount)}</span
+							{integer(standing.rank)}{#if seasonCount}<span class="faint"
+									>{` of ${integer(seasonCount)}`}</span
 								>{/if}
 						{:else}
 							—

@@ -61,6 +61,8 @@
 					</li>
 				{/each}
 			</ul>
+		{:else if !view.hasPlayoffs}
+			<p class="sub">League meets don't give awards.</p>
 		{:else}
 			<p class="sub">Awards haven't been posted yet.</p>
 		{/if}
@@ -129,14 +131,14 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
-		font-size: 0.8em;
+		font-size: 0.72em;
 	}
 
 	.awards li {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 		gap: 0.8em;
-		padding: 0.34em 0;
+		padding: 0.26em 0;
 		border-bottom: 1px solid var(--line);
 	}
 

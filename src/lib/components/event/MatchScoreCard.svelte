@@ -187,7 +187,8 @@
 		}
 
 		th {
-			white-space: nowrap;
+			line-height: 1.2;
+			vertical-align: bottom;
 		}
 
 		th:first-child,

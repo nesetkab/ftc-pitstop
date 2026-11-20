@@ -65,6 +65,14 @@ describe('MatchView after the match', () => {
 		expect(within(points).getAllByText('Chance')).toHaveLength(2);
 	});
 
+	it('leaves ranking points off playoff matches', () => {
+		const final = bundle.matches.find((match) => match.key === 'p10') as Match;
+		render(MatchView, { props: { bundle, match: final, analysis: fakeAnalysis(bundle) } });
+		expect(screen.getByRole('table', { name: 'Final score' })).toBeInTheDocument();
+		expect(screen.queryByRole('table', { name: 'Ranking points' })).toBeNull();
+		expect(screen.queryByRole('heading', { name: /Ranking point/ })).toBeNull();
+	});
+
 	it('draws each flower stack from the bottom up', () => {
 		const result = structuredClone(q26.result!);
 		const flowers = { red: ['red', 'pollen', 'blue'], blue: [], scoring: ['pollen'], audience: [] };
@@ -79,6 +87,18 @@ describe('MatchView after the match', () => {
 		expect(screen.getByText('Blue on top, red at the bottom')).toBeInTheDocument();
 		expect(screen.getByText('Pollen only')).toBeInTheDocument();
 		expect(screen.getAllByText('Empty')).toHaveLength(2);
+	});
+});
+
+describe('MatchView at a two-day event', () => {
+	const twoDay = fixtureBundle('USMISOQ');
+	const first = twoDay.matches.find((match) => match.key === 'q1') as Match;
+
+	it('names the day without doubling up the words', () => {
+		render(MatchView, { props: { bundle: twoDay, match: first } });
+		expect(screen.getByText(/^Played Saturday at \d+:\d\d/)).toBeInTheDocument();
+		expect(screen.getByText(/Scheduled for Saturday at \d+:\d\d/)).toBeInTheDocument();
+		expect(screen.queryByText(/Played at Saturday/)).toBeNull();
 	});
 });
 

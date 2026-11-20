@@ -4,7 +4,7 @@
 	import { pct } from '#lib/format/pct.ts';
 	import { record } from '#lib/format/record.ts';
 	import { relative } from '#lib/format/relative.ts';
-	import { time, timeWithSeconds } from '#lib/format/time.ts';
+	import { relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
 	import type { DataSource, Event, Match } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -21,6 +21,7 @@
 		matchItem,
 		phoneDetail,
 		playoffResult,
+		qualsDoneText,
 		roleText
 	} from './copy.ts';
 	import type { Permission } from './notify.svelte.ts';
@@ -95,6 +96,12 @@
 	});
 	const from = $derived(source === 'ftc' ? 'FTC Events' : 'FTCScout');
 	const result = $derived(playoffResult(view));
+	const qualsDone = $derived(qualsDoneText(view));
+	const firstDay = $derived(
+		view.firstMatch && view.firstMatch.scheduled !== null
+			? relativeDay(view.firstMatch.scheduled, now, timeZone)
+			: null
+	);
 	const blocked = $derived(permission === 'denied' || permission === 'unsupported');
 </script>
 
@@ -139,7 +146,7 @@
 			{:else if view.phase === 'upcoming'}
 				{#if view.firstMatch}
 					<section class="next">
-						<span class="muted">First match</span>
+						<span class="muted">First match{firstDay ? ` ${firstDay}` : ''}</span>
 						<div class="q">
 							<b>{view.firstMatch.label}</b>
 							<AllianceChip alliance={view.firstMatch.alliance} />
@@ -158,6 +165,12 @@
 						This page fills in on its own once it is.
 					</EmptyState>
 				{/if}
+			{:else if view.phase === 'quals'}
+				<section class="next">
+					<span class="muted">Next match</span>
+					<span class="big">{qualsDone.headline}</span>
+					<span class="muted">{qualsDone.detail}</span>
+				</section>
 			{:else if view.phase === 'selection'}
 				<section class="next">
 					<span class="muted">Alliance selection</span>

@@ -60,7 +60,7 @@
 				<p class="sub">Check the team number or pick the event with ?event= in the address.</p>
 			</div>
 		{:else if view.phase === 'upcoming'}
-			<TvUpcoming {view} {event} {phoneUrl} />
+			<TvUpcoming {view} {event} {now} {phoneUrl} />
 		{:else if view.phase === 'quals'}
 			<TvQuals {view} {call} {now} {timeZone} />
 		{:else if view.phase === 'selection'}

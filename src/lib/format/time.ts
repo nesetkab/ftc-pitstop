@@ -75,6 +75,14 @@ function calendarDay(input: DateInput, timeZone?: string) {
 	};
 }
 
+export function relativeDay(input: DateInput, now: DateInput, timeZone?: string): string | null {
+	const days = calendarDay(input, timeZone).serial - calendarDay(now, timeZone).serial;
+	if (days === 0) return null;
+	if (days === 1) return 'tomorrow';
+	if (days > 1 && days < 7) return `on ${format(input, { weekday: 'long' }, timeZone)}`;
+	return `on ${shortDate(input, timeZone)}`;
+}
+
 export function dateRange(start: DateInput, end: DateInput, timeZone?: string): string {
 	const first = calendarDay(start, timeZone);
 	const last = calendarDay(end, timeZone);

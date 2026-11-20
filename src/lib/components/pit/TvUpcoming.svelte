@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { dateRange, time } from '#lib/format/time.ts';
+	import { dateRange, relativeDay, time } from '#lib/format/time.ts';
 	import type { Event } from '#lib/types.ts';
 	import MatchList from '#lib/ui/MatchList.svelte';
 	import QrCode from './QrCode.svelte';
@@ -9,12 +9,20 @@
 	interface Props {
 		view: PitView;
 		event: Event;
+		now: number;
 		phoneUrl: string;
 	}
 
-	let { view, event, phoneUrl }: Props = $props();
+	let { view, event, now, phoneUrl }: Props = $props();
 
 	const first = $derived(view.firstMatch);
+	const firstDay = $derived(
+		first && first.scheduled !== null ? relativeDay(first.scheduled, now, event.timezone) : null
+	);
+	const startDay = $derived(
+		view.startsAt !== null ? relativeDay(view.startsAt, now, event.timezone) : null
+	);
+	const shownUrl = $derived(phoneUrl.replace(/^www\./, ''));
 	const where = $derived(
 		[event.venue, [event.city, event.state].filter(Boolean).join(', ')].filter(Boolean).join(', ')
 	);
@@ -30,7 +38,9 @@
 		<p class="event">{event.name}</p>
 		{#if where}<p class="sub">{where}</p>{/if}
 		<div class="first">
-			{#if first}<span class="tv-label">First match</span>{/if}
+			{#if first}
+				<span class="tv-label">First match{firstDay ? ` ${firstDay}` : ''}</span>
+			{/if}
 			{#if first && first.scheduled !== null}
 				<b>{first.label} at {time(first.scheduled, event.timezone)}</b>
 				<span>
@@ -55,8 +65,8 @@
 		{/if}
 		{#if view.startsAt !== null}
 			<p class="sub">
-				Matches start at {time(view.startsAt, event.timezone)}. {view.qualsTotal} qualification matches
-				in all.
+				Matches start {startDay ? `${startDay} ` : ''}at {time(view.startsAt, event.timezone)}. {view.qualsTotal}
+				qualification matches in all.
 			</p>
 		{/if}
 	</section>
@@ -65,7 +75,7 @@
 			<QrCode text={`https://${phoneUrl}`} label={`QR code for ${phoneUrl}`} />
 		</div>
 		<p class="sub">Open on your phone</p>
-		<p class="url">{phoneUrl}</p>
+		<p class="url">{shownUrl}</p>
 	</section>
 </div>
 
@@ -125,8 +135,10 @@
 	}
 
 	.url {
+		max-width: 100%;
 		font-size: 1.6em;
 		font-weight: 600;
 		letter-spacing: -0.01em;
+		overflow-wrap: anywhere;
 	}
 </style>

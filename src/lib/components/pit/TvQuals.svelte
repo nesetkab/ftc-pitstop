@@ -3,7 +3,7 @@
 	import Facts from './Facts.svelte';
 	import NextHero from './NextHero.svelte';
 	import RankTable from './RankTable.svelte';
-	import { eventFacts, lastResultItem, matchItems } from './copy.ts';
+	import { eventFacts, lastResultItem, matchItems, qualsDoneText } from './copy.ts';
 	import type { QueueCall } from './queue.ts';
 	import { rankWindow, type PitView } from './view.ts';
 
@@ -19,6 +19,7 @@
 
 	const rows = $derived(rankWindow(view.rankings, view.team, rankRows));
 	const rankLabel = $derived(view.rankedAfter ? `Rankings after ${view.rankedAfter}` : 'Rankings');
+	const done = $derived(qualsDoneText(view));
 </script>
 
 <div class="cols" style:--cols="31em 23em minmax(0, 1fr)">
@@ -27,11 +28,8 @@
 			<NextHero next={view.next} {call} {now} {timeZone} delaySeconds={view.delaySeconds} />
 		{:else}
 			<span class="tv-label">Next match</span>
-			<p class="done">Our qualification matches are done.</p>
-			<p class="sub">
-				{view.qualsPlayed} of {view.qualsTotal} qualification matches are posted. Alliance selection comes
-				next.
-			</p>
+			<p class="done">{done.headline}</p>
+			<p class="sub">{done.detail}</p>
 		{/if}
 	</section>
 	<section>

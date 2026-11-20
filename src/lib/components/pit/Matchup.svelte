@@ -91,6 +91,9 @@
 		padding-block: 0.4em;
 		background: var(--surface);
 		color: var(--text-3);
+	}
+
+	.head span {
 		font-size: 0.7em;
 	}
 

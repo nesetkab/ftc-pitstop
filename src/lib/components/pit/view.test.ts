@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
-import { heroText, matchItems } from './copy.ts';
+import { heroText, matchItems, playoffResult } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { bundleSignature, pitView, rankWindow } from './view.ts';
@@ -156,6 +156,58 @@ describe('pitView during quals', () => {
 		expect(heroText(modeled.next!, call, queueAt, ZONE, 120).headline).toBe('Queue now');
 	});
 
+	it('does not ask us to queue across a break', () => {
+		const expectedStart = Date.parse('2026-11-14T21:01:00Z');
+		const analysis = {
+			ratings: [],
+			forecasts: {},
+			timing: {
+				cycleSeconds: 390,
+				delaySeconds: 0,
+				onField: null,
+				next: 'q23',
+				matches: {
+					q26: {
+						key: 'q26',
+						scheduled: expectedStart,
+						expectedStart,
+						queueAt: expectedStart - 50 * 60_000,
+						matchesAway: 0
+					}
+				}
+			},
+			projections: null,
+			playoffs: null,
+			picks: null
+		} as unknown as EventAnalysis;
+		const next = view(at('Q22'), analysis).next!;
+		expect(next.queueAt).toBe(expectedStart - 20 * 60_000);
+		expect(queueCall(next, expectedStart - 40 * 60_000)).toBeNull();
+		expect(queueCall(next, expectedStart - 15 * 60_000)?.reason).toBe('timing');
+	});
+
+	it('skips an earlier match that is held or never scored', () => {
+		const time = at('Q22');
+		const bundle = replayBundle(full, time);
+		const held = {
+			...bundle,
+			matches: bundle.matches.map((match) =>
+				match.key === 'q14' ? { ...match, actualTime: null, postedTime: null, result: null } : match
+			)
+		};
+		const current = pitView({ bundle: held, analysis: null, queue: null, team: TEAM });
+		expect(current.next).toMatchObject({ key: 'q26', matchesAway: 3 });
+		expect(current.upNext).toBe('Q23');
+		expect(queueCall(current.next, time)).toBeNull();
+	});
+
+	it('does not show a rank before our first match is posted', () => {
+		const early = view(at('Q1'));
+		expect(early.rankings.find((row) => row.team === TEAM)?.played).toBe(0);
+		expect(early.ranking).toBeNull();
+		expect(view(at('Q5')).ranking).toMatchObject({ played: 1 });
+	});
+
 	it('shows the match on the field once it starts', () => {
 		const playing = view(Date.parse('2026-11-14T20:59:00Z'));
 		expect(playing.next?.key).toBe('q26');
@@ -193,6 +245,42 @@ describe('pitView after quals', () => {
 			position: 'Out after M5'
 		});
 		expect(out.standings.find((standing) => standing.seed === 5)).toMatchObject({ out: true });
+	});
+
+	it('stops showing the chance to win once we are out', () => {
+		const analysis = {
+			ratings: [],
+			forecasts: {},
+			timing: { cycleSeconds: null, delaySeconds: null, onField: null, next: null, matches: {} },
+			projections: null,
+			playoffs: [{ seed: 5, teams: [TEAM, 2844], strength: 0, winEvent: 0.004 }],
+			picks: null
+		} as unknown as EventAnalysis;
+		expect(view(at('M1'), analysis).playoff?.winEvent).toBe(0.004);
+		expect(view(at('M5'), analysis).playoff?.winEvent).toBeNull();
+	});
+
+	it('calls the losing finalist a finalist before awards are posted', () => {
+		const final = replayBundle(full, at('M10'));
+		expect(final.awards).toEqual([]);
+		const runnerUp = pitView({ bundle: final, analysis: null, queue: null, team: 26670 });
+		expect(runnerUp.playoff).toMatchObject({ state: 'eliminated', finalist: true });
+		expect(playoffResult(runnerUp)).toBe('Finalist');
+		const winner = pitView({ bundle: final, analysis: null, queue: null, team: 25620 });
+		expect(playoffResult(winner)).toBe('Won the event');
+		expect(view(at('M10')).playoff?.finalist).toBe(false);
+	});
+
+	it('names the finals at a two-alliance event', () => {
+		const finals = fixtureBundle('USALATQ');
+		const first = replayBundle(finals, replayStart('F1', finals)!);
+		const runnerUp = pitView({ bundle: first, analysis: null, queue: null, team: 24378 });
+		expect(runnerUp.next?.label).toBe('F2');
+		expect(runnerUp.playoff?.position).toBe('Finals');
+		const done = replayBundle(finals, replayStart('F2', finals)!);
+		expect(playoffResult(pitView({ bundle: done, analysis: null, queue: null, team: 24378 }))).toBe(
+			'Finalist'
+		);
 	});
 
 	it('ends with the final standings and awards', () => {

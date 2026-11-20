@@ -1,6 +1,8 @@
-import type { EventAnalysis, MatchForecast, TeamRating } from '#lib/analysis/types.ts';
+import type { EventAnalysis, MatchForecast, MatchTiming, TeamRating } from '#lib/analysis/types.ts';
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
+import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';
+import { QUEUE_EARLIEST } from './queue.ts';
 import type {
 	AllianceColor,
 	AllianceSelection,
@@ -100,6 +102,7 @@ export interface PitView {
 	team: number;
 	teamName: string | null;
 	phase: EventPhase;
+	hasPlayoffs: boolean;
 	registered: boolean;
 	names: Map<number, string>;
 	rankings: Ranking[];
@@ -224,6 +227,12 @@ function earliestScheduled(matches: Match[]): number | null {
 	return times.length > 0 ? Math.min(...times) : null;
 }
 
+function queueTime(timing: MatchTiming | undefined): number | null {
+	if (!timing || timing.queueAt === null) return null;
+	if (timing.expectedStart === null) return timing.queueAt;
+	return Math.max(timing.queueAt, timing.expectedStart - QUEUE_EARLIEST);
+}
+
 function factualDelay(matches: Match[]): number | null {
 	const started = matches.filter(
 		(match) => match.actualTime !== null && match.scheduledTime !== null
@@ -296,6 +305,7 @@ function bracketPosition(match: Pick<Match, 'description' | 'label'>): string {
 	if (parsed?.level === 'playoff' && parsed.bracket && parsed.round) {
 		return `${parsed.bracket === 'upper' ? 'Upper' : 'Lower'} bracket round ${parsed.round}`;
 	}
+	if (/^finals?\b/i.test(match.description.trim())) return 'Finals';
 	return titleOf(match);
 }
 
@@ -316,10 +326,17 @@ function playoffView(
 		(award) => award.id === WINNER_AWARD_ID && award.team === team
 	);
 	const finalMatch = [...playoffs].reverse().find((match) => match.result);
-	const wonFinal =
-		decided && finalMatch !== undefined && sideOf(finalMatch, team) === finalMatch.result?.winner;
+	const teams = membership ? allianceTeams(membership.alliance) : [team];
+	const finalSide =
+		decided && finalMatch
+			? (teams.map((number) => sideOf(finalMatch, number)).find((side) => side !== null) ?? null)
+			: null;
+	const wonFinal = finalSide !== null && finalSide === finalMatch?.result?.winner;
 	const won = winnerAward || wonFinal;
 	const eliminated = !won && (losses >= 2 || decided);
+	const finalistAward = bundle.awards.some(
+		(award) => award.id === FINALIST_AWARD_ID && award.team === team
+	);
 	const next = matches.find((match) => match.outcome === null);
 	const nextMatch = next && playoffs.find((match) => match.key === next.key);
 	const lastMatch = [...matches].reverse().find((match) => match.outcome !== null);
@@ -336,8 +353,11 @@ function playoffView(
 		state,
 		position,
 		matches,
-		winEvent: analysis?.playoffs?.find((odds) => odds.seed === seed)?.winEvent ?? null,
-		finalist: bundle.awards.some((award) => award.id === FINALIST_AWARD_ID && award.team === team)
+		winEvent:
+			state === 'alive' || state === 'waiting'
+				? (analysis?.playoffs?.find((odds) => odds.seed === seed)?.winEvent ?? null)
+				: null,
+		finalist: finalistAward || (!won && finalSide !== null)
 	};
 }
 
@@ -378,8 +398,11 @@ export function pitView(input: PitInput): PitView {
 	const ours = bundle.matches
 		.map((match) => pitMatch(match, team, analysis))
 		.filter((match): match is PitMatch => match !== null);
+	const active = bundle.matches.findLastIndex(
+		(match) => match.actualTime !== null || match.result !== null
+	);
 	const nextIndex = bundle.matches.findIndex(
-		(match) => match.result === null && sideOf(match, team) !== null
+		(match, index) => index >= active && match.result === null && sideOf(match, team) !== null
 	);
 	let next: NextMatch | null = null;
 	if (nextIndex !== -1) {
@@ -400,13 +423,13 @@ export function pitView(input: PitInput): PitView {
 			red: match.red.map((entry) => slot(entry.team)),
 			blue: match.blue.map((entry) => slot(entry.team)),
 			forecast: analysis?.forecasts[match.key] ?? null,
-			queueAt: nexusMatch?.times.estimatedQueue ?? timing?.queueAt ?? null,
+			queueAt: nexusMatch?.times.estimatedQueue ?? queueTime(timing),
 			expectedStart:
 				nexusMatch?.times.estimatedStart ??
 				nexusMatch?.times.estimatedOnField ??
 				timing?.expectedStart ??
 				null,
-			matchesAway: bundle.matches.slice(0, nextIndex).filter(isUnplayed).length,
+			matchesAway: bundle.matches.slice(active + 1, nextIndex).filter(isUnplayed).length,
 			nexus: {
 				tracked: nexusMatch !== null,
 				status: nowQueuing ? 'now-queuing' : (nexusMatch?.status ?? null)
@@ -415,18 +438,20 @@ export function pitView(input: PitInput): PitView {
 	}
 	const membership = allianceOf(bundle.alliances, team);
 	const rating = ratings.get(team);
+	const standing = ranks.get(team);
 	const live = bundle.phase !== 'upcoming' && bundle.phase !== 'done';
-	const firstUnplayed = bundle.matches.find(isUnplayed);
+	const firstUnplayed = bundle.matches.find((match, index) => index > active && isUnplayed(match));
 	const registered =
 		bundle.teams.some((entry) => entry.number === team) || ours.length > 0 || ranks.has(team);
 	return {
 		team,
 		teamName: names.get(team) ?? null,
 		phase: bundle.phase,
+		hasPlayoffs: hasPlayoffs(bundle.event.type),
 		registered,
 		names,
 		rankings: bundle.rankings,
-		ranking: ranks.get(team) ?? null,
+		ranking: standing && standing.played > 0 ? standing : null,
 		teamCount: Math.max(bundle.teams.length, bundle.rankings.length),
 		rankedAfter: postedQuals.at(-1)?.label ?? null,
 		qualsPlayed: postedQuals.length,

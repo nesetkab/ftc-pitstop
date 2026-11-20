@@ -14,6 +14,7 @@ import {
 	pct,
 	record,
 	relative,
+	relativeDay,
 	shortDate,
 	shortMatchLabel,
 	signed,
@@ -128,6 +129,22 @@ describe('time', () => {
 		expect(dateRange('2026-11-20', '2026-11-22')).toBe('November 20 to 22, 2026');
 		expect(dateRange('2026-10-31', '2026-11-01')).toBe('October 31 and November 1, 2026');
 		expect(dateRange('2026-12-31', '2027-01-02')).toBe('December 31, 2026 to January 2, 2027');
+	});
+});
+
+describe('relativeDay', () => {
+	const now = Date.parse('2026-11-20T22:00:00Z');
+	const DENVER = 'America/Denver';
+
+	it('says nothing for later today', () => {
+		expect(relativeDay(Date.parse('2026-11-21T05:30:00Z'), now, DENVER)).toBeNull();
+	});
+
+	it('names tomorrow, the rest of the week and later dates', () => {
+		expect(relativeDay(Date.parse('2026-11-21T16:00:00Z'), now, DENVER)).toBe('tomorrow');
+		expect(relativeDay(Date.parse('2026-11-23T16:00:00Z'), now, DENVER)).toBe('on Monday');
+		expect(relativeDay(Date.parse('2026-12-05T16:00:00Z'), now, DENVER)).toBe('on Dec 5');
+		expect(relativeDay(Date.parse('2026-11-19T16:00:00Z'), now, DENVER)).toBe('on Nov 19');
 	});
 });
 
