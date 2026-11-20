@@ -24,7 +24,10 @@ const viteConfig = readFileSync(`${root}vite.config.ts`, 'utf8');
 afterEach(() => vi.restoreAllMocks());
 
 function respond(response: Response) {
-	return handle({ event: {} as never, resolve: async () => response } as never);
+	return handle({
+		event: { url: new URL('https://www.ftcpitstop.com/') } as never,
+		resolve: async () => response
+	} as never);
 }
 
 describe('security headers', () => {
@@ -186,5 +189,19 @@ describe('server errors', () => {
 			error: new TypeError('secret detail F7C2A9E1-SECRET-KEY-0042')
 		});
 		expect(JSON.stringify(result ?? {})).not.toContain('F7C2A9E1');
+	});
+});
+
+describe('legacy links', () => {
+	it('redirects old routes before rendering anything', async () => {
+		const response = await handle({
+			event: { url: new URL('https://www.ftcpitstop.com/dashboard/usmtbuq/3747') } as never,
+			resolve: async () => {
+				throw new Error('rendered a legacy route');
+			}
+		} as never);
+		expect(response.status).toBe(308);
+		expect(response.headers.get('location')).toBe('/3747?event=USMTBUQ');
+		expect(response.headers.get('x-frame-options')).toBe('DENY');
 	});
 });
