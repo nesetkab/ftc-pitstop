@@ -1,6 +1,12 @@
-import type { EventAnalysis, MatchForecast, TeamRating } from '#lib/analysis/types.ts';
+import type {
+	EventAnalysis,
+	MatchForecast,
+	MatchTiming,
+	TeamRating
+} from '#lib/analysis/types.ts';
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';
+import { QUEUE_EARLIEST } from './queue.ts';
 import type {
 	AllianceColor,
 	AllianceSelection,
@@ -224,6 +230,12 @@ function earliestScheduled(matches: Match[]): number | null {
 	return times.length > 0 ? Math.min(...times) : null;
 }
 
+function queueTime(timing: MatchTiming | undefined): number | null {
+	if (!timing || timing.queueAt === null) return null;
+	if (timing.expectedStart === null) return timing.queueAt;
+	return Math.max(timing.queueAt, timing.expectedStart - QUEUE_EARLIEST);
+}
+
 function factualDelay(matches: Match[]): number | null {
 	const started = matches.filter(
 		(match) => match.actualTime !== null && match.scheduledTime !== null
@@ -400,7 +412,7 @@ export function pitView(input: PitInput): PitView {
 			red: match.red.map((entry) => slot(entry.team)),
 			blue: match.blue.map((entry) => slot(entry.team)),
 			forecast: analysis?.forecasts[match.key] ?? null,
-			queueAt: nexusMatch?.times.estimatedQueue ?? timing?.queueAt ?? null,
+			queueAt: nexusMatch?.times.estimatedQueue ?? queueTime(timing),
 			expectedStart:
 				nexusMatch?.times.estimatedStart ??
 				nexusMatch?.times.estimatedOnField ??

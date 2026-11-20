@@ -156,6 +156,36 @@ describe('pitView during quals', () => {
 		expect(heroText(modeled.next!, call, queueAt, ZONE, 120).headline).toBe('Queue now');
 	});
 
+	it('does not ask us to queue across a break', () => {
+		const expectedStart = Date.parse('2026-11-14T21:01:00Z');
+		const analysis = {
+			ratings: [],
+			forecasts: {},
+			timing: {
+				cycleSeconds: 390,
+				delaySeconds: 0,
+				onField: null,
+				next: 'q23',
+				matches: {
+					q26: {
+						key: 'q26',
+						scheduled: expectedStart,
+						expectedStart,
+						queueAt: expectedStart - 50 * 60_000,
+						matchesAway: 0
+					}
+				}
+			},
+			projections: null,
+			playoffs: null,
+			picks: null
+		} as unknown as EventAnalysis;
+		const next = view(at('Q22'), analysis).next!;
+		expect(next.queueAt).toBe(expectedStart - 20 * 60_000);
+		expect(queueCall(next, expectedStart - 40 * 60_000)).toBeNull();
+		expect(queueCall(next, expectedStart - 15 * 60_000)?.reason).toBe('timing');
+	});
+
 	it('shows the match on the field once it starts', () => {
 		const playing = view(Date.parse('2026-11-14T20:59:00Z'));
 		expect(playing.next?.key).toBe('q26');
