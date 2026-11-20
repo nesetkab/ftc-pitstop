@@ -65,7 +65,7 @@ export function tallyResults(matches: ModelMatch[], rules: RpRules = RP_RULES): 
 	for (const m of matches) {
 		if (m.level !== 'qual' || m.redScore === null || m.blueScore === null) continue;
 		const surrogates = new Set(m.surrogates ?? []);
-		const dqs = new Set(m.dqs ?? []);
+		const dqs = new Set([...(m.dqs ?? []), ...(m.noShows ?? [])]);
 		for (const own of ['red', 'blue'] as const) {
 			const teams = m[own];
 			const score = own === 'red' ? m.redScore : m.blueScore;
@@ -82,11 +82,12 @@ export function tallyResults(matches: ModelMatch[], rules: RpRules = RP_RULES): 
 			for (const team of teams) {
 				if (surrogates.has(team)) continue;
 				const t = row(team);
-				t.rp += dqs.has(team) ? 0 : rp;
+				t.counted += 1;
+				if (dqs.has(team)) continue;
+				t.rp += rp;
 				t.np += np;
 				t.tips += tips;
 				t.auto += detail?.autoPoints ?? 0;
-				t.counted += 1;
 			}
 		}
 	}

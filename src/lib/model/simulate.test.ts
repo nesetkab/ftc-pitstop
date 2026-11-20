@@ -68,6 +68,20 @@ describe('tallyResults', () => {
 		expect(rows.get(3)!.rp).toBe(1);
 	});
 
+	it('gives a disqualified or absent team nothing toward the tiebreakers', () => {
+		const rows = new Map(
+			tallyResults([
+				played([1, 2], [3, 4], 80, 40, { dqs: [2] }),
+				played([5, 6], [7, 8], 80, 40, { noShows: [6] })
+			]).map((t) => [t.team, t])
+		);
+		const nothing = { rp: 0, np: 0, tips: 0, auto: 0, counted: 1 };
+		expect(rows.get(2)).toEqual({ team: 2, ...nothing });
+		expect(rows.get(6)).toEqual({ team: 6, ...nothing });
+		expect(rows.get(1)).toEqual({ team: 1, rp: 5, np: 80, tips: 4, auto: 20, counted: 1 });
+		expect(rows.get(5)).toEqual({ team: 5, rp: 5, np: 80, tips: 4, auto: 20, counted: 1 });
+	});
+
 	it('leaves surrogate and playoff matches out', () => {
 		const rows = tallyResults([
 			played([1, 2], [3, 4], 80, 40, { surrogates: [1] }),
