@@ -172,6 +172,7 @@ describe('redis workspace store', () => {
 				(await redis.mget(...keys)).map((raw) => (typeof raw === 'string' ? JSON.parse(raw) : raw)),
 			set: redis.set.bind(redis),
 			incr: redis.incr.bind(redis),
+			decr: redis.decr.bind(redis),
 			expire: redis.expire.bind(redis)
 		};
 		const other = createRedisStore(decoded, { now: () => time });

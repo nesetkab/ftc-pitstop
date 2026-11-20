@@ -1,8 +1,12 @@
 import { createHash } from 'node:crypto';
-import type { CspDirectives } from '@sveltejs/kit';
+import type { Config } from '@sveltejs/kit/vite';
 
-export function inlineScriptHashes(html: string): string[] {
-	const hashes: string[] = [];
+type CspDirectives = NonNullable<NonNullable<Config['csp']>['directives']>;
+
+type ScriptHash = `sha256-${string}`;
+
+export function inlineScriptHashes(html: string): ScriptHash[] {
+	const hashes: ScriptHash[] = [];
 	for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
 		const [, attributes, body] = match;
 		if (/\bsrc\s*=/i.test(attributes) || body.trim() === '') continue;

@@ -137,15 +137,13 @@ describe('content security policy', () => {
 });
 
 describe('server errors', () => {
-	function fail(error: unknown, status = 500) {
+	function fail(input: { kind: string; error: unknown }) {
 		const logs: string[] = [];
 		vi.spyOn(console, 'error').mockImplementation((...args: unknown[]) => {
 			logs.push(args.map(String).join(' '));
 		});
 		const result = handleError({
-			error,
-			status,
-			message: 'x',
+			...input,
 			event: {
 				request: new Request('http://localhost/api/workspace/QWERTY'),
 				route: { id: '/api/workspace/[code]' },
@@ -156,27 +154,37 @@ describe('server errors', () => {
 	}
 
 	it('log what happened without secrets, paths or commands', () => {
-		const { result, logs } = fail(
-			new Error(
+		const { result, logs } = fail({
+			kind: 'unknown',
+			error: new Error(
 				'Command failed: WRONGPASS AXXXredis-secret-token-5521, command was: ["GET","pitstop:ws:QWERTY:meta"]'
 			)
-		);
-		expect(result).toEqual({ message: 'Internal Error' });
+		});
+		expect(result).toBeUndefined();
 		expect(logs).toHaveLength(1);
-		expect(logs[0]).toContain('GET /api/workspace/[code] failed with 500');
+		expect(logs[0]).toContain('GET /api/workspace/[code] failed: Error Command failed');
 		for (const secret of ['AXXXredis-secret-token-5521', 'QWERTY', 'command was']) {
 			expect(logs[0]).not.toContain(secret);
 		}
 	});
 
-	it('stay quiet about pages that do not exist', () => {
-		const { result, logs } = fail(new Error('Not found: /nope'), 404);
-		expect(result).toEqual({ message: 'Not Found' });
-		expect(logs).toEqual([]);
+	it('stay quiet about errors the app raised on purpose and pages that do not exist', () => {
+		for (const input of [
+			{ kind: 'framework', error: { status: 404, message: 'Not Found' } },
+			{ kind: 'app', error: { message: 'Event not found' } },
+			{ kind: 'validation', error: { status: 400, message: 'Bad Request' } }
+		]) {
+			const { result, logs } = fail(input);
+			expect(result).toBeUndefined();
+			expect(logs).toEqual([]);
+		}
 	});
 
-	it('say nothing about the error to the visitor', () => {
-		const { result } = fail(new TypeError('secret detail F7C2A9E1-SECRET-KEY-0042'));
-		expect(JSON.stringify(result)).not.toContain('F7C2A9E1');
+	it('leave the visitor with the default message, not the detail', () => {
+		const { result } = fail({
+			kind: 'unknown',
+			error: new TypeError('secret detail F7C2A9E1-SECRET-KEY-0042')
+		});
+		expect(JSON.stringify(result ?? {})).not.toContain('F7C2A9E1');
 	});
 });
