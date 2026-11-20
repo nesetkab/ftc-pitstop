@@ -64,6 +64,9 @@
 	let tab = $state<'team' | 'matches'>('team');
 
 	const timeZone = $derived(event.timezone);
+	const alertOptions = $derived(
+		ALERT_OPTIONS.filter((option) => view.hasPlayoffs || option.key !== 'selectionStarts')
+	);
 	const next = $derived(view.next);
 	const text = $derived(next ? heroText(next, call, now, timeZone, view.delaySeconds) : null);
 	const href = (key: string) => `/events/${event.code}/matches/${key}`;
@@ -240,7 +243,7 @@
 
 			<section class="sec">
 				<h2 class="sec-title">Alerts</h2>
-				{#each ALERT_OPTIONS as option (option.key)}
+				{#each alertOptions as option (option.key)}
 					<Toggle
 						label={option.label}
 						checked={alerts[option.key] && permission === 'granted'}

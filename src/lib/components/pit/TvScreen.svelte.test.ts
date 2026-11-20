@@ -250,4 +250,24 @@ describe('PhoneScreen', () => {
 		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).toBeChecked();
 		expect(screen.getByRole('switch', { name: 'Our rank changes' })).not.toBeChecked();
 	});
+
+	it('only offers the alliance selection alert at events that have one', () => {
+		phone('default');
+		expect(screen.getByRole('switch', { name: 'Alliance selection starts' })).toBeInTheDocument();
+		cleanup();
+		const meet = fixtureBundle('USFLORM1');
+		const team = meet.rankings[0].team;
+		render(PhoneScreen, {
+			props: {
+				...props(at('Q22')),
+				view: pitView({ bundle: meet, analysis: null, queue: null, team }),
+				event: meet.event,
+				matches: meet.matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default' as const
+			}
+		});
+		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).toBeInTheDocument();
+		expect(screen.queryByRole('switch', { name: 'Alliance selection starts' })).toBeNull();
+	});
 });

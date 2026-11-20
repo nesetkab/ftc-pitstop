@@ -247,6 +247,22 @@ describe('pitView after quals', () => {
 		expect(out.standings.find((standing) => standing.seed === 5)).toMatchObject({ out: true });
 	});
 
+	it('says whose picks the available list is sorted for', () => {
+		const analysis = {
+			ratings: [],
+			forecasts: {},
+			timing: { cycleSeconds: null, delaySeconds: null, onField: null, next: null, matches: {} },
+			projections: null,
+			playoffs: [],
+			picks: { seed: 4, options: [{ team: 2844 }] }
+		} as unknown as EventAnalysis;
+		const window = selectionWindow(full)!;
+		const picking = view((window.start + window.end) / 2, analysis);
+		expect(picking.picksFor).toBe(4);
+		expect(picking.available[0].number).toBe(2844);
+		expect(view((window.start + window.end) / 2).picksFor).toBeNull();
+	});
+
 	it('stops showing the chance to win once we are out', () => {
 		const analysis = {
 			ratings: [],
@@ -290,6 +306,16 @@ describe('pitView after quals', () => {
 		expect(done.standings.find((standing) => standing.won)?.seed).toBe(2);
 		expect(done.eventAwards.length).toBeGreaterThan(10);
 		expect(done.advancesTo).toBe('USAZCMP');
+	});
+
+	it('names the event a team advances to when it is known', () => {
+		const named = {
+			...full,
+			advancement: { ...full.advancement!, advancesToName: 'Arizona Championship' }
+		};
+		expect(pitView({ bundle: named, analysis: null, queue: null, team: 26670 }).advancesTo).toBe(
+			'Arizona Championship'
+		);
 	});
 
 	it('knows when a team is not at the event', () => {

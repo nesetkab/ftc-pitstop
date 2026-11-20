@@ -164,6 +164,7 @@ const ADVANCEMENT_STATUS: Record<string, AdvancementStatus> = {
 export function mapAdvancement(raw: FtcAdvancementResponse): Advancement {
 	return {
 		advancesTo: clean(raw.advancesTo),
+		advancesToName: null,
 		slots: raw.slots ?? 0,
 		fcmpReserved: raw.fcmpReserved ?? 0,
 		teams: (raw.advancement ?? [])

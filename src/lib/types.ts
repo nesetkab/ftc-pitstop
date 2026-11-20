@@ -209,6 +209,7 @@ export interface AdvancementSlot {
 
 export interface Advancement {
 	advancesTo: string | null;
+	advancesToName: string | null;
 	slots: number;
 	fcmpReserved: number;
 	teams: AdvancementSlot[];

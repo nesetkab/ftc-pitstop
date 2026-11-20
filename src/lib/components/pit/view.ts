@@ -127,6 +127,7 @@ export interface PitView {
 	role: AllianceRole | null;
 	picking: number | null;
 	available: AvailableTeam[];
+	picksFor: number | null;
 	playoff: PlayoffView | null;
 	standings: AllianceStanding[];
 	awards: Award[];
@@ -472,13 +473,14 @@ export function pitView(input: PitInput): PitView {
 		role: membership?.role ?? null,
 		picking: bundle.phase === 'selection' ? currentPick(bundle.alliances) : null,
 		available: availableTeams(bundle, analysis, ratings, names),
+		picksFor: analysis?.picks?.options.length ? analysis.picks.seed : null,
 		playoff: playoffView(bundle, team, analysis, ours),
 		standings: standings(bundle),
 		awards: bundle.awards.filter((award) => award.team === team),
 		eventAwards: bundle.awards.filter((award) => award.team !== null),
 		advancing:
 			bundle.advancement?.teams.some((slot) => slot.team === team && !slot.declined) ?? false,
-		advancesTo: bundle.advancement?.advancesTo ?? null
+		advancesTo: bundle.advancement?.advancesToName ?? bundle.advancement?.advancesTo ?? null
 	};
 }
 

@@ -430,6 +430,14 @@ export function createLoaders(deps: LoaderDeps) {
 					)
 				: null;
 
+		const advancementList = advancement?.body ? mapAdvancement(advancement.body) : null;
+		if (advancementList?.advancesTo) {
+			const target = advancementList.advancesTo;
+			const season = await loadSeasonEvents().catch(() => null);
+			advancementList.advancesToName =
+				season?.events.find((entry) => entry.code === target)?.name ?? null;
+		}
+
 		const parts = [
 			teams,
 			qualSchedule,
@@ -459,7 +467,7 @@ export function createLoaders(deps: LoaderDeps) {
 			rankings: rankings.body ? mapRankings(rankings.body) : [],
 			alliances: allianceList,
 			awards: awardList,
-			advancement: advancement?.body ? mapAdvancement(advancement.body) : null,
+			advancement: advancementList,
 			phase,
 			fetchedAt: live.length > 0 ? Math.min(...live) : eventValue.fetchedAt,
 			stale: eventValue.stale || parts.some((part) => part.stale) || Boolean(advancement?.stale),

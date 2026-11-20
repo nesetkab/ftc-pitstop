@@ -71,8 +71,8 @@
 	}
 
 	.stale {
-		background: var(--accent);
-		color: var(--on-accent);
+		background: var(--text);
+		color: var(--bg);
 		font-weight: 500;
 	}
 
@@ -91,7 +91,8 @@
 	}
 
 	.dot.retrying {
-		background: var(--accent);
+		background: transparent;
+		box-shadow: inset 0 0 0 0.14em var(--text-2);
 	}
 
 	.dot.offline {
@@ -99,7 +100,8 @@
 	}
 
 	.stale .dot {
-		background: var(--on-accent);
+		background: var(--bg);
+		box-shadow: none;
 	}
 
 	.space {

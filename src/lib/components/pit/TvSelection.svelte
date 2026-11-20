@@ -74,7 +74,9 @@
 		{/if}
 	</section>
 	<section>
-		<span class="tv-label">Available teams</span>
+		<span class="tv-label">
+			{view.picksFor === null ? 'Available teams' : `Best picks for alliance ${view.picksFor}`}
+		</span>
 		<table class="available">
 			<caption class="visually-hidden">Available teams</caption>
 			<thead>

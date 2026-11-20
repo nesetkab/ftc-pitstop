@@ -305,6 +305,7 @@ describe('FTC mapper details', () => {
 		expect(mapAwards(data.awards)).toEqual([]);
 		expect(mapAdvancement(data.advancement)).toEqual({
 			advancesTo: 'USMTCMP',
+			advancesToName: null,
 			slots: 0,
 			fcmpReserved: 0,
 			teams: []

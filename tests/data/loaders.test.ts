@@ -51,7 +51,10 @@ const paths = (calls: { url: string }[]) =>
 
 describe('loadEventBundle', () => {
 	it('builds the full bundle for a finished event', async () => {
-		const data = setup({ now: '2026-11-19T12:00:00Z' });
+		const data = setup({
+			now: '2026-11-19T12:00:00Z',
+			scout: { EventsSearch: scoutSeasonList('USAZGIQ', 'USAZCMP') }
+		});
 		const bundle = await data.loadEventBundle('usazgiq');
 		expect(bundle.event.code).toBe('USAZGIQ');
 		expect(bundle).toMatchObject({
@@ -66,7 +69,11 @@ describe('loadEventBundle', () => {
 		expect(bundle.rankings[0]).toMatchObject({ rank: 1, team: 26670 });
 		expect(bundle.alliances).toHaveLength(6);
 		expect(bundle.awards.length).toBeGreaterThan(10);
-		expect(bundle.advancement).toMatchObject({ advancesTo: 'USAZCMP', slots: 5 });
+		expect(bundle.advancement).toMatchObject({
+			advancesTo: 'USAZCMP',
+			advancesToName: 'Event USAZCMP',
+			slots: 5
+		});
 		expect(bundle.fetchedAt).toBe(Date.parse('2026-11-19T12:00:00Z'));
 		const before = data.ftcCalls.length;
 		await data.loadEventBundle('USAZGIQ');
