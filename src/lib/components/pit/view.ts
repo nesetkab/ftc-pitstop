@@ -328,10 +328,17 @@ function playoffView(
 		(award) => award.id === WINNER_AWARD_ID && award.team === team
 	);
 	const finalMatch = [...playoffs].reverse().find((match) => match.result);
-	const wonFinal =
-		decided && finalMatch !== undefined && sideOf(finalMatch, team) === finalMatch.result?.winner;
+	const teams = membership ? allianceTeams(membership.alliance) : [team];
+	const finalSide =
+		decided && finalMatch
+			? (teams.map((number) => sideOf(finalMatch, number)).find((side) => side !== null) ?? null)
+			: null;
+	const wonFinal = finalSide !== null && finalSide === finalMatch?.result?.winner;
 	const won = winnerAward || wonFinal;
 	const eliminated = !won && (losses >= 2 || decided);
+	const finalistAward = bundle.awards.some(
+		(award) => award.id === FINALIST_AWARD_ID && award.team === team
+	);
 	const next = matches.find((match) => match.outcome === null);
 	const nextMatch = next && playoffs.find((match) => match.key === next.key);
 	const lastMatch = [...matches].reverse().find((match) => match.outcome !== null);
@@ -348,8 +355,11 @@ function playoffView(
 		state,
 		position,
 		matches,
-		winEvent: analysis?.playoffs?.find((odds) => odds.seed === seed)?.winEvent ?? null,
-		finalist: bundle.awards.some((award) => award.id === FINALIST_AWARD_ID && award.team === team)
+		winEvent:
+			state === 'alive' || state === 'waiting'
+				? (analysis?.playoffs?.find((odds) => odds.seed === seed)?.winEvent ?? null)
+				: null,
+		finalist: finalistAward || (!won && finalSide !== null)
 	};
 }
 

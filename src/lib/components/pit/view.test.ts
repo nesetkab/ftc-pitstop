@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
-import { heroText, matchItems } from './copy.ts';
+import { heroText, matchItems, playoffResult } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { bundleSignature, pitView, rankWindow } from './view.ts';
@@ -230,6 +230,30 @@ describe('pitView after quals', () => {
 			position: 'Out after M5'
 		});
 		expect(out.standings.find((standing) => standing.seed === 5)).toMatchObject({ out: true });
+	});
+
+	it('stops showing the chance to win once we are out', () => {
+		const analysis = {
+			ratings: [],
+			forecasts: {},
+			timing: { cycleSeconds: null, delaySeconds: null, onField: null, next: null, matches: {} },
+			projections: null,
+			playoffs: [{ seed: 5, teams: [TEAM, 2844], strength: 0, winEvent: 0.004 }],
+			picks: null
+		} as unknown as EventAnalysis;
+		expect(view(at('M1'), analysis).playoff?.winEvent).toBe(0.004);
+		expect(view(at('M5'), analysis).playoff?.winEvent).toBeNull();
+	});
+
+	it('calls the losing finalist a finalist before awards are posted', () => {
+		const final = replayBundle(full, at('M10'));
+		expect(final.awards).toEqual([]);
+		const runnerUp = pitView({ bundle: final, analysis: null, queue: null, team: 26670 });
+		expect(runnerUp.playoff).toMatchObject({ state: 'eliminated', finalist: true });
+		expect(playoffResult(runnerUp)).toBe('Finalist');
+		const winner = pitView({ bundle: final, analysis: null, queue: null, team: 25620 });
+		expect(playoffResult(winner)).toBe('Won the event');
+		expect(view(at('M10')).playoff?.finalist).toBe(false);
 	});
 
 	it('ends with the final standings and awards', () => {
