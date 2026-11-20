@@ -90,12 +90,14 @@ export function createRedisStore(
 			const meta = parseMeta(rawMeta);
 			if (!meta) return null;
 			const snapshot: Snapshot = { meta, docs: {} };
+			const matched: DocName[] = [];
 			names.forEach((name, index) => {
 				const stamped = parseStamped(name, rawDocs[index]);
-				if (!stamped || loadOptions.known?.[name] === stamped.updatedAt) return;
-				putDoc(snapshot.docs, name, stamped);
+				if (!stamped) return;
+				if (loadOptions.known?.[name] === stamped.updatedAt) matched.push(name);
+				else putDoc(snapshot.docs, name, stamped);
 			});
-			return snapshot;
+			return { ...snapshot, matched };
 		},
 
 		async write<K extends DocName>(

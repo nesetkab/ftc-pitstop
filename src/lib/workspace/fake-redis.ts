@@ -57,6 +57,13 @@ export function createFakeRedis(now: () => number = Date.now): FakeRedis {
 			data.set(key, { value: String(next), expiresAt: entry?.expiresAt ?? null });
 			return next;
 		},
+		async decr(key) {
+			this.calls.push('decr');
+			const entry = live(key);
+			const next = Number(entry?.value ?? 0) - 1;
+			data.set(key, { value: String(next), expiresAt: entry?.expiresAt ?? null });
+			return next;
+		},
 		async expire(key, seconds) {
 			this.calls.push('expire');
 			const entry = live(key);

@@ -1,11 +1,13 @@
 export interface LimiterRedis {
 	get(key: string): Promise<unknown>;
 	incr(key: string): Promise<number>;
+	decr(key: string): Promise<number>;
 	expire(key: string, seconds: number): Promise<unknown>;
 }
 
 export interface Limiter {
 	allow(name: string, limit: number, windowSeconds: number): Promise<boolean>;
+	release(name: string, windowSeconds: number): Promise<void>;
 	used(name: string, windowSeconds: number): Promise<number>;
 }
 
@@ -26,6 +28,9 @@ export function createLimiter(redis: LimiterRedis, options: LimiterOptions = {})
 			const count = await redis.incr(key);
 			if (count === 1) await redis.expire(key, windowSeconds * 2);
 			return count <= limit;
+		},
+		async release(name, windowSeconds) {
+			await redis.decr(bucket(name, windowSeconds));
 		},
 		async used(name, windowSeconds) {
 			const value = Number(await redis.get(bucket(name, windowSeconds)));

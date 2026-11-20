@@ -13,7 +13,16 @@ export type WriteResult<K extends DocName> =
 	{ ok: true; stamped: Stamped<DocMap[K]> } | { ok: false; current: Stamped<DocMap[K]> };
 
 export type WorkspaceErrorCode =
-	'not-found' | 'invalid' | 'too-large' | 'rate-limited' | 'unavailable' | 'storage';
+	| 'not-found'
+	| 'invalid'
+	| 'too-large'
+	| 'rate-limited'
+	| 'unavailable'
+	| 'storage'
+	| 'unsupported'
+	| 'forbidden';
+
+export type LoadedSnapshot = Snapshot & { matched?: readonly DocName[] };
 
 export class WorkspaceError extends Error {
 	readonly code: WorkspaceErrorCode;
@@ -28,7 +37,7 @@ export class WorkspaceError extends Error {
 export interface WorkspaceStore {
 	readonly kind: WorkspaceKind;
 	create(input: { teamNumber: number | null }): Promise<WorkspaceMeta>;
-	load(code: string, options?: LoadOptions): Promise<Snapshot | null>;
+	load(code: string, options?: LoadOptions): Promise<LoadedSnapshot | null>;
 	write<K extends DocName>(
 		code: string,
 		doc: K,

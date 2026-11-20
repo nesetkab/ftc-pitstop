@@ -1,3 +1,4 @@
+import { clientKey } from '#lib/server/client-address.ts';
 import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
 import { getRedis } from '#lib/server/redis.ts';
 import { createWorkspaceApi, type WorkspaceApi } from '#lib/workspace/api.ts';
@@ -24,8 +25,8 @@ export function notShared(): Response {
 
 export function clientAddress(getClientAddress: () => string): string {
 	try {
-		return getClientAddress();
+		return clientKey(getClientAddress());
 	} catch {
-		return 'unknown';
+		return clientKey(null);
 	}
 }
