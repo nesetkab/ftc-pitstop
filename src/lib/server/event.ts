@@ -365,7 +365,11 @@ export function createLoaders(deps: LoaderDeps) {
 		const quals = qualSchedule.body?.schedule ?? [];
 		const playoffs = playoffSchedule.body?.schedule ?? [];
 		const anyQualPlayed = quals.some(played);
-		const allQualsPlayed = quals.length > 0 && quals.every(played);
+		const lastQual = quals.reduce<FtcScheduleMatch | null>(
+			(latest, match) => (!latest || match.matchNumber > latest.matchNumber ? match : latest),
+			null
+		);
+		const allQualsPlayed = lastQual !== null && played(lastQual);
 		const anyPlayoffPlayed = playoffs.some(played);
 		const finished = tier === 'finished';
 		const started = anyQualPlayed || anyPlayoffPlayed;

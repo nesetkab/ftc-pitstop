@@ -141,6 +141,25 @@ describe('loadEventBundle', () => {
 		expect(awarded.cacheControl).toBe('public, s-maxage=300, stale-while-revalidate=3600');
 	});
 
+	it('shows alliance selection even when one earlier qual never got a score', async () => {
+		const base = fixtureFetch().fetch;
+		const ftcFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+			const url = String(input);
+			if (url.includes('/schedule/USAZGIQ/playoff')) return Response.json({ schedule: [] });
+			const response = await base(input, init);
+			if (!url.includes('/schedule/USAZGIQ/qual')) return response;
+			const body = (await response.json()) as { schedule: Record<string, unknown>[] };
+			body.schedule = body.schedule.map((match) =>
+				match.matchNumber === 20 ? { ...match, scoreRedFinal: null, scoreBlueFinal: null } : match
+			);
+			return Response.json(body);
+		}) as typeof fetch;
+		const data = setup({ now: '2026-11-14T22:30:00Z', ftcFetch });
+		const bundle = await data.loadEventBundle('USAZGIQ');
+		expect(bundle.alliances).toHaveLength(6);
+		expect(bundle.phase).not.toBe('quals');
+	});
+
 	it('reports a missing event as not found', async () => {
 		const data = setup({ now: '2026-11-19T12:00:00Z' });
 		await expect(data.loadEventBundle('NOPE123')).rejects.toMatchObject({
