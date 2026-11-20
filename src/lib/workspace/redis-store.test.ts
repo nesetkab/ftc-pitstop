@@ -201,4 +201,15 @@ describe('rate limiter', () => {
 		time += 130_000;
 		expect(redis.keys()).toEqual([]);
 	});
+
+	it('refunds a slot without leaving a key that never expires', async () => {
+		const limiter = createLimiter(redis, { now: () => time });
+		await limiter.allow('key', 1, 60);
+		await limiter.release('key', 60);
+		expect(await limiter.allow('key', 1, 60)).toBe(true);
+		time += 61_000;
+		await limiter.release('key', 60);
+		time += 130_000;
+		expect(redis.keys()).toEqual([]);
+	});
 });

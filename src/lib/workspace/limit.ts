@@ -30,7 +30,8 @@ export function createLimiter(redis: LimiterRedis, options: LimiterOptions = {})
 			return count <= limit;
 		},
 		async release(name, windowSeconds) {
-			await redis.decr(bucket(name, windowSeconds));
+			const key = bucket(name, windowSeconds);
+			if ((await redis.decr(key)) < 0) await redis.expire(key, windowSeconds * 2);
 		},
 		async used(name, windowSeconds) {
 			const value = Number(await redis.get(bucket(name, windowSeconds)));
