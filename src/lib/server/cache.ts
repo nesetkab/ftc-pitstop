@@ -182,12 +182,15 @@ export function createCache(options: CacheOptions = {}) {
 		const run = fetcher as Fetcher<unknown>;
 		if (entry) {
 			const seconds = age(entry);
-			const failed = (failures.get(key) ?? 0) > entry.fetchedAt;
+			const failedAt = failures.get(key) ?? 0;
+			const failed = failedAt > entry.fetchedAt;
 			if (seconds < policy.ttl) return { ...(entry as CacheEntry<T>), stale: false };
 			if (seconds < policy.ttl + policy.maxStale) {
-				background(
-					refresh(key, policy, run, checkStore).catch((error: unknown) => onError(key, error))
-				);
+				if (!failed || now() - failedAt >= policy.ttl * 1000) {
+					background(
+						refresh(key, policy, run, checkStore).catch((error: unknown) => onError(key, error))
+					);
+				}
 				return { ...(entry as CacheEntry<T>), stale: failed };
 			}
 		}
