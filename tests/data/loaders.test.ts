@@ -177,6 +177,27 @@ describe('loadEventBundle', () => {
 		expect(bundle.matches[0].scheduledTime).toBe(ftc.matches[0].scheduledTime);
 	});
 
+	it('falls back to FTCScout when the schedule fails on a cold server', async () => {
+		const data = setup({
+			now: '2026-11-14T20:00:00Z',
+			failPaths: /schedule\//,
+			scout: { EventByCode: 'event-USAZGIQ' }
+		});
+		const bundle = await data.loadEventBundle('USAZGIQ');
+		expect(bundle).toMatchObject({ source: 'ftcscout', stale: true });
+		expect(bundle.matches).toHaveLength(44);
+		expect(bundle.phase).not.toBe('upcoming');
+	});
+
+	it('keeps the FTC bundle when FTCScout cannot stand in for a failed schedule', async () => {
+		for (const scout of [{}, { EventByCode: { data: { eventByCode: null } } }]) {
+			const data = setup({ now: '2026-11-14T20:00:00Z', failPaths: /schedule\//, scout });
+			const bundle = await data.loadEventBundle('USAZGIQ');
+			expect(bundle).toMatchObject({ source: 'ftc', stale: true, matches: [] });
+			expect((await data.loadEventBundle('USAZGIQ')).event.code).toBe('USAZGIQ');
+		}
+	});
+
 	it('falls back to FTCScout when credentials are missing', async () => {
 		const data = setup({
 			now: '2026-11-19T12:00:00Z',

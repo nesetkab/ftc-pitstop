@@ -276,7 +276,7 @@ export function createLoaders(deps: LoaderDeps) {
 		return raw ? eventTier(mapEvent(raw), time) : 'live';
 	}
 
-	async function scoutBundle(code: string, time: number): Promise<LoadedBundle> {
+	async function scoutBundle(code: string, time: number, required = true): Promise<LoadedBundle> {
 		let value: CachedValue<Awaited<ReturnType<typeof fetchEventByCode>>>;
 		try {
 			value = await cache.get(
@@ -291,6 +291,7 @@ export function createLoaders(deps: LoaderDeps) {
 			throw unavailable('Event data is unavailable right now');
 		}
 		const data = value.body;
+		if (!data && !required) throw unavailable('Event data is unavailable right now');
 		if (!data) {
 			rememberMiss(`event:${code}`);
 			throw notFound('Event not found');
@@ -355,6 +356,11 @@ export function createLoaders(deps: LoaderDeps) {
 			settle(ftcPart('schedule', ftcPaths.schedule(code, 'qual'), policy('scheduleQual'))),
 			settle(ftcPart('schedule', ftcPaths.schedule(code, 'playoff'), policy('schedulePlayoff')))
 		]);
+
+		if (qualSchedule.body === null) {
+			const fallback = await scoutBundle(code, time, false).catch(() => null);
+			if (fallback) return fallback;
+		}
 
 		const quals = qualSchedule.body?.schedule ?? [];
 		const playoffs = playoffSchedule.body?.schedule ?? [];
