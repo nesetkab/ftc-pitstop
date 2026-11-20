@@ -1,6 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { loadEventAnalysis } from '#lib/server/analysis.ts';
 import { DataError, loadEventBundle } from '#lib/server/event.ts';
+import { parseEventCode } from '#lib/workspace/code.ts';
 import type { LayoutServerLoad } from './$types';
 
 function failure(cause: unknown): never {
@@ -11,9 +12,12 @@ function failure(cause: unknown): never {
 
 export const load: LayoutServerLoad = async ({ params, depends, url, untrack }) => {
 	depends('event:live');
-	const code = params.code.toUpperCase();
+	const code = parseEventCode(params.code);
+	if (!code) error(404, 'Event not found');
 	if (code !== params.code) {
-		const target = untrack(() => url.pathname.replace(params.code, code) + url.search);
+		const target = untrack(
+			() => url.pathname.replace(/^\/events\/[^/]+/, `/events/${code}`) + url.search
+		);
 		redirect(308, target);
 	}
 	const [bundle, analysis] = await Promise.all([

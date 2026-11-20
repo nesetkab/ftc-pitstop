@@ -14,6 +14,7 @@ import { DataError, describeError, unavailable } from '#lib/server/errors.ts';
 import {
 	eventTier,
 	loaders as defaultLoaders,
+	normalizeEventCode,
 	normalizeTeamNumber,
 	type EventTier,
 	type Loaders
@@ -138,10 +139,11 @@ export function createAnalysis(deps: AnalysisDeps) {
 	async function loadEventAnalysisEntry(
 		input: string
 	): Promise<{ analysis: EventAnalysis; cacheControl: string }> {
+		const code = normalizeEventCode(input);
 		const model = loadSeasonModel();
 		model.catch(() => undefined);
 		const deadline = pending ? Math.max(now(), pendingSince + budget) : now() + budget;
-		const { cacheControl, ...bundle } = await loaders.loadEventBundle(input);
+		const { cacheControl, ...bundle } = await loaders.loadEventBundle(code);
 		const teams = teamsOf(bundle);
 		const day = dayNumber(bundle.event.start);
 		const policy = analysisPolicy(eventTier(bundle.event, now()), bundle.phase);

@@ -5,7 +5,7 @@ import { createLoaders, eventTier, policyFor } from '#lib/server/event.ts';
 import { createFtcClient } from '#lib/server/ftc/client.ts';
 import { createFtcScoutClient } from '#lib/server/ftcscout.ts';
 import { createNexusClient } from '#lib/server/nexus.ts';
-import { fixtureFetch, scoutFetch, scoutFixture } from './helpers.ts';
+import { fixture, fixtureFetch, scoutFetch, scoutFixture, scoutSeasonList } from './helpers.ts';
 
 interface Setup {
 	now: string;
@@ -74,7 +74,10 @@ describe('loadEventBundle', () => {
 	});
 
 	it('only asks for the schedule and teams before an event starts', async () => {
-		const data = setup({ now: '2026-11-19T12:00:00Z' });
+		const data = setup({
+			now: '2026-11-19T12:00:00Z',
+			scout: { EventsSearch: scoutSeasonList('USMTBUQ') }
+		});
 		const bundle = await data.loadEventBundle('USMTBUQ');
 		expect(bundle).toMatchObject({
 			phase: 'upcoming',
@@ -231,7 +234,7 @@ describe('season loaders', () => {
 		expect(season2844?.events[0].awards[0]).toMatchObject({ name: 'Inspire Award', placement: 3 });
 		expect(season2844?.previousQuickStats?.season).toBe(2025);
 		const missing = setup({ now: '2026-11-19T12:00:00Z', scout: { TeamSeason: 'team-missing' } });
-		expect(await missing.loadTeamSeason(999998)).toBeNull();
+		expect(await missing.loadTeamSeason(99998)).toBeNull();
 		await expect(missing.loadTeamSeason('abc')).rejects.toMatchObject({ status: 404 });
 	});
 
@@ -332,5 +335,135 @@ describe('loadQueueStatus', () => {
 		expect(String((nexusFetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0][0])).toBe(
 			'https://ftc.nexus/api/v1/event/2026usazgiq'
 		);
+	});
+});
+
+describe('input validation', () => {
+	it.each(['', ' ', 'A', '../etc', 'US/AZ', 'USAZ?x=1', 'USAZ#', 'US AZ!', 'a'.repeat(25), 'é1'])(
+		'refuses the event code %j before any upstream call',
+		async (code) => {
+			const data = setup({ now: '2026-11-19T12:00:00Z', nexusFetch: vi.fn() as never });
+			await expect(data.loadEventBundle(code)).rejects.toMatchObject({ status: 404 });
+			await expect(data.loadQueueStatus(code)).rejects.toMatchObject({ status: 404 });
+			expect(data.ftcCalls).toHaveLength(0);
+			expect(data.scoutCalls).toHaveLength(0);
+		}
+	);
+
+	it.each(['0', '-5', '1e3', '0x10', '12.5', '100000', '007', ' 12', '12 ', '1_000', '٣٤', ''])(
+		'refuses the team number %j before any upstream call',
+		async (number) => {
+			const data = setup({ now: '2026-11-19T12:00:00Z' });
+			await expect(data.loadTeamSeason(number)).rejects.toMatchObject({ status: 404 });
+			expect(data.ftcCalls).toHaveLength(0);
+			expect(data.scoutCalls).toHaveLength(0);
+		}
+	);
+
+	it('accepts plain team numbers in the range the FTC API knows', async () => {
+		const data = setup({ now: '2026-11-19T12:00:00Z', scout: { TeamSeason: 'team-missing' } });
+		for (const number of ['1', 2844, '99999']) {
+			expect(await data.loadTeamSeason(number)).toBeNull();
+		}
+		expect(data.scoutCalls).toHaveLength(3);
+	});
+});
+
+describe('junk event codes', () => {
+	const onDate = scoutFixture<{ data: { eventsOnDate: unknown[] } }>('events-on-2026-11-14');
+	const season = { data: { eventsSearch: onDate.data.eventsOnDate } };
+	const eventCalls = (data: ReturnType<typeof setup>, code: string) =>
+		paths(data.ftcCalls).filter((path) => path.includes(`=${code}`) || path.includes(`/${code}`));
+
+	it('are answered from the season list without calling the FTC API', async () => {
+		const data = setup({ now: '2026-11-19T12:00:00Z', scout: { EventsSearch: season } });
+		for (let i = 0; i < 25; i++) {
+			await expect(data.loadEventBundle(`JUNK${i}`)).rejects.toMatchObject({
+				status: 404,
+				message: 'Event not found'
+			});
+		}
+		expect(paths(data.ftcCalls).filter((path) => path.includes('JUNK'))).toEqual([]);
+		expect(paths(data.ftcCalls).length).toBeLessThanOrEqual(1);
+		expect(data.scoutCalls.filter((body) => body.operationName === 'EventsSearch')).toHaveLength(
+			1
+		);
+	});
+
+	it('never reach Nexus', async () => {
+		const nexusFetch = vi.fn(async () => new Response('{}', { status: 404 })) as never;
+		const data = setup({
+			now: '2026-11-19T12:00:00Z',
+			scout: { EventsSearch: season },
+			nexusFetch
+		});
+		await expect(data.loadQueueStatus('JUNK1')).rejects.toMatchObject({ status: 404 });
+		expect(nexusFetch).not.toHaveBeenCalled();
+		expect(await data.loadQueueStatus('USAZGIQ')).toBeNull();
+		expect(nexusFetch).toHaveBeenCalledTimes(1);
+	});
+
+	it('let events through that only the FTC list knows about', async () => {
+		const list = Response.json(fixture('USAZGIQ', 'event'));
+		const base = fixtureFetch().fetch;
+		const ftcFetch = (async (input: RequestInfo | URL, init?: RequestInit) =>
+			String(input).endsWith('/events') ? list.clone() : base(input, init)) as typeof fetch;
+		const other = scoutSeasonList('OTHER1');
+		const data = setup({ now: '2026-11-19T12:00:00Z', scout: { EventsSearch: other }, ftcFetch });
+		expect((await data.loadEventBundle('usazgiq')).event.code).toBe('USAZGIQ');
+		await expect(data.loadEventBundle('JUNK1')).rejects.toMatchObject({ status: 404 });
+	});
+
+	it('are remembered for a few minutes when the lists are unavailable', async () => {
+		const data = setup({ now: '2026-11-19T12:00:00Z' });
+		for (let round = 0; round < 3; round++) {
+			await expect(data.loadEventBundle('NOPE123')).rejects.toMatchObject({ status: 404 });
+		}
+		expect(eventCalls(data, 'NOPE123')).toHaveLength(1);
+		data.advance(301);
+		await expect(data.loadEventBundle('NOPE123')).rejects.toMatchObject({ status: 404 });
+		expect(eventCalls(data, 'NOPE123')).toHaveLength(2);
+	});
+
+	it('do not make the loader hammer the lists while they are down', async () => {
+		const data = setup({ now: '2026-11-19T12:00:00Z' });
+		for (let i = 0; i < 12; i++) {
+			await expect(data.loadEventBundle(`NOPE${i}`)).rejects.toMatchObject({ status: 404 });
+		}
+		const lists = data.scoutCalls.filter((body) => body.operationName === 'EventsSearch');
+		expect(lists.length).toBeLessThanOrEqual(2);
+		expect(paths(data.ftcCalls).filter((path) => path === 'events')).toHaveLength(1);
+		data.advance(31);
+		await expect(data.loadEventBundle('NOPEX')).rejects.toMatchObject({ status: 404 });
+		expect(paths(data.ftcCalls).filter((path) => path === 'events')).toHaveLength(2);
+	});
+});
+
+describe('junk team numbers', () => {
+	it('ask upstream once, then are remembered briefly', async () => {
+		const data = setup({ now: '2026-11-19T12:00:00Z', scout: { TeamSeason: 'team-missing' } });
+		for (let round = 0; round < 4; round++) expect(await data.loadTeamSeason(54321)).toBeNull();
+		expect(data.scoutCalls).toHaveLength(1);
+		expect(data.ftcCalls).toHaveLength(0);
+		data.advance(301);
+		expect(await data.loadTeamSeason(54321)).toBeNull();
+		expect(data.scoutCalls).toHaveLength(2);
+	});
+
+	it('do not fill the shared cache', async () => {
+		const redis = new Map<string, string>();
+		const store = {
+			get: async (key: string) => (redis.has(key) ? JSON.parse(redis.get(key) as string) : null),
+			set: async (key: string, entry: unknown) => void redis.set(key, JSON.stringify(entry))
+		};
+		const scout = scoutFetch({ TeamSeason: 'team-missing' });
+		const loaders = createLoaders({
+			ftc: createFtcClient({ username: 'u', apiKey: 'k', fetch: fixtureFetch().fetch }),
+			scout: createFtcScoutClient({ fetch: scout.fetch, sleep: async () => {} }),
+			nexus: createNexusClient(),
+			cache: createCache({ store, onError: () => {} })
+		});
+		for (let number = 50000; number < 50040; number++) await loaders.loadTeamSeason(number);
+		expect(redis.size).toBe(0);
 	});
 });

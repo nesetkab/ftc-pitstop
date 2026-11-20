@@ -103,4 +103,18 @@ export function scoutFetch(responses: Record<string, string | object>): FixtureF
 	return { fetch: fetcher as typeof fetch, calls, bodies };
 }
 
+export function scoutSeasonList(...codes: string[]) {
+	return {
+		data: {
+			eventsSearch: codes.map((code) => ({
+				code,
+				name: `Event ${code}`,
+				type: 'Qualifier',
+				start: '2026-11-14',
+				end: '2026-11-14'
+			}))
+		}
+	};
+}
+
 export const instant = (iso: string) => Date.parse(iso);
