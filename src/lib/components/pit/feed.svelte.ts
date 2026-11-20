@@ -100,6 +100,9 @@ export class PitFeed {
 				this.bundle ??= bundle;
 				throw new Error('Served from the offline cache');
 			}
+			if (this.bundle && this.bundle.matches.length > 0 && bundle.matches.length === 0) {
+				throw new Error('Event data lost its matches');
+			}
 			this.bundle = bundle;
 			this.updatedAt = this.#now();
 			this.failures = 0;
