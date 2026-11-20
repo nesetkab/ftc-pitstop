@@ -61,6 +61,8 @@
 					</li>
 				{/each}
 			</ul>
+		{:else if !view.hasPlayoffs}
+			<p class="sub">League meets don't give awards.</p>
 		{:else}
 			<p class="sub">Awards haven't been posted yet.</p>
 		{/if}

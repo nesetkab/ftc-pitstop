@@ -178,6 +178,17 @@ export function lastResultItem(result: LastResult): MatchListItem {
 	};
 }
 
+export function qualsDoneText(view: PitView): { headline: string; detail: string } {
+	const scheduled = view.matches.some((match) => match.level === 'qual');
+	const posted = `${view.qualsPlayed} of ${view.qualsTotal} qualification matches are posted.`;
+	return {
+		headline: scheduled
+			? 'Our qualification matches are done.'
+			: `No qualification matches for ${view.team}.`,
+		detail: view.hasPlayoffs ? `${posted} Alliance selection comes next.` : posted
+	};
+}
+
 export function roleText(view: PitView): string {
 	const seed = view.alliance?.seed;
 	if (view.role === 'captain') return `Captain of alliance ${seed}`;

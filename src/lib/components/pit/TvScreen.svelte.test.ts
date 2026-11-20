@@ -6,7 +6,7 @@ import PhoneScreen from './PhoneScreen.svelte';
 import { DEFAULT_ALERTS } from './alerts.ts';
 import { queueCall } from './queue.ts';
 import TvScreen from './TvScreen.svelte';
-import { pitView } from './view.ts';
+import { pitView, sideOf } from './view.ts';
 
 const TEAM = 14624;
 const full = fixtureBundle('USAZGIQ');
@@ -133,6 +133,29 @@ describe('TvScreen', () => {
 		expect(content).toContain('Final rankings');
 	});
 
+	it('does not promise alliance selection or awards at a league meet', () => {
+		const meet = fixtureBundle('USFLORM1');
+		const quals = meet.matches.filter((item) => item.level === 'qual');
+		const team = meet.rankings.find((row) => {
+			const ours = quals.filter((item) => sideOf(item, row.team) !== null);
+			return ours.length > 0 && ours.at(-1)!.key !== quals.at(-1)!.key;
+		})!.team;
+		const last = quals.filter((item) => sideOf(item, team) !== null).at(-1)!;
+		const time = replayStart(last.label, meet)!;
+		const during = pitView({ bundle: replayBundle(meet, time), analysis: null, queue: null, team });
+		const { container } = render(TvScreen, {
+			props: { ...props(time), view: during, event: meet.event }
+		});
+		expect(text(container)).toContain('Our qualification matches are done.');
+		expect(text(container)).not.toContain('Alliance selection');
+		cleanup();
+		const done = pitView({ bundle: meet, analysis: null, queue: null, team });
+		const after = render(TvScreen, { props: { ...props(time), view: done, event: meet.event } });
+		expect(done.phase).toBe('done');
+		expect(text(after.container)).toContain("League meets don't give awards.");
+		expect(text(after.container)).not.toContain("Awards haven't been posted yet.");
+	});
+
 	it('says when the team is not at the event', () => {
 		const bundle = replayBundle(full, at('Q22'));
 		const view = pitView({ bundle, analysis: null, queue: null, team: 99999 });
@@ -166,6 +189,28 @@ describe('PhoneScreen', () => {
 		expect(facts).toEqual(['Rank', '8 of 27', 'Record', '3-0-0', 'Ranking score', '3.33']);
 		expect(screen.getByRole('link', { name: 'Event' })).toHaveAttribute('href', '/events/USAZGIQ');
 		expect(screen.getByRole('link', { name: 'Tools' })).toHaveAttribute('href', '/w');
+	});
+
+	it('says our qualification matches are done while others still play', () => {
+		const time = at('Q31');
+		const base = props(time);
+		expect(base.view.phase).toBe('quals');
+		expect(base.view.next).toBeNull();
+		const { container } = render(PhoneScreen, {
+			props: {
+				...base,
+				matches: replayBundle(full, time).matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default' as const
+			}
+		});
+		const content = text(container);
+		expect(content).toContain('Our qualification matches are done.');
+		expect(content).toContain(
+			'31 of 34 qualification matches are posted. Alliance selection comes next.'
+		);
+		expect(content).not.toContain('Playoffs');
+		expect(content).not.toContain('Waiting for the next match');
 	});
 
 	it('shows alerts as on only once notifications are allowed', () => {

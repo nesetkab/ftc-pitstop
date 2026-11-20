@@ -21,6 +21,7 @@
 		matchItem,
 		phoneDetail,
 		playoffResult,
+		qualsDoneText,
 		roleText
 	} from './copy.ts';
 	import type { Permission } from './notify.svelte.ts';
@@ -95,6 +96,7 @@
 	});
 	const from = $derived(source === 'ftc' ? 'FTC Events' : 'FTCScout');
 	const result = $derived(playoffResult(view));
+	const qualsDone = $derived(qualsDoneText(view));
 	const blocked = $derived(permission === 'denied' || permission === 'unsupported');
 </script>
 
@@ -158,6 +160,12 @@
 						This page fills in on its own once it is.
 					</EmptyState>
 				{/if}
+			{:else if view.phase === 'quals'}
+				<section class="next">
+					<span class="muted">Next match</span>
+					<span class="big">{qualsDone.headline}</span>
+					<span class="muted">{qualsDone.detail}</span>
+				</section>
 			{:else if view.phase === 'selection'}
 				<section class="next">
 					<span class="muted">Alliance selection</span>

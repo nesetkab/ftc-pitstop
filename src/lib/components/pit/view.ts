@@ -5,6 +5,7 @@ import type {
 	TeamRating
 } from '#lib/analysis/types.ts';
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
+import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';
 import { QUEUE_EARLIEST } from './queue.ts';
 import type {
@@ -106,6 +107,7 @@ export interface PitView {
 	team: number;
 	teamName: string | null;
 	phase: EventPhase;
+	hasPlayoffs: boolean;
 	registered: boolean;
 	names: Map<number, string>;
 	rankings: Ranking[];
@@ -447,6 +449,7 @@ export function pitView(input: PitInput): PitView {
 		team,
 		teamName: names.get(team) ?? null,
 		phase: bundle.phase,
+		hasPlayoffs: hasPlayoffs(bundle.event.type),
 		registered,
 		names,
 		rankings: bundle.rankings,
