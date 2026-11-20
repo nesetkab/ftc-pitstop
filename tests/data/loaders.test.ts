@@ -113,6 +113,34 @@ describe('loadEventBundle', () => {
 		expect(again.stale).toBe(false);
 	});
 
+	it('keeps live caching after the final until the winning alliance is announced', async () => {
+		let awardsPosted = false;
+		const base = fixtureFetch().fetch;
+		const ftcFetch = (async (input: RequestInfo | URL, init?: RequestInit) =>
+			String(input).includes('/awards/') && !awardsPosted
+				? Response.json({ awards: [] })
+				: base(input, init)) as typeof fetch;
+		let time = Date.parse('2026-11-15T00:20:00Z');
+		const cache = createCache({ onError: () => {}, now: () => time });
+		const loaders = createLoaders({
+			ftc: createFtcClient({ username: 'u', apiKey: 'k', fetch: ftcFetch, sleep: async () => {} }),
+			scout: createFtcScoutClient({ fetch: scoutFetch({}).fetch, sleep: async () => {} }),
+			nexus: createNexusClient(),
+			cache,
+			now: () => time
+		});
+		const final = await loaders.loadEventBundle('USAZGIQ');
+		expect(final).toMatchObject({ phase: 'done', awards: [] });
+		expect(final.cacheControl).toBe('public, s-maxage=30, stale-while-revalidate=300');
+		awardsPosted = true;
+		time += 61_000;
+		await loaders.loadEventBundle('USAZGIQ');
+		await vi.waitFor(() => expect(cache.pending()).toBe(0));
+		const awarded = await loaders.loadEventBundle('USAZGIQ');
+		expect(awarded.awards.some((award) => award.id === 13)).toBe(true);
+		expect(awarded.cacheControl).toBe('public, s-maxage=300, stale-while-revalidate=3600');
+	});
+
 	it('reports a missing event as not found', async () => {
 		const data = setup({ now: '2026-11-19T12:00:00Z' });
 		await expect(data.loadEventBundle('NOPE123')).rejects.toMatchObject({

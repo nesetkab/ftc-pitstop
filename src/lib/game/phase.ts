@@ -57,7 +57,7 @@ export function bracketDecided(playoffs: Match[], alliances: AllianceSelection[]
 	return alive === 1;
 }
 
-function lastPosted(matches: Match[]): number | null {
+export function lastPosted(matches: Match[]): number | null {
 	let latest: number | null = null;
 	for (const match of matches) {
 		const time = match.postedTime ?? match.actualTime;
