@@ -205,3 +205,25 @@ describe('legacy links', () => {
 		expect(response.headers.get('x-frame-options')).toBe('DENY');
 	});
 });
+
+describe('share previews in pages', () => {
+	it('adds preview tags to rendered HTML', async () => {
+		const response = await handle({
+			event: { url: new URL('https://www.ftcpitstop.com/events/USMTBUQ') } as never,
+			resolve: async (
+				_event: unknown,
+				options: { transformPageChunk: (input: { html: string; done: boolean }) => string }
+			) =>
+				new Response(
+					options.transformPageChunk({
+						html: '<html><head><title>Montana Qualifier</title></head><body></body></html>',
+						done: true
+					}),
+					{ headers: { 'content-type': 'text/html' } }
+				)
+		} as never);
+		const html = await response.text();
+		expect(html).toContain('https://www.ftcpitstop.com/og/events/USMTBUQ.png');
+		expect(html).toContain('<meta property="og:title" content="Montana Qualifier" />');
+	});
+});

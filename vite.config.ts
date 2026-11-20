@@ -20,6 +20,7 @@ export default defineConfig({
 			experimental: { remoteFunctions: true }
 		})
 	],
+	assetsInclude: ['**/@resvg/resvg-wasm/index_bg.wasm'],
 	test: {
 		expect: { requireAssertions: true },
 		coverage: {
