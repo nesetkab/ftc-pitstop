@@ -427,6 +427,7 @@ export function pitView(input: PitInput): PitView {
 	}
 	const membership = allianceOf(bundle.alliances, team);
 	const rating = ratings.get(team);
+	const standing = ranks.get(team);
 	const live = bundle.phase !== 'upcoming' && bundle.phase !== 'done';
 	const firstUnplayed = bundle.matches.find(isUnplayed);
 	const registered =
@@ -438,7 +439,7 @@ export function pitView(input: PitInput): PitView {
 		registered,
 		names,
 		rankings: bundle.rankings,
-		ranking: ranks.get(team) ?? null,
+		ranking: standing && standing.played > 0 ? standing : null,
 		teamCount: Math.max(bundle.teams.length, bundle.rankings.length),
 		rankedAfter: postedQuals.at(-1)?.label ?? null,
 		qualsPlayed: postedQuals.length,

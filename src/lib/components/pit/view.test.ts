@@ -186,6 +186,13 @@ describe('pitView during quals', () => {
 		expect(queueCall(next, expectedStart - 15 * 60_000)?.reason).toBe('timing');
 	});
 
+	it('does not show a rank before our first match is posted', () => {
+		const early = view(at('Q1'));
+		expect(early.rankings.find((row) => row.team === TEAM)?.played).toBe(0);
+		expect(early.ranking).toBeNull();
+		expect(view(at('Q5')).ranking).toMatchObject({ played: 1 });
+	});
+
 	it('shows the match on the field once it starts', () => {
 		const playing = view(Date.parse('2026-11-14T20:59:00Z'));
 		expect(playing.next?.key).toBe('q26');
