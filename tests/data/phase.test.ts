@@ -124,6 +124,21 @@ describe('detectPhase', () => {
 		expect(phaseAt('USCALACAS1', { now: lastPosted + 3 * HOUR })).toBe('done');
 	});
 
+	it('waits overnight for selection when quals end on the first day of a longer event', () => {
+		const data = load('USAZGIQ');
+		const quals = data.matches.filter((match) => match.level === 'qual');
+		const last = Math.max(...quals.map((match) => match.postedTime ?? 0));
+		const twoDays = { ...data.event, end: '2026-11-15' };
+		const input = { matches: quals, alliances: [], awards: [], now: last + 3 * HOUR };
+		expect(
+			detectPhase({ ...input, event: twoDays, endsAt: eventWindow(twoDays).endsAt })
+		).toBe('selection');
+		expect(
+			detectPhase({ ...input, event: twoDays, now: last + 18 * HOUR, endsAt: eventWindow(twoDays).endsAt })
+		).toBe('selection');
+		expect(detectPhase({ ...input, event: data.event, endsAt: data.endsAt })).toBe('done');
+	});
+
 	it('calls an event done once its last day is over', () => {
 		const data = load('USAZGIQ');
 		expect(phaseAt('USAZGIQ', { until: 'q10', noPlayoffs: true, now: data.endsAt! + 1 })).toBe(
