@@ -49,6 +49,16 @@ describe('estimateStarts', () => {
 		expect(minutes(late)[3]).toBe(51);
 	});
 
+	it('queues the first matches after a break near the restart, not before the break', () => {
+		const est = estimateStarts(plan([0, 6, 12, 18, 80, 86], [0, 6]), { now: 7 * MIN });
+		expect(minutes(est).slice(4)).toEqual([80, 86]);
+		expect(est[4].queue).toBe(68 * MIN);
+		expect(est[5].queue).toBe(74 * MIN);
+		expect(est[3].queue).toBe(est[1].start);
+		const overnight = estimateStarts(plan([0, 8, 16, 24, 1080, 1088], [0, 8, 16, 24]));
+		expect(overnight[4].queue).toBe(1064 * MIN);
+	});
+
 	it('never starts before now', () => {
 		const est = estimateStarts(plan([0, 7, 14, 21], [0, 7]), { now: 20 * MIN });
 		expect(minutes(est).slice(2)).toEqual([20, 27]);
