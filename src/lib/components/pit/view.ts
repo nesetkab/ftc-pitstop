@@ -398,8 +398,11 @@ export function pitView(input: PitInput): PitView {
 	const ours = bundle.matches
 		.map((match) => pitMatch(match, team, analysis))
 		.filter((match): match is PitMatch => match !== null);
+	const active = bundle.matches.findLastIndex(
+		(match) => match.actualTime !== null || match.result !== null
+	);
 	const nextIndex = bundle.matches.findIndex(
-		(match) => match.result === null && sideOf(match, team) !== null
+		(match, index) => index >= active && match.result === null && sideOf(match, team) !== null
 	);
 	let next: NextMatch | null = null;
 	if (nextIndex !== -1) {
@@ -426,7 +429,7 @@ export function pitView(input: PitInput): PitView {
 				nexusMatch?.times.estimatedOnField ??
 				timing?.expectedStart ??
 				null,
-			matchesAway: bundle.matches.slice(0, nextIndex).filter(isUnplayed).length,
+			matchesAway: bundle.matches.slice(active + 1, nextIndex).filter(isUnplayed).length,
 			nexus: {
 				tracked: nexusMatch !== null,
 				status: nowQueuing ? 'now-queuing' : (nexusMatch?.status ?? null)
@@ -437,7 +440,7 @@ export function pitView(input: PitInput): PitView {
 	const rating = ratings.get(team);
 	const standing = ranks.get(team);
 	const live = bundle.phase !== 'upcoming' && bundle.phase !== 'done';
-	const firstUnplayed = bundle.matches.find(isUnplayed);
+	const firstUnplayed = bundle.matches.find((match, index) => index > active && isUnplayed(match));
 	const registered =
 		bundle.teams.some((entry) => entry.number === team) || ours.length > 0 || ranks.has(team);
 	return {

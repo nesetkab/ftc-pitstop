@@ -186,6 +186,21 @@ describe('pitView during quals', () => {
 		expect(queueCall(next, expectedStart - 15 * 60_000)?.reason).toBe('timing');
 	});
 
+	it('skips an earlier match that is held or never scored', () => {
+		const time = at('Q22');
+		const bundle = replayBundle(full, time);
+		const held = {
+			...bundle,
+			matches: bundle.matches.map((match) =>
+				match.key === 'q14' ? { ...match, actualTime: null, postedTime: null, result: null } : match
+			)
+		};
+		const current = pitView({ bundle: held, analysis: null, queue: null, team: TEAM });
+		expect(current.next).toMatchObject({ key: 'q26', matchesAway: 3 });
+		expect(current.upNext).toBe('Q23');
+		expect(queueCall(current.next, time)).toBeNull();
+	});
+
 	it('does not show a rank before our first match is posted', () => {
 		const early = view(at('Q1'));
 		expect(early.rankings.find((row) => row.team === TEAM)?.played).toBe(0);
