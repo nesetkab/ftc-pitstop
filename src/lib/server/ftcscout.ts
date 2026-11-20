@@ -39,22 +39,46 @@ export interface FtcScoutClientOptions {
 	timeoutMs?: number;
 	retries?: number;
 	sleep?: (ms: number) => Promise<void>;
+	now?: () => number;
+	pauseMs?: number;
 }
 
 const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+const PAUSE_MS = 60_000;
+const MAX_PAUSE_DOUBLINGS = 4;
+const MAX_PAUSED_QUERIES = 500;
+
+function isTimeout(error: unknown): boolean {
+	return error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
+}
+
+function mediaType(response: Response): string {
+	return response.headers.get('content-type')?.split(';')[0].trim() || 'a response';
+}
+
+interface Payload {
+	data?: unknown;
+	errors?: unknown[];
+}
 
 export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 	const timeoutMs = options.timeoutMs ?? 15_000;
 	const retries = options.retries ?? 1;
 	const sleep = options.sleep ?? defaultSleep;
+	const now = options.now ?? Date.now;
+	const pauseMs = options.pauseMs ?? PAUSE_MS;
+	const paused = new Map<string, { failures: number; until: number }>();
 
-	async function query<S extends z.ZodType>(
-		operationName: string,
-		document: string,
-		variables: Record<string, unknown>,
-		schema: S,
-		init: { timeoutMs?: number } = {}
-	): Promise<z.output<S>> {
+	function pause(body: string) {
+		const failures = (paused.get(body)?.failures ?? 0) + 1;
+		paused.delete(body);
+		if (paused.size >= MAX_PAUSED_QUERIES) paused.delete(paused.keys().next().value!);
+		const wait = pauseMs * 2 ** Math.min(failures - 1, MAX_PAUSE_DOUBLINGS);
+		paused.set(body, { failures, until: now() + wait });
+	}
+
+	async function send(body: string, wait: number): Promise<Payload> {
 		for (let attempt = 0; ; attempt++) {
 			let response: Response;
 			try {
@@ -65,10 +89,11 @@ export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 						accept: 'application/json',
 						'user-agent': USER_AGENT
 					},
-					body: JSON.stringify({ operationName, query: document, variables }),
-					signal: AbortSignal.timeout(init.timeoutMs ?? timeoutMs)
+					body,
+					signal: AbortSignal.timeout(wait)
 				});
-			} catch {
+			} catch (error) {
+				if (isTimeout(error)) throw new FtcScoutError(504, 'FTCScout timed out');
 				if (attempt < retries) {
 					await sleep(500 * 2 ** attempt);
 					continue;
@@ -84,12 +109,39 @@ export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 				await response.body?.cancel();
 				throw new FtcScoutError(response.status, `FTCScout error ${response.status}`);
 			}
-			let payload: { data?: unknown; errors?: unknown[] };
+			let text: string;
 			try {
-				payload = await response.json();
-			} catch {
-				throw new FtcScoutError(502, 'FTCScout sent a response that is not JSON');
+				text = await response.text();
+			} catch (error) {
+				throw isTimeout(error)
+					? new FtcScoutError(504, 'FTCScout timed out')
+					: new FtcScoutError(502, 'FTCScout cut the response short');
 			}
+			let payload: unknown;
+			try {
+				payload = JSON.parse(text);
+			} catch {
+				throw new FtcScoutError(502, `FTCScout sent ${mediaType(response)} instead of JSON`);
+			}
+			if (!payload || typeof payload !== 'object') {
+				throw new FtcScoutError(502, 'FTCScout sent an empty response');
+			}
+			return payload;
+		}
+	}
+
+	async function query<S extends z.ZodType>(
+		operationName: string,
+		document: string,
+		variables: Record<string, unknown>,
+		schema: S,
+		init: { timeoutMs?: number } = {}
+	): Promise<z.output<S>> {
+		const body = JSON.stringify({ operationName, query: document, variables });
+		const pausedUntil = paused.get(body)?.until ?? 0;
+		if (now() < pausedUntil) throw new FtcScoutError(503, 'FTCScout is paused after errors');
+		try {
+			const payload = await send(body, init.timeoutMs ?? timeoutMs);
 			if (payload.errors?.length && !payload.data) {
 				throw new FtcScoutError(502, 'FTCScout rejected the query');
 			}
@@ -100,7 +152,11 @@ export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 				);
 				throw new FtcScoutError(502, 'FTCScout sent data in an unexpected shape');
 			}
+			paused.delete(body);
 			return parsed.data;
+		} catch (error) {
+			pause(body);
+			throw error;
 		}
 	}
 

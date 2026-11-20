@@ -113,6 +113,53 @@ describe('loadEventBundle', () => {
 		expect(again.stale).toBe(false);
 	});
 
+	it('keeps live caching after the final until the winning alliance is announced', async () => {
+		let awardsPosted = false;
+		const base = fixtureFetch().fetch;
+		const ftcFetch = (async (input: RequestInfo | URL, init?: RequestInit) =>
+			String(input).includes('/awards/') && !awardsPosted
+				? Response.json({ awards: [] })
+				: base(input, init)) as typeof fetch;
+		let time = Date.parse('2026-11-15T00:20:00Z');
+		const cache = createCache({ onError: () => {}, now: () => time });
+		const loaders = createLoaders({
+			ftc: createFtcClient({ username: 'u', apiKey: 'k', fetch: ftcFetch, sleep: async () => {} }),
+			scout: createFtcScoutClient({ fetch: scoutFetch({}).fetch, sleep: async () => {} }),
+			nexus: createNexusClient(),
+			cache,
+			now: () => time
+		});
+		const final = await loaders.loadEventBundle('USAZGIQ');
+		expect(final).toMatchObject({ phase: 'done', awards: [] });
+		expect(final.cacheControl).toBe('public, s-maxage=30, stale-while-revalidate=300');
+		awardsPosted = true;
+		time += 61_000;
+		await loaders.loadEventBundle('USAZGIQ');
+		await vi.waitFor(() => expect(cache.pending()).toBe(0));
+		const awarded = await loaders.loadEventBundle('USAZGIQ');
+		expect(awarded.awards.some((award) => award.id === 13)).toBe(true);
+		expect(awarded.cacheControl).toBe('public, s-maxage=300, stale-while-revalidate=3600');
+	});
+
+	it('shows alliance selection even when one earlier qual never got a score', async () => {
+		const base = fixtureFetch().fetch;
+		const ftcFetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+			const url = String(input);
+			if (url.includes('/schedule/USAZGIQ/playoff')) return Response.json({ schedule: [] });
+			const response = await base(input, init);
+			if (!url.includes('/schedule/USAZGIQ/qual')) return response;
+			const body = (await response.json()) as { schedule: Record<string, unknown>[] };
+			body.schedule = body.schedule.map((match) =>
+				match.matchNumber === 20 ? { ...match, scoreRedFinal: null, scoreBlueFinal: null } : match
+			);
+			return Response.json(body);
+		}) as typeof fetch;
+		const data = setup({ now: '2026-11-14T22:30:00Z', ftcFetch });
+		const bundle = await data.loadEventBundle('USAZGIQ');
+		expect(bundle.alliances).toHaveLength(6);
+		expect(bundle.phase).not.toBe('quals');
+	});
+
 	it('reports a missing event as not found', async () => {
 		const data = setup({ now: '2026-11-19T12:00:00Z' });
 		await expect(data.loadEventBundle('NOPE123')).rejects.toMatchObject({
@@ -147,6 +194,27 @@ describe('loadEventBundle', () => {
 			ftc.rankings.map((ranking) => [ranking.team, ranking.rs, ranking.avgAuto])
 		);
 		expect(bundle.matches[0].scheduledTime).toBe(ftc.matches[0].scheduledTime);
+	});
+
+	it('falls back to FTCScout when the schedule fails on a cold server', async () => {
+		const data = setup({
+			now: '2026-11-14T20:00:00Z',
+			failPaths: /schedule\//,
+			scout: { EventByCode: 'event-USAZGIQ' }
+		});
+		const bundle = await data.loadEventBundle('USAZGIQ');
+		expect(bundle).toMatchObject({ source: 'ftcscout', stale: true });
+		expect(bundle.matches).toHaveLength(44);
+		expect(bundle.phase).not.toBe('upcoming');
+	});
+
+	it('keeps the FTC bundle when FTCScout cannot stand in for a failed schedule', async () => {
+		for (const scout of [{}, { EventByCode: { data: { eventByCode: null } } }]) {
+			const data = setup({ now: '2026-11-14T20:00:00Z', failPaths: /schedule\//, scout });
+			const bundle = await data.loadEventBundle('USAZGIQ');
+			expect(bundle).toMatchObject({ source: 'ftc', stale: true, matches: [] });
+			expect((await data.loadEventBundle('USAZGIQ')).event.code).toBe('USAZGIQ');
+		}
 	});
 
 	it('falls back to FTCScout when credentials are missing', async () => {
@@ -301,6 +369,31 @@ describe('season loaders', () => {
 			level: 'playoff',
 			red: { total: 39, teams: [20515] }
 		});
+	});
+
+	it('asks FTCScout for a few weeks at a time instead of the whole season at once', async () => {
+		const week = scoutFixture('season-matches-2026-09-19');
+		let open = 0;
+		let most = 0;
+		const scout = vi.fn(async () => {
+			open++;
+			most = Math.max(most, open);
+			await new Promise((resolve) => setTimeout(resolve, 5));
+			open--;
+			return Response.json(week);
+		});
+		const time = Date.parse('2026-11-19T12:00:00Z');
+		const loaders = createLoaders({
+			ftc: createFtcClient({ username: 'u', apiKey: 'k', fetch: fixtureFetch().fetch }),
+			scout: createFtcScoutClient({ fetch: scout as unknown as typeof fetch }),
+			nexus: createNexusClient(),
+			cache: createCache({ onError: () => {}, now: () => time }),
+			now: () => time
+		});
+		const result = await loaders.loadSeasonMatches();
+		expect(scout).toHaveBeenCalledTimes(12);
+		expect(result.missing).toEqual([]);
+		expect(most).toBeLessThanOrEqual(3);
 	});
 });
 

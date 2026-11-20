@@ -106,12 +106,13 @@ export function estimateStarts(
 		if (i === lastPlayed + 1 && options.now !== undefined) start = Math.max(start, options.now);
 		starts.push(start);
 	}
+	const lead = queueMatches * Math.max(cycle, sched);
 	return matches.map((m, i) => {
 		const q = i - queueMatches;
 		return {
 			key: m.key,
 			start: starts[i],
-			queue: q >= 0 ? starts[q] : starts[i] - queueMatches * cycle,
+			queue: q >= 0 ? Math.max(starts[q], starts[i] - lead) : starts[i] - queueMatches * cycle,
 			delay: m.scheduled === null ? null : starts[i] - m.scheduled,
 			played: i <= lastPlayed && m.actual !== null
 		};

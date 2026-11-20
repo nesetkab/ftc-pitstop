@@ -1,5 +1,5 @@
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { detectPhase } from '#lib/game/phase.ts';
+import { detectPhase, lastPosted, WINNER_AWARD_ID } from '#lib/game/phase.ts';
 import {
 	cache as defaultCache,
 	LruMap,
@@ -42,10 +42,12 @@ import {
 import { nexus as defaultNexus, type NexusClient } from '#lib/server/nexus.ts';
 import { addDays, localDate, startOfLocalDay } from '#lib/server/time.ts';
 import type {
+	Award,
 	Event,
 	EventBundle,
 	EventPhase,
 	EventSummary,
+	Match,
 	QueueStatusSnapshot,
 	QuickStats,
 	SearchIndex,
@@ -58,6 +60,8 @@ const HOUR = 3_600_000;
 const DAY_SECONDS = 86_400;
 const MISS_MS = 5 * 60_000;
 const LIST_RETRY_MS = 30_000;
+const SEASON_WEEKS_AT_ONCE = 3;
+const AWARDS_WAIT_MS = 2 * HOUR;
 const EVENT_LIST_POLICY: CachePolicy = { ttl: 3600, maxStale: 7 * DAY_SECONDS };
 const EVENT_CODE_PATTERN = /^[A-Z0-9]{2,24}$/;
 const TEAM_NUMBER_PATTERN = /^[1-9]\d{0,4}$/;
@@ -125,6 +129,19 @@ export function policyFor(
 		return { ttl: part === 'scheduleQual' ? 600 : 1800, maxStale: DAY_SECONDS };
 	if (phase === 'done') return { ttl: 300, maxStale: DAY_SECONDS };
 	return { ttl: LIVE_TTL[part], maxStale: 300 };
+}
+
+export function cachePhase(
+	phase: EventPhase,
+	matches: Match[],
+	awards: Award[],
+	now: number,
+	endsAt: number | null
+): EventPhase {
+	if (phase !== 'done' || (endsAt !== null && now >= endsAt)) return phase;
+	if (awards.some((award) => award.id === WINNER_AWARD_ID)) return phase;
+	const last = lastPosted(matches);
+	return last !== null && now - last < AWARDS_WAIT_MS ? 'playoffs' : phase;
 }
 
 export function cacheControlFor(tier: EventTier, phase: EventPhase): string {
@@ -259,7 +276,7 @@ export function createLoaders(deps: LoaderDeps) {
 		return raw ? eventTier(mapEvent(raw), time) : 'live';
 	}
 
-	async function scoutBundle(code: string, time: number): Promise<LoadedBundle> {
+	async function scoutBundle(code: string, time: number, required = true): Promise<LoadedBundle> {
 		let value: CachedValue<Awaited<ReturnType<typeof fetchEventByCode>>>;
 		try {
 			value = await cache.get(
@@ -274,6 +291,7 @@ export function createLoaders(deps: LoaderDeps) {
 			throw unavailable('Event data is unavailable right now');
 		}
 		const data = value.body;
+		if (!data && !required) throw unavailable('Event data is unavailable right now');
 		if (!data) {
 			rememberMiss(`event:${code}`);
 			throw notFound('Event not found');
@@ -339,10 +357,19 @@ export function createLoaders(deps: LoaderDeps) {
 			settle(ftcPart('schedule', ftcPaths.schedule(code, 'playoff'), policy('schedulePlayoff')))
 		]);
 
+		if (qualSchedule.body === null) {
+			const fallback = await scoutBundle(code, time, false).catch(() => null);
+			if (fallback) return fallback;
+		}
+
 		const quals = qualSchedule.body?.schedule ?? [];
 		const playoffs = playoffSchedule.body?.schedule ?? [];
 		const anyQualPlayed = quals.some(played);
-		const allQualsPlayed = quals.length > 0 && quals.every(played);
+		const lastQual = quals.reduce<FtcScheduleMatch | null>(
+			(latest, match) => (!latest || match.matchNumber > latest.matchNumber ? match : latest),
+			null
+		);
+		const allQualsPlayed = lastQual !== null && played(lastQual);
 		const anyPlayoffPlayed = playoffs.some(played);
 		const finished = tier === 'finished';
 		const started = anyQualPlayed || anyPlayoffPlayed;
@@ -380,15 +407,17 @@ export function createLoaders(deps: LoaderDeps) {
 		});
 		const allianceList = alliances.body ? mapAlliances(alliances.body) : [];
 		const awardList = awards.body ? mapAwards(awards.body) : [];
+		const endsAt = eventWindow(event).endsAt;
 		const phase = detectPhase({
 			event,
 			matches,
 			alliances: allianceList,
 			awards: awardList,
 			now: time,
-			endsAt: eventWindow(event).endsAt
+			endsAt
 		});
-		phases.set(code, phase);
+		const caching = cachePhase(phase, matches, awardList, time, endsAt);
+		phases.set(code, caching);
 
 		const advancement =
 			phase === 'done'
@@ -435,7 +464,7 @@ export function createLoaders(deps: LoaderDeps) {
 			fetchedAt: live.length > 0 ? Math.min(...live) : eventValue.fetchedAt,
 			stale: eventValue.stale || parts.some((part) => part.stale) || Boolean(advancement?.stale),
 			source: 'ftc',
-			cacheControl: cacheControlFor(tier, phase)
+			cacheControl: cacheControlFor(tier, caching)
 		};
 	}
 
@@ -643,9 +672,15 @@ export function createLoaders(deps: LoaderDeps) {
 		const to = options.to ?? today;
 		const weeks: string[] = [];
 		for (let start = from; start <= to; start = addDays(start, 7)) weeks.push(start);
-		const loaded = await Promise.all(
-			weeks.map((start) => loadSeasonWeek(start, today).catch(() => null))
-		);
+		const loaded: (Awaited<ReturnType<typeof loadSeasonWeek>> | null)[] = [];
+		let next = 0;
+		const worker = async () => {
+			while (next < weeks.length) {
+				const index = next++;
+				loaded[index] = await loadSeasonWeek(weeks[index], today).catch(() => null);
+			}
+		};
+		await Promise.all(Array.from({ length: SEASON_WEEKS_AT_ONCE }, worker));
 		const matches = new Map<string, SeasonMatch>();
 		let fetchedAt = now();
 		let stale = false;

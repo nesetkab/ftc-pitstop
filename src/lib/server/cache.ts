@@ -71,6 +71,18 @@ export interface CacheOptions {
 	store?: CacheStore | null;
 	now?: () => number;
 	onError?: (key: string, error: unknown) => void;
+	background?: (task: Promise<unknown>) => void;
+}
+
+type RequestStore = { get?: () => { waitUntil?: (task: Promise<unknown>) => void } | undefined };
+
+const REQUEST_CONTEXT = Symbol.for('@vercel/request-context');
+
+export function keepAlive(task: Promise<unknown>): void {
+	const store = (globalThis as unknown as Record<symbol, RequestStore | undefined>)[
+		REQUEST_CONTEXT
+	];
+	store?.get?.()?.waitUntil?.(task.catch(() => undefined));
 }
 
 function logError(key: string, error: unknown) {
@@ -84,6 +96,7 @@ export function createCache(options: CacheOptions = {}) {
 	const store = options.store ?? null;
 	const now = options.now ?? Date.now;
 	const onError = options.onError ?? logError;
+	const background = options.background ?? keepAlive;
 
 	async function readStore(key: string): Promise<CacheEntry | null> {
 		if (!store) return null;
@@ -169,10 +182,15 @@ export function createCache(options: CacheOptions = {}) {
 		const run = fetcher as Fetcher<unknown>;
 		if (entry) {
 			const seconds = age(entry);
-			const failed = (failures.get(key) ?? 0) > entry.fetchedAt;
+			const failedAt = failures.get(key) ?? 0;
+			const failed = failedAt > entry.fetchedAt;
 			if (seconds < policy.ttl) return { ...(entry as CacheEntry<T>), stale: false };
 			if (seconds < policy.ttl + policy.maxStale) {
-				refresh(key, policy, run, checkStore).catch((error: unknown) => onError(key, error));
+				if (!failed || now() - failedAt >= policy.ttl * 1000) {
+					background(
+						refresh(key, policy, run, checkStore).catch((error: unknown) => onError(key, error))
+					);
+				}
 				return { ...(entry as CacheEntry<T>), stale: failed };
 			}
 		}

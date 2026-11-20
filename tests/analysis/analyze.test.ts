@@ -151,6 +151,21 @@ describe('replaying Gilbert after Q22', async () => {
 		expect(analysis.picks).toBeNull();
 	});
 
+	it('does not time a held match the field has already moved past', () => {
+		const held = {
+			...bundle,
+			matches: bundle.matches.map((m) =>
+				m.key === 'q20' ? { ...m, result: null, actualTime: null, postedTime: null } : m
+			)
+		};
+		const timing = run(held, 'USAZGIQ', now).timing;
+		expect(timing.next).toBe('q23');
+		expect(timing.matches.q20).toMatchObject({ queueAt: null, expectedStart: null });
+		expect(timing.matches.q26.matchesAway).toBe(3);
+		expect(timing.delaySeconds).not.toBeNull();
+		expect(Math.abs(timing.delaySeconds! - analysis.timing.delaySeconds!)).toBeLessThan(60);
+	});
+
 	it('shows the match on the field once it starts', () => {
 		const started = {
 			...bundle,

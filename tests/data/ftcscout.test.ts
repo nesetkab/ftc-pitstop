@@ -184,3 +184,92 @@ describe('FTCScout client', () => {
 		expect(offline).toHaveBeenCalledTimes(2);
 	});
 });
+
+describe('FTCScout politeness', () => {
+	function failingClient(fetcher: () => Promise<Response>) {
+		let time = Date.parse('2026-11-19T12:00:00Z');
+		const fetch = vi.fn(fetcher);
+		const scout = createFtcScoutClient({
+			fetch: fetch as unknown as typeof fetch,
+			sleep: async () => {},
+			now: () => time
+		});
+		return {
+			scout,
+			fetch,
+			advance: (seconds: number) => {
+				time += seconds * 1000;
+			}
+		};
+	}
+
+	it('pauses a query that keeps failing instead of asking again on every request', async () => {
+		let healthy = false;
+		const data = failingClient(async () =>
+			healthy
+				? new Response(JSON.stringify(scoutFixture('team-2844')), { status: 200 })
+				: new Response('<html>busy</html>', { status: 503 })
+		);
+		await expect(fetchTeamSeason(2844, 2026, data.scout)).rejects.toMatchObject({ status: 503 });
+		expect(data.fetch).toHaveBeenCalledTimes(2);
+		for (let i = 0; i < 5; i++) {
+			await expect(fetchTeamSeason(2844, 2026, data.scout)).rejects.toBeInstanceOf(FtcScoutError);
+		}
+		expect(data.fetch).toHaveBeenCalledTimes(2);
+		data.advance(61);
+		await expect(fetchTeamSeason(2844, 2026, data.scout)).rejects.toMatchObject({ status: 503 });
+		expect(data.fetch).toHaveBeenCalledTimes(4);
+		data.advance(61);
+		await expect(fetchTeamSeason(2844, 2026, data.scout)).rejects.toBeInstanceOf(FtcScoutError);
+		expect(data.fetch).toHaveBeenCalledTimes(4);
+		data.advance(60);
+		healthy = true;
+		expect((await fetchTeamSeason(2844, 2026, data.scout))?.team.number).toBe(2844);
+		expect((await fetchTeamSeason(2844, 2026, data.scout))?.team.number).toBe(2844);
+		expect(data.fetch).toHaveBeenCalledTimes(6);
+	});
+
+	it('keeps other queries going while one is paused', async () => {
+		const data = failingClient(async () => new Response('busy', { status: 503 }));
+		await expect(fetchTeamSeason(2844, 2026, data.scout)).rejects.toBeInstanceOf(FtcScoutError);
+		await expect(fetchTeamSeason(3747, 2026, data.scout)).rejects.toBeInstanceOf(FtcScoutError);
+		expect(data.fetch).toHaveBeenCalledTimes(4);
+	});
+
+	it('does not send a slow query twice', async () => {
+		const data = failingClient(async () => {
+			throw new DOMException('The operation timed out.', 'TimeoutError');
+		});
+		await expect(fetchTeamSeason(2844, 2026, data.scout)).rejects.toEqual(
+			new FtcScoutError(504, 'FTCScout timed out')
+		);
+		expect(data.fetch).toHaveBeenCalledTimes(1);
+	});
+
+	it('tells a cut off response apart from one that is not JSON', async () => {
+		const cut = failingClient(async () => {
+			const body = new ReadableStream({
+				start(controller) {
+					controller.enqueue(new TextEncoder().encode('{"data":{"team'));
+					controller.error(new TypeError('terminated'));
+				}
+			});
+			return new Response(body, { status: 200 });
+		});
+		await expect(fetchTeamSeason(2844, 2026, cut.scout)).rejects.toEqual(
+			new FtcScoutError(502, 'FTCScout cut the response short')
+		);
+		const html = failingClient(
+			async () =>
+				new Response('<html>Just a moment...</html>', {
+					status: 200,
+					headers: { 'content-type': 'text/html; charset=UTF-8' }
+				})
+		);
+		await expect(fetchTeamSeason(2844, 2026, html.scout)).rejects.toEqual(
+			new FtcScoutError(502, 'FTCScout sent text/html instead of JSON')
+		);
+		const empty = failingClient(async () => new Response('null', { status: 200 }));
+		await expect(fetchTeamSeason(2844, 2026, empty.scout)).rejects.toBeInstanceOf(FtcScoutError);
+	});
+});

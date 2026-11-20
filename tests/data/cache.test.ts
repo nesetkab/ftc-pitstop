@@ -74,6 +74,21 @@ describe('cache ttl and stale-while-revalidate', () => {
 		expect(fresh).toMatchObject({ body: 'value 2', stale: false, fetchedAt: time.now() });
 	});
 
+	it('keeps the function alive until a background refresh is done', async () => {
+		const time = clock();
+		const background = vi.fn();
+		const cache = createCache({ now: time.now, background });
+		const fetcher = counter();
+		await cache.get('a', policy, fetcher);
+		expect(background).not.toHaveBeenCalled();
+		time.advance(31);
+		await cache.get('a', policy, fetcher);
+		expect(background).toHaveBeenCalledTimes(1);
+		await background.mock.calls[0][0];
+		expect(fetcher).toHaveBeenCalledTimes(2);
+		expect(cache.pending()).toBe(0);
+	});
+
 	it('waits for a new value once the entry is older than the stale window', async () => {
 		const time = clock();
 		const cache = createCache({ now: time.now });
@@ -185,6 +200,36 @@ describe('cache failures', () => {
 			body: 'back',
 			stale: false
 		});
+	});
+});
+
+describe('cache refresh pacing', () => {
+	it('waits a ttl before trying a failed background refresh again', async () => {
+		const time = clock();
+		const cache = createCache({ now: time.now, onError: () => {} });
+		await cache.get('a', policy, counter(['good']));
+		const failing = vi.fn(async () => {
+			throw new Error('down');
+		});
+		time.advance(31);
+		await cache.get('a', policy, failing);
+		await settle(cache);
+		expect(failing).toHaveBeenCalledTimes(1);
+		for (let i = 0; i < 5; i++) {
+			time.advance(5);
+			expect(await cache.get('a', policy, failing)).toMatchObject({ body: 'good', stale: true });
+			await settle(cache);
+		}
+		expect(failing).toHaveBeenCalledTimes(1);
+		time.advance(6);
+		await cache.get('a', policy, failing);
+		await settle(cache);
+		expect(failing).toHaveBeenCalledTimes(2);
+		time.advance(policy.ttl);
+		const back = counter(['back']);
+		await cache.get('a', policy, back);
+		await settle(cache);
+		expect(await cache.get('a', policy, back)).toMatchObject({ body: 'back', stale: false });
 	});
 });
 
