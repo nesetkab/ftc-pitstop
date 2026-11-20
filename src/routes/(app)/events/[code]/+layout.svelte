@@ -14,6 +14,7 @@
 	import type { LayoutProps } from './$types';
 
 	const REFRESH_MS = 30_000;
+	const DONE_REFRESH_MS = 120_000;
 
 	let { data, children }: LayoutProps = $props();
 
@@ -31,7 +32,8 @@
 	);
 	const withPlayoffs = $derived(hasPlayoffs(event.type) || bundle.alliances.length > 0);
 	const onMatchPage = $derived(page.route.id?.includes('/matches/') ?? false);
-	const live = $derived(bundle.phase !== 'done' && eventStatus(event, Date.now()) === 'live');
+	const live = $derived(eventStatus(event, Date.now()) === 'live');
+	const every = $derived(bundle.phase === 'done' ? DONE_REFRESH_MS : REFRESH_MS);
 	const showUpdated = $derived(bundle.phase !== 'done' || bundle.stale);
 	const source = $derived(bundle.source === 'ftcscout' ? ' from FTCScout' : '');
 
@@ -92,7 +94,7 @@
 		if (!live) return;
 		let last = Date.now();
 		const refresh = () => {
-			if (document.visibilityState !== 'visible' || Date.now() - last < REFRESH_MS) return;
+			if (document.visibilityState !== 'visible' || Date.now() - last < every) return;
 			last = Date.now();
 			invalidate('event:live');
 		};
