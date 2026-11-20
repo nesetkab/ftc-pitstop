@@ -1,4 +1,4 @@
-import { DataError } from '#lib/server/errors.ts';
+import { DataError, describeError } from '#lib/server/errors.ts';
 
 export const CACHE_CONTROL = {
 	live: 'public, s-maxage=30, stale-while-revalidate=300',
@@ -20,8 +20,6 @@ export function errorResponse(error: unknown, fallback: string): Response {
 		const cacheControl = error.status === 404 ? CACHE_CONTROL.missing : CACHE_CONTROL.none;
 		return jsonResponse({ error: error.message }, cacheControl, error.status);
 	}
-	console.error(
-		`${fallback}: ${error instanceof Error ? `${error.name} ${error.message}` : 'unknown error'}`
-	);
+	console.error(`${fallback}: ${describeError(error)}`);
 	return jsonResponse({ error: fallback }, CACHE_CONTROL.none, 503);
 }

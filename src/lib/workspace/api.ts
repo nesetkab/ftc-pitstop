@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { describeError } from '#lib/server/errors.ts';
 import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
 import { isCode } from '#lib/workspace/code.ts';
 import type { Limiter } from '#lib/workspace/limit.ts';
@@ -54,9 +55,7 @@ function failure(error: unknown): Response {
 			? rateLimited()
 			: reply({ error: error.message }, STATUS[error.code]);
 	}
-	console.error(
-		`workspace request failed: ${error instanceof Error ? `${error.name} ${error.message}` : 'unknown error'}`
-	);
+	console.error(`workspace request failed: ${describeError(error)}`);
 	return reply({ error: 'Workspaces are unavailable right now' }, 503);
 }
 

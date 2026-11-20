@@ -1,3 +1,4 @@
+import { describeError } from '#lib/server/errors.ts';
 import { getRedis, type RedisLike } from '#lib/server/redis.ts';
 
 export interface CacheEntry<T = unknown> {
@@ -73,8 +74,7 @@ export interface CacheOptions {
 }
 
 function logError(key: string, error: unknown) {
-	const message = error instanceof Error ? error.message : 'unknown error';
-	console.warn(`cache refresh failed for ${key}: ${message}`);
+	console.warn(`cache refresh failed for ${key}: ${describeError(error)}`);
 }
 
 export function createCache(options: CacheOptions = {}) {

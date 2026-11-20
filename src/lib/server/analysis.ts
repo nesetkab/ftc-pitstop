@@ -10,7 +10,7 @@ import { SEASON } from '#lib/game/biobuzz.ts';
 import { dayNumber, previousFrom } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import { cache as sharedCache, type Cache, type CachePolicy } from '#lib/server/cache.ts';
-import { DataError, unavailable } from '#lib/server/errors.ts';
+import { DataError, describeError, unavailable } from '#lib/server/errors.ts';
 import {
 	eventTier,
 	loaders as defaultLoaders,
@@ -128,9 +128,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 		}
 		if (current && time < current.model.generatedAt + DAY_SECONDS * 1000) {
 			pending.catch((error: unknown) =>
-				console.warn(
-					`season ratings refresh failed: ${error instanceof Error ? error.message : error}`
-				)
+				console.warn(`season ratings refresh failed: ${describeError(error)}`)
 			);
 			return Promise.resolve(current.model);
 		}
