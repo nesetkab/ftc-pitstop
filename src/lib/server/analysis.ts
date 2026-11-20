@@ -9,7 +9,12 @@ import type {
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { dayNumber, previousFrom } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
-import { cache as sharedCache, type Cache, type CachePolicy } from '#lib/server/cache.ts';
+import {
+	keepAlive,
+	cache as sharedCache,
+	type Cache,
+	type CachePolicy
+} from '#lib/server/cache.ts';
 import { DataError, describeError, unavailable } from '#lib/server/errors.ts';
 import {
 	eventTier,
@@ -33,17 +38,6 @@ export function analysisPolicy(tier: EventTier, phase: EventPhase): CachePolicy 
 	if (tier === 'upcoming') return { ttl: 600, maxStale: DAY_SECONDS };
 	if (phase === 'done') return { ttl: 300, maxStale: DAY_SECONDS };
 	return { ttl: 30, maxStale: 300 };
-}
-
-type RequestStore = { get?: () => { waitUntil?: (task: Promise<unknown>) => void } | undefined };
-
-const REQUEST_CONTEXT = Symbol.for('@vercel/request-context');
-
-function keepAlive(task: Promise<unknown>): void {
-	const store = (globalThis as unknown as Record<symbol, RequestStore | undefined>)[
-		REQUEST_CONTEXT
-	];
-	store?.get?.()?.waitUntil?.(task.catch(() => undefined));
 }
 
 class ColdStart extends Error {}
@@ -131,11 +125,15 @@ export function createAnalysis(deps: AnalysisDeps) {
 				.finally(() => {
 					pending = null;
 				});
+			if (current) {
+				background(
+					pending.catch((error: unknown) =>
+						console.warn(`season ratings refresh failed: ${describeError(error)}`)
+					)
+				);
+			}
 		}
 		if (current && time < current.model.generatedAt + DAY_SECONDS * 1000) {
-			pending.catch((error: unknown) =>
-				console.warn(`season ratings refresh failed: ${describeError(error)}`)
-			);
 			return Promise.resolve(current.model);
 		}
 		return pending;

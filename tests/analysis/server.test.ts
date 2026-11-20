@@ -111,12 +111,13 @@ describe('createAnalysis', () => {
 			stale: missing.length > 0,
 			missing
 		}));
+		const background = vi.fn();
 		const analysis = createAnalysis({
 			loaders: { loadEventBundle: fixtureLoaders().loadEventBundle, loadSeasonMatches: season },
 			cache: createCache({ onError: () => {}, now: () => time }),
 			previous,
 			now: () => time,
-			background: vi.fn()
+			background
 		});
 		const full = await analysis.loadSeasonModel();
 		expect(full.complete).toBe(true);
@@ -124,6 +125,7 @@ describe('createAnalysis', () => {
 		time += 61 * 60_000;
 		await analysis.loadSeasonModel();
 		await vi.waitFor(() => expect(season).toHaveBeenCalledTimes(2));
+		expect(background).toHaveBeenCalledTimes(1);
 		await new Promise((resolve) => setTimeout(resolve, 0));
 		expect(await analysis.loadSeasonModel()).toBe(full);
 		time += 30_000;

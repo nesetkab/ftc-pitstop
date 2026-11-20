@@ -74,6 +74,21 @@ describe('cache ttl and stale-while-revalidate', () => {
 		expect(fresh).toMatchObject({ body: 'value 2', stale: false, fetchedAt: time.now() });
 	});
 
+	it('keeps the function alive until a background refresh is done', async () => {
+		const time = clock();
+		const background = vi.fn();
+		const cache = createCache({ now: time.now, background });
+		const fetcher = counter();
+		await cache.get('a', policy, fetcher);
+		expect(background).not.toHaveBeenCalled();
+		time.advance(31);
+		await cache.get('a', policy, fetcher);
+		expect(background).toHaveBeenCalledTimes(1);
+		await background.mock.calls[0][0];
+		expect(fetcher).toHaveBeenCalledTimes(2);
+		expect(cache.pending()).toBe(0);
+	});
+
 	it('waits for a new value once the entry is older than the stale window', async () => {
 		const time = clock();
 		const cache = createCache({ now: time.now });
