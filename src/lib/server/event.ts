@@ -58,6 +58,7 @@ const HOUR = 3_600_000;
 const DAY_SECONDS = 86_400;
 const MISS_MS = 5 * 60_000;
 const LIST_RETRY_MS = 30_000;
+const SEASON_WEEKS_AT_ONCE = 3;
 const EVENT_LIST_POLICY: CachePolicy = { ttl: 3600, maxStale: 7 * DAY_SECONDS };
 const EVENT_CODE_PATTERN = /^[A-Z0-9]{2,24}$/;
 const TEAM_NUMBER_PATTERN = /^[1-9]\d{0,4}$/;
@@ -643,9 +644,15 @@ export function createLoaders(deps: LoaderDeps) {
 		const to = options.to ?? today;
 		const weeks: string[] = [];
 		for (let start = from; start <= to; start = addDays(start, 7)) weeks.push(start);
-		const loaded = await Promise.all(
-			weeks.map((start) => loadSeasonWeek(start, today).catch(() => null))
-		);
+		const loaded: (Awaited<ReturnType<typeof loadSeasonWeek>> | null)[] = [];
+		let next = 0;
+		const worker = async () => {
+			while (next < weeks.length) {
+				const index = next++;
+				loaded[index] = await loadSeasonWeek(weeks[index], today).catch(() => null);
+			}
+		};
+		await Promise.all(Array.from({ length: SEASON_WEEKS_AT_ONCE }, worker));
 		const matches = new Map<string, SeasonMatch>();
 		let fetchedAt = now();
 		let stale = false;

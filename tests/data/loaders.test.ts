@@ -302,6 +302,31 @@ describe('season loaders', () => {
 			red: { total: 39, teams: [20515] }
 		});
 	});
+
+	it('asks FTCScout for a few weeks at a time instead of the whole season at once', async () => {
+		const week = scoutFixture('season-matches-2026-09-19');
+		let open = 0;
+		let most = 0;
+		const scout = vi.fn(async () => {
+			open++;
+			most = Math.max(most, open);
+			await new Promise((resolve) => setTimeout(resolve, 5));
+			open--;
+			return Response.json(week);
+		});
+		const time = Date.parse('2026-11-19T12:00:00Z');
+		const loaders = createLoaders({
+			ftc: createFtcClient({ username: 'u', apiKey: 'k', fetch: fixtureFetch().fetch }),
+			scout: createFtcScoutClient({ fetch: scout as unknown as typeof fetch }),
+			nexus: createNexusClient(),
+			cache: createCache({ onError: () => {}, now: () => time }),
+			now: () => time
+		});
+		const result = await loaders.loadSeasonMatches();
+		expect(scout).toHaveBeenCalledTimes(12);
+		expect(result.missing).toEqual([]);
+		expect(most).toBeLessThanOrEqual(3);
+	});
 });
 
 describe('loadQueueStatus', () => {
