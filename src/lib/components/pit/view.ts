@@ -1,9 +1,4 @@
-import type {
-	EventAnalysis,
-	MatchForecast,
-	MatchTiming,
-	TeamRating
-} from '#lib/analysis/types.ts';
+import type { EventAnalysis, MatchForecast, MatchTiming, TeamRating } from '#lib/analysis/types.ts';
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';

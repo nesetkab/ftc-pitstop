@@ -263,9 +263,9 @@ describe('pitView after quals', () => {
 		expect(runnerUp.next?.label).toBe('F2');
 		expect(runnerUp.playoff?.position).toBe('Finals');
 		const done = replayBundle(finals, replayStart('F2', finals)!);
-		expect(
-			playoffResult(pitView({ bundle: done, analysis: null, queue: null, team: 24378 }))
-		).toBe('Finalist');
+		expect(playoffResult(pitView({ bundle: done, analysis: null, queue: null, team: 24378 }))).toBe(
+			'Finalist'
+		);
 	});
 
 	it('ends with the final standings and awards', () => {
