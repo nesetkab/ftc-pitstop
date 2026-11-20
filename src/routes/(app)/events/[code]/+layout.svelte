@@ -5,6 +5,7 @@
 	import { eventStatus } from '#lib/components/event/dates.ts';
 	import { eventMeta } from '#lib/components/event/event-meta.ts';
 	import { watchFollowed } from '#lib/components/event/follow.ts';
+	import { httpUrl } from '#lib/format/url.ts';
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -25,7 +26,9 @@
 	const playoffsPlayed = $derived(playoffMatches.filter((match) => match.result).length);
 	const started = $derived(bundle.rankings.length > 0 || qualsPlayed > 0 || playoffsPlayed > 0);
 	const scheduled = $derived(bundle.matches.length > 0);
-	const stream = $derived(event.liveStreamUrl ?? event.webcasts[0] ?? null);
+	const stream = $derived(
+		[event.liveStreamUrl, ...event.webcasts].map(httpUrl).find((url) => url !== null) ?? null
+	);
 	const withPlayoffs = $derived(hasPlayoffs(event.type) || bundle.alliances.length > 0);
 	const onMatchPage = $derived(page.route.id?.includes('/matches/') ?? false);
 	const live = $derived(bundle.phase !== 'done' && eventStatus(event, Date.now()) === 'live');

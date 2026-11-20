@@ -224,6 +224,30 @@ describe('FTC mapper details', () => {
 		});
 	});
 
+	it('only keeps web addresses in the links of an event', () => {
+		const raw = load('USAZGIQ').event.events![0];
+		const event = mapEvent({
+			...raw,
+			liveStreamUrl: 'javascript:alert(document.domain)',
+			website: 'vbscript:msgbox(1)',
+			webcasts: [
+				'data:text/html,<script>alert(1)</script>',
+				' HTTPS://Twitch.tv/pitstop ',
+				'//evil.example/x',
+				'https://twitch.tv@evil.example/',
+				'https://example.com/a b'
+			]
+		});
+		expect(event).toMatchObject({
+			liveStreamUrl: null,
+			website: null,
+			webcasts: ['https://twitch.tv/pitstop', 'https://example.com/a%20b']
+		});
+		expect(mapEvent({ ...raw, liveStreamUrl: 'https://youtu.be/abc' }).liveStreamUrl).toBe(
+			'https://youtu.be/abc'
+		);
+	});
+
 	it('only produces match keys that the match page accepts', () => {
 		const keys = FIXTURE_EVENTS.flatMap((code) => matchesFor(code).map((match) => match.key));
 		expect(keys.length).toBeGreaterThan(100);

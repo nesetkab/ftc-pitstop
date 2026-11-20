@@ -1,4 +1,5 @@
 import { EVENT_TYPE_NAMES, FTC_EVENT_TYPE_CODES } from '#lib/game/event-types.ts';
+import { httpUrl } from '#lib/format/url.ts';
 import { isValidTimeZone, zonedTimeToUtc } from '#lib/server/time.ts';
 import type {
 	Advancement,
@@ -55,9 +56,9 @@ export function mapEvent(raw: FtcEvent): Event {
 		timezone: isValidTimeZone(raw.timezone) ? raw.timezone : 'UTC',
 		start: raw.dateStart.slice(0, 10),
 		end: raw.dateEnd.slice(0, 10),
-		liveStreamUrl: clean(raw.liveStreamUrl),
-		webcasts: (raw.webcasts ?? []).filter(Boolean),
-		website: clean(raw.website),
+		liveStreamUrl: httpUrl(raw.liveStreamUrl),
+		webcasts: (raw.webcasts ?? []).flatMap((url) => httpUrl(url) ?? []),
+		website: httpUrl(raw.website),
 		fieldCount: raw.fieldCount ?? 1,
 		published: raw.published ?? false,
 		remote: raw.remote ?? false,
