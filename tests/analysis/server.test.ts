@@ -102,6 +102,43 @@ describe('createAnalysis', () => {
 		expect(analysis.ratings).toEqual(cold.ratings);
 	});
 
+	it('keeps the last complete season when a refresh comes back with weeks missing', async () => {
+		let time = NOW;
+		let missing: string[] = [];
+		const season = vi.fn(async () => ({
+			matches: missing.length > 0 ? earlier.slice(0, 8) : earlier,
+			fetchedAt: time,
+			stale: missing.length > 0,
+			missing
+		}));
+		const analysis = createAnalysis({
+			loaders: { loadEventBundle: fixtureLoaders().loadEventBundle, loadSeasonMatches: season },
+			cache: createCache({ onError: () => {}, now: () => time }),
+			previous,
+			now: () => time,
+			background: vi.fn()
+		});
+		const full = await analysis.loadSeasonModel();
+		expect(full.complete).toBe(true);
+		missing = ['2026-11-03'];
+		time += 61 * 60_000;
+		await analysis.loadSeasonModel();
+		await vi.waitFor(() => expect(season).toHaveBeenCalledTimes(2));
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		expect(await analysis.loadSeasonModel()).toBe(full);
+		time += 30_000;
+		await analysis.loadSeasonModel();
+		expect(season).toHaveBeenCalledTimes(2);
+		missing = [];
+		time += 2 * 60_000;
+		await analysis.loadSeasonModel();
+		await vi.waitFor(() => expect(season).toHaveBeenCalledTimes(3));
+		await new Promise((resolve) => setTimeout(resolve, 0));
+		const back = await analysis.loadSeasonModel();
+		expect(back).not.toBe(full);
+		expect(back.complete).toBe(true);
+	});
+
 	it('returns a team rating history', async () => {
 		const data = setup();
 		const history = (await data.loadTeamRatingHistory('26670'))!;

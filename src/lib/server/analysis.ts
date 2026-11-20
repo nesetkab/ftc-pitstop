@@ -120,6 +120,11 @@ export function createAnalysis(deps: AnalysisDeps) {
 			pendingSince = time;
 			pending = build()
 				.then((model) => {
+					const kept = current?.model;
+					if (!model.complete && kept?.complete && now() < kept.generatedAt + DAY_SECONDS * 1000) {
+						current = { model: kept, expires: now() + 2 * MINUTE };
+						return kept;
+					}
 					current = { model, expires: now() + (model.complete ? HOUR : 2 * MINUTE) };
 					return model;
 				})
