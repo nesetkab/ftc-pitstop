@@ -308,6 +308,7 @@ function bracketPosition(match: Pick<Match, 'description' | 'label'>): string {
 	if (parsed?.level === 'playoff' && parsed.bracket && parsed.round) {
 		return `${parsed.bracket === 'upper' ? 'Upper' : 'Lower'} bracket round ${parsed.round}`;
 	}
+	if (/^finals?\b/i.test(match.description.trim())) return 'Finals';
 	return titleOf(match);
 }
 

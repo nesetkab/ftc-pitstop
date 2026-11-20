@@ -256,6 +256,18 @@ describe('pitView after quals', () => {
 		expect(view(at('M10')).playoff?.finalist).toBe(false);
 	});
 
+	it('names the finals at a two-alliance event', () => {
+		const finals = fixtureBundle('USALATQ');
+		const first = replayBundle(finals, replayStart('F1', finals)!);
+		const runnerUp = pitView({ bundle: first, analysis: null, queue: null, team: 24378 });
+		expect(runnerUp.next?.label).toBe('F2');
+		expect(runnerUp.playoff?.position).toBe('Finals');
+		const done = replayBundle(finals, replayStart('F2', finals)!);
+		expect(
+			playoffResult(pitView({ bundle: done, analysis: null, queue: null, team: 24378 }))
+		).toBe('Finalist');
+	});
+
 	it('ends with the final standings and awards', () => {
 		const done = view(at('M10') + 20 * 60_000);
 		expect(done.phase).toBe('done');
