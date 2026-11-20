@@ -119,7 +119,7 @@
 	</div>
 
 	<div class="panel wide">
-		{#if forecast || match.result}
+		{#if match.level === 'qual' && (forecast || match.result)}
 			<div class="panel">
 				<h2 class="sec-title">{match.result ? 'Ranking points' : 'Ranking point chances'}</h2>
 				<RpChances {forecast} result={match.result} />

@@ -65,6 +65,14 @@ describe('MatchView after the match', () => {
 		expect(within(points).getAllByText('Chance')).toHaveLength(2);
 	});
 
+	it('leaves ranking points off playoff matches', () => {
+		const final = bundle.matches.find((match) => match.key === 'p10') as Match;
+		render(MatchView, { props: { bundle, match: final, analysis: fakeAnalysis(bundle) } });
+		expect(screen.getByRole('table', { name: 'Final score' })).toBeInTheDocument();
+		expect(screen.queryByRole('table', { name: 'Ranking points' })).toBeNull();
+		expect(screen.queryByRole('heading', { name: /Ranking point/ })).toBeNull();
+	});
+
 	it('draws each flower stack from the bottom up', () => {
 		const result = structuredClone(q26.result!);
 		const flowers = { red: ['red', 'pollen', 'blue'], blue: [], scoring: ['pollen'], audience: [] };
