@@ -43,8 +43,8 @@
 	const meta = $derived.by(() => {
 		const parts: string[] = [];
 		if (match.result) {
-			if (match.actualTime !== null) parts.push(`Played at ${at(match.actualTime)}.`);
-			else parts.push('Played.');
+			const played = match.actualTime;
+			parts.push(played === null ? 'Played.' : `Played ${multiDay ? '' : 'at '}${at(played)}.`);
 			if (match.scheduledTime !== null) parts.push(`Scheduled for ${at(match.scheduledTime)}.`);
 		} else {
 			if (match.scheduledTime !== null) parts.push(`Scheduled for ${at(match.scheduledTime)}.`);

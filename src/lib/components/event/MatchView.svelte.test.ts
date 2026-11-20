@@ -82,6 +82,18 @@ describe('MatchView after the match', () => {
 	});
 });
 
+describe('MatchView at a two-day event', () => {
+	const twoDay = fixtureBundle('USMISOQ');
+	const first = twoDay.matches.find((match) => match.key === 'q1') as Match;
+
+	it('names the day without doubling up the words', () => {
+		render(MatchView, { props: { bundle: twoDay, match: first } });
+		expect(screen.getByText(/^Played Saturday at \d+:\d\d/)).toBeInTheDocument();
+		expect(screen.getByText(/Scheduled for Saturday at \d+:\d\d/)).toBeInTheDocument();
+		expect(screen.queryByText(/Played at Saturday/)).toBeNull();
+	});
+});
+
 describe('MatchView before the match', () => {
 	const upcoming = unplay(bundle, (match) => match.level === 'playoff' || match.number >= 26);
 	const match = upcoming.matches.find((entry) => entry.key === 'q26') as Match;
