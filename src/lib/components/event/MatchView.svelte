@@ -138,6 +138,7 @@
 				rankings={bundle.rankings}
 				ratings={analysis?.ratings ?? null}
 				{followed}
+				eventCode={code}
 			/>
 		</div>
 	</div>

@@ -1,0 +1,65 @@
+@page {
+	margin: 12mm;
+}
+
+@media print {
+	:root,
+	:root[data-theme],
+	[data-theme] {
+		--bg: #ffffff;
+		--surface: #f4f4f2;
+		--line: #d6d6d1;
+		--line-2: #b9b9b3;
+		--text: #111111;
+		--text-2: #444441;
+		--text-3: #5d5d58;
+		--accent: #f2c200;
+		--accent-wash: #fbf1c7;
+		--red: #bf3528;
+		--red-wash: #fae7e5;
+		--blue: #2c5fcc;
+		--blue-wash: #e6edfa;
+		color-scheme: light;
+	}
+
+	body {
+		background: #ffffff;
+		color: var(--text);
+	}
+
+	.appbar,
+	.skip,
+	.shell > footer,
+	nav.tabs,
+	.page-header .actions,
+	.page-header .status {
+		display: none !important;
+	}
+
+	main {
+		max-width: none !important;
+		padding: 0 !important;
+		gap: 12px !important;
+	}
+
+	.page-header h1 {
+		font-size: 15px;
+	}
+
+	.page-header .meta {
+		font-size: 11px;
+	}
+
+	a {
+		text-decoration: none;
+	}
+
+	.table-wrap {
+		overflow: visible !important;
+	}
+
+	h2,
+	h3 {
+		break-after: avoid;
+	}
+}

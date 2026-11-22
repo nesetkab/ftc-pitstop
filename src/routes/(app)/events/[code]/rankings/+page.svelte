@@ -43,4 +43,5 @@
 	csvHref="/events/{data.bundle.event.code}/rankings.csv"
 	{choice}
 	onchoose={choose}
+	eventCode={data.bundle.event.code}
 />

@@ -82,9 +82,12 @@
 		...(withPlayoffs ? [{ href: `${base}/alliance-selection`, label: 'Alliance selection' }] : [])
 	]);
 
-	const current = $derived(
-		page.url.pathname === base && started ? `${base}/rankings` : page.url.pathname
-	);
+	const current = $derived.by(() => {
+		const path = page.url.pathname;
+		if (path === base && started) return `${base}/rankings`;
+		if (path.startsWith(`${base}/teams/`) || path === `${base}/scouting`) return `${base}/teams`;
+		return path;
+	});
 
 	const TOPICS: Record<string, { label: string; topic: string }> = {
 		rankings: { label: 'Rankings', topic: 'Rankings, OPR and schedule strength.' },
@@ -100,12 +103,27 @@
 		'alliance-selection': {
 			label: 'Alliance selection',
 			topic: 'Alliance selection, pick suggestions and playoff odds.'
+		},
+		scouting: {
+			label: 'Scouting binder',
+			topic: 'Printable scouting reports for every team, with OPR by part and ranking points.'
 		}
 	};
 
 	const section = $derived(page.route.id?.split('/events/[code]/')[1] ?? '');
+	const teamTopic = $derived.by(() => {
+		const number = page.params.number;
+		if (section !== 'teams/[number]' || !number) return null;
+		const name = bundle.teams.find((team) => String(team.number) === number)?.name;
+		return {
+			label: name ? `${number} ${name}` : `Team ${number}`,
+			topic: `Scouting report for team ${number}: OPR by part, consistency, ranking points and remaining matches.`,
+			path: `teams/${number}`
+		};
+	});
 	const seo = $derived.by(() => {
-		const tab = TOPICS[section];
+		const tab = teamTopic ?? TOPICS[section];
+		const tabPath = teamTopic?.path ?? section;
 		const origin = page.url.origin;
 		const crumbs = [
 			{ name: 'PitStop', path: '/' },
@@ -121,12 +139,12 @@
 				? siteTitle(`${tab.label} at ${event.name}`)
 				: siteTitle(`${event.name}, ${when.includes(year) ? when : `${when}, ${year}`}`),
 			description: eventDescription(event, status, tab ? tab.topic : rootTopic),
-			path: showsRankings ? base : `${base}/${section}`,
+			path: showsRankings ? base : `${base}/${tabPath}`,
 			data: [
 				eventJsonLd(origin, event),
 				breadcrumbs(
 					origin,
-					tab ? [...crumbs, { name: tab.label, path: `${base}/${section}` }] : crumbs
+					tab ? [...crumbs, { name: tab.label, path: `${base}/${tabPath}` }] : crumbs
 				)
 			]
 		};
