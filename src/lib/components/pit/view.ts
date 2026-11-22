@@ -2,6 +2,7 @@ import type { EventAnalysis, MatchForecast, MatchTiming, TeamRating } from '#lib
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';
+import { fillPlayoffs } from './bracket.ts';
 import { QUEUE_EARLIEST } from './queue.ts';
 import type {
 	AllianceColor,
@@ -57,6 +58,7 @@ export interface NextMatch extends PitMatch {
 	queueAt: number | null;
 	expectedStart: number | null;
 	matchesAway: number;
+	pending: string | null;
 	nexus: { tracked: boolean; status: QueueStatus | null };
 }
 
@@ -390,7 +392,9 @@ function standings(bundle: EventBundle): AllianceStanding[] {
 }
 
 export function pitView(input: PitInput): PitView {
-	const { bundle, analysis, queue, team } = input;
+	const { analysis, queue, team } = input;
+	const filled = fillPlayoffs(input.bundle.matches, input.bundle.alliances);
+	const bundle = { ...input.bundle, matches: filled.matches };
 	const names = new Map([
 		...bundle.rankings.flatMap((row) => (row.name ? [[row.team, row.name] as const] : [])),
 		...bundle.teams.map((entry) => [entry.number, entry.name] as const)
@@ -434,6 +438,7 @@ export function pitView(input: PitInput): PitView {
 				timing?.expectedStart ??
 				null,
 			matchesAway: bundle.matches.slice(active + 1, nextIndex).filter(isUnplayed).length,
+			pending: filled.pending.get(match.key)?.[opposite(base.alliance)] ?? null,
 			nexus: {
 				tracked: nexusMatch !== null,
 				status: nowQueuing ? 'now-queuing' : (nexusMatch?.status ?? null)

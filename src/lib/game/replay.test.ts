@@ -125,16 +125,17 @@ describe('replayBundle', () => {
 		expect(after.phase).toBe('playoffs');
 	});
 
-	it('adds playoff matches once the teams in them are known', () => {
-		const keys = (time: number) =>
+	it('adds each side of a playoff match once its alliance is known', () => {
+		const sides = (time: number) =>
 			replayBundle(bundle, time)
 				.matches.filter((match) => match.level === 'playoff')
-				.map((match) => match.key);
+				.map((match) => `${match.label} ${match.red.length}-${match.blue.length}`);
 		const window = selectionWindow(bundle)!;
-		expect(keys(window.end)).toEqual(['p1', 'p2']);
-		expect(keys(at('M1'))).toEqual(['p1', 'p2', 'p3']);
-		expect(keys(at('M4'))).toEqual(['p1', 'p2', 'p3', 'p4', 'p5', 'p6', 'p7']);
-		expect(keys(at('M10'))).toHaveLength(10);
+		expect(sides(window.end)).toEqual(['M1 2-2', 'M2 2-2', 'M3 2-0', 'M4 2-0']);
+		expect(sides(at('M1'))).toEqual(['M1 2-2', 'M2 2-2', 'M3 2-2', 'M4 2-0', 'M6 0-2']);
+		expect(sides(at('M3')).slice(-3)).toEqual(['M5 2-2', 'M6 0-2', 'M7 2-0']);
+		expect(sides(at('M7')).slice(-2)).toEqual(['M9 2-0', 'M10 2-0']);
+		expect(sides(at('M10'))).toHaveLength(10);
 	});
 
 	it('plays out the playoffs and ends with the awards', () => {

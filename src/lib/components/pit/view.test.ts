@@ -247,6 +247,43 @@ describe('pitView after quals', () => {
 		expect(out.standings.find((standing) => standing.seed === 5)).toMatchObject({ out: true });
 	});
 
+	it('shows the next playoff match before the opponent is known', () => {
+		const captain = pitView({
+			bundle: replayBundle(full, at('M3')),
+			analysis: null,
+			queue: null,
+			team: 26670
+		});
+		expect(captain.next).toMatchObject({
+			key: 'p7',
+			alliance: 'red',
+			opponents: [],
+			blue: [],
+			pending: 'Winner of M4'
+		});
+		expect(captain.playoff?.position).toBe('Upper bracket round 4');
+		const lower = pitView({
+			bundle: replayBundle(full, at('M7')),
+			analysis: null,
+			queue: null,
+			team: 26670
+		});
+		expect(lower.next).toMatchObject({ key: 'p9', pending: 'Winner of M8' });
+		expect(lower.playoff?.position).toBe('Lower bracket round 5');
+	});
+
+	it('plays the tiebreaker after a tied final', () => {
+		const event = fixtureBundle('USMINOQ');
+		const tied = replayBundle(event, replayStart('M10', event)!);
+		const captain = pitView({ bundle: tied, analysis: null, queue: null, team: 21331 });
+		expect(captain.next?.label).toBe('M10-2');
+		expect(captain.playoff?.position).toBe('Finals');
+		const replayed = replayBundle(event, replayStart('M10-2', event)!);
+		expect(
+			pitView({ bundle: replayed, analysis: null, queue: null, team: 10137 }).next?.label
+		).toBe('M11');
+	});
+
 	it('says whose picks the available list is sorted for', () => {
 		const analysis = {
 			ratings: [],
