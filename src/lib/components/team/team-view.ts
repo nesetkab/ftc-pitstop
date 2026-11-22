@@ -3,7 +3,7 @@ import { matchLabel, ordinal, parseMatchKey, shortDate } from '#lib/format/index
 import { GAME_NAME, SEASON } from '#lib/game/biobuzz.ts';
 import type { Award, EventBundle, QuickStat, QuickStats, TeamSeason } from '#lib/types.ts';
 import { localDay } from './dates.ts';
-import { placeName } from './places.ts';
+import { placeName } from '#lib/format/places.ts';
 import { playoffSummary } from './playoffs.ts';
 
 export const SEASON_GAMES: Record<number, string> = {

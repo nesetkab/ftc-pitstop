@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { placeName, stateName } from './places.ts';
+import { areaName, isUnitedStates, placeName, stateName } from './places.ts';
 
 describe('placeName', () => {
 	it('writes US places with the full state name', () => {
@@ -27,7 +27,9 @@ describe('placeName', () => {
 		expect(placeName({ city: 'Washington', state: 'Washington', country: 'USA' })).toBe(
 			'Washington'
 		);
+		expect(placeName({ city: 'Washington', state: 'WA', country: 'USA' })).toBe('Washington');
 		expect(placeName({ city: null, state: null, country: 'Chile' })).toBe('Chile');
+		expect(placeName({ city: null, state: 'TX', country: 'USA' })).toBe('Texas');
 		expect(placeName({ city: null, state: null, country: null })).toBe('');
 	});
 });
@@ -45,7 +47,19 @@ describe('placeName with a city that already names its region', () => {
 describe('stateName', () => {
 	it('maps known abbreviations and passes unknown ones through', () => {
 		expect(stateName('az', 'USA')).toBe('Arizona');
-		expect(stateName('SH', 'China')).toBe('SH');
+		expect(stateName('GU', 'United States')).toBe('Guam');
+		expect(stateName('XX', 'Canada')).toBe('XX');
+		expect(stateName('SH', 'China')).toBeNull();
 		expect(stateName(null, 'USA')).toBeNull();
+	});
+});
+
+describe('areaName', () => {
+	it('uses the state in the US and Canada and the country elsewhere', () => {
+		expect(areaName('TX', 'US')).toBe('Texas');
+		expect(areaName(null, 'USA')).toBeNull();
+		expect(areaName('SH', 'China')).toBe('China');
+		expect(isUnitedStates('United States of America')).toBe(true);
+		expect(isUnitedStates(null)).toBe(false);
 	});
 });

@@ -1,6 +1,6 @@
 import type { SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import { awardLabel, ratedTeams } from '#lib/components/team/team-view.ts';
-import { placeName } from '#lib/components/team/places.ts';
+import { placeName } from '#lib/format/places.ts';
 import { fixed, integer, MISSING, record } from '#lib/format/index.ts';
 import type { AllianceColor, EventBundle, Match, TeamSeason, TeamSeasonEvent } from '#lib/types.ts';
 

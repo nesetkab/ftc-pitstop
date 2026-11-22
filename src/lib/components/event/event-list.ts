@@ -2,7 +2,7 @@ import { dateRange } from '#lib/format/time.ts';
 import type { EventSummary, EventType } from '#lib/types.ts';
 import { addDays, eventStatus, localDate, weekStart, type EventStatus } from './dates.ts';
 import { TYPE_ORDER } from './event-meta.ts';
-import { areaName, isUnitedStates, placeName } from './places.ts';
+import { areaName, isUnitedStates, placeName } from '#lib/format/places.ts';
 
 export type ListedEvent = {
 	code: string;
@@ -22,7 +22,7 @@ export function listed(event: EventSummary, teams: number | null): ListedEvent {
 		name: event.name,
 		type: event.type,
 		region: event.region,
-		place: placeName(event.city, event.state, event.country),
+		place: placeName(event) || null,
 		timezone: event.timezone,
 		start: event.start,
 		end: event.end,

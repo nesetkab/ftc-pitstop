@@ -1,5 +1,5 @@
 import type { SeasonRatings } from '#lib/analysis/types.ts';
-import { placeName } from '#lib/components/team/places.ts';
+import { placeName } from '#lib/format/places.ts';
 import { dateRange, fixed, integer, ordinal, record } from '#lib/format/index.ts';
 import { DataError } from '#lib/server/errors.ts';
 import { eventCard, siteCard, teamCard, type OgNode, type Stat } from '#lib/server/og/cards.ts';

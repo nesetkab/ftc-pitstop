@@ -8,7 +8,7 @@
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import { weekday } from './dates.ts';
-	import { placeName } from './places.ts';
+	import { placeName } from '#lib/format/places.ts';
 	import RangeBar from './RangeBar.svelte';
 
 	type RatingWithRange = TeamRating & { sd?: number };
@@ -148,7 +148,7 @@
 						{/if}
 					{:else}
 						<td class="l muted"
-							>{placeName(row.team.city, row.team.state, row.team.country) ?? ''}</td
+							>{placeName(row.team)}</td
 						>
 						<td>{row.team.rookieYear ?? '—'}</td>
 					{/if}
