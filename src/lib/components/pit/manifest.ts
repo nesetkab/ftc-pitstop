@@ -10,12 +10,22 @@ export function teamManifest(team: number) {
 		name: `PitStop ${team}`,
 		short_name: 'PitStop',
 		description: `Next match, queue time and alerts for team ${team}.`,
+		lang: 'en',
 		id: `/${team}`,
 		start_url: `/${team}`,
 		scope: '/',
 		display: 'standalone',
 		background_color: '#131313',
 		theme_color: '#131313',
-		icons: ICONS
+		icons: ICONS,
+		shortcuts: [
+			{
+				name: 'Pit display',
+				short_name: 'TV',
+				description: `Full screen pit display for team ${team}.`,
+				url: `/${team}/tv`,
+				icons: [ICONS[0]]
+			}
+		]
 	};
 }
