@@ -24,6 +24,11 @@ table.t th {
 	vertical-align: bottom;
 }
 
+table.t th abbr[title] {
+	text-decoration: none;
+	cursor: help;
+}
+
 table.t thead tr:not(:last-child) th:not(.group) {
 	border-bottom-color: transparent;
 }

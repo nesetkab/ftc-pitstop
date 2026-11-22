@@ -156,10 +156,6 @@
 		color: var(--text);
 	}
 
-	th abbr {
-		text-decoration: none;
-	}
-
 	td.strong {
 		font-weight: 600;
 	}

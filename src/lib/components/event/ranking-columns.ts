@@ -32,9 +32,10 @@ function ranking<K extends string>(
 	label: string,
 	name: string,
 	digits: number,
-	get: (ranking: Ranking) => number
+	get: (ranking: Ranking) => number,
+	title?: string
 ): RankingColumn & { key: K } {
-	return { key, label, name, source: 'ranking', digits, value: (row) => get(row.ranking) };
+	return { key, label, name, title, source: 'ranking', digits, value: (row) => get(row.ranking) };
 }
 
 function score<K extends string>(
@@ -60,6 +61,8 @@ function score<K extends string>(
 	};
 }
 
+const OPR_TITLE = 'Offensive power rating, estimated points per match';
+
 function rating<K extends string>(
 	key: K,
 	label: string,
@@ -71,6 +74,7 @@ function rating<K extends string>(
 		key,
 		label,
 		name,
+		title: key === 'opr' ? OPR_TITLE : `${OPR_TITLE} from ${name.toLowerCase()}`,
 		source: 'rating',
 		digits,
 		value: (row) => (row.rating ? get(row.rating) : null)
@@ -83,7 +87,14 @@ function winShare(row: Ranking): number {
 }
 
 export const RANKING_COLUMNS = [
-	ranking('rs', 'RS', 'Ranking score (RS)', 2, (row) => row.rs),
+	ranking(
+		'rs',
+		'RS',
+		'Ranking score (RS)',
+		2,
+		(row) => row.rs,
+		'Ranking score, average ranking points per match'
+	),
 	{
 		...ranking('record', 'Record', 'Record', 0, winShare),
 		text: (row: RankingRow) => record(row.ranking.wins, row.ranking.losses, row.ranking.ties),
@@ -93,7 +104,14 @@ export const RANKING_COLUMNS = [
 		}
 	},
 	ranking('played', 'Played', 'Matches played', 0, (row) => row.played),
-	ranking('tbp', 'TBP', 'Tiebreaker (TBP)', 1, (row) => row.tbp),
+	ranking(
+		'tbp',
+		'TBP',
+		'Tiebreaker (TBP)',
+		1,
+		(row) => row.tbp,
+		'Tiebreaker points, average match score without penalties'
+	),
 	score(
 		'npavg',
 		'NP avg',
@@ -112,7 +130,7 @@ export const RANKING_COLUMNS = [
 		1,
 		(stats) => stats.sd
 	),
-	ranking('avgtips', 'Avg tips', 'Average tips', 1, (row) => row.avgTips),
+	ranking('avgtips', 'Avg tips', 'Average tips', 1, (row) => row.avgTips, 'Average tips per match'),
 	rating('opr', 'OPR', 'Total', 1, (row) => row.opr),
 	rating('opr-auto', `${PART_LABELS.auto} OPR`, PART_LABELS.auto, 1, (row) => row.parts.auto),
 	rating(
