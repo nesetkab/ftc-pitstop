@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed, signed } from '#lib/format/number.ts';
 	import type { Match, Team } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
@@ -51,7 +52,7 @@
 				<th class="l opt" scope="col"><span class="visually-hidden">Rank change</span></th>
 			{/if}
 			{#if showOpr}
-				<th scope="col">OPR</th>
+				<th scope="col"><Term label="OPR" /></th>
 				<th scope="col">Change</th>
 			{/if}
 		</tr>

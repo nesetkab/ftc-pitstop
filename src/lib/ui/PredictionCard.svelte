@@ -8,6 +8,7 @@
 </script>
 
 <script lang="ts">
+	import Term from './Term.svelte';
 	import { fixed } from '#lib/format/number.ts';
 	import { pct } from '#lib/format/pct.ts';
 	import AllianceChip from './AllianceChip.svelte';
@@ -47,7 +48,9 @@
 				{/if}
 				<th scope="col">{compact ? 'Alliance' : 'Teams'}</th>
 				<th scope="col" class="right">{compact ? 'Win' : 'Win chance'}</th>
-				<th scope="col" class="right">{compact ? 'Pred.' : 'Predicted'}</th>
+				<th scope="col" class="right"
+					>{#if compact}<Term label="Pred." />{:else}Predicted{/if}</th
+				>
 			</tr>
 		</thead>
 		<tbody>

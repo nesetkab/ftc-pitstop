@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { oprTerm } from '#lib/format/glossary.ts';
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed } from '#lib/format/index.ts';
 	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import Table from '#lib/ui/Table.svelte';
@@ -41,7 +43,9 @@
 		<tr>
 			<th class="l" scope="col">Event</th>
 			{#each columns as column (column.key)}
-				<th scope="col" class={{ nested: column.nested, opt: column.opt }}>{column.label}</th>
+				<th scope="col" class={{ nested: column.nested, opt: column.opt }}
+					><Term label={column.label} term={oprTerm(column.label)} /></th
+				>
 			{/each}
 		</tr>
 	</thead>

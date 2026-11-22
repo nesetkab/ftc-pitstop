@@ -1,4 +1,5 @@
 import type { Projection, TeamRating } from '#lib/analysis/types.ts';
+import { explain } from '#lib/format/glossary.ts';
 import { fixed } from '#lib/format/number.ts';
 import { record } from '#lib/format/record.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
@@ -32,17 +33,23 @@ function ranking<K extends string>(
 	label: string,
 	name: string,
 	digits: number,
-	get: (ranking: Ranking) => number,
-	title?: string
+	get: (ranking: Ranking) => number
 ): RankingColumn & { key: K } {
-	return { key, label, name, title, source: 'ranking', digits, value: (row) => get(row.ranking) };
+	return {
+		key,
+		label,
+		name,
+		title: explain(label) ?? undefined,
+		source: 'ranking',
+		digits,
+		value: (row) => get(row.ranking)
+	};
 }
 
 function score<K extends string>(
 	key: K,
 	label: string,
 	name: string,
-	title: string,
 	digits: number,
 	get: (scores: ScoreStats) => number
 ): RankingColumn & { key: K } {
@@ -50,7 +57,7 @@ function score<K extends string>(
 		key,
 		label,
 		name,
-		title,
+		title: explain(label) ?? undefined,
 		source: 'score',
 		digits,
 		value: (row) => (row.scores ? get(row.scores) : null),
@@ -60,8 +67,6 @@ function score<K extends string>(
 		}
 	};
 }
-
-const OPR_TITLE = 'Offensive power rating, estimated points per match';
 
 function rating<K extends string>(
 	key: K,
@@ -74,7 +79,7 @@ function rating<K extends string>(
 		key,
 		label,
 		name,
-		title: key === 'opr' ? OPR_TITLE : `${OPR_TITLE} from ${name.toLowerCase()}`,
+		title: explain(label) ?? undefined,
 		source: 'rating',
 		digits,
 		value: (row) => (row.rating ? get(row.rating) : null)
@@ -87,14 +92,7 @@ function winShare(row: Ranking): number {
 }
 
 export const RANKING_COLUMNS = [
-	ranking(
-		'rs',
-		'RS',
-		'Ranking score (RS)',
-		2,
-		(row) => row.rs,
-		'Ranking score, average ranking points per match'
-	),
+	ranking('rs', 'RS', 'Ranking score (RS)', 2, (row) => row.rs),
 	{
 		...ranking('record', 'Record', 'Record', 0, winShare),
 		text: (row: RankingRow) => record(row.ranking.wins, row.ranking.losses, row.ranking.ties),
@@ -104,33 +102,12 @@ export const RANKING_COLUMNS = [
 		}
 	},
 	ranking('played', 'Played', 'Matches played', 0, (row) => row.played),
-	ranking(
-		'tbp',
-		'TBP',
-		'Tiebreaker (TBP)',
-		1,
-		(row) => row.tbp,
-		'Tiebreaker points, average match score without penalties'
-	),
-	score(
-		'npavg',
-		'NP avg',
-		'Average',
-		'Average score without opponent fouls',
-		1,
-		(stats) => stats.avg
-	),
-	score('npmax', 'NP max', 'Best', 'Best score without opponent fouls', 0, (stats) => stats.max),
-	score('npmin', 'NP min', 'Worst', 'Worst score without opponent fouls', 0, (stats) => stats.min),
-	score(
-		'npsd',
-		'Spread',
-		'Spread',
-		'Standard deviation of scores without opponent fouls',
-		1,
-		(stats) => stats.sd
-	),
-	ranking('avgtips', 'Avg tips', 'Average tips', 1, (row) => row.avgTips, 'Average tips per match'),
+	ranking('tbp', 'TBP', 'Tiebreaker (TBP)', 1, (row) => row.tbp),
+	score('npavg', 'NP avg', 'Average', 1, (stats) => stats.avg),
+	score('npmax', 'NP max', 'Best', 0, (stats) => stats.max),
+	score('npmin', 'NP min', 'Worst', 0, (stats) => stats.min),
+	score('npsd', 'Spread', 'Spread', 1, (stats) => stats.sd),
+	ranking('avgtips', 'Avg tips', 'Average tips', 1, (row) => row.avgTips),
 	rating('opr', 'OPR', 'Total', 1, (row) => row.opr),
 	rating('opr-auto', `${PART_LABELS.auto} OPR`, PART_LABELS.auto, 1, (row) => row.parts.auto),
 	rating(

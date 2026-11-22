@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { oprTerm } from '#lib/format/glossary.ts';
+	import Term from '#lib/ui/Term.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import type { CompareRow, CompareTeam } from './compare.ts';
 
@@ -8,6 +10,8 @@
 	}
 
 	let { teams, rows }: Props = $props();
+
+	const OPR_PARTS = new Set(['auto', 'teleop', 'hive', 'flower', 'garden', 'park', 'tips']);
 </script>
 
 <div class="wrap" style:max-width="{240 + 190 * teams.length}px">
@@ -27,7 +31,12 @@
 		<tbody>
 			{#each rows as row (row.key)}
 				<tr class:nested={row.nested}>
-					<th class="l measure pin" scope="row">{row.label}</th>
+					<th class="l measure pin" scope="row"
+						><Term
+							label={row.label}
+							term={OPR_PARTS.has(row.key) ? oprTerm(row.label) : row.label}
+						/></th
+					>
 					{#each row.values as value, index (index)}
 						<td><span class:best={row.best.includes(index)}>{value}</span></td>
 					{/each}

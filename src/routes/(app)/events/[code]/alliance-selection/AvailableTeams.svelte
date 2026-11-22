@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed } from '#lib/format/number.ts';
 	import { MISSING } from '#lib/format/pct.ts';
 	import ProbCell from '#lib/ui/ProbCell.svelte';
@@ -30,15 +31,15 @@
 		<tr>
 			<th class="l" scope="col">Team</th>
 			{#if table.rated}
-				<th class="w" scope="col">OPR</th>
-				<th class="w" scope="col">Auto OPR</th>
+				<th class="w" scope="col"><Term label="OPR" /></th>
+				<th class="w" scope="col"><Term label="Auto OPR" /></th>
 			{:else}
-				<th class="w" scope="col">RS</th>
-				<th class="w opt" scope="col">TBP</th>
-				<th class="w" scope="col">Avg auto</th>
+				<th class="w" scope="col"><Term label="RS" /></th>
+				<th class="w opt" scope="col"><Term label="TBP" /></th>
+				<th class="w" scope="col"><Term label="Avg auto" /></th>
 			{/if}
-			<th class="w opt" scope="col">Avg tips</th>
-			<th class="w opt" scope="col">Avg park</th>
+			<th class="w opt" scope="col"><Term label="Avg tips" /></th>
+			<th class="w opt" scope="col"><Term label="Avg park" /></th>
 			<th class="w" scope="col">Rank</th>
 			{#if table.picks}
 				<th class="w opt" scope="col">Win round 1</th>

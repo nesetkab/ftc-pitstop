@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import type { RankedRecord } from '#lib/components/records/records.ts';
 	import { integer } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -42,7 +43,7 @@
 						aria-sort={active ? 'descending' : undefined}
 					>
 						<a href={sortHref(part.key)} data-sveltekit-noscroll>
-							{part.label}{#if active}<span aria-hidden="true"> ↓</span>{/if}
+							<Term label={part.label} />{#if active}<span aria-hidden="true"> ↓</span>{/if}
 						</a>
 					</th>
 				{/each}

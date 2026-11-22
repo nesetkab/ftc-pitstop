@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed, MISSING, signed } from '#lib/format/index.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import {
@@ -49,7 +50,9 @@
 	<tbody>
 		{#each INSIGHT_PARTS as part (part.key)}
 			<tr>
-				<th class={['l', 'part', { nested: NESTED.has(part.key) }]} scope="row">{part.label}</th>
+				<th class={['l', 'part', { nested: NESTED.has(part.key) }]} scope="row"
+					><Term label={part.label} /></th
+				>
 				<td class={{ strong: part.key === 'total', opt: playoff }}>{value(qual, part.key)}</td>
 				{#if playoff}
 					<td class={{ strong: part.key === 'total', opt: true }}>{value(playoff, part.key)}</td>

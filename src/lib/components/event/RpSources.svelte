@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed } from '#lib/format/number.ts';
 	import type { Ranking, Team } from '#lib/types.ts';
 	import { heatBackground } from '#lib/ui/heat.ts';
@@ -48,16 +48,12 @@
 			<tr>
 				<th class="l opt" scope="col">Rank</th>
 				<th class="l" scope="col">Team</th>
-				<th class="opt" scope="col">RS</th>
+				<th class="opt" scope="col"><Term label="RS" /></th>
 				<th scope="col">Won</th>
-				<th scope="col"><abbr title="Leave and park {RP_THRESHOLDS.swarm}+ points">Swarm</abbr></th>
-				<th scope="col"
-					><abbr title="Pollinator 1, {RP_THRESHOLDS.pollinator1}+ tips">Poll. 1</abbr></th
-				>
-				<th scope="col"
-					><abbr title="Pollinator 2, {RP_THRESHOLDS.pollinator2}+ tips">Poll. 2</abbr></th
-				>
-				<th class="opt" scope="col">Bonus RS</th>
+				<th scope="col"><Term label="Swarm" /></th>
+				<th scope="col"><Term label="Poll. 1" /></th>
+				<th scope="col"><Term label="Poll. 2" /></th>
+				<th class="opt" scope="col"><Term label="Bonus RS" /></th>
 			</tr>
 		</thead>
 		<tbody>

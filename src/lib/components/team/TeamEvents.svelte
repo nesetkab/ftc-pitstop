@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed, MISSING, record } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -29,8 +30,8 @@
 				<th class="l" scope="col">Event</th>
 				<th class="l opt" scope="col">Date</th>
 				<th scope="col">Rank</th>
-				<th scope="col">Record</th>
-				<th scope="col">OPR</th>
+				<th scope="col"><Term label="Record" /></th>
+				<th scope="col"><Term label="OPR" /></th>
 				<th class="l opt" scope="col">Playoffs</th>
 				<th class="l opt" scope="col">Awards</th>
 			</tr>

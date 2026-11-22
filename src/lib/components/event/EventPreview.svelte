@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import type { Projection, TeamRating } from '#lib/analysis/types.ts';
 	import { SEASON } from '#lib/game/biobuzz.ts';
 	import { fixed, integer } from '#lib/format/number.ts';
@@ -127,7 +128,7 @@
 				{#if rated}<th class="l" scope="col">#</th>{/if}
 				<th class="l" scope="col">Team</th>
 				{#if rated}
-					<th scope="col">Starting OPR</th>
+					<th scope="col"><Term label="Starting OPR" /></th>
 					{#if withRange}
 						<th scope="col">Likely range</th>
 					{/if}

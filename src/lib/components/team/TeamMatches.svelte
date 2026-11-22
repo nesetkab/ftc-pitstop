@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { MISSING, record } from '#lib/format/index.ts';
 	import { PART_LABELS } from '#lib/game/biobuzz.ts';
@@ -48,7 +49,7 @@
 						<th class="l" scope="col">Alliance and opponents</th>
 						<th scope="col">Score</th>
 						{#each parts as part (part.key)}
-							<th class="opt" scope="col">{part.label}</th>
+							<th class="opt" scope="col"><Term label={part.label} /></th>
 						{/each}
 					</tr>
 				</thead>

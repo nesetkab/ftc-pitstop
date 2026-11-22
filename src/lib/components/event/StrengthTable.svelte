@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import type { ScheduleStrength } from '#lib/analysis/types.ts';
 	import { fixed, signed } from '#lib/format/number.ts';
 	import type { Ranking, Team } from '#lib/types.ts';
@@ -40,9 +41,9 @@
 			<tr>
 				<th class="l" scope="col">Team</th>
 				<th scope="col">Rank</th>
-				<th scope="col">Rank by OPR</th>
-				<th class="opt" scope="col">Partners' OPR</th>
-				<th class="opt" scope="col">Opponents' OPR</th>
+				<th scope="col"><Term label="Rank by OPR" /></th>
+				<th class="opt" scope="col"><Term label="Partners' OPR" /></th>
+				<th class="opt" scope="col"><Term label="Opponents' OPR" /></th>
 				<th scope="col">Difference</th>
 			</tr>
 		</thead>
