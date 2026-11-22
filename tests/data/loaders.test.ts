@@ -61,7 +61,7 @@ describe('loadEventBundle', () => {
 			phase: 'done',
 			source: 'ftc',
 			stale: false,
-			cacheControl: 'public, s-maxage=86400'
+			cacheControl: 'public, s-maxage=86400, stale-while-revalidate=604800'
 		});
 		expect(bundle.teams).toHaveLength(27);
 		expect(bundle.matches).toHaveLength(44);

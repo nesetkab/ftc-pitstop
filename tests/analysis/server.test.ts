@@ -68,7 +68,7 @@ describe('createAnalysis', () => {
 	it('analyzes an event with priors from earlier events only', async () => {
 		const data = setup();
 		const { analysis, cacheControl } = await data.loadEventAnalysisEntry('usazgiq');
-		expect(cacheControl).toBe('public, s-maxage=86400');
+		expect(cacheControl).toBe(CACHE_CONTROL.finished);
 		const teams = analysis.ratings.map((r) => r.team);
 		const before = await data.priorsForTeams(teams, Date.parse('2026-11-14T00:00:00Z'));
 		expect(Object.keys(before.states)).toHaveLength(27);
