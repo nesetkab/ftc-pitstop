@@ -279,3 +279,9 @@ select:disabled {
 	color: var(--text-3);
 	cursor: not-allowed;
 }
+
+@media (pointer: coarse) {
+	select {
+		min-height: 40px;
+	}
+}

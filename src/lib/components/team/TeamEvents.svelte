@@ -27,24 +27,24 @@
 		<thead>
 			<tr>
 				<th class="l" scope="col">Event</th>
-				<th class="l" scope="col">Date</th>
+				<th class="l opt" scope="col">Date</th>
 				<th scope="col">Rank</th>
 				<th scope="col">Record</th>
 				<th scope="col">OPR</th>
-				<th class="l" scope="col">Playoffs</th>
-				<th class="l" scope="col">Awards</th>
+				<th class="l opt" scope="col">Playoffs</th>
+				<th class="l opt" scope="col">Awards</th>
 			</tr>
 		</thead>
 		<tbody>
 			{#each rows as row (row.code)}
 				<tr>
-					<td class="l"><a href="/events/{row.code}">{row.name}</a></td>
-					<td class="l">{shortRange(row.start, row.end)}</td>
+					<td class="l wrap"><a href="/events/{row.code}">{row.name}</a></td>
+					<td class="l opt">{shortRange(row.start, row.end)}</td>
 					<td>{row.rank ?? MISSING}</td>
 					<td>{recordText(row)}</td>
 					<td>{fixed(row.opr)}</td>
-					<td class="l wrap wide">{row.playoffs ?? MISSING}</td>
-					<td class="l wrap wide">{awardsText(row)}</td>
+					<td class="l wrap wide opt">{row.playoffs ?? MISSING}</td>
+					<td class="l wrap wide opt">{awardsText(row)}</td>
 				</tr>
 			{/each}
 		</tbody>

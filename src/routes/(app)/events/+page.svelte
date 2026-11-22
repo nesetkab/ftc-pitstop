@@ -353,10 +353,15 @@
 		text-decoration-thickness: 1px;
 	}
 
-	@media (max-width: 760px) {
+	@media (max-width: 900px) {
 		.type,
-		.place,
 		.teams {
+			display: none;
+		}
+	}
+
+	@media (max-width: 760px) {
+		.place {
 			display: none;
 		}
 
@@ -374,6 +379,11 @@
 
 		.filters label:not(.search) {
 			flex: 1 1 140px;
+		}
+	}
+	@media (pointer: coarse) {
+		.seg button {
+			min-height: 40px;
 		}
 	}
 </style>

@@ -37,7 +37,7 @@
 			<th scope="col">Earned in</th>
 			<th scope="col">Brier score</th>
 			<th scope="col">Brier score from the base rate alone</th>
-			<th scope="col">Log loss</th>
+			<th class="opt" scope="col">Log loss</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -47,7 +47,7 @@
 				<td>{percent(row.result.rate)}</td>
 				<td>{fixed(row.result.brier, 3)}</td>
 				<td>{fixed(baseRateBrier(row.result.rate), 3)}</td>
-				<td>{fixed(row.result.logloss, 3)}</td>
+				<td class="opt">{fixed(row.result.logloss, 3)}</td>
 			</tr>
 		{/each}
 	</tbody>

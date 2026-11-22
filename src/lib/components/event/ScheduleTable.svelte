@@ -67,15 +67,15 @@
 	<thead>
 		<tr>
 			<th class="l" scope="col">Match</th>
-			<th class="l" scope="col">Time</th>
+			<th class="l opt" scope="col">Time</th>
 			{#if showExpected}
-				<th class="l" scope="col">Expected</th>
+				<th class="l opt" scope="col">Expected</th>
 			{/if}
 			<th class="l" scope="col">Red</th>
 			<th class="l" scope="col">Blue</th>
 			<th scope="col">Score</th>
 			{#if showForecast}
-				<th scope="col">Predicted</th>
+				<th class="opt" scope="col">Predicted</th>
 				<th scope="col">Win chance</th>
 			{/if}
 		</tr>
@@ -90,14 +90,20 @@
 			{#each group.matches as match (match.key)}
 				{@const forecast = forecasts?.[match.key]}
 				{@const at = expected(match)}
+				{@const when = at ?? match.scheduledTime}
 				{@const result = match.result}
 				<tr>
-					<td class="l"><a class="label" href={matchHref(code, match)}>{match.label}</a></td>
-					<td class="l muted">
+					<td class="l">
+						<a class="label" href={matchHref(code, match)}>{match.label}</a>
+						{#if when !== null}
+							<span class="when">{time(when, timezone)}</span>
+						{/if}
+					</td>
+					<td class="l muted opt">
 						{match.scheduledTime === null ? '' : time(match.scheduledTime, timezone)}
 					</td>
 					{#if showExpected}
-						<td class="l muted">{at === null ? '' : time(at, timezone)}</td>
+						<td class="l muted opt">{at === null ? '' : time(at, timezone)}</td>
 					{/if}
 					<td class="l">
 						<span class="chips">
@@ -121,7 +127,7 @@
 						{/if}
 					</td>
 					{#if showForecast}
-						<td class="muted">
+						<td class="muted opt">
 							{#if forecast}
 								{fixed(forecast.red.score, 0)}–{fixed(forecast.blue.score, 0)}
 							{/if}
@@ -145,9 +151,26 @@
 		font-weight: 600;
 	}
 
+	.when {
+		display: none;
+		font-size: 12.5px;
+		color: var(--text-2);
+	}
+
 	.chips {
 		display: inline-flex;
 		gap: 4px;
+	}
+
+	@media (max-width: 600px) {
+		.when {
+			display: block;
+		}
+
+		.chips {
+			flex-direction: column;
+			align-items: flex-start;
+		}
 	}
 
 	.score span {

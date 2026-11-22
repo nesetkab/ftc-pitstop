@@ -61,6 +61,19 @@ describe('RankingsView', () => {
 		expect(screen.queryByText('Schedule so far')).toBeNull();
 	});
 
+	it('drops low-value columns on phones', () => {
+		render(RankingsView, { props: { bundle: midway, analysis: fakeAnalysis(midway) } });
+		const table = screen.getByRole('table', { name: 'Rankings' });
+		const optional = within(table)
+			.getAllByRole('columnheader')
+			.filter((cell) => cell.classList.contains('opt'))
+			.map((cell) => cell.textContent?.trim());
+		expect(optional).toEqual(['TBP', 'Avg tips', 'Finish, 1st to 27th']);
+		const first = bodyRows(table)[0];
+		expect(first.querySelectorAll('td.opt')).toHaveLength(3);
+		expect(screen.getByText('Projected after 34 matches').closest('tr')).toHaveClass('opt');
+	});
+
 	it('highlights followed teams', () => {
 		render(RankingsView, { props: { bundle: finished, followed: new Set([14624]) } });
 		const table = screen.getByRole('table', { name: 'Rankings' });

@@ -43,7 +43,7 @@
 	<caption class="visually-hidden">Rankings</caption>
 	<thead>
 		{#if projected}
-			<tr>
+			<tr class="opt">
 				<td colspan={baseColumns}></td>
 				<th colspan="3" scope="colgroup" class="group sep">Projected after {qualCount} matches</th>
 			</tr>
@@ -53,13 +53,13 @@
 			<th class="l" scope="col">Team</th>
 			<th scope="col">RS</th>
 			<th scope="col">Record</th>
-			<th scope="col">TBP</th>
-			<th scope="col">Avg tips</th>
+			<th class="opt" scope="col">TBP</th>
+			<th class="opt" scope="col">Avg tips</th>
 			{#if opr}
 				<th scope="col">OPR</th>
 			{/if}
 			{#if projected}
-				<th class="sep" scope="col">Finish, 1st to {ordinal(rankings.length)}</th>
+				<th class="sep opt" scope="col">Finish, 1st to {ordinal(rankings.length)}</th>
 				<th scope="col">Top 4</th>
 				<th scope="col">Top 8</th>
 			{/if}
@@ -75,13 +75,13 @@
 				</td>
 				<td>{fixed(row.rs, 2)}</td>
 				<td>{record(row.wins, row.losses, row.ties)}</td>
-				<td>{fixed(row.tbp)}</td>
-				<td>{fixed(row.avgTips)}</td>
+				<td class="opt">{fixed(row.tbp)}</td>
+				<td class="opt">{fixed(row.avgTips)}</td>
 				{#if opr}
 					<td>{fixed(opr.get(row.team))}</td>
 				{/if}
 				{#if projected}
-					<td class="sep">
+					<td class="sep opt">
 						{#if projection}
 							<FinishSpark dist={projection.rankChances} />
 						{/if}

@@ -19,8 +19,8 @@
 	<tbody>
 		{#each rows as row, index (index)}
 			<tr>
-				<td class="l">{row.name}</td>
-				<td class="l"><a href="/events/{row.code}">{row.event}</a></td>
+				<td class="l wrap">{row.name}</td>
+				<td class="l wrap"><a href="/events/{row.code}">{row.event}</a></td>
 			</tr>
 		{/each}
 	</tbody>

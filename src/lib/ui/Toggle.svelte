@@ -88,4 +88,10 @@
 		color: var(--text-3);
 		cursor: not-allowed;
 	}
+
+	@media (pointer: coarse) {
+		.toggle {
+			min-height: 40px;
+		}
+	}
 </style>

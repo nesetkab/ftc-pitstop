@@ -41,7 +41,7 @@ describe('event table', () => {
 		expect(headers).toEqual(['Event', 'Where', 'Type', 'Day', 'Status']);
 		const row = within(table).getAllByRole('row')[1];
 		expect([...row.querySelectorAll('td')].map((cell) => cell.textContent)).toEqual([
-			'Event 0',
+			'Event 0 Gilbert, AZ',
 			'Gilbert, AZ',
 			'Qualifier',
 			'Today',

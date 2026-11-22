@@ -41,8 +41,8 @@
 				<th class="l" scope="col">Team</th>
 				<th scope="col">Rank</th>
 				<th scope="col">Rank by OPR</th>
-				<th scope="col">Partners' OPR</th>
-				<th scope="col">Opponents' OPR</th>
+				<th class="opt" scope="col">Partners' OPR</th>
+				<th class="opt" scope="col">Opponents' OPR</th>
 				<th scope="col">Difference</th>
 			</tr>
 		</thead>
@@ -54,8 +54,8 @@
 					</td>
 					<td>{row.rank}</td>
 					<td>{row.ratingRank}</td>
-					<td>{fixed(row.partners)}</td>
-					<td>{fixed(row.opponents)}</td>
+					<td class="opt">{fixed(row.partners)}</td>
+					<td class="opt">{fixed(row.opponents)}</td>
 					<td>{signed(row.partners - row.opponents)}</td>
 				</tr>
 			{/each}

@@ -63,4 +63,9 @@
 			padding: 7px 9px;
 		}
 	}
+	@media (pointer: coarse) {
+		button {
+			min-height: 40px;
+		}
+	}
 </style>

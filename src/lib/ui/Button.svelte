@@ -62,4 +62,9 @@
 	.secondary:disabled:hover {
 		background: transparent;
 	}
+	@media (pointer: coarse) {
+		.btn {
+			min-height: 40px;
+		}
+	}
 </style>

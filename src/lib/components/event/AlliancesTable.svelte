@@ -41,7 +41,7 @@
 	}
 </script>
 
-<Table>
+<Table class="alliances">
 	<caption class="visually-hidden">Alliances</caption>
 	<thead>
 		<tr>
@@ -102,3 +102,11 @@
 		{/each}
 	</tbody>
 </Table>
+
+<style>
+	@media (max-width: 600px) {
+		:global(.table-wrap.alliances .team-cell .name) {
+			display: none;
+		}
+	}
+</style>

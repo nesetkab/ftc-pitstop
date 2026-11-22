@@ -75,11 +75,5 @@
 		.optional {
 			display: none;
 		}
-
-		.team-name {
-			max-width: none;
-			overflow: visible;
-			white-space: normal;
-		}
 	}
 </style>

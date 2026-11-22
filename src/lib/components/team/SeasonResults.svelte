@@ -21,7 +21,7 @@
 			<th class="l" scope="col">Model</th>
 			<th scope="col">Winner accuracy</th>
 			<th scope="col">Brier score</th>
-			<th scope="col">Log loss</th>
+			<th class="opt" scope="col">Log loss</th>
 			<th scope="col">Score error</th>
 		</tr>
 	</thead>
@@ -49,7 +49,7 @@
 						</td>
 						<td>{percent(result.accuracy)}</td>
 						<td>{fixed(result.brier, 3)}</td>
-						<td>{fixed(result.logloss, 3)}</td>
+						<td class="opt">{fixed(result.logloss, 3)}</td>
 						<td>{fixed(result.mae, 1)}</td>
 					</tr>
 				{/if}
@@ -78,13 +78,17 @@
 	}
 
 	tr.chosen td {
-		background: var(--accent-wash);
+		background: var(--surface);
 	}
 
 	@media (max-width: 640px) {
 		th.season span {
 			display: block;
 			margin: 2px 0 0;
+		}
+
+		td.model {
+			min-width: 9em;
 		}
 	}
 

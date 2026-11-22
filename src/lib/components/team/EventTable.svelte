@@ -31,7 +31,7 @@
 		<thead>
 			<tr>
 				<th class="l" scope="col">Event</th>
-				<th class="l" scope="col">Where</th>
+				<th class="l where" scope="col">Where</th>
 				<th class="l type" scope="col">Type</th>
 				<th class="l" scope="col">{datesHeader}</th>
 				<th class="l" scope="col">{statusHeader}</th>
@@ -40,8 +40,11 @@
 		<tbody>
 			{#each shown as row (row.code)}
 				<tr>
-					<td class="l"><a href="/events/{row.code}">{row.name}</a></td>
-					<td class="l">{row.place}</td>
+					<td class="l name">
+						<a href="/events/{row.code}">{row.name}</a>
+						<span class="sub">{row.place}</span>
+					</td>
+					<td class="l where">{row.place}</td>
 					<td class="l type">{row.type}</td>
 					<td class="l">{row.dates}</td>
 					<td class="l">{row.status}</td>
@@ -85,6 +88,12 @@
 		width: 17%;
 	}
 
+	.sub {
+		display: none;
+		font-size: 13px;
+		color: var(--text-2);
+	}
+
 	.more {
 		display: flex;
 	}
@@ -96,12 +105,27 @@
 	}
 
 	@media (max-width: 640px) {
-		.events :global(td) {
+		.name {
 			white-space: normal;
 		}
 
+		.sub {
+			display: block;
+		}
+
+		col.event {
+			width: auto;
+		}
+
+		col.dates,
+		col.status {
+			width: 1%;
+		}
+
 		.type,
-		col.type {
+		.where,
+		col.type,
+		col.where {
 			display: none;
 		}
 	}
