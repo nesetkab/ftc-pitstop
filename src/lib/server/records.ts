@@ -1,3 +1,4 @@
+import { partAverages, type PartAverages } from '#lib/components/event/insights.ts';
 import {
 	buildRecordDataset,
 	filterRecords,
@@ -11,6 +12,7 @@ import { loadSeasonModelWithin } from '#lib/server/analysis.ts';
 import { searchIndex } from '#lib/server/event.ts';
 
 let memo: { generatedAt: number; dataset: RecordDataset } | null = null;
+let averagesMemo: { generatedAt: number; averages: PartAverages | null } | null = null;
 let directory: {
 	fetchedAt: number;
 	teams: Map<number, string>;
@@ -26,6 +28,15 @@ export async function loadRecordDataset(
 		memo = { generatedAt: model.generatedAt, dataset: buildRecordDataset(model.matches) };
 	}
 	return { dataset: memo.dataset, updated: model.generatedAt };
+}
+
+export async function loadSeasonAverages(ms: number): Promise<PartAverages | null> {
+	const source = await loadRecordDataset(ms);
+	if (!source) return null;
+	if (averagesMemo?.generatedAt !== source.updated) {
+		averagesMemo = { generatedAt: source.updated, averages: partAverages(source.dataset.rows) };
+	}
+	return averagesMemo.averages;
 }
 
 export async function recordNames(

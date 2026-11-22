@@ -70,6 +70,7 @@
 		{ href: `${base}/rankings`, label: 'Rankings' },
 		{ href: `${base}/schedule`, label: 'Schedule' },
 		{ href: `${base}/results`, label: 'Results' },
+		...(qualsPlayed + playoffsPlayed > 0 ? [{ href: `${base}/insights`, label: 'Insights' }] : []),
 		...(withPlayoffs ? [{ href: `${base}/playoffs`, label: 'Playoffs' }] : []),
 		{ href: `${base}/teams`, label: 'Teams' },
 		{ href: `${base}/awards`, label: 'Awards' },

@@ -50,6 +50,7 @@ export interface RecordRow {
 	flower: number;
 	garden: number;
 	park: number;
+	tips: number;
 }
 
 export interface RankedRecord extends RecordRow {
@@ -172,7 +173,8 @@ function side(
 		hive: own.hive,
 		flower: own.flower,
 		garden: own.garden,
-		park: own.park
+		park: own.park,
+		tips: own.tips
 	};
 }
 
