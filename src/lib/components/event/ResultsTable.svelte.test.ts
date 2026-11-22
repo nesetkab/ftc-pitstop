@@ -17,6 +17,9 @@ describe('ResultsTable', () => {
 		const [red, blue] = [...group.querySelectorAll('tr')];
 		expect(red.querySelector('td.l')).toHaveTextContent(/^Red \d/);
 		expect(blue.querySelector('td.l')).toHaveTextContent(/^Blue \d/);
+		const labels = [red, blue].map((row) => row.querySelector('td.l > span') as HTMLElement);
+		expect(labels.map((label) => label.textContent)).toEqual(['Red', 'Blue']);
+		expect(labels.some((label) => label.classList.contains('visually-hidden'))).toBe(false);
 		const winner = q1.result!.winner === 'red' ? red : blue;
 		expect(winner.querySelector('td.total')).toHaveTextContent(/^\d+, won$/);
 	});

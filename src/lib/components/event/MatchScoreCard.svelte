@@ -212,4 +212,15 @@
 			white-space: nowrap;
 		}
 	}
+
+	@media (pointer: coarse) {
+		.teams {
+			gap: 0 14px;
+			margin-block: -10px;
+		}
+
+		.team {
+			padding-block: 10px;
+		}
+	}
 </style>

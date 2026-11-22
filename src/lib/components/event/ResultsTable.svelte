@@ -68,7 +68,7 @@
 						</th>
 					{/if}
 					<td class="l">
-						<span class="visually-hidden">{color === 'red' ? 'Red' : 'Blue'}</span>
+						<span class={['side-name', color]}>{color === 'red' ? 'Red' : 'Blue'}</span>
 						<span class="chips">
 							{#each match[color] as entry (entry.team)}
 								<TeamChip number={entry.team} alliance={color} me={followed.has(entry.team)} />
@@ -107,6 +107,13 @@
 		color: var(--text);
 	}
 
+	@media (pointer: coarse) {
+		.sort {
+			margin-block: -11px;
+			padding-block: 11px;
+		}
+	}
+
 	th.match {
 		padding: 11px 10px 9px;
 		border-bottom: 1px solid var(--line);
@@ -127,6 +134,21 @@
 
 	tr.side:not(.first) td {
 		padding-top: 3px;
+	}
+
+	.side-name {
+		display: inline-block;
+		width: 2.6em;
+		font-size: 12.5px;
+		font-weight: 500;
+	}
+
+	.side-name.red {
+		color: var(--red);
+	}
+
+	.side-name.blue {
+		color: var(--blue);
 	}
 
 	.chips {

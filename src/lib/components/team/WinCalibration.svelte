@@ -20,6 +20,7 @@
 
 	const percent = (value: number) => `${fixed(value * 100, 1)}%`;
 	const range = (lo: number, hi: number) => `${Math.round(lo * 100)}% to ${Math.round(hi * 100)}%`;
+	const shortRange = (lo: number, hi: number) => `${Math.round(lo * 100)}–${Math.round(hi * 100)}%`;
 
 	function binAt(entry: CalibrationSeries, lo: number): CalibrationBin | undefined {
 		return entry.bins.find((bin) => bin.lo === lo);
@@ -36,33 +37,65 @@
 	/>
 	<Table>
 		<thead>
+			{#each [3, 2] as span (span)}
+				<tr class={span === 3 ? 'full' : 'short'}>
+					<td></td>
+					{#each series as entry (entry.label)}
+						<th class="group sep" scope="colgroup" colspan={span}>{entry.label}</th>
+					{/each}
+				</tr>
+			{/each}
 			<tr>
-				<td></td>
+				<th class="l" scope="col" aria-label="Predicted range">
+					<span class="full">Predicted range</span>
+					<span class="short">Range</span>
+				</th>
 				{#each series as entry (entry.label)}
-					<th class="group sep" scope="colgroup" colspan="3">{entry.label}</th>
-				{/each}
-			</tr>
-			<tr>
-				<th class="l" scope="col">Predicted range</th>
-				{#each series as entry (entry.label)}
-					<th class="sep" scope="col">Predicted</th>
+					<th class="sep" scope="col" aria-label="Predicted">
+						<span class="full">Predicted</span>
+						<span class="short">Pred.</span>
+					</th>
 					<th scope="col">Won</th>
-					<th scope="col">Matches</th>
+					<th class="opt" scope="col">Matches</th>
 				{/each}
 			</tr>
 		</thead>
 		<tbody>
 			{#each edges as edge (edge.lo)}
 				<tr>
-					<td class="l">{range(edge.lo, edge.hi)}</td>
+					<td class="l">
+						<span class="full">{range(edge.lo, edge.hi)}</span>
+						<span class="short" aria-hidden="true">{shortRange(edge.lo, edge.hi)}</span>
+						<span class="short visually-hidden">{range(edge.lo, edge.hi)}</span>
+					</td>
 					{#each series as entry (entry.label)}
 						{@const bin = binAt(entry, edge.lo)}
 						<td class="sep">{bin ? percent(bin.predicted) : ''}</td>
 						<td>{bin ? percent(bin.observed) : ''}</td>
-						<td>{bin ? integer(bin.n) : ''}</td>
+						<td class="opt">{bin ? integer(bin.n) : ''}</td>
 					{/each}
 				</tr>
 			{/each}
 		</tbody>
 	</Table>
 {/if}
+
+<style>
+	.short {
+		display: none;
+	}
+
+	@media (max-width: 600px) {
+		.full {
+			display: none;
+		}
+
+		span.short {
+			display: inline;
+		}
+
+		tr.short {
+			display: table-row;
+		}
+	}
+</style>

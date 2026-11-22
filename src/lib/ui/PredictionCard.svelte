@@ -59,7 +59,7 @@
 					<td>
 						<div class="teams">
 							{#if compact}
-								<span class="visually-hidden">{alliance === 'red' ? 'Red' : 'Blue'} alliance:</span>
+								<span class={['side-name', alliance]}>{alliance === 'red' ? 'Red' : 'Blue'}</span>
 							{/if}
 							{#each side.teams as team (team.number)}
 								{#if compact}
@@ -171,7 +171,22 @@
 	}
 
 	.compact .teams {
+		align-items: center;
 		gap: 6px;
+	}
+
+	.side-name {
+		width: 2.6em;
+		font-size: 12.5px;
+		font-weight: 500;
+	}
+
+	.side-name.red {
+		color: var(--red);
+	}
+
+	.side-name.blue {
+		color: var(--blue);
 	}
 
 	.compact .v {

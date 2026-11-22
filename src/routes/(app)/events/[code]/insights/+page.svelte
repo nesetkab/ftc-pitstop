@@ -128,4 +128,12 @@
 		gap: 6px 20px;
 		font-size: 14px;
 	}
+
+	@media (pointer: coarse) {
+		.levels a,
+		.links a {
+			margin-block: -10px;
+			padding-block: 10px;
+		}
+	}
 </style>

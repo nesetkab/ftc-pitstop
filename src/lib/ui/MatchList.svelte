@@ -61,6 +61,18 @@
 		text-decoration: underline;
 	}
 
+	@media (pointer: coarse) {
+		li {
+			position: relative;
+		}
+
+		a.label::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+		}
+	}
+
 	.status,
 	.detail {
 		color: var(--text-2);

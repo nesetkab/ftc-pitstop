@@ -106,4 +106,12 @@
 			display: block;
 		}
 	}
+
+	@media (pointer: coarse) {
+		footer a {
+			display: inline-block;
+			margin-block: -10px;
+			padding-block: 10px;
+		}
+	}
 </style>

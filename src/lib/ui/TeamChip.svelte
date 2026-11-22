@@ -40,4 +40,16 @@
 	a.team-chip:hover {
 		text-decoration: underline;
 	}
+
+	@media (pointer: coarse) {
+		a.team-chip {
+			position: relative;
+		}
+
+		a.team-chip::after {
+			content: '';
+			position: absolute;
+			inset: -8px 0;
+		}
+	}
 </style>
