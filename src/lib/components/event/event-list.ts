@@ -2,7 +2,7 @@ import { dateRange } from '#lib/format/time.ts';
 import type { EventSummary, EventType } from '#lib/types.ts';
 import { addDays, eventStatus, localDate, weekStart, type EventStatus } from './dates.ts';
 import { TYPE_ORDER } from './event-meta.ts';
-import { areaName, isUnitedStates, placeName } from './places.ts';
+import { areaName, isUnitedStates, placeName } from '#lib/format/places.ts';
 
 export type ListedEvent = {
 	code: string;
@@ -22,12 +22,71 @@ export function listed(event: EventSummary, teams: number | null): ListedEvent {
 		name: event.name,
 		type: event.type,
 		region: event.region,
-		place: placeName(event.city, event.state, event.country),
+		place: placeName(event) || null,
 		timezone: event.timezone,
 		start: event.start,
 		end: event.end,
 		teams
 	};
+}
+
+export type PackedEvent = [
+	code: string,
+	name: string,
+	type: number,
+	region: number | null,
+	place: string | null,
+	timezone: number,
+	start: string,
+	days: number,
+	teams: number | null
+];
+
+export type PackedEvents = { words: string[]; rows: PackedEvent[] };
+
+const DAY_MS = 86_400_000;
+
+function dayGap(start: string, end: string): number {
+	return Math.round((Date.parse(end) - Date.parse(start)) / DAY_MS);
+}
+
+export function packEvents(events: ListedEvent[]): PackedEvents {
+	const words: string[] = [];
+	const index = new Map<string, number>();
+	const word = (text: string) => {
+		let at = index.get(text);
+		if (at === undefined) {
+			at = words.push(text) - 1;
+			index.set(text, at);
+		}
+		return at;
+	};
+	const rows = events.map((event): PackedEvent => [
+		event.code,
+		event.name,
+		word(event.type),
+		event.region === null ? null : word(event.region),
+		event.place,
+		word(event.timezone),
+		event.start,
+		dayGap(event.start, event.end),
+		event.teams
+	]);
+	return { words, rows };
+}
+
+export function unpackEvents({ words, rows }: PackedEvents): ListedEvent[] {
+	return rows.map(([code, name, type, region, place, timezone, start, days, teams]) => ({
+		code,
+		name,
+		type: words[type] as EventType,
+		region: region === null ? null : words[region],
+		place,
+		timezone: words[timezone],
+		start,
+		end: days === 0 ? start : addDays(start, days),
+		teams
+	}));
 }
 
 export type DateFilter = 'week' | 'upcoming' | 'past' | 'all';

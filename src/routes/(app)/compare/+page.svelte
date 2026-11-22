@@ -60,7 +60,8 @@
 				OPR is the points a team adds to its alliance's score. Hive, flower, garden, park and tips
 				are parts of teleop.
 			{/if}
-			The best value in each row is underlined. Record and ranks are from qualification matches.
+			The best value in each row is underlined, ties included, unless every team shows the same. Record
+			and ranks are from qualification matches.
 		</p>
 	</section>
 

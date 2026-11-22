@@ -1,7 +1,7 @@
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';
 import { addDays, daysBetween, localDay, shortRange } from './dates.ts';
-import { placeName } from './places.ts';
+import { placeName } from '#lib/format/places.ts';
 
 export interface HomeEvent {
 	code: string;

@@ -22,7 +22,7 @@
 	<caption class="visually-hidden">Events where two or more of these teams were entered</caption>
 	<thead>
 		<tr>
-			<th class="l" scope="col">Event</th>
+			<th class="l pin" scope="col">Event</th>
 			{#each teams as team (team.number)}
 				<th scope="col">{team.number}</th>
 			{/each}
@@ -31,7 +31,7 @@
 	<tbody>
 		{#each events as event (event.code)}
 			<tr>
-				<td class="l event">
+				<td class="l event pin">
 					<a href="/events/{event.code}">{event.name}</a>
 					<span class="date">{shortDate(event.start)}</span>
 				</td>
@@ -62,6 +62,17 @@
 		text-overflow: ellipsis;
 	}
 
+	td {
+		vertical-align: top;
+	}
+
+	.pin {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background: var(--bg);
+	}
+
 	.date,
 	.sub {
 		display: block;
@@ -70,9 +81,32 @@
 	}
 
 	.sub {
-		max-width: 220px;
+		max-width: 180px;
 		margin-left: auto;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		white-space: normal;
+	}
+
+	@media (max-width: 600px) {
+		.event {
+			min-width: 120px;
+			max-width: 120px;
+			white-space: normal;
+			box-shadow: inset -1px 0 var(--line);
+		}
+
+		th.pin {
+			box-shadow: inset -1px 0 var(--line-2);
+		}
+
+		.event a {
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			line-clamp: 2;
+		}
+
+		.sub {
+			max-width: 140px;
+		}
 	}
 </style>

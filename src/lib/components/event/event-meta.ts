@@ -1,7 +1,7 @@
 import { integer } from '#lib/format/number.ts';
 import { dateRange } from '#lib/format/time.ts';
 import type { Event, EventType } from '#lib/types.ts';
-import { placeName } from './places.ts';
+import { placeName } from '#lib/format/places.ts';
 
 export const TYPE_LABELS: Record<EventType, string> = {
 	Qualifier: 'Qualifier',
@@ -49,7 +49,7 @@ type MetaEvent = Pick<
 
 export function eventMeta(event: MetaEvent, teamCount?: number | null): string {
 	const noun = typeNoun(event.type);
-	const place = placeName(event.city, event.state, event.country);
+	const place = placeName(event);
 	let where = noun;
 	if (event.remote) where = `Remote ${noun.toLowerCase()}`;
 	else if (event.venue && place) where = `${noun} at ${event.venue}, ${place}`;

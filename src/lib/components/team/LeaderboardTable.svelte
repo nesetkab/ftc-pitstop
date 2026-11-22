@@ -5,7 +5,7 @@
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import { follows, syncFollows } from './follow.svelte.ts';
 	import type { LeaderboardRow } from './leaderboard.ts';
-	import { placeName } from './places.ts';
+	import { placeName } from '#lib/format/places.ts';
 
 	interface Props {
 		rows: LeaderboardRow[];

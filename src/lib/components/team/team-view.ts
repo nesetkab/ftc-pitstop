@@ -4,8 +4,8 @@ import { GAME_NAME, SEASON } from '#lib/game/biobuzz.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import type { Award, EventBundle, QuickStat, QuickStats, TeamSeason } from '#lib/types.ts';
 import { localDay } from './dates.ts';
+import { placeName } from '#lib/format/places.ts';
 import { teamMatches, type TeamMatchEvent } from './matches.ts';
-import { placeName } from './places.ts';
 import { playoffSummary } from './playoffs.ts';
 
 export const SEASON_GAMES: Record<number, string> = {

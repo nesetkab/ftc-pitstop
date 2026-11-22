@@ -24,7 +24,7 @@
 						class="remove"
 						href={compareHref(numbers.filter((number) => number !== team.number))}
 						aria-label="Remove {team.number}"
-						data-sveltekit-noscroll>×</a
+						data-sveltekit-reset="false">×</a
 					>
 				</li>
 			{/each}
@@ -56,7 +56,7 @@
 	<p class="suggest">
 		{teams.length === 0 ? 'Top teams this season:' : 'Close in OPR:'}
 		{#each suggestions as team, index (team.number)}
-			<a href={compareHref([...numbers, team.number])} data-sveltekit-noscroll
+			<a href={compareHref([...numbers, team.number])} data-sveltekit-reset="false"
 				><b>{team.number}</b>{team.name ? ` ${team.name}` : ''}</a
 			>{index < suggestions.length - 1 ? ', ' : ''}
 		{/each}
@@ -170,6 +170,35 @@
 			flex: 1;
 			width: auto;
 			min-width: 0;
+		}
+	}
+
+	@media (pointer: coarse) {
+		.team {
+			line-height: 28px;
+		}
+
+		.remove {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 40px;
+			min-height: 40px;
+			padding: 0;
+		}
+
+		.add input {
+			min-height: 40px;
+		}
+
+		.suggest {
+			line-height: 40px;
+		}
+
+		.suggest a {
+			display: inline-block;
+			padding-block: 10px;
+			line-height: 20px;
 		}
 	}
 </style>

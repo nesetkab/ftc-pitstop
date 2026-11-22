@@ -15,7 +15,7 @@
 		<caption class="visually-hidden">Season stats side by side</caption>
 		<thead>
 			<tr>
-				<th class="l" scope="col"><span class="visually-hidden">Measure</span></th>
+				<th class="l pin" scope="col"><span class="visually-hidden">Measure</span></th>
 				{#each teams as team (team.number)}
 					<th scope="col" class="team">
 						<a href="/teams/{team.number}">{team.number}</a>
@@ -27,7 +27,7 @@
 		<tbody>
 			{#each rows as row (row.key)}
 				<tr class:nested={row.nested}>
-					<th class="l measure" scope="row">{row.label}</th>
+					<th class="l measure pin" scope="row">{row.label}</th>
 					{#each row.values as value, index (index)}
 						<td><span class:best={row.best.includes(index)}>{value}</span></td>
 					{/each}
@@ -72,9 +72,39 @@
 		color: var(--text-2);
 	}
 
+	.pin {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background: var(--bg);
+	}
+
 	.best {
 		padding-bottom: 1px;
 		border-bottom: 2px solid var(--text);
 		font-weight: 600;
+	}
+
+	@media (max-width: 600px) {
+		th.team {
+			min-width: 76px;
+		}
+
+		.name {
+			max-width: 76px;
+		}
+
+		th.measure {
+			min-width: 96px;
+			white-space: normal;
+		}
+
+		tr.nested th.measure {
+			padding-left: 12px;
+		}
+
+		.pin {
+			box-shadow: inset -1px 0 var(--line);
+		}
 	}
 </style>

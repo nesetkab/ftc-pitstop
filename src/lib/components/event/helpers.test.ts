@@ -2,7 +2,14 @@ import { describe, expect, it } from 'vitest';
 import type { Award, EventSummary } from '#lib/types.ts';
 import { groupAwards, noAwardsText } from './awards.ts';
 import { eventMeta } from './event-meta.ts';
-import { filterEvents, groupByWeek, listed, regionGroups } from './event-list.ts';
+import {
+	filterEvents,
+	groupByWeek,
+	listed,
+	packEvents,
+	regionGroups,
+	unpackEvents
+} from './event-list.ts';
 import { fixtureBundle } from './test-fixtures.ts';
 
 const NOW = Date.parse('2026-11-19T18:00:00Z');
@@ -74,6 +81,29 @@ describe('event list', () => {
 				]
 			}
 		]);
+	});
+	it('packs events into a compact shape and back without losing anything', () => {
+		const packed = packEvents(events);
+		expect(packed.words).toEqual([
+			'Qualifier',
+			'USAZ',
+			'America/Phoenix',
+			'USMT',
+			'America/Denver',
+			'LeagueMeet'
+		]);
+		expect(packed.rows[2]).toEqual([
+			'SOON',
+			'SOON Qualifier',
+			0,
+			3,
+			'Butte, Montana',
+			4,
+			'2026-11-21',
+			1,
+			20
+		]);
+		expect(unpackEvents(JSON.parse(JSON.stringify(packed)))).toEqual(events);
 	});
 });
 

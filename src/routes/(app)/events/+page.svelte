@@ -8,6 +8,7 @@
 		filterEvents,
 		groupByWeek,
 		typeOptions,
+		unpackEvents,
 		type DateFilter
 	} from '#lib/components/event/event-list.ts';
 	import { integer } from '#lib/format/number.ts';
@@ -40,13 +41,14 @@
 	let limit = $state(PAGE_SIZE);
 	let ready = false;
 
-	const types = $derived(typeOptions(data.events));
+	const events = $derived(unpackEvents(data.events));
+	const types = $derived(typeOptions(events));
 	const filters = $derived({ query, region, type, when });
-	const shown = $derived(filterEvents(data.events, filters, now));
+	const shown = $derived(filterEvents(events, filters, now));
 	const groups = $derived(groupByWeek(shown.slice(0, limit), now));
 	const elsewhere = $derived(
 		shown.length === 0 && when !== 'all'
-			? filterEvents(data.events, { ...filters, when: 'all' }, now).length
+			? filterEvents(events, { ...filters, when: 'all' }, now).length
 			: 0
 	);
 
@@ -97,14 +99,14 @@
 <Seo
 	title={siteTitle(`FTC events, ${SEASON_NAME} season`)}
 	description="All {integer(
-		data.events.length
+		events.length
 	)} FTC events in the {SEASON_NAME} season: qualifiers, league meets, championships and more, with live rankings, schedules, results and awards."
 	path="/events"
 />
 
 <PageHeader
 	title="Events"
-	meta="{integer(data.events.length)} events in the BIOBUZZ season."
+	meta="{integer(events.length)} events in the BIOBUZZ season."
 	status={data.stale ? staleLine : undefined}
 />
 

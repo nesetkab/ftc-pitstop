@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
-	import { RECORD_RANGES, type RecordFilters, type RecordOption } from './records.ts';
+	import { RECORD_PARTS, RECORD_RANGES, type RecordFilters, type RecordOption } from './records.ts';
 
 	interface Props {
 		filters: RecordFilters;
@@ -33,9 +33,6 @@
 </script>
 
 <form class="filters" method="get" onchange={apply} onsubmit={apply}>
-	{#if filters.part !== 'total'}
-		<input type="hidden" name="part" value={filters.part} />
-	{/if}
 	<label>
 		<span>Dates</span>
 		<select name="range" value={filters.range}>
@@ -83,6 +80,14 @@
 			value={filters.team ?? ''}
 		/>
 	</label>
+	<label class="sort">
+		<span>Sort by</span>
+		<select name="part" value={filters.part}>
+			{#each RECORD_PARTS as part (part.key)}
+				<option value={part.key}>{part.label}</option>
+			{/each}
+		</select>
+	</label>
 	<noscript><button type="submit">Apply</button></noscript>
 	{#if active}
 		<a class="clear" href={clearHref}>Clear filters</a>
@@ -124,10 +129,20 @@
 		border-color: var(--text-3);
 	}
 
+	.sort {
+		display: none;
+	}
+
 	.clear {
 		padding-block: 8px;
 		font-size: 13px;
 		color: var(--text-2);
+	}
+
+	@media (max-width: 900px) {
+		.sort {
+			display: grid;
+		}
 	}
 
 	@media (max-width: 600px) {
@@ -139,6 +154,19 @@
 		input {
 			min-width: 0;
 			width: 100%;
+		}
+	}
+
+	@media (pointer: coarse) {
+		input,
+		.clear {
+			min-height: 40px;
+		}
+
+		.clear {
+			display: inline-flex;
+			align-items: center;
+			padding-block: 0;
 		}
 	}
 </style>

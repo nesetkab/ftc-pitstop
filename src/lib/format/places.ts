@@ -73,33 +73,42 @@ const CA_PROVINCES: Record<string, string> = {
 	YT: 'Yukon'
 };
 
+export interface Place {
+	city: string | null;
+	state: string | null;
+	country: string | null;
+}
+
 const US = new Set(['USA', 'US', 'United States', 'United States of America']);
 
 export function isUnitedStates(country: string | null | undefined): boolean {
 	return country != null && US.has(country);
 }
 
-export function stateName(state: string | null, country: string | null): string | null {
-	if (!state) return null;
-	const code = state.toUpperCase();
-	if (isUnitedStates(country)) return US_STATES[code] ?? (state.length > 3 ? state : null);
-	if (country === 'Canada') return CA_PROVINCES[code] ?? (state.length > 3 ? state : null);
+function regionNames(country: string | null): Record<string, string> | null {
+	if (isUnitedStates(country)) return US_STATES;
+	if (country === 'Canada') return CA_PROVINCES;
 	return null;
 }
 
-export function areaName(state: string | null, country: string | null): string | null {
-	return stateName(state, country) ?? (isUnitedStates(country) ? null : country);
+export function stateName(state: string | null, country: string | null): string | null {
+	const names = regionNames(country);
+	if (!state || !names) return null;
+	return names[state.toUpperCase()] ?? state;
 }
 
-export function placeName(
-	city: string | null,
-	state: string | null,
-	country: string | null
-): string | null {
-	const area = areaName(state, country);
-	const repeated = Boolean(
-		city && area && `, ${city.toLowerCase()}`.endsWith(`, ${area.toLowerCase()}`)
-	);
-	const parts = [city, repeated ? null : area].filter((part): part is string => Boolean(part));
-	return parts.length > 0 ? parts.join(', ') : null;
+export function areaName(state: string | null, country: string | null): string | null {
+	return regionNames(country) ? stateName(state, country) : country;
+}
+
+function names(city: string | null, part: string | null): boolean {
+	if (!city || !part) return false;
+	return `, ${city.toLowerCase()}`.endsWith(`, ${part.toLowerCase()}`);
+}
+
+export function placeName(place: Place, style: 'full' | 'short' = 'full'): string {
+	const full = areaName(place.state, place.country);
+	const area = style === 'short' && regionNames(place.country) && full ? place.state : full;
+	const repeated = names(place.city, full) || names(place.city, area);
+	return [place.city, repeated ? null : area].filter(Boolean).join(', ');
 }

@@ -8,7 +8,7 @@
 	import type { Ranking, Team } from '#lib/types.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
-	import { placeName } from './places.ts';
+	import { placeName } from '#lib/format/places.ts';
 
 	interface Props {
 		teams: Team[];
@@ -63,7 +63,7 @@
 					<TeamCell number={team.number} name={team.name} href="/teams/{team.number}" />
 				</td>
 				<td class={['l muted', { opt: stats }]}>
-					{placeName(team.city, team.state, team.country) ?? ''}
+					{placeName(team)}
 				</td>
 				<td class="opt">{team.rookieYear ?? '—'}</td>
 				{#if ranks.size > 0}

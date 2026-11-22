@@ -1,6 +1,6 @@
 import type { SeasonRatings } from '#lib/analysis/types.ts';
 import type { SearchTeam } from '#lib/types.ts';
-import { stateName } from './places.ts';
+import { stateName } from '#lib/format/places.ts';
 import { ratedTeams } from './team-view.ts';
 
 export const PAGE_SIZE = 50;
