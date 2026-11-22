@@ -172,7 +172,21 @@ describe('buildTeamPage without season ratings', () => {
 		expect(view.charts).toEqual([]);
 		expect(view.comparison).toEqual([]);
 		expect(view.previous).toBeNull();
-		expect(view.events[0].playoffs).toBe('No results');
+		expect(view.events[0].playoffs).toBe("Didn't play");
+		const unposted = buildTeamPage({
+			season: {
+				...empty,
+				events: empty.events.map((entry) => ({
+					...entry,
+					event: { ...entry.event, hasMatches: false }
+				}))
+			},
+			ratings: null,
+			analyses: {},
+			bundles: {},
+			now: NOW
+		});
+		expect(unposted.events[0].playoffs).toBe('No results');
 	});
 
 	it('labels events that have not happened or are still running', () => {

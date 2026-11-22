@@ -347,7 +347,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		if (entry.stats) playoffs = bundle ? playoffSummary(bundle, number) : null;
 		else if (day < event.start) playoffs = 'Upcoming';
 		else if (day <= event.end) playoffs = 'In progress';
-		else playoffs = 'No results';
+		else playoffs = event.hasMatches ? "Didn't play" : 'No results';
 		return {
 			code: event.code,
 			name: event.name,
