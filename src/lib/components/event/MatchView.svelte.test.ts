@@ -34,8 +34,8 @@ describe('MatchView after the match', () => {
 		const breakdown = screen.getByRole('table', { name: 'Score breakdown' });
 		expect(row(breakdown, 'Auto')).toEqual(['', '11', '', '28']);
 		expect(row(breakdown, 'Leave')).toEqual(['2', '6', '1', '3']);
-		expect(row(breakdown, 'Cell balls')).toEqual(['7', '14', '0', '0']);
-		expect(row(breakdown, 'Garden balls')).toEqual(['0', '0', '6', '6']);
+		expect(row(breakdown, 'Hive pollen and nectar')).toEqual(['7', '14', '0', '0']);
+		expect(row(breakdown, 'Garden pollen and nectar')).toEqual(['0', '0', '6', '6']);
 		expect(row(breakdown, 'Minor')).toEqual(['0', '', '0', '']);
 		expect(row(breakdown, 'Total')).toEqual(['', '75', '', '64']);
 		const points = screen.getByRole('table', { name: 'Ranking points' });

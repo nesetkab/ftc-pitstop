@@ -22,6 +22,22 @@ export const POINTS = {
 	majorFoul: 20
 } as const;
 
+export const PART_LABELS = {
+	total: 'Total',
+	auto: 'Auto',
+	teleop: 'Teleop',
+	leave: 'Leave',
+	park: 'Park',
+	hive: 'Hive',
+	flower: 'Flower',
+	garden: 'Garden',
+	tips: 'Tips',
+	fouls: 'Fouls',
+	hiveTips: 'Hive tips',
+	hivePieces: 'Hive pollen and nectar',
+	gardenPieces: 'Garden pollen and nectar'
+} as const;
+
 export const RP_THRESHOLDS = {
 	swarm: 16,
 	pollinator1: 4,

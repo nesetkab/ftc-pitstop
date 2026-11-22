@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { integer } from '#lib/format/number.ts';
+	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import Bars from '#lib/ui/Bars.svelte';
 	import type { PointAverages } from './averages.ts';
 
@@ -11,11 +12,11 @@
 
 	const items = $derived(
 		[
-			{ label: 'Hive', value: averages.hive },
-			{ label: 'Auto', value: averages.auto },
-			{ label: 'Park', value: averages.park },
-			{ label: 'Garden', value: averages.garden },
-			{ label: 'Flowers', value: averages.flower }
+			{ label: PART_LABELS.hive, value: averages.hive },
+			{ label: PART_LABELS.auto, value: averages.auto },
+			{ label: PART_LABELS.park, value: averages.park },
+			{ label: PART_LABELS.garden, value: averages.garden },
+			{ label: PART_LABELS.flower, value: averages.flower }
 		].sort((a, b) => b.value - a.value)
 	);
 </script>

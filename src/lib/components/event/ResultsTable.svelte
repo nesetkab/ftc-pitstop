@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { breakdownParts } from '#lib/game/biobuzz.ts';
+	import { breakdownParts, PART_LABELS } from '#lib/game/biobuzz.ts';
 	import type { AllianceColor, AllianceScore, Match } from '#lib/types.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
@@ -47,13 +47,13 @@
 				</button>
 			</th>
 			<th class="l" scope="col">Teams</th>
-			<th scope="col">Auto</th>
-			<th class="opt" scope="col">Hive</th>
-			<th class="opt" scope="col">Flowers</th>
-			<th class="opt" scope="col">Garden</th>
-			<th class="opt" scope="col">Park</th>
-			<th class="opt" scope="col">Fouls</th>
-			<th scope="col">Total</th>
+			<th scope="col">{PART_LABELS.auto}</th>
+			<th class="opt" scope="col">{PART_LABELS.hive}</th>
+			<th class="opt" scope="col">{PART_LABELS.flower}</th>
+			<th class="opt" scope="col">{PART_LABELS.garden}</th>
+			<th class="opt" scope="col">{PART_LABELS.park}</th>
+			<th class="opt" scope="col">{PART_LABELS.fouls}</th>
+			<th scope="col">{PART_LABELS.total}</th>
 		</tr>
 	</thead>
 	{#each rows as match (match.key)}

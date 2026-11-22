@@ -2,6 +2,7 @@
 	import type { TeamRating } from '#lib/analysis/types.ts';
 	import { fixed } from '#lib/format/number.ts';
 	import { record } from '#lib/format/record.ts';
+	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import type { Match, Ranking, Team } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -35,9 +36,9 @@
 			<th class="l" scope="col">Alliance</th>
 			{#if rated}
 				<th scope="col">OPR</th>
-				<th scope="col">Auto</th>
-				<th class="opt" scope="col">Hive</th>
-				<th class="opt" scope="col">Park</th>
+				<th scope="col">{PART_LABELS.auto}</th>
+				<th class="opt" scope="col">{PART_LABELS.hive}</th>
+				<th class="opt" scope="col">{PART_LABELS.park}</th>
 				<th class="opt" scope="col">Avg tips</th>
 				<th class="opt" scope="col">Matches</th>
 			{:else}

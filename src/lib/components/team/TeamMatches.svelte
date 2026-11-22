@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { MISSING, record } from '#lib/format/index.ts';
+	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import { shortRange } from '#lib/format/time.ts';
@@ -14,11 +15,11 @@
 	let { events, team }: Props = $props();
 
 	const parts: { key: keyof TeamMatchParts; label: string }[] = [
-		{ key: 'auto', label: 'Auto' },
-		{ key: 'hive', label: 'Hive' },
-		{ key: 'flower', label: 'Flower' },
-		{ key: 'garden', label: 'Garden' },
-		{ key: 'park', label: 'Park' }
+		{ key: 'auto', label: PART_LABELS.auto },
+		{ key: 'hive', label: PART_LABELS.hive },
+		{ key: 'flower', label: PART_LABELS.flower },
+		{ key: 'garden', label: PART_LABELS.garden },
+		{ key: 'park', label: PART_LABELS.park }
 	];
 
 	const OUTCOME: Record<MatchOutcome, string> = { win: 'W', loss: 'L', tie: 'T' };

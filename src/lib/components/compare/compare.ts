@@ -2,6 +2,7 @@ import type { SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import { awardLabel, ratedTeams } from '#lib/components/team/team-view.ts';
 import { placeName } from '#lib/format/places.ts';
 import { fixed, integer, MISSING, record } from '#lib/format/index.ts';
+import { PART_LABELS } from '#lib/game/biobuzz.ts';
 import type { AllianceColor, EventBundle, Match, TeamSeason, TeamSeasonEvent } from '#lib/types.ts';
 
 export const MAX_COMPARE = 4;
@@ -188,21 +189,21 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 				),
 				row(
 					'auto',
-					'Auto',
+					PART_LABELS.auto,
 					rated.map((r) => r?.parts.auto ?? null),
 					fixed,
 					'high'
 				),
 				row(
 					'teleop',
-					'Teleop',
+					PART_LABELS.teleop,
 					rated.map((r) => (r ? r.opr - r.parts.auto : null)),
 					fixed,
 					'high'
 				),
 				row(
 					'hive',
-					'Hive',
+					PART_LABELS.hive,
 					rated.map((r) => r?.parts.hive ?? null),
 					fixed,
 					'high',
@@ -210,7 +211,7 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 				),
 				row(
 					'flower',
-					'Flower',
+					PART_LABELS.flower,
 					rated.map((r) => r?.parts.flower ?? null),
 					fixed,
 					'high',
@@ -218,7 +219,7 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 				),
 				row(
 					'garden',
-					'Garden',
+					PART_LABELS.garden,
 					rated.map((r) => r?.parts.garden ?? null),
 					fixed,
 					'high',
@@ -226,7 +227,7 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 				),
 				row(
 					'park',
-					'Park',
+					PART_LABELS.park,
 					rated.map((r) => r?.parts.park ?? null),
 					fixed,
 					'high',
@@ -234,7 +235,7 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 				),
 				row(
 					'tips',
-					'Tips',
+					PART_LABELS.tips,
 					rated.map((r) => r?.parts.tips ?? null),
 					fixed,
 					'high',
@@ -259,14 +260,14 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 					),
 					row(
 						'auto',
-						'Auto',
+						PART_LABELS.auto,
 						quick.map((q) => q?.auto.value ?? null),
 						fixed,
 						'high'
 					),
 					row(
 						'teleop',
-						'Teleop',
+						PART_LABELS.teleop,
 						quick.map((q) => q?.teleop.value ?? null),
 						fixed,
 						'high'
