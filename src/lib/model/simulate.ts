@@ -32,6 +32,7 @@ export type SimMatch = {
 	blueSwarm: number;
 	redAuto: number;
 	blueAuto: number;
+	winner?: 'red' | 'blue';
 };
 
 export type SimInput = {
@@ -132,6 +133,7 @@ export function simulateRankings(input: SimInput, options: SimOptions = {}): Ran
 			red: counted(m.red),
 			blue: counted(m.blue),
 			tie: m.tie,
+			winner: m.winner ?? null,
 			redMean: mid + shift,
 			blueMean: mid - shift,
 			redSd: m.redSd,
@@ -177,8 +179,8 @@ export function simulateRankings(input: SimInput, options: SimOptions = {}): Ran
 			const m = plan[k];
 			const redNp = Math.max(0, m.redMean + m.redSd * normal());
 			const blueNp = Math.max(0, m.blueMean + m.blueSd * normal());
-			const isTie = rng() < m.tie;
-			const redWins = !isTie && redNp > blueNp;
+			const isTie = m.winner === null && rng() < m.tie;
+			const redWins = m.winner === null ? !isTie && redNp > blueNp : m.winner === 'red';
 			const blueWins = !isTie && !redWins;
 			const ru = rng();
 			const bu = rng();

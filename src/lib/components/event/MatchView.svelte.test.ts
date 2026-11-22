@@ -65,6 +65,18 @@ describe('MatchView after the match', () => {
 		expect(within(points).getAllByText('Chance')).toHaveLength(2);
 	});
 
+	it('shows how the match moved each team rank and OPR', () => {
+		render(MatchView, {
+			props: { bundle, match: q26, oprShifts: { 14624: { before: 30, after: 32.5 } } }
+		});
+		const impact = screen.getByRole('table', { name: 'What this match changed' });
+		const rows = within(impact).getAllByRole('row').slice(1);
+		expect(rows).toHaveLength(4);
+		expect(rows.every((row) => /\d+ → \d+/.test(row.textContent ?? ''))).toBe(true);
+		expect(impact).toHaveTextContent('30.0 → 32.5');
+		expect(impact).toHaveTextContent('+2.5');
+	});
+
 	it('leaves ranking points off playoff matches', () => {
 		const final = bundle.matches.find((match) => match.key === 'p10') as Match;
 		render(MatchView, { props: { bundle, match: final, analysis: fakeAnalysis(bundle) } });
@@ -130,6 +142,15 @@ describe('MatchView before the match', () => {
 				.map((cell) => cell.textContent)
 		).toEqual(['Team', 'Alliance', 'OPR', 'Auto', 'Hive', 'Park', 'Avg tips', 'Matches']);
 		expect(screen.getByText(/alliance scores in 25 matches/)).toBeInTheDocument();
+		const stakes = screen.getByRole('table', { name: 'Chance to finish in the top 6' });
+		expect(within(stakes).getAllByRole('row')).toHaveLength(5);
+		expect(stakes).toHaveTextContent('If they win');
+	});
+
+	it('leaves out the stakes at league meets, which have no alliance selection', () => {
+		const meet = { ...upcoming, event: { ...upcoming.event, type: 'LeagueMeet' as const } };
+		render(MatchView, { props: { bundle: meet, match, analysis: fakeAnalysis(meet) } });
+		expect(screen.queryByRole('heading', { name: "What's at stake" })).toBeNull();
 	});
 
 	it('hides predictions without analysis', () => {

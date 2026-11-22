@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
 	import { time } from '#lib/format/time.ts';
+	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import type { EventBundle, Match } from '#lib/types.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -9,19 +10,24 @@
 	import { pointAverages } from './averages.ts';
 	import { isMultiDay, weekday } from './dates.ts';
 	import MatchBreakdown from './MatchBreakdown.svelte';
+	import MatchImpact from './MatchImpact.svelte';
 	import MatchScoreCard from './MatchScoreCard.svelte';
+	import MatchStakes from './MatchStakes.svelte';
 	import MatchTeams from './MatchTeams.svelte';
 	import { hasTeam, matchHref, neighbors, teamNumbers, titleOf } from './matches.ts';
 	import RpChances from './RpChances.svelte';
+	import { matchStakes } from './stakes.ts';
+	import { localRankings, rankShifts, type OprShift } from './standings.ts';
 
 	interface Props {
 		bundle: Pick<EventBundle, 'event' | 'teams' | 'matches' | 'rankings'>;
 		match: Match;
-		analysis?: Pick<EventAnalysis, 'forecasts' | 'ratings' | 'timing'> | null;
+		analysis?: Pick<EventAnalysis, 'forecasts' | 'ratings' | 'timing' | 'projections'> | null;
+		oprShifts?: Record<number, OprShift> | null;
 		followed?: ReadonlySet<number>;
 	}
 
-	let { bundle, match, analysis = null, followed = new Set() }: Props = $props();
+	let { bundle, match, analysis = null, oprShifts = null, followed = new Set() }: Props = $props();
 
 	const code = $derived(bundle.event.code);
 	const zone = $derived(bundle.event.timezone);
@@ -34,6 +40,16 @@
 	const averages = $derived(pointAverages(bundle.matches));
 	const multiDay = $derived(isMultiDay(bundle.event));
 	const mine = $derived([...followed].find((team) => hasTeam(match, team)));
+	const ranks = $derived(
+		match.result && match.level === 'qual' && localRankings(bundle.matches, bundle.rankings)
+			? rankShifts(bundle.matches, match.key)
+			: null
+	);
+	const stakes = $derived(
+		analysis && hasPlayoffs(bundle.event.type)
+			? matchStakes({ match, matches: bundle.matches, rankings: bundle.rankings, analysis })
+			: null
+	);
 
 	function at(value: number) {
 		const clock = time(value, zone);
@@ -99,6 +115,14 @@
 			<MatchScoreCard {match} teams={bundle.teams} {forecast} {followed} />
 		{/if}
 
+		{#if match.result && (ranks || oprShifts)}
+			<div class="panel">
+				<h2 class="sec-title">What this match changed</h2>
+				<MatchImpact {match} teams={bundle.teams} {ranks} oprs={oprShifts} {followed} />
+				<p class="note">Each team's standing and OPR just before and just after this match.</p>
+			</div>
+		{/if}
+
 		{#if match.result}
 			<div class="panel">
 				<h2 class="sec-title">Score breakdown</h2>
@@ -119,6 +143,12 @@
 	</div>
 
 	<div class="panel wide">
+		{#if stakes}
+			<div class="panel">
+				<h2 class="sec-title">What's at stake</h2>
+				<MatchStakes {stakes} teams={bundle.teams} {followed} />
+			</div>
+		{/if}
 		{#if match.level === 'qual' && (forecast || match.result)}
 			<div class="panel">
 				<h2 class="sec-title">{match.result ? 'Ranking points' : 'Ranking point chances'}</h2>

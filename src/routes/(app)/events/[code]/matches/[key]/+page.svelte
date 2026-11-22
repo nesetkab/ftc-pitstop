@@ -36,7 +36,13 @@
 />
 
 {#if match}
-	<MatchView {bundle} {match} analysis={data.analysis} followed={view.followed} />
+	<MatchView
+		{bundle}
+		{match}
+		analysis={data.analysis}
+		oprShifts={data.oprShifts}
+		followed={view.followed}
+	/>
 {:else}
 	<EmptyState title="This match isn't in the schedule anymore." />
 {/if}

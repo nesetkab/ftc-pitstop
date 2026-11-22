@@ -93,6 +93,27 @@ describe('tallyResults', () => {
 });
 
 describe('simulateRankings', () => {
+	it('honors a forced winner', () => {
+		const current = [1, 2, 3, 4].map((team) => ({
+			team,
+			rp: 0,
+			np: 0,
+			tips: 0,
+			auto: 0,
+			counted: 0
+		}));
+		const input = (winner?: 'red' | 'blue') => ({
+			teams: [1, 2, 3, 4],
+			current,
+			remaining: [{ ...even([1, 2], [3, 4]), winner }]
+		});
+		const red = simulateRankings(input('red'), { sims: 500 });
+		const blue = simulateRankings(input('blue'), { sims: 500 });
+		expect(red.find((p) => p.team === 1)!.expectedRs).toBeGreaterThanOrEqual(3);
+		expect(red.find((p) => p.team === 3)!.expectedRs).toBeLessThan(3);
+		expect(blue.find((p) => p.team === 3)!.expectedRs).toBeGreaterThanOrEqual(3);
+	});
+
 	it('ranks by RS then TBP when nothing is left to play', () => {
 		const out = simulateRankings(
 			{
