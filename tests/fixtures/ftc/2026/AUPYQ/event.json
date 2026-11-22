@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "92535735-22b3-6340-b007-2adca63063f4",
+			"code": "AUPYQ",
+			"divisionCode": null,
+			"name": "Sydney North Pymble Qualifier",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 2,
+			"published": true,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "AU",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "Pymble Ladies College",
+			"address": "Avond Rd",
+			"city": "Pymble",
+			"stateprov": "NSW",
+			"country": "Australia",
+			"website": "",
+			"liveStreamUrl": "",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=82063",
+			"coordinates": { "type": "Point", "coordinates": [151.13694, -33.74006] },
+			"webcasts": null,
+			"timezone": "Australia/Sydney",
+			"dateStart": "2026-11-21T00:00:00",
+			"dateEnd": "2026-11-22T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

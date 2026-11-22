@@ -1,0 +1,43 @@
+{
+	"code": "KZASQ1",
+	"note": "qualifier recorded live on day 2 with day 1 matches carried over",
+	"recordedAt": "2026-11-22T05:53:35.932Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=KZASQ1", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=KZASQ1", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/KZASQ1", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/KZASQ1/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:47:18 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/KZASQ1/playoff/hybrid",
+			"status": 200,
+			"lastModified": null
+		},
+		"matches-qual": {
+			"path": "matches/KZASQ1?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:47:18 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/KZASQ1?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": null
+		},
+		"scores-qual": {
+			"path": "scores/KZASQ1/qual",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:47:18 GMT"
+		},
+		"scores-playoff": { "path": "scores/KZASQ1/playoff", "status": 200, "lastModified": null },
+		"alliances": {
+			"path": "alliances/KZASQ1",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:53:35 GMT"
+		},
+		"awards": { "path": "awards/KZASQ1", "status": 200, "lastModified": null },
+		"advancement": { "path": "advancement/KZASQ1", "status": 200, "lastModified": null }
+	}
+}

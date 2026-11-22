@@ -1,0 +1,51 @@
+{
+	"code": "USMTBUQ",
+	"note": "the same qualifier recorded after it finished",
+	"recordedAt": "2026-11-22T05:54:04.451Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USMTBUQ", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USMTBUQ", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USMTBUQ", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USMTBUQ/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 02:30:23 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USMTBUQ/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 02:30:23 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/USMTBUQ?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 02:30:23 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USMTBUQ?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 02:30:23 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/USMTBUQ/qual",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 02:30:23 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/USMTBUQ/playoff",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 02:30:23 GMT"
+		},
+		"alliances": {
+			"path": "alliances/USMTBUQ",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:54:04 GMT"
+		},
+		"awards": {
+			"path": "awards/USMTBUQ",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 02:30:23 GMT"
+		},
+		"advancement": { "path": "advancement/USMTBUQ", "status": 200, "lastModified": null }
+	}
+}

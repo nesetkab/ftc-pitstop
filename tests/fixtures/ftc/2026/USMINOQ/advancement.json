@@ -1,0 +1,71 @@
+{
+	"advancesTo": "USMISECMP",
+	"slots": 5,
+	"fcmpReserved": 0,
+	"advancement": [
+		{
+			"team": 11129,
+			"displayTeam": "11129",
+			"slot": 1,
+			"criteria": "Points",
+			"declined": false,
+			"status": "ALREADY_ADVANCING"
+		},
+		{
+			"team": 21331,
+			"displayTeam": "21331",
+			"slot": 2,
+			"criteria": "Points",
+			"declined": false,
+			"status": "ALREADY_ADVANCING"
+		},
+		{
+			"team": 10137,
+			"displayTeam": "10137",
+			"slot": 3,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 8533,
+			"displayTeam": "8533",
+			"slot": 4,
+			"criteria": "Points",
+			"declined": false,
+			"status": "ALREADY_ADVANCING"
+		},
+		{
+			"team": 29694,
+			"displayTeam": "29694",
+			"slot": 5,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 37709,
+			"displayTeam": "37709",
+			"slot": 6,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 19940,
+			"displayTeam": "19940",
+			"slot": 7,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 25721,
+			"displayTeam": "25721",
+			"slot": 8,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		}
+	]
+}

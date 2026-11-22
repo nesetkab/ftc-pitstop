@@ -1,0 +1,51 @@
+{
+	"code": "AUPYQ",
+	"note": "finished qualifier with 6 alliances",
+	"recordedAt": "2026-11-22T05:53:39.521Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=AUPYQ", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=AUPYQ", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/AUPYQ", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/AUPYQ/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 04:47:00 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/AUPYQ/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 04:47:00 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/AUPYQ?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 04:47:00 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/AUPYQ?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 04:47:00 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/AUPYQ/qual",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 04:47:00 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/AUPYQ/playoff",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 04:47:00 GMT"
+		},
+		"alliances": {
+			"path": "alliances/AUPYQ",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:53:39 GMT"
+		},
+		"awards": {
+			"path": "awards/AUPYQ",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 04:47:01 GMT"
+		},
+		"advancement": { "path": "advancement/AUPYQ", "status": 200, "lastModified": null }
+	}
+}

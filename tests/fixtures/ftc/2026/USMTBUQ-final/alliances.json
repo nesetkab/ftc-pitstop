@@ -1,0 +1,89 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": { "teamNumber": 5026, "displayTeamNumber": "5026", "teamName": "Tesla Coils" },
+			"round1": { "teamNumber": 4133, "displayTeamNumber": "4133", "teamName": "Fusion" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": {
+				"teamNumber": 724,
+				"displayTeamNumber": "724",
+				"teamName": "RedNek Robotics Wun"
+			},
+			"round1": {
+				"teamNumber": 10662,
+				"displayTeamNumber": "10662",
+				"teamName": "Lazer Sharks in Space"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 3,
+			"name": "Alliance Seed 3",
+			"captain": { "teamNumber": 26706, "displayTeamNumber": "26706", "teamName": "Thunder Lab" },
+			"round1": {
+				"teamNumber": 18240,
+				"displayTeamNumber": "18240",
+				"teamName": "RoboScout Squad"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 4,
+			"name": "Alliance Seed 4",
+			"captain": {
+				"teamNumber": 36380,
+				"displayTeamNumber": "36380",
+				"teamName": "Wise Wonders Robotics FTC"
+			},
+			"round1": { "teamNumber": 4813, "displayTeamNumber": "4813", "teamName": "Ammonites" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 5,
+			"name": "Alliance Seed 5",
+			"captain": {
+				"teamNumber": 38372,
+				"displayTeamNumber": "38372",
+				"teamName": "The Gear Grinders"
+			},
+			"round1": { "teamNumber": 17097, "displayTeamNumber": "17097", "teamName": "Protostars" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 6,
+			"name": "Alliance Seed 6",
+			"captain": {
+				"teamNumber": 37390,
+				"displayTeamNumber": "37390",
+				"teamName": "River City Robotics"
+			},
+			"round1": { "teamNumber": 26858, "displayTeamNumber": "26858", "teamName": "Prairie Bytes" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 6
+}
