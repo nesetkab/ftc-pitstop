@@ -135,7 +135,7 @@ describe('team page load', () => {
 		expect(view.charts[0]).toMatchObject({ id: 'AAA' });
 	});
 
-	it('only loads analysis for events that have started and bundles for events with playoffs', async () => {
+	it('only loads analysis and bundles for events that have started', async () => {
 		server.loadTeamSeason.mockResolvedValue(
 			season([
 				played('MEET', '2026-11-07', 'LeagueMeet'),
@@ -148,7 +148,10 @@ describe('team page load', () => {
 			'MEET',
 			'QUAL'
 		]);
-		expect(server.loadEventBundle.mock.calls.map(([code]) => code)).toEqual(['QUAL']);
+		expect(server.loadEventBundle.mock.calls.map(([code]) => code).sort()).toEqual([
+			'MEET',
+			'QUAL'
+		]);
 	});
 
 	it('still renders when the event details cannot be loaded', async () => {

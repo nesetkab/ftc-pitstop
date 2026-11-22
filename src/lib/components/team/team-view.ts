@@ -1,8 +1,10 @@
 import type { EventAnalysis, SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import { matchLabel, ordinal, parseMatchKey, shortDate } from '#lib/format/index.ts';
 import { GAME_NAME, SEASON } from '#lib/game/biobuzz.ts';
+import { hasPlayoffs } from '#lib/game/event-types.ts';
 import type { Award, EventBundle, QuickStat, QuickStats, TeamSeason } from '#lib/types.ts';
 import { localDay } from './dates.ts';
+import { teamMatches, type TeamMatchEvent } from './matches.ts';
 import { placeName } from './places.ts';
 import { playoffSummary } from './playoffs.ts';
 
@@ -93,6 +95,7 @@ export interface TeamPageData {
 	charts: TeamChart[];
 	comparison: TeamComparisonRow[];
 	events: TeamEventRow[];
+	matches: TeamMatchEvent[];
 	awards: TeamAwardRow[];
 	previous: PreviousSeason | null;
 	updated: number;
@@ -342,7 +345,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 	const events = season.events.map<TeamEventRow>((entry) => {
 		const { event } = entry;
 		const day = localDay(now, event.timezone);
-		const bundle = bundles[event.code];
+		const bundle = hasPlayoffs(event.type) ? bundles[event.code] : null;
 		let playoffs: string | null;
 		if (entry.stats) playoffs = bundle ? playoffSummary(bundle, number) : null;
 		else if (day < event.start) playoffs = 'Upcoming';
@@ -376,6 +379,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		charts,
 		comparison,
 		events,
+		matches: teamMatches(season, bundles, number),
 		awards: season.events.flatMap((entry) =>
 			entry.awards.map((award) => ({
 				code: entry.event.code,

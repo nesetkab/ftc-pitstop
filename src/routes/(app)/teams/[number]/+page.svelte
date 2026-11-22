@@ -5,6 +5,7 @@
 	import OprCharts from '#lib/components/team/OprCharts.svelte';
 	import TeamAwards from '#lib/components/team/TeamAwards.svelte';
 	import TeamEvents from '#lib/components/team/TeamEvents.svelte';
+	import TeamMatches from '#lib/components/team/TeamMatches.svelte';
 	import TeamStats from '#lib/components/team/TeamStats.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -68,6 +69,13 @@
 		</p>
 	{/if}
 </section>
+
+{#if view.matches.length > 0}
+	<section class="panel" aria-labelledby="matches-title">
+		<h2 class="sec-title" id="matches-title">Matches</h2>
+		<TeamMatches events={view.matches} team={view.team.number} />
+	</section>
+{/if}
 
 {#if view.awards.length > 0}
 	<section class="panel awards" aria-labelledby="awards-title">
