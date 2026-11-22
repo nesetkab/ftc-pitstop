@@ -1,5 +1,6 @@
 import { addDays } from '#lib/components/team/dates.ts';
 import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
+import { regionName } from '#lib/format/places.ts';
 import { EVENT_TYPE_NAMES } from '#lib/game/event-types.ts';
 import type {
 	AllianceColor,
@@ -198,7 +199,7 @@ export function buildRecordDataset(matches: SeasonMatch[]): RecordDataset {
 	}
 	return {
 		rows,
-		regions: [...regions].map((value) => ({ value, label: value })).sort(byLabel),
+		regions: [...regions].map((value) => ({ value, label: regionName(value) })).sort(byLabel),
 		types: [...types].map((value) => ({ value, label: EVENT_TYPE_NAMES[value] })).sort(byLabel)
 	};
 }

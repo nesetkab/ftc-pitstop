@@ -2,7 +2,7 @@ import { dateRange } from '#lib/format/time.ts';
 import type { EventSummary, EventType } from '#lib/types.ts';
 import { addDays, eventStatus, localDate, weekStart, type EventStatus } from './dates.ts';
 import { TYPE_ORDER } from './event-meta.ts';
-import { areaName, isUnitedStates, placeName } from '#lib/format/places.ts';
+import { areaName, isUnitedStates, knownRegion, placeName } from '#lib/format/places.ts';
 
 export type ListedEvent = {
 	code: string;
@@ -115,7 +115,11 @@ function normalize(text: string): string {
 }
 
 function haystack(event: ListedEvent): string {
-	return normalize([event.name, event.code, event.place, event.region].filter(Boolean).join(' '));
+	return normalize(
+		[event.name, event.code, event.place, event.region, knownRegion(event.region)]
+			.filter(Boolean)
+			.join(' ')
+	);
 }
 
 const searchText = new WeakMap<ListedEvent, string>();
@@ -217,7 +221,9 @@ export function regionGroups(events: EventSummary[]): RegionGroup[] {
 	for (const [code, entry] of regions) {
 		const names = [...entry.areas.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
 		const shown = names.slice(0, 3).join(', ');
-		const label = shown ? `${shown}${names.length > 3 ? ' and more' : ''} (${code})` : code;
+		const label =
+			knownRegion(code) ??
+			(shown ? `${shown}${names.length > 3 ? ' and more' : ''} (${code})` : code);
 		const bucket = entry.us ? 'us' : entry.canada ? 'canada' : 'other';
 		groups[bucket].push({ value: code, label });
 	}

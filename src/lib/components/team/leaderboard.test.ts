@@ -116,7 +116,12 @@ describe('createDataset', () => {
 	});
 
 	it('lists regions, countries and the states of each country', () => {
-		expect(dataset.regions.map((option) => option.value)).toEqual(['CAON', 'CN', 'USAZ', 'USCALA']);
+		expect(dataset.regions).toEqual([
+			{ value: 'USAZ', label: 'Arizona' },
+			{ value: 'USCALA', label: 'California SoCal' },
+			{ value: 'CN', label: 'China' },
+			{ value: 'CAON', label: 'Ontario' }
+		]);
 		expect(dataset.countries.map((option) => option.value)).toEqual(['Canada', 'China', 'USA']);
 		expect(dataset.states.USA).toEqual([
 			{ value: 'AZ', label: 'Arizona' },
