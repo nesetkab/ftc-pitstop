@@ -81,10 +81,9 @@
 	}
 
 	.sub {
-		max-width: 220px;
+		max-width: 180px;
 		margin-left: auto;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		white-space: normal;
 	}
 
 	@media (max-width: 600px) {
@@ -108,7 +107,6 @@
 
 		.sub {
 			max-width: 140px;
-			white-space: normal;
 		}
 	}
 </style>

@@ -147,9 +147,7 @@
 							<td class="l muted">No rating yet</td>
 						{/if}
 					{:else}
-						<td class="l muted"
-							>{placeName(row.team)}</td
-						>
+						<td class="l muted">{placeName(row.team)}</td>
 						<td>{row.team.rookieYear ?? '—'}</td>
 					{/if}
 				</tr>

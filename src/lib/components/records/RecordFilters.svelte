@@ -139,10 +139,14 @@
 		color: var(--text-2);
 	}
 
-	@media (max-width: 600px) {
-		label,
+	@media (max-width: 900px) {
 		.sort {
 			display: grid;
+		}
+	}
+
+	@media (max-width: 600px) {
+		label {
 			flex: 1 1 140px;
 		}
 

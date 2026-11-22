@@ -187,5 +187,9 @@
 			flex-direction: column;
 			align-items: flex-start;
 		}
+
+		.chip {
+			padding-inline: 5px;
+		}
 	}
 </style>

@@ -54,7 +54,7 @@
 						scope="col"
 						class={{
 							optional: compact && part.key !== 'total',
-							opt: part.key !== 'total' && !active,
+							extra: part.key !== 'total' && !active,
 							active
 						}}
 						aria-sort={active ? 'descending' : undefined}
@@ -82,12 +82,12 @@
 						<td
 							class={{
 								optional: compact && part.key !== 'total',
-								opt: part.key !== 'total' && filters.part !== part.key,
+								extra: part.key !== 'total' && filters.part !== part.key,
 								strong: filters.part === part.key
 							}}>{integer(row[part.key])}</td
 						>
 					{/each}
-					<td class="l team">
+					<td class={['l team', { bare: filters.part !== 'total' }]}>
 						<span class="teams">
 							{#each row.teams as team (team)}
 								<a href="/teams/{team}"
@@ -187,6 +187,12 @@
 		color: var(--blue);
 	}
 
+	@media (max-width: 900px) {
+		.extra {
+			display: none;
+		}
+	}
+
 	@media (max-width: 760px) {
 		.optional {
 			display: none;
@@ -205,6 +211,10 @@
 
 		.event {
 			max-width: 34vw;
+		}
+
+		.bare .name {
+			display: none;
 		}
 
 		.phone {
