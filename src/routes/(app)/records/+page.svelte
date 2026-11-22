@@ -9,7 +9,9 @@
 	} from '#lib/components/records/records.ts';
 	import Pagination from '#lib/components/team/Pagination.svelte';
 	import { integer } from '#lib/format/index.ts';
+	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import type { PageProps } from './$types';
 
@@ -34,13 +36,11 @@
 	);
 </script>
 
-<svelte:head>
-	<title>Season records - PitStop</title>
-	<meta
-		name="description"
-		content="The highest FTC alliance scores this season, by total, auto, teleop, hive, flower and garden points."
-	/>
-</svelte:head>
+<Seo
+	title={siteTitle(`FTC high scores and season records, ${SEASON_NAME}`)}
+	description="The highest FTC alliance scores of the {SEASON_NAME} season, ranked by total, auto, teleop, hive, flower and garden points. Filter by date, region, event type and team."
+	path="/records"
+/>
 
 <PageHeader
 	title="Season records"

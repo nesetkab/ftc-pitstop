@@ -27,15 +27,6 @@
 	);
 </script>
 
-<svelte:head>
-	<title>Insights at {data.bundle.event.name}</title>
-	<meta
-		name="description"
-		content="Highest scores and average points by part at {data.bundle.event
-			.name}, compared with the season."
-	/>
-</svelte:head>
-
 {#if !averages.event}
 	<EmptyState title="No scores yet.">Insights show here as soon as matches are played.</EmptyState>
 {:else}

@@ -27,13 +27,13 @@
 		{#if view.next}
 			<NextHero next={view.next} {call} {now} {timeZone} delaySeconds={view.delaySeconds} />
 		{:else}
-			<span class="tv-label">Next match</span>
+			<h2 class="tv-label">Next match</h2>
 			<p class="done">{done.headline}</p>
 			<p class="sub">{done.detail}</p>
 		{/if}
 	</section>
 	<section>
-		<span class="tv-label">{rankLabel}</span>
+		<h2 class="tv-label">{rankLabel}</h2>
 		{#if rows.length > 0}
 			<RankTable {rows} team={view.team} names={view.names} caption={rankLabel} />
 		{:else}
@@ -41,16 +41,16 @@
 		{/if}
 	</section>
 	<section>
-		<span class="tv-label">Our matches</span>
+		<h2 class="tv-label">Our matches</h2>
 		{#if view.matches.length > 0}
 			<MatchList items={matchItems(view.matches, view.next?.key ?? null, timeZone, 7)} />
 		{:else}
 			<p class="sub">No matches scheduled for {view.team}.</p>
 		{/if}
-		<span class="tv-label">This event</span>
+		<h2 class="tv-label">This event</h2>
 		<Facts facts={eventFacts(view)} />
 		{#if view.lastResult}
-			<span class="tv-label">Last result</span>
+			<h2 class="tv-label">Last result</h2>
 			<MatchList items={[lastResultItem(view.lastResult)]} />
 		{/if}
 	</section>

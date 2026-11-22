@@ -150,7 +150,22 @@ describe('team page', () => {
 		show();
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('26670 SCA Iron Eagles');
 		expect(screen.getByText('Phoenix, Arizona. Rookie year 2024.')).toBeInTheDocument();
-		expect(document.title).toBe('26670 SCA Iron Eagles - PitStop');
+		expect(document.title).toBe('FTC 26670 SCA Iron Eagles (Phoenix, Arizona) - PitStop');
+	});
+
+	it('describes the team for search and links its canonical page', () => {
+		show();
+		const description = document.head.querySelector('meta[name="description"]');
+		expect(description?.getAttribute('content')).toBe(
+			'FTC team 26670 SCA Iron Eagles from Phoenix, Arizona. 2026-27 BIOBUZZ OPR 58.2, 214th of 3,272 teams worldwide. Record 5-0-0 across 1 event. Match history, OPR by part and awards.'
+		);
+		const canonical = document.head.querySelector('link[rel="canonical"]');
+		expect(canonical?.getAttribute('href')).toMatch(/\/teams\/26670$/);
+		const data = [...document.head.querySelectorAll('script[type="application/ld+json"]')].map(
+			(node) => JSON.parse(node.textContent ?? '')
+		);
+		expect(data.map((item) => item['@type'])).toEqual(['SportsTeam', 'BreadcrumbList']);
+		expect(data[0]).toMatchObject({ name: '26670 SCA Iron Eagles', foundingDate: '2024' });
 	});
 
 	it('shows the stats row', () => {

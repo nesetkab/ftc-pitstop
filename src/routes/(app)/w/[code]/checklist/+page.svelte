@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-	<title>Checklist, team tools</title>
+	<title>Checklist, team tools - PitStop</title>
 </svelte:head>
 
 <Checklist

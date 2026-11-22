@@ -38,7 +38,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.team} pit display</title>
+	<title>{data.team} pit display - PitStop</title>
 	<meta name="theme-color" content="#121212" />
 	<meta name="robots" content="noindex" />
 </svelte:head>

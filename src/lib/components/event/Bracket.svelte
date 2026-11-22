@@ -26,7 +26,10 @@
 
 {#snippet slot(side: SlotView, color: 'red' | 'blue', match: BracketMatchView)}
 	<div class={['slot', { won: side.won, lost: match.played && !side.won }]}>
-		<span class="seed">{side.seed ?? ''}</span>
+		<span class="visually-hidden"
+			>{color === 'red' ? 'Red' : 'Blue'}{side.seed === null ? '' : `, alliance ${side.seed}`}</span
+		>
+		<span class="seed" aria-hidden="true">{side.seed ?? ''}</span>
 		<span class="teams">
 			{#if side.teams.length > 0}
 				{#each side.teams as team (team)}
@@ -36,12 +39,14 @@
 				<span class="source">{side.source}</span>
 			{/if}
 		</span>
-		<span class="score">{side.score ?? ''}</span>
+		<span class="score"
+			>{side.score ?? ''}{#if side.won}<span class="visually-hidden">, won</span>{/if}</span
+		>
 	</div>
 {/snippet}
 
 {#snippet box(match: BracketMatchView)}
-	<div class="box" data-series={match.series}>
+	<li class="box" data-series={match.series}>
 		<div class="head">
 			<svelte:element this={match.key ? 'a' : 'span'} class="label" href={href(match.key)}>
 				{match.label}
@@ -52,7 +57,7 @@
 		</div>
 		{@render slot(match.red, 'red', match)}
 		{@render slot(match.blue, 'blue', match)}
-	</div>
+	</li>
 {/snippet}
 
 <div class={['bracket', `size-${bracket.size}`]} aria-label="Playoff bracket" role="group">
@@ -62,12 +67,12 @@
 			<div class="rounds">
 				{#each section.rounds as round, index (index)}
 					<div class="round">
-						<span class="round-title">Round {round[0].round}</span>
-						<div class="round-matches">
+						<h4 class="round-title">Round {round[0].round}</h4>
+						<ul class="round-matches">
 							{#each round as match (match.series)}
 								{@render box(match)}
 							{/each}
-						</div>
+						</ul>
 					</div>
 				{/each}
 			</div>
@@ -97,7 +102,12 @@
 					<tr class={{ champion: side.champion }}>
 						<th scope="row" class="side">
 							<span class="side-inner">
-								<span class="seed">{side.seed ?? ''}</span>
+								<span class="seed">
+									{#if side.seed !== null}
+										<span class="visually-hidden">Alliance</span>
+										{side.seed}
+									{/if}
+								</span>
 								<span class="teams">
 									{#if side.teams.length > 0}
 										{#each side.teams as team (team)}
@@ -119,7 +129,9 @@
 									}
 								]}
 							>
-								{game.scores[index] ?? ''}
+								{game.scores[index] ?? ''}{#if game.winner === index}<span class="visually-hidden"
+										>, won</span
+									>{/if}
 							</td>
 						{/each}
 					</tr>
@@ -189,10 +201,16 @@
 
 	.round-title {
 		font-size: 12.5px;
+		font-weight: 400;
+		line-height: inherit;
+		letter-spacing: normal;
 		color: var(--text-3);
 	}
 
 	.round-matches {
+		margin: 0;
+		padding: 0;
+		list-style: none;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-around;

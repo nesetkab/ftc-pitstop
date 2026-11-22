@@ -4,7 +4,9 @@
 	import Pagination from '#lib/components/team/Pagination.svelte';
 	import { queryString } from '#lib/components/team/leaderboard.ts';
 	import { integer } from '#lib/format/index.ts';
+	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import type { PageProps } from './$types';
 
@@ -14,13 +16,11 @@
 	const last = $derived(data.start + data.rows.length);
 </script>
 
-<svelte:head>
-	<title>Leaderboards - PitStop</title>
-	<meta
-		name="description"
-		content="FTC teams ranked by OPR this season, with filters for region, country and state."
-	/>
-</svelte:head>
+<Seo
+	title={siteTitle(`FTC team leaderboards by OPR, ${SEASON_NAME}`)}
+	description="Every FTC team ranked by OPR in the {SEASON_NAME} season, with auto, teleop and tips OPR, matches and events. Filter by region, country or state."
+	path="/leaderboards"
+/>
 
 <PageHeader
 	title="Leaderboards"

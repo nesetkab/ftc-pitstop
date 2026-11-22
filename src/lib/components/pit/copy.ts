@@ -265,3 +265,32 @@ export function awardName(name: string): string {
 		.replace(/\s+/g, ' ')
 		.trim();
 }
+
+function callText(next: NextMatch, call: QueueCall | null): string | null {
+	if (next.started !== null) return 'On the field now.';
+	if (!call) return null;
+	const status = next.nexus.tracked ? next.nexus.status : null;
+	const headline =
+		status && status !== 'queuing-soon' ? NEXUS_HEADLINE[status] : NEXUS_HEADLINE['now-queuing'];
+	return `${headline}.`;
+}
+
+export function liveText(view: PitView, call: QueueCall | null): string {
+	const last = view.matches.findLast((match) => match.outcome !== null && match.score !== null);
+	const parts: (string | null)[] = [];
+	if (last?.outcome && last.score) {
+		const outcome = OUTCOME[last.outcome].toLowerCase();
+		parts.push(`${last.label} ${outcome} ${last.score.ours}–${last.score.theirs}.`);
+	}
+	const next = view.next;
+	if (next && view.phase !== 'upcoming') {
+		parts.push(`Next match ${next.label}, ${colorName(next.alliance)} alliance.`);
+		parts.push(callText(next, call));
+	} else if (view.phase === 'selection') {
+		parts.push(`${roleText(view)}.`);
+	} else if (view.phase === 'done') {
+		const result = playoffResult(view);
+		if (result) parts.push(`${result}.`);
+	}
+	return present(parts).join(' ');
+}

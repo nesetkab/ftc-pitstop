@@ -8,10 +8,6 @@
 	const view = getEventView();
 </script>
 
-<svelte:head>
-	<title>Rankings at {data.bundle.event.name}</title>
-</svelte:head>
-
 <RankingsView
 	bundle={data.bundle}
 	analysis={data.analysis}

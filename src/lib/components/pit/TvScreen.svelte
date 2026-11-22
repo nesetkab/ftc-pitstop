@@ -131,6 +131,8 @@
 	.tv :global(.tv-label) {
 		font-size: 0.8em;
 		font-weight: 500;
+		line-height: inherit;
+		letter-spacing: inherit;
 		color: var(--text-2);
 	}
 

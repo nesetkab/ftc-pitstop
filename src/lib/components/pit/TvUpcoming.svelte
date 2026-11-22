@@ -39,7 +39,7 @@
 		{#if where}<p class="sub">{where}</p>{/if}
 		<div class="first">
 			{#if first}
-				<span class="tv-label">First match{firstDay ? ` ${firstDay}` : ''}</span>
+				<h2 class="tv-label">First match{firstDay ? ` ${firstDay}` : ''}</h2>
 			{/if}
 			{#if first && first.scheduled !== null}
 				<b>{first.label} at {time(first.scheduled, event.timezone)}</b>
@@ -57,7 +57,7 @@
 		</div>
 	</section>
 	<section>
-		<span class="tv-label">Our matches</span>
+		<h2 class="tv-label">Our matches</h2>
 		{#if view.matches.length > 0}
 			<MatchList items={matchItems(view.matches, first?.key ?? null, event.timezone, 10)} />
 		{:else}

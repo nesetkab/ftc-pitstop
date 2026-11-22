@@ -13,7 +13,9 @@
 	import { integer } from '#lib/format/number.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import type { PageProps } from './$types';
 
@@ -92,9 +94,13 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Events</title>
-</svelte:head>
+<Seo
+	title={siteTitle(`FTC events, ${SEASON_NAME} season`)}
+	description="All {integer(
+		data.events.length
+	)} FTC events in the {SEASON_NAME} season: qualifiers, league meets, championships and more, with live rankings, schedules, results and awards."
+	path="/events"
+/>
 
 <PageHeader
 	title="Events"

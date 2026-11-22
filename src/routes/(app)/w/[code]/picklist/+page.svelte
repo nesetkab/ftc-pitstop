@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-	<title>Pick list, team tools</title>
+	<title>Pick list, team tools - PitStop</title>
 </svelte:head>
 
 <PickList

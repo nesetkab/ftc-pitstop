@@ -29,6 +29,19 @@ describe('share previews', () => {
 		expect(html.indexOf('og:image')).toBeLessThan(html.indexOf('</head>'));
 	});
 
+	it('points og:url at the canonical page when there is one', () => {
+		const html = withSocialTags(
+			page(
+				'<title>Compare</title><link rel="canonical" href="https://www.ftcpitstop.com/compare?teams=16,724">'
+			),
+			new URL('https://www.ftcpitstop.com/compare?teams=724,16')
+		);
+		expect(html).toContain(
+			'<meta property="og:url" content="https://www.ftcpitstop.com/compare?teams=16,724" />'
+		);
+		expect(html).toContain('<meta name="twitter:title" content="Compare" />');
+	});
+
 	it('leaves chunks without a head and pages that already have tags alone', () => {
 		const url = new URL('https://www.ftcpitstop.com/');
 		expect(withSocialTags('<div>body chunk</div>', url)).toBe('<div>body chunk</div>');

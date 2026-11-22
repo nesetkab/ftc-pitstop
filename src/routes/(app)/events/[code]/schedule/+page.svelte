@@ -27,10 +27,6 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Schedule at {bundle.event.name}</title>
-</svelte:head>
-
 {#if bundle.matches.length === 0}
 	<EmptyState title="The match schedule hasn't been posted yet.">
 		This page fills in on its own once it is.

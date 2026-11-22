@@ -21,7 +21,7 @@
 	const rp = $derived(showRp ? (next.forecast?.[next.alliance].rp ?? null) : null);
 </script>
 
-<span class="tv-label">Next match</span>
+<h2 class="tv-label">Next match</h2>
 <div class="hero">
 	<b>{next.label}</b>
 	<AllianceTag alliance={next.alliance} />
@@ -34,7 +34,7 @@
 </div>
 <Matchup {next} />
 {#if rp}
-	<span class="tv-label">Ranking point chances for {next.alliance}</span>
+	<h2 class="tv-label">Ranking point chances for {next.alliance}</h2>
 	<div class="rp">
 		<div><span>Swarm</span><b>{pct(rp.swarm)}</b></div>
 		<div><span>Pollinator 1</span><b>{pct(rp.pollinator1)}</b></div>

@@ -77,7 +77,7 @@
 </script>
 
 <svelte:head>
-	<title>Team tools</title>
+	<title>Team tools - PitStop</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
