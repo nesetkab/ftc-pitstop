@@ -19,6 +19,7 @@
 	const projections = $derived(remaining > 0 ? (analysis?.projections ?? null) : null);
 	const ratings = $derived(analysis && analysis.ratings.length > 0 ? analysis.ratings : null);
 	const strength = $derived(analysis?.strength ?? []);
+	const strengthTitle = $derived(remaining > 0 ? 'Schedule so far' : 'Schedule strength');
 	const note = $derived(
 		[
 			'RS is the average ranking points per match.',
@@ -49,8 +50,14 @@
 	<p class="note">{note}</p>
 	{#if strength.length > 0}
 		<section class="panel" aria-labelledby="strength-title">
-			<h2 class="sec-title" id="strength-title">Schedule so far</h2>
-			<StrengthTable {strength} rankings={bundle.rankings} teams={bundle.teams} {followed} />
+			<h2 class="sec-title" id="strength-title">{strengthTitle}</h2>
+			<StrengthTable
+				title={strengthTitle}
+				{strength}
+				rankings={bundle.rankings}
+				teams={bundle.teams}
+				{followed}
+			/>
 			<p class="note">
 				Partners' and opponents' OPR are averages over the matches each team has played. Sorted by
 				the gap between rank and rank by OPR.

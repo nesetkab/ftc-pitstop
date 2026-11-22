@@ -334,6 +334,11 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 					]
 				: [];
 
+	const eventOpr = (entry: TeamSeason['events'][number]) =>
+		analyses[entry.event.code]?.ratings.find((rating) => rating.team === number)?.opr ??
+		entry.stats?.opr.total ??
+		null;
+
 	const events = season.events.map<TeamEventRow>((entry) => {
 		const { event } = entry;
 		const day = localDay(now, event.timezone);
@@ -352,7 +357,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 			record: entry.stats
 				? { wins: entry.stats.wins, losses: entry.stats.losses, ties: entry.stats.ties }
 				: null,
-			opr: entry.stats?.opr.total ?? null,
+			opr: entry.stats ? eventOpr(entry) : null,
 			playoffs,
 			awards: entry.awards.map(awardLabel)
 		};

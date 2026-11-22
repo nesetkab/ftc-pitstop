@@ -57,6 +57,8 @@ describe('RankingsView', () => {
 		render(RankingsView, { props: { bundle: finished, analysis: fakeAnalysis(finished) } });
 		expect(screen.queryByText(/Projected after/)).toBeNull();
 		expect(headers()).toContain('OPR');
+		expect(screen.getByRole('table', { name: 'Schedule strength' })).toBeInTheDocument();
+		expect(screen.queryByText('Schedule so far')).toBeNull();
 	});
 
 	it('highlights followed teams', () => {

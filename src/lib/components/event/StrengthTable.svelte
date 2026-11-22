@@ -10,9 +10,16 @@
 		rankings: Ranking[];
 		teams: Team[];
 		followed?: ReadonlySet<number>;
+		title?: string;
 	}
 
-	let { strength, rankings, teams, followed = new Set() }: Props = $props();
+	let {
+		strength,
+		rankings,
+		teams,
+		followed = new Set(),
+		title = 'Schedule so far'
+	}: Props = $props();
 
 	const names = $derived(new Map(teams.map((team) => [team.number, team.name])));
 	const ranks = $derived(new Map(rankings.map((row) => [row.team, row.rank])));
@@ -28,7 +35,7 @@
 
 <div class="strength">
 	<Table>
-		<caption class="visually-hidden">Schedule so far</caption>
+		<caption class="visually-hidden">{title}</caption>
 		<thead>
 			<tr>
 				<th class="l" scope="col">Team</th>

@@ -250,6 +250,7 @@ describe('buildTeamPage with season ratings', () => {
 		});
 		expect(view.charts[0].points.map((point) => point.label)).toEqual(['Q3', 'Q9', 'M1', 'M3']);
 		expect(view.charts[0].points.map((point) => point.value)).toEqual([30, 32, 34, 36]);
+		expect(view.events.find((event) => event.code === 'USAZGIQ')?.opr).toBe(40);
 	});
 
 	it('leaves the divider out when there are no playoff matches', () => {
