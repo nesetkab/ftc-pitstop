@@ -4,7 +4,7 @@
 	import { pct } from '#lib/format/pct.ts';
 	import { record } from '#lib/format/record.ts';
 	import { relative } from '#lib/format/relative.ts';
-	import { relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
+	import { dayTime, relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
 	import type { DataSource, Event, Match } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -15,6 +15,7 @@
 	import Toggle from '#lib/ui/Toggle.svelte';
 	import { ALERT_OPTIONS, type AlertKey, type AlertSettings } from './alerts.ts';
 	import {
+		absentText,
 		awardName,
 		colorName,
 		heroText,
@@ -75,7 +76,7 @@
 	const text = $derived(next ? heroText(next, call, now, timeZone, view.delaySeconds) : null);
 	const href = (key: string) => `/events/${event.code}/matches/${key}`;
 	const items = $derived(
-		view.matches.map((match) => matchItem(match, next?.key ?? null, timeZone, href(match.key)))
+		view.matches.map((match) => matchItem(match, next?.key ?? null, timeZone, now, href(match.key)))
 	);
 	const facts = $derived.by(() => {
 		const ranking = view.ranking;
@@ -135,7 +136,8 @@
 
 		{#if tab === 'team'}
 			{#if !view.registered}
-				<EmptyState title="{view.team} is not on the team list for this event." />
+				{@const absent = absentText(view)}
+				<EmptyState title={absent.title}>{absent.detail}</EmptyState>
 			{:else if next && text && view.phase !== 'upcoming'}
 				<section class="next">
 					<span class="muted">Next match</span>
@@ -144,7 +146,7 @@
 						<AllianceChip alliance={next.alliance} />
 					</div>
 					<span class={['big', { urgent: text.urgent }]}>{text.headline}</span>
-					<span class="muted">{phoneDetail(next, timeZone, view.delaySeconds)}</span>
+					<span class="muted">{phoneDetail(next, timeZone, view.delaySeconds, now)}</span>
 					{#if next.level === 'playoff' && view.playoff?.position}
 						<span class="muted">{view.playoff.position}</span>
 					{/if}
@@ -207,7 +209,7 @@
 				</section>
 			{/if}
 
-			{#if facts.length > 0}
+			{#if view.registered && facts.length > 0}
 				<KeyValue items={facts} />
 			{/if}
 
@@ -287,7 +289,7 @@
 								{:else if match.actualTime !== null}
 									On field
 								{:else if match.scheduledTime !== null}
-									{time(match.scheduledTime, timeZone)}
+									{dayTime(match.scheduledTime, now, timeZone)}
 								{/if}
 							</span>
 							<span class="side red">

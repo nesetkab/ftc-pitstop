@@ -1,0 +1,93 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": { "teamNumber": 18359, "displayTeamNumber": "18359", "teamName": "Pymble Kids" },
+			"round1": {
+				"teamNumber": 11146,
+				"displayTeamNumber": "11146",
+				"teamName": "Barker Redbacks"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": { "teamNumber": 30781, "displayTeamNumber": "30781", "teamName": "Helix Black" },
+			"round1": { "teamNumber": 23636, "displayTeamNumber": "23636", "teamName": "Pymble Bees" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 3,
+			"name": "Alliance Seed 3",
+			"captain": { "teamNumber": 18363, "displayTeamNumber": "18363", "teamName": "Rice" },
+			"round1": { "teamNumber": 18360, "displayTeamNumber": "18360", "teamName": "Pymble Pride" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 4,
+			"name": "Alliance Seed 4",
+			"captain": {
+				"teamNumber": 23369,
+				"displayTeamNumber": "23369",
+				"teamName": "Fluffy Terminators"
+			},
+			"round1": {
+				"teamNumber": 11147,
+				"displayTeamNumber": "11147",
+				"teamName": "Barker Purplebacks"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 5,
+			"name": "Alliance Seed 5",
+			"captain": {
+				"teamNumber": 34095,
+				"displayTeamNumber": "34095",
+				"teamName": "Monte MegaBytes"
+			},
+			"round1": {
+				"teamNumber": 12554,
+				"displayTeamNumber": "12554",
+				"teamName": "Pymble Panthers"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 6,
+			"name": "Alliance Seed 6",
+			"captain": {
+				"teamNumber": 11145,
+				"displayTeamNumber": "11145",
+				"teamName": "Barker Greenbacks"
+			},
+			"round1": {
+				"teamNumber": 11148,
+				"displayTeamNumber": "11148",
+				"teamName": "Barker Greybacks"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 6
+}

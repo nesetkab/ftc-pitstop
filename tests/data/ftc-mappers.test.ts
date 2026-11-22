@@ -71,7 +71,7 @@ describe.each(FIXTURE_EVENTS)('FTC mappers on %s', (code) => {
 
 	it('maps the event', () => {
 		const event = mapEvent(data.event.events![0]);
-		expect(event.code).toBe(code);
+		expect(event.code).toBe(code.split('-')[0]);
 		expect(event.name.length).toBeGreaterThan(0);
 		expect(isValidTimeZone(event.timezone)).toBe(true);
 		expect(event.start <= event.end).toBe(true);

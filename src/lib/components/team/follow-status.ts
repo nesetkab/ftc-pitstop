@@ -1,4 +1,4 @@
-import { MISSING, record, shortDate, time } from '#lib/format/index.ts';
+import { dayTime, MISSING, record, shortDate } from '#lib/format/index.ts';
 import type { Event, Match, Ranking, TeamSeason, TeamSeasonEvent } from '#lib/types.ts';
 import { localDay } from './dates.ts';
 
@@ -38,7 +38,7 @@ export function chooseEvent(season: TeamSeason, now: number): ChosenEvent | null
 	return last ? { entry: last, standing: 'last' } : null;
 }
 
-export function nextMatch(bundle: FollowedBundle, team: number): string {
+export function nextMatch(bundle: FollowedBundle, team: number, now = Date.now()): string {
 	if (bundle.matches.length === 0) return 'Schedule not posted';
 	const plays = (match: Match) =>
 		match.red.some((entry) => entry.team === team) ||
@@ -46,7 +46,9 @@ export function nextMatch(bundle: FollowedBundle, team: number): string {
 	const next = bundle.matches.find((match) => match.result === null && plays(match));
 	if (!next) return bundle.matches.some(plays) ? 'No matches left' : 'Not scheduled';
 	const side = next.red.some((entry) => entry.team === team) ? 'red' : 'blue';
-	const at = next.scheduledTime ? ` at ${time(next.scheduledTime, bundle.event.timezone)}` : '';
+	const at = next.scheduledTime
+		? ` at ${dayTime(next.scheduledTime, now, bundle.event.timezone)}`
+		: '';
 	return `${next.label}${at}, ${side}`;
 }
 
@@ -66,7 +68,8 @@ function whenText(chosen: ChosenEvent): string {
 export function followedRow(
 	season: TeamSeason,
 	chosen: ChosenEvent | null,
-	bundle: FollowedBundle | null
+	bundle: FollowedBundle | null,
+	now = Date.now()
 ): FollowedRow {
 	const base = { team: season.team.number, name: season.team.name };
 	if (!chosen) {
@@ -84,7 +87,7 @@ export function followedRow(
 		eventCode: chosen.entry.event.code,
 		event: chosen.entry.event.name,
 		when: whenText(chosen),
-		next: bundle ? nextMatch(bundle, season.team.number) : MISSING,
+		next: bundle ? nextMatch(bundle, season.team.number, now) : MISSING,
 		rank: bundle ? standing(bundle, season.team.number) : MISSING
 	};
 }

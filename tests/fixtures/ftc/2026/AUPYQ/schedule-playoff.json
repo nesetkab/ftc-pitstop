@@ -1,0 +1,624 @@
+{
+	"schedule": [
+		{
+			"description": "Upper Bracket  Round 1 Match 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T13:45:00",
+			"actualStartTime": "2026-11-22T13:43:15.749",
+			"postResultTime": "2026-11-22T13:47:02.513",
+			"videoURL": null,
+			"scoreRedFinal": 89,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 8,
+			"scoreBlueFinal": 41,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 23369,
+					"displayTeamNumber": "23369",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Fluffy Terminators"
+				},
+				{
+					"teamNumber": 11147,
+					"displayTeamNumber": "11147",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Purplebacks"
+				},
+				{
+					"teamNumber": 34095,
+					"displayTeamNumber": "34095",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Monte MegaBytes"
+				},
+				{
+					"teamNumber": 12554,
+					"displayTeamNumber": "12554",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Panthers"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 1 Match 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 2,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T13:51:00",
+			"actualStartTime": "2026-11-22T13:51:24.268",
+			"postResultTime": "2026-11-22T13:55:47.356",
+			"videoURL": null,
+			"scoreRedFinal": 105,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 56,
+			"scoreBlueFinal": 97,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 33,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 18363,
+					"displayTeamNumber": "18363",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Rice"
+				},
+				{
+					"teamNumber": 18360,
+					"displayTeamNumber": "18360",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Pride"
+				},
+				{
+					"teamNumber": 11145,
+					"displayTeamNumber": "11145",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Greenbacks"
+				},
+				{
+					"teamNumber": 11148,
+					"displayTeamNumber": "11148",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Greybacks"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 3",
+			"tournamentLevel": "PLAYOFF",
+			"series": 3,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T13:57:00",
+			"actualStartTime": "2026-11-22T14:00:41.183",
+			"postResultTime": "2026-11-22T14:04:18.744",
+			"videoURL": null,
+			"scoreRedFinal": 147,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 53,
+			"scoreBlueFinal": 65,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 11146,
+					"displayTeamNumber": "11146",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Redbacks"
+				},
+				{
+					"teamNumber": 23369,
+					"displayTeamNumber": "23369",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Fluffy Terminators"
+				},
+				{
+					"teamNumber": 11147,
+					"displayTeamNumber": "11147",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Purplebacks"
+				},
+				{
+					"teamNumber": 18359,
+					"displayTeamNumber": "18359",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Kids"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 4",
+			"tournamentLevel": "PLAYOFF",
+			"series": 4,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T14:03:00",
+			"actualStartTime": "2026-11-22T14:07:53.331",
+			"postResultTime": "2026-11-22T14:12:44.45",
+			"videoURL": null,
+			"scoreRedFinal": 123,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 107,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 56,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 30781,
+					"displayTeamNumber": "30781",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Helix Black"
+				},
+				{
+					"teamNumber": 18360,
+					"displayTeamNumber": "18360",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Pride"
+				},
+				{
+					"teamNumber": 23636,
+					"displayTeamNumber": "23636",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Bees"
+				},
+				{
+					"teamNumber": 18363,
+					"displayTeamNumber": "18363",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Rice"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 5",
+			"tournamentLevel": "PLAYOFF",
+			"series": 5,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T14:09:00",
+			"actualStartTime": "2026-11-22T14:17:27.204",
+			"postResultTime": "2026-11-22T14:22:26.497",
+			"videoURL": null,
+			"scoreRedFinal": 82,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 31,
+			"scoreBlueFinal": 70,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 33,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 23369,
+					"displayTeamNumber": "23369",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Fluffy Terminators"
+				},
+				{
+					"teamNumber": 11147,
+					"displayTeamNumber": "11147",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Purplebacks"
+				},
+				{
+					"teamNumber": 11145,
+					"displayTeamNumber": "11145",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Greenbacks"
+				},
+				{
+					"teamNumber": 11148,
+					"displayTeamNumber": "11148",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Greybacks"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 6",
+			"tournamentLevel": "PLAYOFF",
+			"series": 6,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T14:15:00",
+			"actualStartTime": "2026-11-22T14:23:37.446",
+			"postResultTime": "2026-11-22T14:28:01.724",
+			"videoURL": null,
+			"scoreRedFinal": 107,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 11,
+			"scoreBlueFinal": 48,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 10,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 12554,
+					"displayTeamNumber": "12554",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Panthers"
+				},
+				{
+					"teamNumber": 34095,
+					"displayTeamNumber": "34095",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Monte MegaBytes"
+				},
+				{
+					"teamNumber": 18360,
+					"displayTeamNumber": "18360",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Pride"
+				},
+				{
+					"teamNumber": 18363,
+					"displayTeamNumber": "18363",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Rice"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 4 Match 7",
+			"tournamentLevel": "PLAYOFF",
+			"series": 7,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T14:21:00",
+			"actualStartTime": "2026-11-22T14:32:21.683",
+			"postResultTime": "2026-11-22T14:36:27.815",
+			"videoURL": null,
+			"scoreRedFinal": 173,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 31,
+			"scoreBlueFinal": 151,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 48,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 18359,
+					"displayTeamNumber": "18359",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Kids"
+				},
+				{
+					"teamNumber": 11146,
+					"displayTeamNumber": "11146",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Redbacks"
+				},
+				{
+					"teamNumber": 30781,
+					"displayTeamNumber": "30781",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Helix Black"
+				},
+				{
+					"teamNumber": 23636,
+					"displayTeamNumber": "23636",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Bees"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 4 Match 8",
+			"tournamentLevel": "PLAYOFF",
+			"series": 8,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T14:27:00",
+			"actualStartTime": "2026-11-22T14:37:54.626",
+			"postResultTime": "2026-11-22T14:41:41.761",
+			"videoURL": null,
+			"scoreRedFinal": 103,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 11,
+			"scoreBlueFinal": 53,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 8,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 18363,
+					"displayTeamNumber": "18363",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Rice"
+				},
+				{
+					"teamNumber": 18360,
+					"displayTeamNumber": "18360",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Pride"
+				},
+				{
+					"teamNumber": 23369,
+					"displayTeamNumber": "23369",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Fluffy Terminators"
+				},
+				{
+					"teamNumber": 11147,
+					"displayTeamNumber": "11147",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Purplebacks"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 5 Match 9",
+			"tournamentLevel": "PLAYOFF",
+			"series": 9,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T14:45:00",
+			"actualStartTime": "2026-11-22T14:54:10.531",
+			"postResultTime": "2026-11-22T14:58:05.65",
+			"videoURL": null,
+			"scoreRedFinal": 128,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 28,
+			"scoreBlueFinal": 77,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 30781,
+					"displayTeamNumber": "30781",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Helix Black"
+				},
+				{
+					"teamNumber": 23636,
+					"displayTeamNumber": "23636",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Bees"
+				},
+				{
+					"teamNumber": 18363,
+					"displayTeamNumber": "18363",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Rice"
+				},
+				{
+					"teamNumber": 18360,
+					"displayTeamNumber": "18360",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Pride"
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 6 Match 10",
+			"tournamentLevel": "PLAYOFF",
+			"series": 10,
+			"matchNumber": 1,
+			"startTime": "2026-11-22T15:03:00",
+			"actualStartTime": "2026-11-22T15:10:57.693",
+			"postResultTime": "2026-11-22T15:15:56.719",
+			"videoURL": null,
+			"scoreRedFinal": 243,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 56,
+			"scoreBlueFinal": 141,
+			"scoreBlueFoul": 40,
+			"scoreBlueAuto": 48,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 23636,
+					"displayTeamNumber": "23636",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Bees"
+				},
+				{
+					"teamNumber": 30781,
+					"displayTeamNumber": "30781",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Helix Black"
+				},
+				{
+					"teamNumber": 11146,
+					"displayTeamNumber": "11146",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Barker Redbacks"
+				},
+				{
+					"teamNumber": 18359,
+					"displayTeamNumber": "18359",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Pymble Kids"
+				}
+			]
+		}
+	]
+}

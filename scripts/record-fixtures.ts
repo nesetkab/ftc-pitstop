@@ -21,7 +21,10 @@ const EVENTS: Record<string, string> = {
 	UZTAQ1: 'qualifier with 4 alliances, many no-shows and surrogates',
 	USMISOQ: 'qualifier with 6 alliances and 11 playoff matches',
 	USUTSAS1: 'scrimmage whose second alliance captain is placeholder team 99999',
-	USMIWMM8: 'league meet whose rankings cover the whole league, 13 of 33 teams here'
+	USMIWMM8: 'league meet whose rankings cover the whole league, 13 of 33 teams here',
+	KZASQ1: 'qualifier recorded live on day 2 with day 1 matches carried over',
+	USMINOQ: 'qualifier with a tied final and a tiebreaker replay',
+	AUPYQ: 'finished qualifier with 6 alliances'
 };
 
 function endpoints(code: string): [string, string][] {

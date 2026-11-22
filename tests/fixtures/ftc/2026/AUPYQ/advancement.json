@@ -1,0 +1,79 @@
+{
+	"advancesTo": "AUCMP",
+	"slots": 6,
+	"fcmpReserved": 0,
+	"advancement": [
+		{
+			"team": 18359,
+			"displayTeam": "18359",
+			"slot": 1,
+			"criteria": "Points",
+			"declined": false,
+			"status": "ALREADY_ADVANCING"
+		},
+		{
+			"team": 11146,
+			"displayTeam": "11146",
+			"slot": 2,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 30781,
+			"displayTeam": "30781",
+			"slot": 3,
+			"criteria": "Points",
+			"declined": false,
+			"status": "ALREADY_ADVANCING"
+		},
+		{
+			"team": 10517,
+			"displayTeam": "10517",
+			"slot": 4,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 23636,
+			"displayTeam": "23636",
+			"slot": 5,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 18363,
+			"displayTeam": "18363",
+			"slot": 6,
+			"criteria": "Points",
+			"declined": false,
+			"status": "ALREADY_ADVANCING"
+		},
+		{
+			"team": 18360,
+			"displayTeam": "18360",
+			"slot": 7,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 23369,
+			"displayTeam": "23369",
+			"slot": 8,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 11147,
+			"displayTeam": "11147",
+			"slot": 9,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		}
+	]
+}

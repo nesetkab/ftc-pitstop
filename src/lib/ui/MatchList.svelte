@@ -33,19 +33,21 @@
 <style>
 	.ml {
 		display: grid;
+		grid-template-columns: minmax(2.6em, auto) minmax(4.4em, auto) minmax(0, 1fr) auto;
+		column-gap: 0.6em;
 		margin: 0;
+		font-size: 0.85em;
 		padding: 0;
 		list-style: none;
 	}
 
 	li {
 		display: grid;
-		grid-template-columns: 2.6em 4.4em minmax(0, 1fr) auto;
-		gap: 0.6em;
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
 		align-items: baseline;
 		padding: 0.42em 0;
 		border-bottom: 1px solid var(--line);
-		font-size: 0.85em;
 		font-variant-numeric: tabular-nums;
 	}
 

@@ -1,0 +1,93 @@
+{
+	"alliances": [
+		{
+			"number": 1,
+			"name": "Alliance Seed 1",
+			"captain": {
+				"teamNumber": 21331,
+				"displayTeamNumber": "21331",
+				"teamName": "Silver Hornets"
+			},
+			"round1": { "teamNumber": 8533, "displayTeamNumber": "8533", "teamName": "CSA MS Miners" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 2,
+			"name": "Alliance Seed 2",
+			"captain": {
+				"teamNumber": 29694,
+				"displayTeamNumber": "29694",
+				"teamName": "SILAMBU STRIKERS"
+			},
+			"round1": {
+				"teamNumber": 37709,
+				"displayTeamNumber": "37709",
+				"teamName": "SILAMBU WARRIORS"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 3,
+			"name": "Alliance Seed 3",
+			"captain": {
+				"teamNumber": 10137,
+				"displayTeamNumber": "10137",
+				"teamName": "Emerson RoboEagles"
+			},
+			"round1": {
+				"teamNumber": 11129,
+				"displayTeamNumber": "11129",
+				"teamName": "Novi Robotitans"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 4,
+			"name": "Alliance Seed 4",
+			"captain": {
+				"teamNumber": 25721,
+				"displayTeamNumber": "25721",
+				"teamName": "Liberty Bees #25721"
+			},
+			"round1": {
+				"teamNumber": 8688,
+				"displayTeamNumber": "8688",
+				"teamName": "Marysville Jr Vi-Bots"
+			},
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 5,
+			"name": "Alliance Seed 5",
+			"captain": { "teamNumber": 19940, "displayTeamNumber": "19940", "teamName": "TechoRaptors" },
+			"round1": { "teamNumber": 8845, "displayTeamNumber": "8845", "teamName": "The Wild Bees" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		},
+		{
+			"number": 6,
+			"name": "Alliance Seed 6",
+			"captain": { "teamNumber": 23596, "displayTeamNumber": "23596", "teamName": "Techno Tacos" },
+			"round1": { "teamNumber": 23777, "displayTeamNumber": "23777", "teamName": "Silver Eagles" },
+			"round2": null,
+			"round3": null,
+			"backup": null,
+			"backupReplaced": null
+		}
+	],
+	"count": 6
+}

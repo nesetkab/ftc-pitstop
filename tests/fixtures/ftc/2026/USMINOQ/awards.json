@@ -1,0 +1,244 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "USMINOQ",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": 11129,
+			"schoolName": null,
+			"fullTeamName": "KLA/Magna/Bosch/Harman/GM/ZF&Novi Middle School",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USMINOQ",
+			"name": "Inspire Award 2nd Place",
+			"series": 2,
+			"teamNumber": 21331,
+			"schoolName": null,
+			"fullTeamName": "Polymaker/General Motors/Fabworks/Gene Haas Foundation&Boulan Park Middle School",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USMINOQ",
+			"name": "Inspire Award 3rd Place",
+			"series": 3,
+			"teamNumber": 23439,
+			"schoolName": null,
+			"fullTeamName": "Novi Middle School",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USMINOQ",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 10137,
+			"schoolName": null,
+			"fullTeamName": "FRC 2832-The Livonia Warriors/Livonia Public Schools&Emerson Middle School",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USMINOQ",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 11129,
+			"schoolName": null,
+			"fullTeamName": "KLA/Magna/Bosch/Harman/GM/ZF&Novi Middle School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USMINOQ",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 21331,
+			"schoolName": null,
+			"fullTeamName": "Polymaker/General Motors/Fabworks/Gene Haas Foundation&Boulan Park Middle School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USMINOQ",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 8533,
+			"schoolName": null,
+			"fullTeamName": "Charyl Stockwell Academy-Sec",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USMINOQ",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": 6294,
+			"schoolName": null,
+			"fullTeamName": "Borgwarner/Gene Haas Foundation/Diya Construction Group/Infomerica/GE Healthcare/Suburban Showplace/Capgemini/General Motors/Realtor Piyush Dave/CENGAGE GROUP/Affiliated Home Health Care/Porsche Farmington Hills/BOSCH/North American Lighting/BRIGHTSHARKS ENGINEERING/ePROMPTUS/Pande Grocers/AUTODESK/Roofing Technology Associates/Vani Foods/Family Hair Salon/Kumon Farmington Hills/FANUC/APTIV/FRC 503 Frog Force/Busch's/BJ's Wholesale Club/Costco&Novi Middle School",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USMINOQ",
+			"name": "Think Award 2nd Place",
+			"series": 2,
+			"teamNumber": 37113,
+			"schoolName": null,
+			"fullTeamName": "RootLogik &Hillside Middle School",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USMINOQ",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": 25721,
+			"schoolName": null,
+			"fullTeamName": "Liberty Middle School",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USMINOQ",
+			"name": "Connect Award 2nd Place",
+			"series": 2,
+			"teamNumber": 23856,
+			"schoolName": null,
+			"fullTeamName": "The STEAM Syndicate of Livingston County&The STEAM Syndicate from Livingston County",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USMINOQ",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": 20332,
+			"schoolName": null,
+			"fullTeamName": "Ford Motor Company/Michigan Department of Education/FIRST HQ/FIRST in Michigan&Boulan Park Middle School",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USMINOQ",
+			"name": "Sustain Award 2nd Place",
+			"series": 2,
+			"teamNumber": 32759,
+			"schoolName": null,
+			"fullTeamName": "Michigan Department of Education/The Deka Foundation/Bosch Community Foundation/The Timken Community/Jabil Cares Foundation/Stahl's&University Liggett School",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USMINOQ",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": 29694,
+			"schoolName": null,
+			"fullTeamName": "SILAMBU&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USMINOQ",
+			"name": "Innovate Award sponsored by RTX 2nd Place",
+			"series": 2,
+			"teamNumber": 23596,
+			"schoolName": null,
+			"fullTeamName": "Robert Bosch GmbH/State of Michigan/Bentley Infrastructure Software/A and M Pharmacy/Birmingham Education Foundation&Berkshire Middle School",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USMINOQ",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": 37709,
+			"schoolName": null,
+			"fullTeamName": "SILAMBU&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USMINOQ",
+			"name": "Control Award 2nd Place",
+			"series": 2,
+			"teamNumber": 8603,
+			"schoolName": null,
+			"fullTeamName": "Ford Motor Company/Rudolf Steiner School of Ann Arbor/State of Michigan/Stadium Hardware&Rudolf Steiner Sch-Ann Arbor",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USMINOQ",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": 19940,
+			"schoolName": null,
+			"fullTeamName": "Trine University/IEP Urgent Care/Precision Task Group/BRIGHTSharks Engineering/Care4You Pediatrics/Smile Centers PC/VOIP OFFICE/Inovision/Michigan Department of Education/Marimba Auto/V2 Soft&Hillside Middle School&Meads Mill Middle School",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USMINOQ",
+			"name": "Reach Award 2nd Place",
+			"series": 2,
+			"teamNumber": 23416,
+			"schoolName": null,
+			"fullTeamName": "Centennial Middle School",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USMINOQ",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": 10137,
+			"schoolName": null,
+			"fullTeamName": "FRC 2832-The Livonia Warriors/Livonia Public Schools&Emerson Middle School",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USMINOQ",
+			"name": "Design Award 2nd Place",
+			"series": 2,
+			"teamNumber": 8533,
+			"schoolName": null,
+			"fullTeamName": "Charyl Stockwell Academy-Sec",
+			"person": null
+		},
+		{
+			"awardId": 1,
+			"eventCode": "USMINOQ",
+			"name": "Judges' Choice Award",
+			"series": 1,
+			"teamNumber": 17224,
+			"schoolName": null,
+			"fullTeamName": "Ypsilanti Community Middle School",
+			"person": null
+		},
+		{
+			"awardId": 10,
+			"eventCode": "USMINOQ",
+			"name": "<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 19,
+			"eventCode": "USMINOQ",
+			"name": "Volunteer Award",
+			"series": 1,
+			"teamNumber": 20332,
+			"schoolName": null,
+			"fullTeamName": "Ford Motor Company/Michigan Department of Education/FIRST HQ/FIRST in Michigan&Boulan Park Middle School",
+			"person": "Akshita Sakthi"
+		}
+	]
+}

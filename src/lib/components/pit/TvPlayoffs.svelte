@@ -69,7 +69,7 @@
 		{/if}
 		{#if playoff && playoff.matches.length > 0}
 			<h2 class="tv-label">Our playoff matches</h2>
-			<MatchList items={matchItems(playoff.matches, next?.key ?? null, timeZone)} />
+			<MatchList items={matchItems(playoff.matches, next?.key ?? null, timeZone, now)} />
 		{/if}
 	</section>
 	<section>

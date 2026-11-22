@@ -146,7 +146,8 @@ export function currentWeek(now: number): { start: string; end: string } {
 export function filterEvents(
 	events: ListedEvent[],
 	filters: EventFilters,
-	now: number
+	now: number,
+	finished: ReadonlySet<string> = new Set()
 ): (ListedEvent & { status: EventStatus })[] {
 	const words = normalize(filters.query).split(/\s+/).filter(Boolean);
 	const week = currentWeek(now);
@@ -158,7 +159,7 @@ export function filterEvents(
 		if (filters.when === 'week' && (event.start > week.end || event.end < week.start)) return [];
 		if (filters.when === 'upcoming' && status === 'done') return [];
 		if (filters.when === 'past' && status !== 'done') return [];
-		return [{ ...event, status }];
+		return [{ ...event, status: status === 'live' && finished.has(event.code) ? 'done' : status }];
 	});
 	const ascending = (a: ListedEvent, b: ListedEvent) =>
 		a.start.localeCompare(b.start) || a.name.localeCompare(b.name);

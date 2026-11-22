@@ -718,8 +718,13 @@ export function createLoaders(deps: LoaderDeps) {
 		};
 	}
 
+	function finishedEvents(): string[] {
+		return [...phases].filter(([, phase]) => phase === 'done').map(([code]) => code);
+	}
+
 	return {
 		loadEventBundle,
+		finishedEvents,
 		loadSeasonEvents,
 		loadEventsToday,
 		loadTeamSeason,
@@ -741,6 +746,7 @@ export const loaders = createLoaders({
 
 export const {
 	loadEventBundle,
+	finishedEvents,
 	loadSeasonEvents,
 	loadEventsToday,
 	loadTeamSeason,

@@ -212,18 +212,32 @@ export function computeRankings(matches: Match[], teams: number[] = []): Ranking
 	return rows.map((row, index) => ({ rank: index + 1, ...row }));
 }
 
-function teamsOf(match: Match): number[] {
-	return [...match.red, ...match.blue].map((slot) => slot.team);
+function teamsOf(slots: Match['red']): number[] {
+	return slots.map((slot) => slot.team);
 }
 
-function playoffKnown(bundle: EventBundle, match: Match, at: number): boolean {
-	const teams = new Set(teamsOf(match));
+function playsBefore(earlier: Match, match: Match): boolean {
+	return (
+		earlier.series < match.series ||
+		(earlier.series === match.series && earlier.number < match.number)
+	);
+}
+
+function sideKnown(bundle: EventBundle, match: Match, slots: Match['red'], at: number): boolean {
+	const teams = new Set(teamsOf(slots));
 	return bundle.matches.every((earlier) => {
-		if (earlier.level !== 'playoff' || earlier.series >= match.series) return true;
-		if (!teamsOf(earlier).some((team) => teams.has(team))) return true;
+		if (earlier.level !== 'playoff' || !playsBefore(earlier, match)) return true;
+		if (![...earlier.red, ...earlier.blue].some((slot) => teams.has(slot.team))) return true;
 		const posted = earlier.result ? revealTime(earlier) : null;
 		return posted !== null && posted <= at;
 	});
+}
+
+function replayPlayoff(bundle: EventBundle, match: Match, at: number): Match | null {
+	const red = sideKnown(bundle, match, match.red, at);
+	const blue = sideKnown(bundle, match, match.blue, at);
+	if (!red && !blue) return null;
+	return { ...match, red: red ? match.red : [], blue: blue ? match.blue : [] };
 }
 
 export function replayBundle(bundle: EventBundle, at: number): EventBundle {
@@ -231,9 +245,10 @@ export function replayBundle(bundle: EventBundle, at: number): EventBundle {
 	const alliances = replayAlliances(bundle.alliances, window, at);
 	const playoffsVisible = window !== null && at >= window.end;
 	const matches = bundle.matches
-		.filter(
-			(match) => match.level === 'qual' || (playoffsVisible && playoffKnown(bundle, match, at))
+		.map((match) =>
+			match.level === 'qual' ? match : playoffsVisible ? replayPlayoff(bundle, match, at) : null
 		)
+		.filter((match): match is Match => match !== null)
 		.map((match) => replayMatch(match, at));
 	const quals = matches.filter((match) => match.level === 'qual');
 	const allQualsPosted = quals.length > 0 && quals.every((match) => match.result !== null);

@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "8259e06b-192c-6a4b-ae04-311ed20b3f2b",
+			"code": "KZASQ1",
+			"divisionCode": null,
+			"name": "Astana FIRST Regional",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 1,
+			"published": false,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "KZ",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "K.E.R.N. School",
+			"address": "10B Jochy Khan Street, Yessil District, Astana",
+			"city": "Astana",
+			"stateprov": "AST",
+			"country": "Kazakhstan",
+			"website": null,
+			"liveStreamUrl": null,
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=82844",
+			"coordinates": null,
+			"webcasts": null,
+			"timezone": "Asia/Almaty",
+			"dateStart": "2026-11-21T00:00:00",
+			"dateEnd": "2026-11-22T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

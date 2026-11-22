@@ -11,6 +11,7 @@ export {
 	shortDate,
 	relativeDay,
 	dateRange,
+	dayTime,
 	type DateInput
 } from './time.ts';
 export { relative, secondsBetween } from './relative.ts';

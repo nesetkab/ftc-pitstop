@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "8728e609-3d4e-e64a-a92e-531e57cb1854",
+			"code": "USMINOQ",
+			"divisionCode": null,
+			"name": "Novi Qualifier",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 2,
+			"published": true,
+			"type": "2",
+			"typeName": "Qualifier",
+			"regionCode": "USMI",
+			"leagueCode": null,
+			"districtCode": "",
+			"venue": "Novi Meadows Elementary School",
+			"address": "25549 Taft Rd",
+			"city": "Novi",
+			"stateprov": "MI",
+			"country": "USA",
+			"website": "https://firstinmichigan.us/FTC/events/",
+			"liveStreamUrl": "https://fimav.us/live/2026/USMINOQ",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=81826",
+			"coordinates": { "type": "Point", "coordinates": [-83.49693, 42.47729] },
+			"webcasts": null,
+			"timezone": "America/New_York",
+			"dateStart": "2026-11-20T00:00:00",
+			"dateEnd": "2026-11-21T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

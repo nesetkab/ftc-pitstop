@@ -1,0 +1,234 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "AUPYQ",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": 10517,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "AUPYQ",
+			"name": "Inspire Award 2nd Place",
+			"series": 2,
+			"teamNumber": 30781,
+			"schoolName": null,
+			"fullTeamName": "AI Cubed Academy&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "AUPYQ",
+			"name": "Inspire Award 3rd Place",
+			"series": 3,
+			"teamNumber": 23369,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "AUPYQ",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 18359,
+			"schoolName": null,
+			"fullTeamName": "Pymble Ladies' College",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "AUPYQ",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 11146,
+			"schoolName": null,
+			"fullTeamName": "Barker College",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "AUPYQ",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 30781,
+			"schoolName": null,
+			"fullTeamName": "AI Cubed Academy&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "AUPYQ",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 23636,
+			"schoolName": null,
+			"fullTeamName": "Pymble Ladies College",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "AUPYQ",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": 18360,
+			"schoolName": null,
+			"fullTeamName": "Pymble Ladies' College",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "AUPYQ",
+			"name": "Think Award 2nd Place",
+			"series": 2,
+			"teamNumber": 23875,
+			"schoolName": null,
+			"fullTeamName": "Pymble Ladies College",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "AUPYQ",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": 18306,
+			"schoolName": null,
+			"fullTeamName": "Unity Grammar",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "AUPYQ",
+			"name": "Connect Award 2nd Place",
+			"series": 2,
+			"teamNumber": 38356,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "AUPYQ",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": 34628,
+			"schoolName": null,
+			"fullTeamName": "The Ponds High School&The Ponds High School",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "AUPYQ",
+			"name": "Sustain Award 2nd Place",
+			"series": 2,
+			"teamNumber": 34093,
+			"schoolName": null,
+			"fullTeamName": "Monte Sant' Angelo College",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "AUPYQ",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": 11148,
+			"schoolName": null,
+			"fullTeamName": "Barker College",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "AUPYQ",
+			"name": "Innovate Award sponsored by RTX 2nd Place",
+			"series": 2,
+			"teamNumber": 11147,
+			"schoolName": null,
+			"fullTeamName": "Barker College",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "AUPYQ",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": 18359,
+			"schoolName": null,
+			"fullTeamName": "Pymble Ladies' College",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "AUPYQ",
+			"name": "Control Award 2nd Place",
+			"series": 2,
+			"teamNumber": 11145,
+			"schoolName": null,
+			"fullTeamName": "Barker College",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "AUPYQ",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": 23636,
+			"schoolName": null,
+			"fullTeamName": "Pymble Ladies College",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "AUPYQ",
+			"name": "Reach Award 2nd Place",
+			"series": 2,
+			"teamNumber": 28299,
+			"schoolName": null,
+			"fullTeamName": "Macarthur Anglican School",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "AUPYQ",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": 11146,
+			"schoolName": null,
+			"fullTeamName": "Barker College",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "AUPYQ",
+			"name": "Design Award 2nd Place",
+			"series": 2,
+			"teamNumber": 11144,
+			"schoolName": null,
+			"fullTeamName": "Barker College",
+			"person": null
+		},
+		{
+			"awardId": 1,
+			"eventCode": "AUPYQ",
+			"name": "Judges' Choice Award",
+			"series": 1,
+			"teamNumber": 18363,
+			"schoolName": null,
+			"fullTeamName": "Pymble Ladies' College",
+			"person": null
+		},
+		{
+			"awardId": 10,
+			"eventCode": "AUPYQ",
+			"name": "<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}

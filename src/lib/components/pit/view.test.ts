@@ -1,7 +1,17 @@
 import { describe, expect, it } from 'vitest';
+import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
-import { delayText, heroText, liveText, matchItems, playoffResult, shortDelay } from './copy.ts';
+import { time } from '#lib/format/time.ts';
+import {
+	absentText,
+	delayText,
+	heroText,
+	liveText,
+	matchItems,
+	playoffResult,
+	shortDelay
+} from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { bundleSignature, pitView, rankWindow } from './view.ts';
@@ -49,7 +59,7 @@ describe('pitView during quals', () => {
 			high: 97,
 			low: 45
 		});
-		expect(matchItems(current.matches, current.next?.key ?? null, ZONE)).toEqual([
+		expect(matchItems(current.matches, current.next?.key ?? null, ZONE, at('Q22'))).toEqual([
 			{
 				label: 'Q5',
 				status: 'Won',
@@ -229,6 +239,34 @@ describe('pitView during quals', () => {
 	});
 });
 
+describe('matches carried over to the next day', () => {
+	const astana = fixtureBundle('KZASQ1');
+	const now = replayStart('Q30', astana)!;
+	const bundle = replayBundle(astana, now);
+	const zone = astana.event.timezone;
+	const items = (analysis: EventAnalysis | null) => {
+		const current = pitView({ bundle, analysis, queue: null, team: 36465 });
+		return matchItems(current.matches, current.next?.key ?? null, zone, now);
+	};
+
+	it('lists the estimate the headline uses instead of the stale schedule', () => {
+		const analysis = retime(
+			{ forecasts: {}, ratings: [] } as unknown as EventAnalysis,
+			bundle,
+			now
+		);
+		const q36 = items(analysis).find((item) => item.label === 'Q36')!;
+		const expected = analysis.timing.matches.q36.expectedStart!;
+		expect(q36.status).toBe(`~${time(expected, zone)}`);
+		expect(q36.status).not.toContain('7:47');
+	});
+
+	it('names the day when it falls back to an old scheduled time', () => {
+		const q36 = items(null).find((item) => item.label === 'Q36')!;
+		expect(q36.status).toBe(nb('Sat 7:47 PM'));
+	});
+});
+
 describe('pitView after quals', () => {
 	it('follows alliance selection', () => {
 		const window = selectionWindow(full)!;
@@ -258,6 +296,43 @@ describe('pitView after quals', () => {
 			position: 'Out after M5'
 		});
 		expect(out.standings.find((standing) => standing.seed === 5)).toMatchObject({ out: true });
+	});
+
+	it('shows the next playoff match before the opponent is known', () => {
+		const captain = pitView({
+			bundle: replayBundle(full, at('M3')),
+			analysis: null,
+			queue: null,
+			team: 26670
+		});
+		expect(captain.next).toMatchObject({
+			key: 'p7',
+			alliance: 'red',
+			opponents: [],
+			blue: [],
+			pending: 'Winner of M4'
+		});
+		expect(captain.playoff?.position).toBe('Upper bracket round 4');
+		const lower = pitView({
+			bundle: replayBundle(full, at('M7')),
+			analysis: null,
+			queue: null,
+			team: 26670
+		});
+		expect(lower.next).toMatchObject({ key: 'p9', pending: 'Winner of M8' });
+		expect(lower.playoff?.position).toBe('Lower bracket round 5');
+	});
+
+	it('plays the tiebreaker after a tied final', () => {
+		const event = fixtureBundle('USMINOQ');
+		const tied = replayBundle(event, replayStart('M10', event)!);
+		const captain = pitView({ bundle: tied, analysis: null, queue: null, team: 21331 });
+		expect(captain.next?.label).toBe('M10-2');
+		expect(captain.playoff?.position).toBe('Finals');
+		const replayed = replayBundle(event, replayStart('M10-2', event)!);
+		expect(
+			pitView({ bundle: replayed, analysis: null, queue: null, team: 10137 }).next?.label
+		).toBe('M11');
 	});
 
 	it('says whose picks the available list is sorted for', () => {
@@ -354,6 +429,18 @@ describe('pitView after quals', () => {
 		const done = pitView({ bundle: meet, analysis: null, queue: null, team: 10104 });
 		expect(done.names.get(24371)).toBe('Proto Pioneers');
 		expect(done.names.get(10104)).toBe('That OTHER Team');
+	});
+
+	it('treats league teams that skipped the meet as not here', () => {
+		const meet = fixtureBundle('USMIWMM8');
+		const absent = pitView({ bundle: meet, analysis: null, queue: null, team: 24371 });
+		expect(absent).toMatchObject({ registered: false, ranking: null, matches: [] });
+		expect(absentText(absent).title).toBe('24371 is not at this meet.');
+		const here = pitView({ bundle: meet, analysis: null, queue: null, team: 10104 });
+		expect(here.registered).toBe(true);
+		expect(
+			absentText(pitView({ bundle: full, analysis: null, queue: null, team: 99999 })).title
+		).toBe('99999 is not on the team list for this event.');
 	});
 
 	it('knows when a team is not at the event', () => {

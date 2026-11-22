@@ -1,0 +1,111 @@
+{
+	"advancesTo": "USMTCMP",
+	"slots": 12,
+	"fcmpReserved": 0,
+	"advancement": [
+		{
+			"team": 10662,
+			"displayTeam": "10662",
+			"slot": 1,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 724,
+			"displayTeam": "724",
+			"slot": 2,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 5026,
+			"displayTeam": "5026",
+			"slot": 3,
+			"criteria": "Points",
+			"declined": false,
+			"status": "INELIGIBLE"
+		},
+		{
+			"team": 4133,
+			"displayTeam": "4133",
+			"slot": 4,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 18240,
+			"displayTeam": "18240",
+			"slot": 5,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 26858,
+			"displayTeam": "26858",
+			"slot": 6,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 26706,
+			"displayTeam": "26706",
+			"slot": 7,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 37390,
+			"displayTeam": "37390",
+			"slot": 8,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 36380,
+			"displayTeam": "36380",
+			"slot": 9,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 17097,
+			"displayTeam": "17097",
+			"slot": 10,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 38372,
+			"displayTeam": "38372",
+			"slot": 11,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 4813,
+			"displayTeam": "4813",
+			"slot": 12,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		},
+		{
+			"team": 22244,
+			"displayTeam": "22244",
+			"slot": 13,
+			"criteria": "Points",
+			"declined": false,
+			"status": "FIRST"
+		}
+	]
+}

@@ -2,6 +2,7 @@ import type { EventAnalysis, MatchForecast, MatchTiming, TeamRating } from '#lib
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';
+import { fillPlayoffs } from './bracket.ts';
 import { QUEUE_EARLIEST } from './queue.ts';
 import type {
 	AllianceColor,
@@ -43,6 +44,7 @@ export interface PitMatch {
 	partners: number[];
 	opponents: number[];
 	scheduled: number | null;
+	expected: number | null;
 	started: number | null;
 	outcome: Outcome | null;
 	score: { ours: number; theirs: number } | null;
@@ -57,6 +59,7 @@ export interface NextMatch extends PitMatch {
 	queueAt: number | null;
 	expectedStart: number | null;
 	matchesAway: number;
+	pending: string | null;
 	nexus: { tracked: boolean; status: QueueStatus | null };
 }
 
@@ -177,6 +180,9 @@ function pitMatch(match: Match, team: number, analysis: EventAnalysis | null): P
 		partners: match[alliance].filter((slot) => slot.team !== team).map((slot) => slot.team),
 		opponents: match[other].map((slot) => slot.team),
 		scheduled: match.scheduledTime,
+		expected: isUnplayed(match)
+			? (analysis?.timing.matches[match.key]?.expectedStart ?? null)
+			: null,
 		started: match.actualTime,
 		outcome,
 		score: result ? { ours: result[alliance].total, theirs: result[other].total } : null,
@@ -390,7 +396,9 @@ function standings(bundle: EventBundle): AllianceStanding[] {
 }
 
 export function pitView(input: PitInput): PitView {
-	const { bundle, analysis, queue, team } = input;
+	const { analysis, queue, team } = input;
+	const filled = fillPlayoffs(input.bundle.matches, input.bundle.alliances);
+	const bundle = { ...input.bundle, matches: filled.matches };
 	const names = new Map([
 		...bundle.rankings.flatMap((row) => (row.name ? [[row.team, row.name] as const] : [])),
 		...bundle.teams.map((entry) => [entry.number, entry.name] as const)
@@ -434,6 +442,7 @@ export function pitView(input: PitInput): PitView {
 				timing?.expectedStart ??
 				null,
 			matchesAway: bundle.matches.slice(active + 1, nextIndex).filter(isUnplayed).length,
+			pending: filled.pending.get(match.key)?.[opposite(base.alliance)] ?? null,
 			nexus: {
 				tracked: nexusMatch !== null,
 				status: nowQueuing ? 'now-queuing' : (nexusMatch?.status ?? null)
@@ -446,7 +455,9 @@ export function pitView(input: PitInput): PitView {
 	const live = bundle.phase !== 'upcoming' && bundle.phase !== 'done';
 	const firstUnplayed = bundle.matches.find((match, index) => index > active && isUnplayed(match));
 	const registered =
-		bundle.teams.some((entry) => entry.number === team) || ours.length > 0 || ranks.has(team);
+		bundle.teams.some((entry) => entry.number === team) ||
+		ours.length > 0 ||
+		(bundle.teams.length === 0 && ranks.has(team));
 	return {
 		team,
 		teamName: names.get(team) ?? null,
@@ -455,7 +466,7 @@ export function pitView(input: PitInput): PitView {
 		registered,
 		names,
 		rankings: bundle.rankings,
-		ranking: standing && standing.played > 0 ? standing : null,
+		ranking: registered && standing && standing.played > 0 ? standing : null,
 		teamCount: Math.max(bundle.teams.length, bundle.rankings.length),
 		rankedAfter: postedQuals.at(-1)?.label ?? null,
 		qualsPlayed: postedQuals.length,

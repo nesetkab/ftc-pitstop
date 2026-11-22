@@ -1,0 +1,748 @@
+{
+	"schedule": [
+		{
+			"description": "Upper Bracket  Round 1 Match 1",
+			"tournamentLevel": "PLAYOFF",
+			"series": 1,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T16:30:00",
+			"actualStartTime": "2026-11-21T16:34:00.924",
+			"postResultTime": "2026-11-21T16:39:31.762",
+			"videoURL": null,
+			"scoreRedFinal": 47,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 31,
+			"scoreBlueFinal": 88,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 8688,
+					"displayTeamNumber": "8688",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Marysville Jr Vi-Bots"
+				},
+				{
+					"teamNumber": 8845,
+					"displayTeamNumber": "8845",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Wild Bees"
+				},
+				{
+					"teamNumber": 19940,
+					"displayTeamNumber": "19940",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TechoRaptors"
+				},
+				{
+					"teamNumber": 25721,
+					"displayTeamNumber": "25721",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Liberty Bees #25721"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 1 Match 2",
+			"tournamentLevel": "PLAYOFF",
+			"series": 2,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T16:36:00",
+			"actualStartTime": "2026-11-21T16:39:58.178",
+			"postResultTime": "2026-11-21T16:43:41.231",
+			"videoURL": null,
+			"scoreRedFinal": 168,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 26,
+			"scoreBlueFinal": 95,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 10137,
+					"displayTeamNumber": "10137",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Emerson RoboEagles"
+				},
+				{
+					"teamNumber": 11129,
+					"displayTeamNumber": "11129",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Novi Robotitans"
+				},
+				{
+					"teamNumber": 23596,
+					"displayTeamNumber": "23596",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Techno Tacos"
+				},
+				{
+					"teamNumber": 23777,
+					"displayTeamNumber": "23777",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Eagles"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 3",
+			"tournamentLevel": "PLAYOFF",
+			"series": 3,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T16:42:00",
+			"actualStartTime": "2026-11-21T16:49:20.199",
+			"postResultTime": "2026-11-21T16:54:05.091",
+			"videoURL": null,
+			"scoreRedFinal": 154,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 48,
+			"scoreBlueFinal": 86,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 8533,
+					"displayTeamNumber": "8533",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CSA MS Miners"
+				},
+				{
+					"teamNumber": 19940,
+					"displayTeamNumber": "19940",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TechoRaptors"
+				},
+				{
+					"teamNumber": 8845,
+					"displayTeamNumber": "8845",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Wild Bees"
+				},
+				{
+					"teamNumber": 21331,
+					"displayTeamNumber": "21331",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Hornets"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 2 Match 4",
+			"tournamentLevel": "PLAYOFF",
+			"series": 4,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T16:48:00",
+			"actualStartTime": "2026-11-21T16:54:33.12",
+			"postResultTime": "2026-11-21T16:59:14.902",
+			"videoURL": null,
+			"scoreRedFinal": 143,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 33,
+			"scoreBlueFinal": 149,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 46,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 29694,
+					"displayTeamNumber": "29694",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU STRIKERS"
+				},
+				{
+					"teamNumber": 11129,
+					"displayTeamNumber": "11129",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Novi Robotitans"
+				},
+				{
+					"teamNumber": 37709,
+					"displayTeamNumber": "37709",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU WARRIORS"
+				},
+				{
+					"teamNumber": 10137,
+					"displayTeamNumber": "10137",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Emerson RoboEagles"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 5",
+			"tournamentLevel": "PLAYOFF",
+			"series": 5,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T16:54:00",
+			"actualStartTime": "2026-11-21T17:04:31.641",
+			"postResultTime": "2026-11-21T17:08:31.664",
+			"videoURL": null,
+			"scoreRedFinal": 89,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 69,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 11,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 19940,
+					"displayTeamNumber": "19940",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TechoRaptors"
+				},
+				{
+					"teamNumber": 8845,
+					"displayTeamNumber": "8845",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Wild Bees"
+				},
+				{
+					"teamNumber": 23596,
+					"displayTeamNumber": "23596",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Techno Tacos"
+				},
+				{
+					"teamNumber": 23777,
+					"displayTeamNumber": "23777",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Eagles"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 3 Match 6",
+			"tournamentLevel": "PLAYOFF",
+			"series": 6,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T17:00:00",
+			"actualStartTime": "2026-11-21T17:10:46.524",
+			"postResultTime": "2026-11-21T17:14:17.219",
+			"videoURL": null,
+			"scoreRedFinal": 144,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 31,
+			"scoreBlueFinal": 74,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 36,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 37709,
+					"displayTeamNumber": "37709",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU WARRIORS"
+				},
+				{
+					"teamNumber": 8688,
+					"displayTeamNumber": "8688",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Marysville Jr Vi-Bots"
+				},
+				{
+					"teamNumber": 25721,
+					"displayTeamNumber": "25721",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Liberty Bees #25721"
+				},
+				{
+					"teamNumber": 29694,
+					"displayTeamNumber": "29694",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU STRIKERS"
+				}
+			]
+		},
+		{
+			"description": "Upper Bracket  Round 4 Match 7",
+			"tournamentLevel": "PLAYOFF",
+			"series": 7,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T17:06:00",
+			"actualStartTime": "2026-11-21T17:16:01.81",
+			"postResultTime": "2026-11-21T17:21:14.231",
+			"videoURL": null,
+			"scoreRedFinal": 176,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 36,
+			"scoreBlueFinal": 183,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 21331,
+					"displayTeamNumber": "21331",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Hornets"
+				},
+				{
+					"teamNumber": 8533,
+					"displayTeamNumber": "8533",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CSA MS Miners"
+				},
+				{
+					"teamNumber": 10137,
+					"displayTeamNumber": "10137",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Emerson RoboEagles"
+				},
+				{
+					"teamNumber": 11129,
+					"displayTeamNumber": "11129",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Novi Robotitans"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 4 Match 8",
+			"tournamentLevel": "PLAYOFF",
+			"series": 8,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T17:12:00",
+			"actualStartTime": "2026-11-21T17:21:55.087",
+			"postResultTime": "2026-11-21T17:26:45.348",
+			"videoURL": null,
+			"scoreRedFinal": 144,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 53,
+			"scoreBlueFinal": 91,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 29694,
+					"displayTeamNumber": "29694",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU STRIKERS"
+				},
+				{
+					"teamNumber": 37709,
+					"displayTeamNumber": "37709",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU WARRIORS"
+				},
+				{
+					"teamNumber": 19940,
+					"displayTeamNumber": "19940",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "TechoRaptors"
+				},
+				{
+					"teamNumber": 8845,
+					"displayTeamNumber": "8845",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "The Wild Bees"
+				}
+			]
+		},
+		{
+			"description": "Lower Bracket  Round 5 Match 9",
+			"tournamentLevel": "PLAYOFF",
+			"series": 9,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T17:30:00",
+			"actualStartTime": "2026-11-21T17:44:09.045",
+			"postResultTime": "2026-11-21T17:49:06.893",
+			"videoURL": null,
+			"scoreRedFinal": 170,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 56,
+			"scoreBlueFinal": 126,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 31,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 21331,
+					"displayTeamNumber": "21331",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Hornets"
+				},
+				{
+					"teamNumber": 8533,
+					"displayTeamNumber": "8533",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CSA MS Miners"
+				},
+				{
+					"teamNumber": 29694,
+					"displayTeamNumber": "29694",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU STRIKERS"
+				},
+				{
+					"teamNumber": 37709,
+					"displayTeamNumber": "37709",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "SILAMBU WARRIORS"
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 6 Match 10",
+			"tournamentLevel": "PLAYOFF",
+			"series": 10,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T17:48:00",
+			"actualStartTime": "2026-11-21T18:03:20.081",
+			"postResultTime": "2026-11-21T18:08:09.847",
+			"videoURL": null,
+			"scoreRedFinal": 200,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 51,
+			"scoreBlueFinal": 200,
+			"scoreBlueFoul": 20,
+			"scoreBlueAuto": 56,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 10137,
+					"displayTeamNumber": "10137",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Emerson RoboEagles"
+				},
+				{
+					"teamNumber": 11129,
+					"displayTeamNumber": "11129",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Novi Robotitans"
+				},
+				{
+					"teamNumber": 21331,
+					"displayTeamNumber": "21331",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Hornets"
+				},
+				{
+					"teamNumber": 8533,
+					"displayTeamNumber": "8533",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CSA MS Miners"
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 6 Match 10 Tiebreaker",
+			"tournamentLevel": "PLAYOFF",
+			"series": 10,
+			"matchNumber": 2,
+			"startTime": "2026-11-21T17:59:00",
+			"actualStartTime": "2026-11-21T18:21:05.749",
+			"postResultTime": "2026-11-21T18:25:17.495",
+			"videoURL": null,
+			"scoreRedFinal": 183,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 51,
+			"scoreBlueFinal": 203,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 56,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": false,
+			"blueWins": true,
+			"teams": [
+				{
+					"teamNumber": 10137,
+					"displayTeamNumber": "10137",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Emerson RoboEagles"
+				},
+				{
+					"teamNumber": 11129,
+					"displayTeamNumber": "11129",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Novi Robotitans"
+				},
+				{
+					"teamNumber": 21331,
+					"displayTeamNumber": "21331",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Hornets"
+				},
+				{
+					"teamNumber": 8533,
+					"displayTeamNumber": "8533",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CSA MS Miners"
+				}
+			]
+		},
+		{
+			"description": "Final Bracket  Round 7 Match 11",
+			"tournamentLevel": "PLAYOFF",
+			"series": 11,
+			"matchNumber": 1,
+			"startTime": "2026-11-21T18:06:00",
+			"actualStartTime": "2026-11-21T18:33:54.336",
+			"postResultTime": "2026-11-21T18:37:45.946",
+			"videoURL": null,
+			"scoreRedFinal": 193,
+			"scoreRedFoul": 0,
+			"scoreRedAuto": 51,
+			"scoreBlueFinal": 189,
+			"scoreBlueFoul": 0,
+			"scoreBlueAuto": 48,
+			"scoreBlueDriveControlled": null,
+			"scoreBlueEndgame": null,
+			"redWins": true,
+			"blueWins": false,
+			"teams": [
+				{
+					"teamNumber": 10137,
+					"displayTeamNumber": "10137",
+					"station": "Red1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Emerson RoboEagles"
+				},
+				{
+					"teamNumber": 11129,
+					"displayTeamNumber": "11129",
+					"station": "Red2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Novi Robotitans"
+				},
+				{
+					"teamNumber": 21331,
+					"displayTeamNumber": "21331",
+					"station": "Blue1",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "Silver Hornets"
+				},
+				{
+					"teamNumber": 8533,
+					"displayTeamNumber": "8533",
+					"station": "Blue2",
+					"surrogate": false,
+					"noShow": false,
+					"dq": false,
+					"onField": true,
+					"teamName": "CSA MS Miners"
+				}
+			]
+		}
+	]
+}

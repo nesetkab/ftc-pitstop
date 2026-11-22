@@ -1,0 +1,51 @@
+{
+	"code": "USMINOQ",
+	"note": "qualifier with a tied final and a tiebreaker replay",
+	"recordedAt": "2026-11-22T05:53:37.680Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USMINOQ", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USMINOQ", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USMINOQ", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USMINOQ/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 23:50:20 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USMINOQ/playoff/hybrid",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 23:50:20 GMT"
+		},
+		"matches-qual": {
+			"path": "matches/USMINOQ?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 23:50:20 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USMINOQ?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 23:50:20 GMT"
+		},
+		"scores-qual": {
+			"path": "scores/USMINOQ/qual",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 23:50:20 GMT"
+		},
+		"scores-playoff": {
+			"path": "scores/USMINOQ/playoff",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 23:50:20 GMT"
+		},
+		"alliances": {
+			"path": "alliances/USMINOQ",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:53:37 GMT"
+		},
+		"awards": {
+			"path": "awards/USMINOQ",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 23:50:20 GMT"
+		},
+		"advancement": { "path": "advancement/USMINOQ", "status": 200, "lastModified": null }
+	}
+}

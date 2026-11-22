@@ -42,6 +42,9 @@
 		<div class="row">
 			<div class="teams">
 				<span class="visually-hidden">{side.alliance === 'red' ? 'Red' : 'Blue'} alliance</span>
+				{#if side.slots.length === 0}
+					<span class="pending">{next.pending ?? 'To be decided'}</span>
+				{/if}
 				{#each side.slots as slot (slot.number)}
 					<span class="slot">
 						<TeamTag number={slot.number} alliance={side.alliance} me={slot.me} />
@@ -112,6 +115,11 @@
 		align-items: center;
 		gap: 0.35em;
 		font-size: 1.05em;
+	}
+
+	.pending {
+		font-size: 1.05em;
+		color: var(--text-2);
 	}
 
 	small {

@@ -1,0 +1,234 @@
+{
+	"awards": [
+		{
+			"awardId": 11,
+			"eventCode": "USMTBUQ",
+			"name": "Inspire Award",
+			"series": 1,
+			"teamNumber": 10662,
+			"schoolName": null,
+			"fullTeamName": "Interbel Coop/Gianforte Family Foundation/Lincoln Electric Coop/Lion's Den Booster Club/The Broodo Family&Lincoln Co High School",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USMTBUQ",
+			"name": "Inspire Award 2nd Place",
+			"series": 2,
+			"teamNumber": 18240,
+			"schoolName": null,
+			"fullTeamName": " Gene Haas Foundation/ Logan Health/ RWM Home Loans/ Gianforte Family Foundation/ Two Bear Capital/ Amazon/ Glacier Bank/ D&D Trucking and Construction/ Angelic Tunes Karaoke/ Kalispell Daybreak Rotary&Girl Scouts",
+			"person": null
+		},
+		{
+			"awardId": 11,
+			"eventCode": "USMTBUQ",
+			"name": "Inspire Award 3rd Place",
+			"series": 3,
+			"teamNumber": 22244,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USMTBUQ",
+			"name": "Winning Alliance - Captain",
+			"series": 1,
+			"teamNumber": 724,
+			"schoolName": null,
+			"fullTeamName": "Sun River MudBog&Neighborhood Group",
+			"person": null
+		},
+		{
+			"awardId": 13,
+			"eventCode": "USMTBUQ",
+			"name": "Winning Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 10662,
+			"schoolName": null,
+			"fullTeamName": "Interbel Coop/Gianforte Family Foundation/Lincoln Electric Coop/Lion's Den Booster Club/The Broodo Family&Lincoln Co High School",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USMTBUQ",
+			"name": "Finalist Alliance - Captain",
+			"series": 1,
+			"teamNumber": 5026,
+			"schoolName": null,
+			"fullTeamName": "MCM Trucking/Twin Falls Optimist Club/Snake River Design/Gene Haas Foundation/Idaho EcosySTEM/Gibby Group/Beth Ann Wrigley/State Farm - Doug Stokes/Rev Robotics&4-H&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 12,
+			"eventCode": "USMTBUQ",
+			"name": "Finalist Alliance - 1st Team Selected",
+			"series": 2,
+			"teamNumber": 4133,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USMTBUQ",
+			"name": "Think Award",
+			"series": 1,
+			"teamNumber": 16,
+			"schoolName": null,
+			"fullTeamName": "Sentinel High School",
+			"person": null
+		},
+		{
+			"awardId": 9,
+			"eventCode": "USMTBUQ",
+			"name": "Think Award 2nd Place",
+			"series": 2,
+			"teamNumber": 3747,
+			"schoolName": null,
+			"fullTeamName": "Beehive Science and Technology Academy/Motorola Solutions/Parker Hannifin/Gene Haas/DoD STEM/Jacobsen Innovations/The Layshia Clarendon Foundation/Utah STEM Action Center&Beehive Sci & Technology Acad",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USMTBUQ",
+			"name": "Connect Award",
+			"series": 1,
+			"teamNumber": 5026,
+			"schoolName": null,
+			"fullTeamName": "MCM Trucking/Twin Falls Optimist Club/Snake River Design/Gene Haas Foundation/Idaho EcosySTEM/Gibby Group/Beth Ann Wrigley/State Farm - Doug Stokes/Rev Robotics&4-H&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 8,
+			"eventCode": "USMTBUQ",
+			"name": "Connect Award 2nd Place",
+			"series": 2,
+			"teamNumber": 26149,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USMTBUQ",
+			"name": "Sustain Award",
+			"series": 1,
+			"teamNumber": 8271,
+			"schoolName": null,
+			"fullTeamName": "Gianforte Family Foundation/REV Robotics/InterBel Telephone Cooperative/Lincoln Electric Cooperative/Gene Haas Foundation/The Broodo Family/Lion's Den Booster Club&Lincoln Co High School",
+			"person": null
+		},
+		{
+			"awardId": 26,
+			"eventCode": "USMTBUQ",
+			"name": "Sustain Award 2nd Place",
+			"series": 2,
+			"teamNumber": 26706,
+			"schoolName": null,
+			"fullTeamName": "Columbia Falls Kids Foundation/Friends of Casen Clark/Gianforte Family Foundation&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USMTBUQ",
+			"name": "Innovate Award sponsored by RTX",
+			"series": 1,
+			"teamNumber": 20169,
+			"schoolName": null,
+			"fullTeamName": "Quackens PTSA/RTM Engineering&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 7,
+			"eventCode": "USMTBUQ",
+			"name": "Innovate Award sponsored by RTX 2nd Place",
+			"series": 2,
+			"teamNumber": 24375,
+			"schoolName": null,
+			"fullTeamName": "East Helena High School",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USMTBUQ",
+			"name": "Control Award",
+			"series": 1,
+			"teamNumber": 724,
+			"schoolName": null,
+			"fullTeamName": "Sun River MudBog&Neighborhood Group",
+			"person": null
+		},
+		{
+			"awardId": 4,
+			"eventCode": "USMTBUQ",
+			"name": "Control Award 2nd Place",
+			"series": 2,
+			"teamNumber": 17097,
+			"schoolName": null,
+			"fullTeamName": "Main Sequence Robotics & Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USMTBUQ",
+			"name": "Reach Award",
+			"series": 1,
+			"teamNumber": 24458,
+			"schoolName": null,
+			"fullTeamName": "STOKE&Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 25,
+			"eventCode": "USMTBUQ",
+			"name": "Reach Award 2nd Place",
+			"series": 2,
+			"teamNumber": 22520,
+			"schoolName": null,
+			"fullTeamName": "Rapelje School",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USMTBUQ",
+			"name": "Design Award",
+			"series": 1,
+			"teamNumber": 4133,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 6,
+			"eventCode": "USMTBUQ",
+			"name": "Design Award 2nd Place",
+			"series": 2,
+			"teamNumber": 26858,
+			"schoolName": null,
+			"fullTeamName": "Family/Community",
+			"person": null
+		},
+		{
+			"awardId": 1,
+			"eventCode": "USMTBUQ",
+			"name": "Judges' Choice Award",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		},
+		{
+			"awardId": 10,
+			"eventCode": "USMTBUQ",
+			"name": "<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists",
+			"series": 1,
+			"teamNumber": null,
+			"schoolName": null,
+			"fullTeamName": null,
+			"person": null
+		}
+	]
+}
