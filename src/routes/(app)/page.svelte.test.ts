@@ -43,7 +43,7 @@ const week: HomeEvent[] = [
 	}
 ];
 
-function show(data: { today: HomeEvent[] | null; week: HomeEvent[] | null }) {
+function show(data: { today: HomeEvent[] | null; week: HomeEvent[] | null; records?: unknown }) {
 	return render(Page, { props: { data } as never });
 }
 
@@ -110,5 +110,55 @@ describe('home page', () => {
 		expect(
 			screen.getByText('Follow a team from its page and it will show up here.')
 		).toBeInTheDocument();
+	});
+
+	it('shows the highest scores of the last 7 days when they are ready', () => {
+		show({
+			today,
+			week,
+			records: {
+				rows: [
+					{
+						event: 'USAZGIQ',
+						day: '2026-11-14',
+						type: 'Qualifier',
+						region: 'USAZ',
+						key: 'p7',
+						label: 'M7',
+						level: 'playoff',
+						alliance: 'red',
+						teams: [13684, 10016],
+						opponents: [1, 2],
+						result: 'win',
+						total: 288,
+						opponent: 155,
+						auto: 76,
+						teleop: 212,
+						hive: 200,
+						flower: 0,
+						garden: 2,
+						park: 10,
+						rank: 1
+					}
+				],
+				names: { teams: { 13684: 'Infinity Tech' }, events: { USAZGIQ: 'Gilbert Qualifier' } }
+			}
+		});
+		const table = screen.getByRole('table', { name: 'Highest alliance scores in the last 7 days' });
+		expect(within(table).getByRole('link', { name: 'M7' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/matches/p7'
+		);
+		expect(within(table).getByText('Infinity Tech')).toBeInTheDocument();
+		expect(within(table).queryByRole('link', { name: 'Auto' })).not.toBeInTheDocument();
+		expect(screen.getByRole('link', { name: 'More records' })).toHaveAttribute(
+			'href',
+			'/records?range=7'
+		);
+	});
+
+	it('leaves out the scores section until the season is loaded', () => {
+		show({ today, week, records: null });
+		expect(screen.queryByText('Highest scores in the last 7 days')).not.toBeInTheDocument();
 	});
 });

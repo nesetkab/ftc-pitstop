@@ -63,6 +63,6 @@ describe('home load', () => {
 	it('still renders when neither list can be loaded', async () => {
 		server.loadEventsToday.mockRejectedValue(new Error('down'));
 		server.loadSeasonEvents.mockRejectedValue(new Error('down'));
-		expect(await call().result).toEqual({ today: null, week: null });
+		expect(await call().result).toEqual({ today: null, week: null, records: null });
 	});
 });
