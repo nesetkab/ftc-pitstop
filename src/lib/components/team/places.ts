@@ -86,13 +86,23 @@ export function stateName(state: string | null, country: string | null): string 
 	return names(country)?.[state.toUpperCase()] ?? state;
 }
 
+function cityNames(city: string | null, part: string): boolean {
+	if (!city) return false;
+	const lower = city.toLowerCase();
+	const target = part.toLowerCase();
+	return lower === target || lower.endsWith(`, ${target}`);
+}
+
 export function placeName(place: Place, style: 'full' | 'short' = 'full'): string {
 	const parts: string[] = [];
 	if (place.city) parts.push(place.city);
 	if (names(place.country)) {
-		const state = style === 'full' ? stateName(place.state, place.country) : place.state;
-		if (state && state !== place.city) parts.push(state);
-	} else if (place.country) {
+		const full = stateName(place.state, place.country);
+		const state = style === 'full' ? full : place.state;
+		if (state && full && !cityNames(place.city, full) && !cityNames(place.city, state)) {
+			parts.push(state);
+		}
+	} else if (place.country && !cityNames(place.city, place.country)) {
 		parts.push(place.country);
 	}
 	return parts.join(', ');
