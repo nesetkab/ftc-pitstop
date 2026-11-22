@@ -7,6 +7,8 @@ export type Versions = Partial<Record<DocName, number>>;
 export interface LoadOptions {
 	known?: Versions;
 	docs?: readonly DocName[];
+	rev?: string;
+	key?: string;
 }
 
 export type WriteResult<K extends DocName> =
@@ -22,7 +24,7 @@ export type WorkspaceErrorCode =
 	| 'unsupported'
 	| 'forbidden';
 
-export type LoadedSnapshot = Snapshot & { matched?: readonly DocName[] };
+export type LoadedSnapshot = Snapshot & { proven?: boolean };
 
 export class WorkspaceError extends Error {
 	readonly code: WorkspaceErrorCode;

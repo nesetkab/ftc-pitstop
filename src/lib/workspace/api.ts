@@ -128,7 +128,9 @@ function isDocName(value: string): value is DocName {
 
 export function createWorkspaceApi(store: WorkspaceStore, limiter: Limiter): WorkspaceApi {
 	const takeGuess = (ip: string) => limiter.allow(`miss:${ip}`, RATE.miss.limit, RATE.miss.window);
-	const refundGuess = (ip: string) => limiter.release(`miss:${ip}`, RATE.miss.window);
+	const guessedTooMuch = async (ip: string) =>
+		(await limiter.used(`miss:${ip}`, RATE.miss.window)) >= RATE.miss.limit;
+	const missing = () => new WorkspaceError('not-found', 'No workspace uses this code');
 
 	return {
 		async create(request, ip) {
@@ -147,16 +149,16 @@ export function createWorkspaceApi(store: WorkspaceStore, limiter: Limiter): Wor
 
 		async load(request, code, ip) {
 			try {
-				if (!isCode(code)) throw new WorkspaceError('not-found', 'No workspace uses this code');
+				if (!isCode(code)) throw missing();
 				const options = parseLoadOptions(new URL(request.url).searchParams);
 				const snapshot = await store.load(code, options);
-				const knowsIt = (snapshot?.matched?.length ?? 0) > 0;
-				if (!knowsIt) {
+				if (!snapshot) {
 					if (!(await takeGuess(ip))) return rateLimited();
-					if (snapshot) await refundGuess(ip);
+					throw missing();
 				}
-				if (!snapshot) throw new WorkspaceError('not-found', 'No workspace uses this code');
-				return reply({ meta: snapshot.meta, docs: snapshot.docs });
+				if (!snapshot.proven && (await guessedTooMuch(ip))) return rateLimited();
+				const { meta, docs, rev, key } = snapshot;
+				return reply({ meta, docs, rev, key });
 			} catch (error) {
 				return failure(error);
 			}
@@ -164,21 +166,26 @@ export function createWorkspaceApi(store: WorkspaceStore, limiter: Limiter): Wor
 
 		async write(request, code, doc, ip) {
 			try {
-				if (!isCode(code) || !isDocName(doc)) {
-					throw new WorkspaceError('not-found', 'No workspace uses this code');
-				}
+				if (!isCode(code) || !isDocName(doc)) throw missing();
 				requireSameOriginJson(request);
 				const body = writeBody.safeParse(await readJson(request, DOC_BYTE_LIMITS[doc] + 1_000));
 				if (!body.success) throw new WorkspaceError('invalid', 'The request is not valid');
 				const data = parseDoc(doc, body.data.data);
 				if (!data) throw new WorkspaceError('invalid', 'The data is not valid');
-				if (!(await takeGuess(ip))) return rateLimited();
+				if (await guessedTooMuch(ip)) return rateLimited();
 				if (!(await limiter.allow(`write:${code}`, RATE.write.limit, RATE.write.window))) {
-					await refundGuess(ip);
 					return rateLimited();
 				}
-				const result = await store.write(code, doc, data, body.data.base);
-				await refundGuess(ip);
+				const result = await store.write(code, doc, data, body.data.base).catch(async (error) => {
+					if (
+						error instanceof WorkspaceError &&
+						error.code === 'not-found' &&
+						!(await takeGuess(ip))
+					) {
+						throw new WorkspaceError('rate-limited', 'Too many requests');
+					}
+					throw error;
+				});
 				return result.ok
 					? reply({ updatedAt: result.stamped.updatedAt })
 					: reply(result.current, 409);

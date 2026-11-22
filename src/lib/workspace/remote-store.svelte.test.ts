@@ -11,8 +11,9 @@ function reply(body: unknown, status = 200) {
 	});
 }
 
-function setup() {
+function setup(visible = () => true) {
 	let changes = 0;
+	let rev = 'aaaaaaaaaaaa';
 	const loads: number[] = [];
 	const fetch = vi.fn(async (url: string | URL | Request, init?: RequestInit) => {
 		if (init?.method === 'PUT') return reply({ updatedAt: Date.now() });
@@ -20,23 +21,24 @@ function setup() {
 		if (changes > 0) {
 			changes--;
 			const checklist = { updatedAt: Date.now(), data: emptyDoc('checklist') };
-			return reply({ meta, docs: { checklist } });
+			return reply({ meta, docs: { checklist }, rev });
 		}
-		return reply({ meta, docs: {} });
+		return reply({ meta, docs: {}, rev });
 	});
 	const store = createRemoteStore({
 		fetch: fetch as typeof globalThis.fetch,
-		isVisible: () => true
+		isVisible: visible
 	});
 	const onChange = vi.fn();
 	if (!store.watch) throw new Error('A shared workspace store can be watched');
-	const stop = store.watch('ABC234', () => ({}), onChange);
+	const stop = store.watch('ABC234', () => ({ rev: 'aaaaaaaaaaaa' }), onChange);
 	return {
 		store,
 		onChange,
 		stop,
 		loads,
-		change: () => changes++
+		change: () => changes++,
+		bump: (next: string) => (rev = next)
 	};
 }
 
@@ -86,5 +88,50 @@ describe('shared workspace polling', () => {
 		stop();
 		await vi.advanceTimersByTimeAsync(120_000);
 		expect(loads).toHaveLength(1);
+	});
+
+	it('settles at once a minute after five quiet minutes', async () => {
+		const { loads, stop } = setup();
+		await vi.advanceTimersByTimeAsync(500_000);
+		stop();
+		const gaps = gapsAfter(loads, 0);
+		expect(gaps.slice(4, 6)).toEqual([30_000, 30_000]);
+		expect(gaps.slice(-2)).toEqual([60_000, 60_000]);
+	});
+
+	it('snaps back to every 10 seconds when someone touches the page', async () => {
+		const { loads, stop } = setup();
+		await vi.advanceTimersByTimeAsync(10_000 + 15_000 + 22_500 + 30_000);
+		document.dispatchEvent(new Event('pointerdown'));
+		await vi.advanceTimersByTimeAsync(10_000 + 10_000 + 10_000);
+		stop();
+		expect(gapsAfter(loads, 3)).toEqual([0, 10_000, 10_000, 10_000]);
+	});
+
+	it('makes no requests while the tab is hidden and checks right away on return', async () => {
+		let visible = true;
+		const { loads, stop } = setup(() => visible);
+		await vi.advanceTimersByTimeAsync(10_000);
+		visible = false;
+		await vi.advanceTimersByTimeAsync(600_000);
+		expect(loads).toHaveLength(1);
+		visible = true;
+		document.dispatchEvent(new Event('visibilitychange'));
+		window.dispatchEvent(new Event('focus'));
+		await vi.advanceTimersByTimeAsync(0);
+		expect(loads).toHaveLength(2);
+		await vi.advanceTimersByTimeAsync(10_000);
+		stop();
+		expect(loads).toHaveLength(3);
+	});
+
+	it('passes on a new workspace version even when no document came back', async () => {
+		const { onChange, stop, bump } = setup();
+		await vi.advanceTimersByTimeAsync(10_000);
+		expect(onChange).not.toHaveBeenCalled();
+		bump('bbbbbbbbbbbb');
+		await vi.advanceTimersByTimeAsync(15_000);
+		stop();
+		expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ rev: 'bbbbbbbbbbbb' }));
 	});
 });

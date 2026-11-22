@@ -154,6 +154,8 @@ export const DOC_SCHEMAS = {
 	boards: boardsSchema
 } as const;
 
+export const REV_PATTERN = /^[a-z0-9]{8,40}$/;
+
 export const metaSchema = z.object({
 	code: z.string().check(z.regex(CODE_PATTERN)),
 	teamNumber: z.nullable(teamNumber),
@@ -187,7 +189,7 @@ export type Stamped<T> = { updatedAt: number; data: T };
 
 export type Docs = { [K in DocName]?: Stamped<DocMap[K]> };
 
-export type Snapshot = { meta: WorkspaceMeta; docs: Docs };
+export type Snapshot = { meta: WorkspaceMeta; docs: Docs; rev?: string; key?: string };
 
 const stamped = <T extends z.ZodMiniType>(schema: T) =>
 	z.object({ updatedAt: stamp, data: schema });
@@ -209,7 +211,9 @@ export const snapshotSchema = z.object({
 			boards: z.optional(stampedSchemas.boards)
 		}),
 		{}
-	)
+	),
+	rev: z.optional(z.string().check(z.regex(REV_PATTERN))),
+	key: z.optional(z.string().check(z.regex(REV_PATTERN)))
 });
 
 const shareBase = {
