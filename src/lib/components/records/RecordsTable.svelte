@@ -39,7 +39,9 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="No matches fit these filters.">Try a wider date range or other filters.</EmptyState>
+	<EmptyState title="No matches fit these filters."
+		>Try a wider date range or other filters.</EmptyState
+	>
 {:else}
 	<Table>
 		<caption class="visually-hidden">{caption}</caption>
@@ -73,8 +75,11 @@
 				<tr class:me={row.teams.some((team) => followed.has(team))}>
 					<td class="l">{integer(row.rank)}</td>
 					{#each RECORD_PARTS as part (part.key)}
-						<td class={{ optional: compact && part.key !== 'total', strong: filters.part === part.key }}
-							>{integer(row[part.key])}</td
+						<td
+							class={{
+								optional: compact && part.key !== 'total',
+								strong: filters.part === part.key
+							}}>{integer(row[part.key])}</td
 						>
 					{/each}
 					<td class="l team">

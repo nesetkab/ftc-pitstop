@@ -1,4 +1,6 @@
 <script lang="ts">
+	import RecordsTable from '#lib/components/records/RecordsTable.svelte';
+	import type { RecordFilters } from '#lib/components/records/records.ts';
 	import EventTable from '#lib/components/team/EventTable.svelte';
 	import FollowedTeams from '#lib/components/team/FollowedTeams.svelte';
 	import PitDisplayLink from '#lib/components/team/PitDisplayLink.svelte';
@@ -7,6 +9,16 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const recent: RecordFilters = {
+		part: 'total',
+		range: '7',
+		region: '',
+		type: '',
+		level: '',
+		team: null,
+		page: 1
+	};
 </script>
 
 <svelte:head>
@@ -64,6 +76,25 @@
 	{/if}
 	<p class="more"><a href="/events">All events this season</a></p>
 </section>
+
+{#if data.records}
+	<section aria-labelledby="records-title">
+		<h2 class="sec-title" id="records-title">Highest scores in the last 7 days</h2>
+		<RecordsTable
+			rows={data.records.rows}
+			filters={recent}
+			names={data.records.names}
+			sortable={false}
+			compact
+			caption="Highest alliance scores in the last 7 days"
+		/>
+		<p class="more">
+			<a href="/records?range=7">More records</a>
+			<span class="faint">·</span>
+			<a href="/compare">Compare teams</a>
+		</p>
+	</section>
+{/if}
 
 <PitDisplayLink />
 

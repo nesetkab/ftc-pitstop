@@ -16,7 +16,9 @@
 			filters.range !== 'all' || filters.region || filters.type || filters.level || filters.team
 		)
 	);
-	const clearHref = $derived(filters.part === 'total' ? '/records' : `/records?part=${filters.part}`);
+	const clearHref = $derived(
+		filters.part === 'total' ? '/records' : `/records?part=${filters.part}`
+	);
 
 	function apply(event: Event) {
 		event.preventDefault();
@@ -26,7 +28,7 @@
 		}
 		if (params.get('range') === 'all') params.delete('range');
 		if (params.get('part') === 'total') params.delete('part');
-		goto(params.size > 0 ? `?${params}` : '?', { reset: false, keepFocus: true });
+		goto(params.size > 0 ? `?${params}` : '?', { reset: false });
 	}
 </script>
 

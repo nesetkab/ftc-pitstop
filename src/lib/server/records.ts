@@ -1,4 +1,12 @@
-import { buildRecordDataset, type RecordDataset } from '#lib/components/records/records.ts';
+import {
+	buildRecordDataset,
+	filterRecords,
+	pageRecords,
+	parseRecordFilters,
+	type RankedRecord,
+	type RecordDataset
+} from '#lib/components/records/records.ts';
+import { localDay } from '#lib/components/team/dates.ts';
 import { loadSeasonModelWithin } from '#lib/server/analysis.ts';
 import { searchIndex } from '#lib/server/event.ts';
 
@@ -40,4 +48,23 @@ export async function recordNames(
 			})
 		);
 	return { teams: pick(teams, directory?.teams), events: pick(events, directory?.events) };
+}
+
+export interface RecentRecords {
+	rows: RankedRecord[];
+	names: { teams: Record<number, string>; events: Record<string, string> };
+}
+
+export async function loadRecentRecords(count: number, ms: number): Promise<RecentRecords | null> {
+	const source = await loadRecordDataset(ms);
+	if (!source) return null;
+	const filters = parseRecordFilters(new URLSearchParams({ range: '7' }));
+	const sorted = filterRecords(source.dataset.rows, filters, localDay(Date.now(), 'UTC'));
+	const rows = pageRecords(sorted, 'total', 1, count).rows;
+	if (rows.length === 0) return null;
+	const names = await recordNames(
+		rows.flatMap((row) => row.teams),
+		rows.map((row) => row.event)
+	);
+	return { rows, names };
 }

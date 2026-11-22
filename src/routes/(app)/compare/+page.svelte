@@ -1,0 +1,94 @@
+<script lang="ts">
+	import CompareTable from '#lib/components/compare/CompareTable.svelte';
+	import HeadToHead from '#lib/components/compare/HeadToHead.svelte';
+	import SharedEvents from '#lib/components/compare/SharedEvents.svelte';
+	import TeamPicker from '#lib/components/compare/TeamPicker.svelte';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import type { PageProps } from './$types';
+
+	let { data }: PageProps = $props();
+
+	const view = $derived(data.view);
+	const title = $derived(
+		view.teams.length >= 2
+			? `${view.teams.map((team) => team.number).join(' vs ')} - PitStop`
+			: 'Compare teams - PitStop'
+	);
+</script>
+
+<svelte:head>
+	<title>{title}</title>
+	<meta
+		name="description"
+		content="Compare up to four FTC teams side by side: OPR by part, records, shared events and results against each other."
+	/>
+	{#if view.teams.length < 2}
+		<meta name="robots" content="noindex" />
+	{/if}
+</svelte:head>
+
+<PageHeader
+	title="Compare teams"
+	meta="Up to four teams side by side: season OPR by part, records, shared events and how they did against each other."
+/>
+
+<TeamPicker teams={view.teams} suggestions={data.suggestions} />
+
+{#if data.missing.length > 0}
+	<p class="missing" role="status">
+		No team found for {data.missing.join(', ')}.
+	</p>
+{/if}
+
+{#if view.teams.length === 0}
+	<EmptyState title="Pick two or more teams to compare.">
+		Type team numbers above, or use the Compare button on any team page.
+	</EmptyState>
+{:else}
+	<section class="panel" aria-labelledby="season-title">
+		<h2 class="sec-title" id="season-title">This season</h2>
+		<CompareTable teams={view.teams} rows={view.rows} />
+		<p class="note">
+			{#if view.source === 'scout'}
+				Season ratings are not ready yet, so OPR is each team's best event from FTCScout.
+			{:else}
+				OPR is the points a team adds to its alliance's score. Hive, flower, garden, park and tips
+				are parts of teleop.
+			{/if}
+			The best value in each row is underlined. Record and ranks are from qualification matches.
+		</p>
+	</section>
+
+	{#if view.teams.length >= 2}
+		<section class="panel" aria-labelledby="h2h-title">
+			<h2 class="sec-title" id="h2h-title">Head to head</h2>
+			<HeadToHead pairs={view.pairs} meetings={view.meetings} numbers={data.numbers} />
+		</section>
+
+		<section class="panel" aria-labelledby="shared-title">
+			<h2 class="sec-title" id="shared-title">Shared events</h2>
+			{#if view.shared.length === 0}
+				<EmptyState title="These teams have not been entered in the same event this season." />
+			{:else}
+				<SharedEvents teams={view.teams} events={view.shared} />
+				<p class="note">Rank and record are from qualification matches at that event.</p>
+			{/if}
+		</section>
+	{/if}
+{/if}
+
+<style>
+	.panel {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 10px;
+		align-content: start;
+		min-width: 0;
+	}
+
+	.missing {
+		font-size: 14px;
+		color: var(--text-2);
+	}
+</style>

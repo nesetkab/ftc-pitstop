@@ -40,6 +40,7 @@
 	{/snippet}
 	{#snippet actions()}
 		<FollowButton number={view.team.number} />
+		<Button variant="secondary" href="/compare?teams={view.team.number}">Compare</Button>
 		<Button variant="secondary" href="/{view.team.number}/tv">Pit display</Button>
 		<Button variant="secondary" href="/{view.team.number}">Phone view</Button>
 	{/snippet}
@@ -61,6 +62,11 @@
 <section class="panel" aria-labelledby="events-title">
 	<h2 class="sec-title" id="events-title">Events</h2>
 	<TeamEvents rows={view.events} />
+	{#if view.stats.events > 0}
+		<p class="more">
+			<a href="/records?team={view.team.number}">Highest scores with {view.team.number}</a>
+		</p>
+	{/if}
 </section>
 
 {#if view.awards.length > 0}
@@ -95,6 +101,10 @@
 
 	.previous {
 		max-width: 520px;
+	}
+
+	.more {
+		font-size: 14px;
 	}
 
 	.awards {

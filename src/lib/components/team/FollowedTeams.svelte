@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { compareHref, MAX_COMPARE } from '#lib/components/compare/compare.ts';
 	import type { EventBundle, TeamSeason } from '#lib/types.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
@@ -94,6 +95,13 @@
 			{#if follows.teams.length > LIMIT}
 				<p class="note">Showing {LIMIT} of {follows.teams.length} followed teams.</p>
 			{/if}
+			{#if teams.length >= 2}
+				<p class="more">
+					<a href={compareHref(teams.slice(0, MAX_COMPARE))}>
+						Compare {teams.length > MAX_COMPARE ? `the first ${MAX_COMPARE}` : 'these teams'}
+					</a>
+				</p>
+			{/if}
 		{/if}
 	</section>
 {/if}
@@ -105,7 +113,8 @@
 		gap: 10px;
 	}
 
-	.hint {
+	.hint,
+	.more {
 		font-size: 14px;
 	}
 

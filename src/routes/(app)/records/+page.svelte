@@ -18,7 +18,9 @@
 	const teamName = $derived(team ? data.names.teams[team] : undefined);
 	const summary = $derived(
 		[
-			part.key === 'total' ? 'Sorted by total score' : `Sorted by ${part.label.toLowerCase()} points`,
+			part.key === 'total'
+				? 'Sorted by total score'
+				: `Sorted by ${part.label.toLowerCase()} points`,
 			range.key === 'all' ? '' : range.label.toLowerCase(),
 			team ? `alliances with ${team}${teamName ? ` ${teamName}` : ''}` : ''
 		]
@@ -63,8 +65,8 @@
 />
 
 <p class="note">
-	Each match counts twice, once for each alliance. Hive, flower and garden are teleop points. Opp. is
-	the other alliance's score. Click a column to sort by it.
+	Each match counts twice, once for each alliance. Hive, flower and garden are teleop points. Opp.
+	is the other alliance's score. Click a column to sort by it.
 </p>
 
 <style>

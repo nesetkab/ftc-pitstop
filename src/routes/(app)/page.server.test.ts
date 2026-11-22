@@ -9,6 +9,7 @@ const server = vi.hoisted(() => ({
 }));
 
 vi.mock('#lib/server/event.ts', () => server);
+vi.mock('#lib/server/records.ts', () => ({ loadRecentRecords: vi.fn(async () => null) }));
 
 type Home = {
 	today: { code: string }[] | null;

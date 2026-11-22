@@ -141,7 +141,10 @@ function keyLabel(key: string): string {
 }
 
 function dayOf(match: SeasonMatch): string {
-	return match.time === null ? match.date : new Date(match.time).toISOString().slice(0, 10);
+	if (match.time === null) return match.date;
+	const day = new Date(match.time).toISOString().slice(0, 10);
+	if (day < match.date) return match.date;
+	return day > match.end ? match.end : day;
 }
 
 function side(
@@ -161,8 +164,7 @@ function side(
 		alliance,
 		teams: own.teams,
 		opponents: other.teams,
-		result:
-			own.total === other.total ? 'tie' : own.total > other.total ? 'win' : 'loss',
+		result: own.total === other.total ? 'tie' : own.total > other.total ? 'win' : 'loss',
 		total: own.preFoulTotal,
 		opponent: other.preFoulTotal,
 		auto: own.auto,
