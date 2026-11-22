@@ -24,6 +24,9 @@ vi.mock('#lib/server/analysis.ts', () => ({
 }));
 
 const { load: pitLoad } = await import('../../src/routes/(bare)/[team=team]/+layout.server.ts');
+const { loadBreakdowns } =
+	await import('../../src/routes/(app)/events/[code]/breakdowns.server.ts');
+const { GET: liteRoute } = await import('../../src/routes/api/events/[code]/lite/+server.ts');
 const { load: teamsLoad } =
 	await import('../../src/routes/(app)/events/[code]/teams/+page.server.ts');
 
@@ -129,5 +132,35 @@ describe('event teams tab caching', () => {
 		server.loadSeasonRatingsWithin.mockResolvedValue({ teams: [{ team: 2844, opr: 50, rank: 3 }] });
 		await run(CACHE_CONTROL.live);
 		expect(setHeaders).toHaveBeenLastCalledWith({ 'cache-control': CACHE_CONTROL.live });
+	});
+});
+
+describe('score breakdowns', () => {
+	const result = {
+		red: { total: 10, breakdown: { auto: { tips: 1 } } },
+		blue: { total: 5, breakdown: { auto: { tips: 0 } } },
+		winner: 'red'
+	};
+	const scored = { ...bundle, matches: [{ key: 'q1', result }, { key: 'q2', result: null }] };
+
+	it('serves pit screens the bundle without breakdowns, cached like the full one', async () => {
+		server.loadEventBundle.mockResolvedValue({ ...scored, cacheControl: CACHE_CONTROL.live });
+		const response = await liteRoute({ params: { code: 'USAZGIQ' } } as never);
+		expect(response.headers.get('cache-control')).toBe(CACHE_CONTROL.live);
+		const body = await response.json();
+		expect(body.matches[0].result.red).toEqual({ total: 10, breakdown: null });
+		expect(body).not.toHaveProperty('cacheControl');
+	});
+
+	it('gives the results and match pages the breakdowns with the event page cache time', async () => {
+		server.loadEventBundle.mockResolvedValue({ ...scored, cacheControl: CACHE_CONTROL.finished });
+		const setHeaders = vi.fn();
+		const data = await loadBreakdowns({
+			params: { code: 'USAZGIQ' },
+			parent: async () => ({ cacheControl: CACHE_CONTROL.short }),
+			setHeaders
+		});
+		expect(data.breakdowns).toEqual({ q1: [result.red.breakdown, result.blue.breakdown] });
+		expect(setHeaders).toHaveBeenCalledWith({ 'cache-control': CACHE_CONTROL.short });
 	});
 });

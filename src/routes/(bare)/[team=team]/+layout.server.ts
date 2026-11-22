@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { getAnalysis } from '#lib/components/pit/analysis.server.ts';
 import { pickEvent, type EventPickReason } from '#lib/components/pit/resolve.ts';
+import { withoutBreakdowns } from '#lib/game/breakdowns.ts';
 import { replayBundle, replaySettings } from '#lib/game/replay.ts';
 import { DataError } from '#lib/server/errors.ts';
 import {
@@ -104,7 +105,7 @@ export const load: LayoutServerLoad = async ({ params, url, setHeaders }) => {
 		teamName,
 		code,
 		reason,
-		bundle,
+		bundle: bundle ? withoutBreakdowns(bundle) : null,
 		analysis,
 		queue: status.queue,
 		nexus: status.nexus,

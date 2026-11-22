@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import { withoutBreakdowns } from '#lib/game/breakdowns.ts';
 import { loadEventAnalysisEntry } from '#lib/server/analysis.ts';
 import { DataError, loadEventBundle, normalizeEventCode } from '#lib/server/event.ts';
 import { CACHE_CONTROL, shortestCache } from '#lib/server/http.ts';
@@ -10,7 +11,7 @@ function failure(cause: unknown): never {
 	error(503, 'Event data is unavailable right now');
 }
 
-const OWN_HEADERS = /\/(teams|alliance-selection)$/;
+const OWN_HEADERS = /\/(teams|alliance-selection|results|matches\/\[key\])$/;
 
 export const load: LayoutServerLoad = async ({
 	params,
@@ -41,5 +42,5 @@ export const load: LayoutServerLoad = async ({
 	if (!OWN_HEADERS.test(untrack(() => route.id) ?? '')) {
 		setHeaders({ 'cache-control': cacheControl });
 	}
-	return { bundle, analysis: entry?.analysis ?? null, cacheControl };
+	return { bundle: withoutBreakdowns(bundle), analysis: entry?.analysis ?? null, cacheControl };
 };

@@ -41,7 +41,7 @@ beforeEach(() => {
 });
 
 function bundleWith(cacheControl: string) {
-	return { event: { code: 'USAZGIQ' }, cacheControl };
+	return { event: { code: 'USAZGIQ' }, matches: [], cacheControl };
 }
 
 describe('event layout', () => {
@@ -73,9 +73,27 @@ describe('event layout', () => {
 		expect(data).toMatchObject({ cacheControl: CACHE_CONTROL.finished });
 	});
 
+	it('sends the pages the event without score breakdowns', async () => {
+		const result = {
+			red: { total: 1, breakdown: { auto: {} } },
+			blue: { total: 0, breakdown: null }
+		};
+		server.loadEventBundle.mockResolvedValue({
+			...bundleWith(CACHE_CONTROL.live),
+			matches: [{ key: 'q1', result }]
+		});
+		const data = (await run('USAZGIQ')) as { bundle: { matches: (typeof result)[] } };
+		expect(data.bundle.matches).toEqual([
+			{
+				key: 'q1',
+				result: { red: { total: 1, breakdown: null }, blue: { total: 0, breakdown: null } }
+			}
+		]);
+	});
+
 	it('loads the event for a clean code', async () => {
 		const data = await run('USAZGIQ');
-		expect(data.bundle).toEqual({ event: { code: 'USAZGIQ' } });
+		expect(data.bundle).toEqual({ event: { code: 'USAZGIQ' }, matches: [] });
 		expect(server.loadEventBundle).toHaveBeenCalledWith('USAZGIQ');
 	});
 
