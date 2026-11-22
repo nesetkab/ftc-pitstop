@@ -5,13 +5,43 @@ const page = (head: string) => `<!doctype html><html><head>${head}</head><body><
 
 describe('share previews', () => {
 	it('picks the card that matches the page', () => {
-		expect(ogImagePath('/teams/3747')).toBe('/og/teams/3747.png');
-		expect(ogImagePath('/3747')).toBe('/og/teams/3747.png');
-		expect(ogImagePath('/3747/tv')).toBe('/og/teams/3747.png');
-		expect(ogImagePath('/events/usmtbuq/rankings')).toBe('/og/events/USMTBUQ.png');
-		expect(ogImagePath('/')).toBe('/og/site.png');
-		expect(ogImagePath('/w/ABC234/picklist')).toBe('/og/site.png');
-		expect(ogImagePath('/leaderboards')).toBe('/og/site.png');
+		const image = (path: string) => ogImagePath(new URL(path, 'https://www.ftcpitstop.com'));
+		expect(image('/teams/3747')).toBe('/og/teams/3747.png');
+		expect(image('/3747')).toBe('/og/teams/3747.png');
+		expect(image('/3747/tv')).toBe('/og/teams/3747.png');
+		expect(image('/events/usmtbuq/rankings')).toBe('/og/events/USMTBUQ.png');
+		expect(image('/events/USMTBUQ/matches/Q12')).toBe('/og/events/USMTBUQ/matches/q12.png');
+		expect(image('/events/USMTBUQ/matches/p3-2')).toBe('/og/events/USMTBUQ/matches/p3-2.png');
+		expect(image('/')).toBe('/og/site.png');
+		expect(image('/w/ABC234/picklist')).toBe('/og/workspace.png');
+		expect(image('/leaderboards?region=USUT')).toBe('/og/leaderboards.png');
+		expect(image('/records')).toBe('/og/records.png');
+		expect(image('/events')).toBe('/og/events.png');
+		expect(image('/accuracy')).toBe('/og/accuracy.png');
+		expect(image('/compare?teams=16,724,16')).toBe('/og/compare/16-724.png');
+		expect(image('/compare?teams=16')).toBe('/og/compare.png');
+		expect(image('/compare')).toBe('/og/compare.png');
+	});
+
+	it('uses the canonical compare order for the image', () => {
+		const html = withSocialTags(
+			page(
+				'<title>Compare</title><link rel="canonical" href="https://www.ftcpitstop.com/compare?teams=16,724">'
+			),
+			new URL('https://www.ftcpitstop.com/compare?teams=724,16')
+		);
+		expect(html).toContain('content="https://www.ftcpitstop.com/og/compare/16-724.png"');
+	});
+
+	it('describes the pit views that have no description of their own', () => {
+		const html = withSocialTags(
+			page('<title>3747 pit display - PitStop</title>'),
+			new URL('https://www.ftcpitstop.com/3747/tv')
+		);
+		expect(html).toMatch(/<meta name="description" content="Pit display for FTC team 3747: [^"]+"/);
+		expect(html).toMatch(/<meta property="og:description" content="Pit display for FTC team 3747/);
+		expect(html).toContain('<meta property="og:image:alt" content="3747 pit display - PitStop" />');
+		expect(html.match(/name="description"/g)).toHaveLength(1);
 	});
 
 	it('adds preview tags from the page title and description', () => {
@@ -48,5 +78,10 @@ describe('share previews', () => {
 		const tagged = withSocialTags(page('<title>PitStop</title>'), url);
 		expect(withSocialTags(tagged, url)).toBe(tagged);
 		expect(tagged).not.toContain('og:description');
+		const described = withSocialTags(
+			page('<title>PitStop</title><meta name="description" content="Season stats" />'),
+			url
+		);
+		expect(described.match(/name="description"/g)).toHaveLength(1);
 	});
 });
