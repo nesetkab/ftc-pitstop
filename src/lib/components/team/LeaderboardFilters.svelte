@@ -1,7 +1,13 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { onDestroy, untrack } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
-	import { MIN_MATCH_CHOICES, type FilterOption, type LeaderboardFilters } from './leaderboard.ts';
+	import {
+		LEADERBOARD_SORTS,
+		MIN_MATCH_CHOICES,
+		type FilterOption,
+		type LeaderboardFilters
+	} from './leaderboard.ts';
 
 	interface Props {
 		filters: LeaderboardFilters;
@@ -12,29 +18,69 @@
 
 	let { filters, regions, countries, states }: Props = $props();
 
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	let sent = untrack(() => filters.q);
+	let query = $state(untrack(() => filters.q));
+
+	$effect.pre(() => {
+		if (filters.q !== sent) {
+			query = filters.q;
+			sent = filters.q;
+		}
+	});
+
 	const minimums = $derived(
 		[...new Set([...MIN_MATCH_CHOICES, ...(filters.min > 1 ? [filters.min] : [])])].sort(
 			(a, b) => a - b
 		)
 	);
 	const active = $derived(
-		Boolean(filters.region || filters.country || filters.state || filters.min > 1)
+		Boolean(filters.region || filters.country || filters.state || filters.min > 1 || filters.q)
 	);
+
+	function navigate(form: HTMLFormElement, target: EventTarget | null) {
+		clearTimeout(timer);
+		const params = new SvelteURLSearchParams();
+		for (const [key, value] of new FormData(form)) {
+			if (typeof value === 'string' && value.trim() !== '') params.set(key, value.trim());
+		}
+		if (target instanceof HTMLSelectElement && target.name === 'country') params.delete('state');
+		if (params.get('sort') === 'opr') params.delete('sort');
+		sent = params.get('q') ?? '';
+		const options =
+			target instanceof HTMLInputElement ? { reset: false, replace: true } : { reset: false };
+		goto(params.size > 0 ? `?${params}` : '?', options);
+	}
 
 	function apply(event: Event) {
 		event.preventDefault();
-		const params = new SvelteURLSearchParams();
-		for (const [key, value] of new FormData(event.currentTarget as HTMLFormElement)) {
-			if (typeof value === 'string' && value !== '') params.set(key, value);
-		}
-		if (event.target instanceof HTMLSelectElement && event.target.name === 'country') {
-			params.delete('state');
-		}
-		goto(params.size > 0 ? `?${params}` : '?', { reset: false });
+		navigate(event.currentTarget as HTMLFormElement, event.target);
 	}
+
+	function typed(event: Event) {
+		const input = event.currentTarget as HTMLInputElement;
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			if (input.form) navigate(input.form, input);
+		}, 300);
+	}
+
+	onDestroy(() => clearTimeout(timer));
 </script>
 
-<form class="filters" method="get" onchange={apply} onsubmit={apply}>
+<form class="filters" method="get" role="search" onchange={apply} onsubmit={apply}>
+	<label class="find">
+		<span>Find a team</span>
+		<input
+			name="q"
+			type="search"
+			placeholder="Name, number or city"
+			autocomplete="off"
+			maxlength="40"
+			bind:value={query}
+			oninput={typed}
+		/>
+	</label>
 	<label>
 		<span>Region</span>
 		<select name="region" value={filters.region}>
@@ -71,6 +117,17 @@
 			{/each}
 		</select>
 	</label>
+	<label class="sort">
+		<span>Sort by</span>
+		<select name="sort" value={filters.sort}>
+			{#each LEADERBOARD_SORTS as sort (sort.key)}
+				<option value={sort.key}>{sort.label}</option>
+			{/each}
+		</select>
+	</label>
+	{#if filters.team > 0}
+		<input type="hidden" name="team" value={filters.team} />
+	{/if}
 	<noscript><button type="submit">Apply</button></noscript>
 	{#if active}
 		<a class="clear" href="/leaderboards">Clear filters</a>
@@ -96,10 +153,35 @@
 		min-width: 150px;
 	}
 
+	input {
+		width: 200px;
+		padding: 7px 10px;
+		border: 1px solid var(--line-2);
+		border-radius: var(--radius-control);
+		background: var(--bg);
+		color: var(--text);
+		font-size: 14px;
+		line-height: 1.4;
+	}
+
+	input:hover {
+		border-color: var(--text-3);
+	}
+
+	.sort {
+		display: none;
+	}
+
 	.clear {
 		padding-block: 8px;
 		font-size: 13px;
 		color: var(--text-2);
+	}
+
+	@media (max-width: 640px) {
+		.sort {
+			display: grid;
+		}
 	}
 
 	@media (max-width: 600px) {
@@ -107,9 +189,27 @@
 			flex: 1 1 140px;
 		}
 
-		select {
+		.find {
+			flex-basis: 100%;
+		}
+
+		select,
+		input {
 			min-width: 0;
 			width: 100%;
+		}
+	}
+
+	@media (pointer: coarse) {
+		input,
+		.clear {
+			min-height: 40px;
+		}
+
+		.clear {
+			display: inline-flex;
+			align-items: center;
+			padding-block: 0;
 		}
 	}
 </style>

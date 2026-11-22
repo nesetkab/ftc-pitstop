@@ -1,12 +1,21 @@
 <script lang="ts">
-	import { fixed, integer, MISSING, record } from '#lib/format/index.ts';
-	import type { TeamPageData } from './team-view.ts';
+	import { fixed, integer, MISSING, record, signed } from '#lib/format/index.ts';
+	import TrendSpark from './TrendSpark.svelte';
+	import type { ChartPoint, TeamPageData } from './team-view.ts';
 
 	interface Props {
 		stats: TeamPageData['stats'];
+		team?: number;
+		trend?: ChartPoint[];
 	}
 
-	let { stats }: Props = $props();
+	let { stats, team, trend = [] }: Props = $props();
+
+	const change = $derived(trend.length > 1 ? trend[trend.length - 1].value - trend[0].value : null);
+	const worldHref = $derived(team ? `/leaderboards?team=${team}` : undefined);
+	const regionHref = $derived(
+		team && stats.region ? `/leaderboards?region=${stats.region.code}&team=${team}` : undefined
+	);
 </script>
 
 <dl class="stats">
@@ -18,12 +27,28 @@
 		<dt>World rank by OPR</dt>
 		<dd>
 			{#if stats.rank !== null && stats.of !== null}
-				{integer(stats.rank)} <small>of {integer(stats.of)}</small>
+				{#if worldHref}
+					<a href={worldHref} title="Find {team} on the leaderboard">{integer(stats.rank)}</a>
+				{:else}
+					{integer(stats.rank)}
+				{/if}
+				<small>of {integer(stats.of)}</small>
 			{:else}
 				{MISSING}
 			{/if}
 		</dd>
 	</div>
+	{#if stats.region}
+		<div>
+			<dt>Rank in {stats.region.code}</dt>
+			<dd>
+				<a href={regionHref} title="Find {team} on the {stats.region.code} leaderboard"
+					>{integer(stats.region.rank)}</a
+				>
+				<small>of {integer(stats.region.of)}</small>
+			</dd>
+		</div>
+	{/if}
 	<div>
 		<dt>Record</dt>
 		<dd>
@@ -34,6 +59,15 @@
 		<dt>Events played</dt>
 		<dd>{stats.events}</dd>
 	</div>
+	{#if change !== null}
+		<div>
+			<dt>OPR by event</dt>
+			<dd class="trend">
+				<TrendSpark points={trend} />
+				<small>{signed(change)} since first</small>
+			</dd>
+		</div>
+	{/if}
 </dl>
 
 <style>
@@ -47,6 +81,7 @@
 	.stats div {
 		display: grid;
 		gap: 2px;
+		align-content: start;
 	}
 
 	dt {
@@ -59,6 +94,23 @@
 		font-size: 22px;
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
+	}
+
+	dd a {
+		text-decoration: underline;
+		text-decoration-color: var(--line-2);
+		text-underline-offset: 4px;
+	}
+
+	dd a:hover {
+		text-decoration-color: currentColor;
+	}
+
+	.trend {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 33px;
 	}
 
 	small {

@@ -1,4 +1,9 @@
-import type { EventAnalysis, SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
+import type {
+	EventAnalysis,
+	RatingParts,
+	SeasonRating,
+	SeasonRatings
+} from '#lib/analysis/types.ts';
 import { matchLabel, ordinal, parseMatchKey, shortDate } from '#lib/format/index.ts';
 import { GAME_NAME, SEASON } from '#lib/game/biobuzz.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
@@ -67,6 +72,26 @@ export interface TeamAwardRow {
 	name: string;
 }
 
+export interface RegionStanding {
+	code: string;
+	rank: number;
+	of: number;
+}
+
+export interface TeamPartRow {
+	key: string;
+	label: string;
+	code: string | null;
+	opr: number;
+	auto: number | null;
+	teleop: number | null;
+	hive: number | null;
+	flower: number | null;
+	garden: number | null;
+	park: number | null;
+	tips: number | null;
+}
+
 export interface PreviousSeasonRow {
 	key: string;
 	label: string;
@@ -90,7 +115,10 @@ export interface TeamPageData {
 		of: number | null;
 		record: RecordTotals | null;
 		events: number;
+		region: RegionStanding | null;
 	};
+	trend: ChartPoint[];
+	breakdown: TeamPartRow[];
 	chartTitle: string;
 	charts: TeamChart[];
 	comparison: TeamComparisonRow[];
@@ -250,6 +278,62 @@ function historyChart(
 	};
 }
 
+export function regionStanding(mine: SeasonRating, pool: SeasonRating[]): RegionStanding | null {
+	if (!mine.region) return null;
+	const peers = pool.filter((entry) => entry.region === mine.region);
+	return {
+		code: mine.region,
+		rank: 1 + peers.filter((entry) => entry.opr > mine.opr).length,
+		of: peers.length
+	};
+}
+
+function partRow(
+	key: string,
+	label: string,
+	code: string | null,
+	opr: number,
+	parts: RatingParts
+): TeamPartRow {
+	return { key, label, code, opr, teleop: opr - parts.auto, ...parts };
+}
+
+export function eventBreakdown(
+	season: TeamSeason,
+	analyses: Record<string, EventAnalysis | null>,
+	mine: SeasonRating | null
+): TeamPartRow[] {
+	const number = season.team.number;
+	const events = season.events.flatMap<TeamPartRow>((entry) => {
+		const { event, stats } = entry;
+		if (!stats) return [];
+		const rating = analyses[event.code]?.ratings.find((item) => item.team === number);
+		if (rating) return [partRow(event.code, event.name, event.code, rating.opr, rating.parts)];
+		return [
+			{
+				key: event.code,
+				label: event.name,
+				code: event.code,
+				opr: stats.opr.total,
+				auto: stats.opr.auto,
+				teleop: stats.opr.teleop,
+				hive: null,
+				flower: null,
+				garden: null,
+				park: null,
+				tips: null
+			}
+		];
+	});
+	if (events.length === 0) return [];
+	return mine ? [partRow('season', 'Season', null, mine.opr, mine.parts), ...events] : events;
+}
+
+export function seasonTrend(breakdown: TeamPartRow[]): ChartPoint[] {
+	const events = breakdown.filter((row) => row.code !== null);
+	return events.length < 2 ? [] : events.map((row) => ({ label: row.label, value: row.opr }));
+}
+
 function sumRecord(season: TeamSeason): RecordTotals | null {
 	const played = season.events.filter((entry) => entry.stats !== null);
 	if (played.length === 0) return null;
@@ -298,7 +382,8 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 			rank: 1 + pool.filter((entry) => entry.opr > mine.opr).length,
 			of: pool.length,
 			record: sumRecord(season),
-			events: played.length
+			events: played.length,
+			region: regionStanding(mine, pool)
 		};
 		comparison = ratingComparison(mine, pool);
 	} else {
@@ -307,10 +392,13 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 			rank: quick?.total.rank ?? null,
 			of: quick?.count ?? null,
 			record: sumRecord(season),
-			events: played.length
+			events: played.length,
+			region: null
 		};
 		comparison = quick ? quickComparison(quick) : [];
 	}
+
+	const breakdown = eventBreakdown(season, analyses, mine);
 
 	const histories = season.events
 		.map((entry) =>
@@ -375,6 +463,8 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		},
 		source: mine ? 'ratings' : 'scout',
 		stats,
+		trend: seasonTrend(breakdown),
+		breakdown,
 		chartTitle: histories.length > 0 ? 'OPR after each match' : 'OPR at each event',
 		charts,
 		comparison,

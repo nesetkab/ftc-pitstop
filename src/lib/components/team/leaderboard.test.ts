@@ -7,12 +7,24 @@ import {
 	filterRows,
 	paginate,
 	parseFilters,
+	matchesQuery,
+	normalizeText,
 	queryString,
+	teamPage,
 	type LeaderboardFilters,
 	type LeaderboardRow
 } from './leaderboard.ts';
 
-const none: LeaderboardFilters = { region: '', country: '', state: '', min: 0, page: 1 };
+const none: LeaderboardFilters = {
+	region: '',
+	country: '',
+	state: '',
+	min: 0,
+	sort: 'opr',
+	q: '',
+	team: 0,
+	page: 1
+};
 
 function row(team: number, opr: number, overrides: Partial<LeaderboardRow> = {}): LeaderboardRow {
 	return {
@@ -50,6 +62,9 @@ describe('parseFilters', () => {
 			country: 'USA',
 			state: 'AZ',
 			min: 10,
+			sort: 'opr',
+			q: '',
+			team: 0,
 			page: 3
 		});
 	});
@@ -62,6 +77,9 @@ describe('parseFilters', () => {
 			page: 1
 		});
 		expect(parseFilters(new URLSearchParams('region=' + 'A'.repeat(40))).region).toBe('');
+		expect(parseFilters(new URLSearchParams('sort=name&team=-4')).sort).toBe('opr');
+		expect(parseFilters(new URLSearchParams('team=abc')).team).toBe(0);
+		expect(parseFilters(new URLSearchParams('q=' + 'x'.repeat(90))).q).toHaveLength(40);
 	});
 });
 
@@ -70,10 +88,22 @@ describe('queryString', () => {
 		expect(queryString(none)).toBe('');
 		expect(queryString({ ...none, region: 'USAZ', min: 10 }, 2)).toBe('?region=USAZ&min=10&page=2');
 		expect(queryString({ ...none, country: 'USA', state: 'AZ' })).toBe('?country=USA&state=AZ');
+		expect(queryString({ ...none, sort: 'tips', q: 'robo', team: 42 })).toBe(
+			'?sort=tips&q=robo&team=42'
+		);
 	});
 
 	it('round trips through parseFilters', () => {
-		const filters = { region: 'USAZ', country: 'USA', state: 'AZ', min: 15, page: 4 };
+		const filters: LeaderboardFilters = {
+			region: 'USAZ',
+			country: 'USA',
+			state: 'AZ',
+			min: 15,
+			sort: 'auto',
+			q: 'robo',
+			team: 1234,
+			page: 4
+		};
 		expect(parseFilters(new URLSearchParams(queryString(filters)))).toEqual(filters);
 	});
 });
@@ -116,6 +146,45 @@ describe('filterRows', () => {
 		expect(teams({ country: 'USA' })).toEqual([2, 3, 4, 1]);
 		expect(teams({ country: 'USA', state: 'CA' })).toEqual([3]);
 		expect(teams({ country: 'USA', region: 'USAZ', min: 5 })).toEqual([2, 1]);
+	});
+
+	it('finds teams by number prefix, name or city', () => {
+		expect(teams({ q: '5' })).toEqual([5]);
+		expect(teams({ q: 'team 3' })).toEqual([3]);
+		expect(teams({ q: 'los ang' })).toEqual([3]);
+		expect(teams({ q: 'TORONTO' })).toEqual([5]);
+		expect(teams({ q: 'eam' })).toEqual([]);
+		expect(teams({ q: '  ' })).toEqual([2, 5, 3, 4, 1, 6]);
+	});
+
+	it('sorts by another column with OPR as the tiebreak', () => {
+		expect(teams({ sort: 'matches' })).toEqual([2, 5, 3, 1, 6, 4]);
+		expect(teams({ sort: 'auto' })).toEqual([2, 5, 3, 4, 1, 6]);
+	});
+});
+
+describe('matchesQuery', () => {
+	it('ignores accents and punctuation', () => {
+		expect(matchesQuery(row(9, 1, { name: 'Robótica São-Paulo' }), 'robotica sao')).toBe(true);
+		expect(matchesQuery(row(9, 1, { name: 'Robótica São-Paulo' }), 'paulo')).toBe(true);
+		expect(matchesQuery(row(9, 1, { name: null, city: null, state: null }), 'x')).toBe(false);
+	});
+});
+
+describe('teamPage', () => {
+	const many = Array.from({ length: 120 }, (_, index) => row(index + 1, 200 - index));
+
+	it('finds the page a team is on', () => {
+		expect(teamPage(many, 1)).toBe(1);
+		expect(teamPage(many, 51)).toBe(2);
+		expect(teamPage(many, 120)).toBe(3);
+		expect(teamPage(many, 999)).toBeNull();
+	});
+});
+
+describe('normalizeText', () => {
+	it('keeps letters from other scripts', () => {
+		expect(normalizeText('  闵行 Robotics! ')).toBe('闵行 robotics');
 	});
 });
 
