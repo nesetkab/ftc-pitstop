@@ -28,6 +28,9 @@
 			.filter(Boolean)
 			.join(', ')
 	);
+	const showing = $derived(
+		`${summary ? `${summary}. ` : ''}Showing ${integer(first)} to ${integer(last)} of ${integer(data.total)} teams`
+	);
 	const csvHref = $derived(`/leaderboards.csv${queryString({ ...data.filters, team: 0 }, 1)}`);
 
 	$effect(() => {
@@ -66,8 +69,7 @@
 	{#if data.total === 0}
 		No teams
 	{:else}
-		{#if summary}{summary}.
-		{/if}Showing {integer(first)} to {integer(last)} of {integer(data.total)} teams
+		{showing}
 	{/if}
 	{#if data.filters.team > 0 && !data.found}
 		<span class="faint">Team {data.filters.team} is not in this list.</span>

@@ -168,6 +168,50 @@ describe('team page', () => {
 		expect(data[0]).toMatchObject({ name: '26670 SCA Iron Eagles', foundingDate: '2024' });
 	});
 
+	it('links the region rank to that spot on the leaderboard and draws the event trend', () => {
+		show(
+			view({
+				source: 'ratings',
+				stats: {
+					opr: 70,
+					rank: 12,
+					of: 900,
+					record: { wins: 9, losses: 1, ties: 0 },
+					events: 2,
+					region: { code: 'USAZ', rank: 3, of: 40 }
+				},
+				trend: [
+					{ label: 'First', value: 50 },
+					{ label: 'Second', value: 70 }
+				]
+			})
+		);
+		const stat = (name: string) => screen.getByText(name, { selector: 'dt' }).nextElementSibling;
+		expect(stat('Rank in USAZ')).toHaveTextContent('3 of 40');
+		expect(within(stat('Rank in USAZ') as HTMLElement).getByRole('link')).toHaveAttribute(
+			'href',
+			'/leaderboards?region=USAZ&team=26670'
+		);
+		expect(within(stat('World rank by OPR') as HTMLElement).getByRole('link')).toHaveAttribute(
+			'href',
+			'/leaderboards?team=26670'
+		);
+		expect(stat('OPR by event')).toHaveTextContent('+20.0 since first');
+		expect(
+			screen.getByRole('img', { name: 'OPR at each event: First 50.0, Second 70.0' })
+		).toBeInTheDocument();
+	});
+
+	it('breaks down OPR by scoring part at each event', () => {
+		show();
+		const table = screen.getByRole('table', { name: 'OPR by scoring part at each event' });
+		const rows = within(table).getAllByRole('row');
+		expect(rows).toHaveLength(2);
+		expect(
+			within(rows[1]).getByRole('link', { name: 'Roadrunner - Gilbert Qualifier' })
+		).toHaveAttribute('href', '/events/USAZGIQ');
+	});
+
 	it('shows the stats row', () => {
 		show();
 		const stat = (name: string) => screen.getByText(name, { selector: 'dt' }).nextElementSibling;

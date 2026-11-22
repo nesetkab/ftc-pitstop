@@ -27,7 +27,8 @@
 		Object.fromEntries(
 			columns.map(({ key }) => {
 				const values = events.map((row) => row[key]).filter((value) => value !== null);
-				return [key, events.length > 1 && values.length > 0 ? Math.max(...values) : null];
+				const top = values.length > 0 ? Math.max(...values) : 0;
+				return [key, events.length > 1 && top > 0 ? top : null];
 			})
 		) as Record<Part, number | null>
 	);
@@ -76,7 +77,9 @@
 	tbody th {
 		padding: 9px 10px;
 		border-bottom: 1px solid var(--line);
+		font-size: 14px;
 		font-weight: 400;
+		color: var(--text);
 		min-width: 10em;
 	}
 

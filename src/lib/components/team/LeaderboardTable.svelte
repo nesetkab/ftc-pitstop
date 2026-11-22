@@ -32,7 +32,14 @@
 		{ key: 'matches', label: 'Matches', optional: true }
 	];
 
+	const extra = $derived(columns.some((column) => column.optional && column.key === sort));
+
 	$effect(() => syncFollows());
+
+	function hidden(column: (typeof columns)[number]): boolean {
+		if (column.key === sort) return false;
+		return Boolean(column.optional) || (extra && column.key === 'teleop');
+	}
 
 	function sortHref(key: LeaderboardSort) {
 		return filters ? `/leaderboards${queryString({ ...filters, sort: key }, 1)}` : undefined;
@@ -57,7 +64,7 @@
 					{@const active = sort === column.key}
 					<th
 						scope="col"
-						class={{ optional: column.optional && !active, active }}
+						class={{ optional: hidden(column), active }}
 						aria-sort={active ? 'descending' : undefined}
 					>
 						{#if filters}
@@ -91,7 +98,7 @@
 					{#each columns as column (column.key)}
 						<td
 							class={{
-								optional: column.optional && sort !== column.key,
+								optional: hidden(column),
 								active: sort === column.key
 							}}
 						>
