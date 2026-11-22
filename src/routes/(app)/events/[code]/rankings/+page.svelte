@@ -11,6 +11,7 @@
 <RankingsView
 	bundle={data.bundle}
 	analysis={data.analysis}
+	rp={data.rp}
 	followed={view.followed}
 	csvHref="/events/{data.bundle.event.code}/rankings.csv"
 />

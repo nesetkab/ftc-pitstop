@@ -1,20 +1,24 @@
 <script lang="ts">
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
+	import { RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
 	import type { EventBundle } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { npMax } from './insights.ts';
 	import { quals } from './matches.ts';
 	import RankingsTable from './RankingsTable.svelte';
+	import RpSources from './RpSources.svelte';
+	import type { RpCounts } from './standings.ts';
 	import StrengthTable from './StrengthTable.svelte';
 
 	interface Props {
 		bundle: Pick<EventBundle, 'teams' | 'matches' | 'rankings'>;
 		analysis?: Pick<EventAnalysis, 'ratings' | 'projections' | 'strength'> | null;
+		rp?: Record<number, RpCounts> | null;
 		followed?: ReadonlySet<number>;
 		csvHref?: string;
 	}
 
-	let { bundle, analysis = null, followed = new Set(), csvHref }: Props = $props();
+	let { bundle, analysis = null, rp = null, followed = new Set(), csvHref }: Props = $props();
 
 	const qualMatches = $derived(quals(bundle.matches));
 	const remaining = $derived(qualMatches.filter((match) => !match.result).length);
@@ -65,6 +69,18 @@
 	<p class="note">{note}</p>
 	{#if csvHref}
 		<p class="csv"><a href={csvHref} download>Download CSV</a></p>
+	{/if}
+	{#if rp}
+		<section class="panel" aria-labelledby="rp-title">
+			<h2 class="sec-title" id="rp-title">Where ranking points came from</h2>
+			<RpSources {rp} rankings={bundle.rankings} teams={bundle.teams} {followed} />
+			<p class="note">
+				Share of each team's qualification matches where its alliance won or earned each bonus
+				ranking point. Swarm takes {RP_THRESHOLDS.swarm} leave and park points, Pollinator 1 takes {RP_THRESHOLDS.pollinator1}
+				tips and Pollinator 2 takes {RP_THRESHOLDS.pollinator2}. Bonus RS is bonus ranking points
+				per match, the part of RS that doesn't depend on winning.
+			</p>
+		</section>
 	{/if}
 	{#if strength.length > 0}
 		<section class="panel" aria-labelledby="strength-title">

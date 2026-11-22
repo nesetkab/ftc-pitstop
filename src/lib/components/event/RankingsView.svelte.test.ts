@@ -2,6 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import RankingsView from './RankingsView.svelte';
+import { rpCounts } from './standings.ts';
 import { fakeAnalysis, fixtureBundle, unplay } from './test-fixtures.ts';
 
 afterEach(() => {
@@ -119,5 +120,21 @@ describe('RankingsView', () => {
 		render(RankingsView, { props: { bundle: fixtureBundle('USMTBUQ') } });
 		expect(screen.getByText('No rankings yet.')).toBeInTheDocument();
 		expect(screen.queryByRole('table')).toBeNull();
+	});
+
+	it('shows where each team got its ranking points', () => {
+		render(RankingsView, { props: { bundle: finished, rp: rpCounts(finished.matches) } });
+		const table = screen.getByRole('table', { name: 'Where ranking points came from' });
+		const first = bodyRows(table)[0];
+		const cells = Array.from(first.querySelectorAll('td')).map((cell) => cell.textContent?.trim());
+		expect(cells[0]).toBe('1');
+		expect(cells[3]).toBe('100%');
+		expect(cells.slice(4, 7).every((cell) => /^\d+%$/.test(cell ?? ''))).toBe(true);
+		expect(screen.getByText(/Swarm takes 16 leave and park points/)).toBeInTheDocument();
+	});
+
+	it('leaves the ranking point table out without match detail', () => {
+		render(RankingsView, { props: { bundle: finished } });
+		expect(screen.queryByRole('table', { name: 'Where ranking points came from' })).toBeNull();
 	});
 });

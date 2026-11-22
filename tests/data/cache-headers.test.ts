@@ -7,7 +7,8 @@ const server = vi.hoisted(() => ({
 	loadQueueStatus: vi.fn(),
 	loadTeamSeason: vi.fn(),
 	getAnalysis: vi.fn(),
-	loadSeasonRatingsWithin: vi.fn()
+	loadSeasonRatingsWithin: vi.fn(),
+	loadEventAnalysisEntry: vi.fn()
 }));
 
 vi.mock('#lib/server/event.ts', async (importOriginal) => ({
@@ -20,7 +21,8 @@ vi.mock('#lib/server/event.ts', async (importOriginal) => ({
 vi.mock('#lib/components/pit/analysis.server.ts', () => ({ getAnalysis: server.getAnalysis }));
 
 vi.mock('#lib/server/analysis.ts', () => ({
-	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin
+	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin,
+	loadEventAnalysisEntry: server.loadEventAnalysisEntry
 }));
 
 const { load: pitLoad } = await import('../../src/routes/(bare)/[team=team]/+layout.server.ts');
@@ -29,6 +31,10 @@ const { loadBreakdowns } =
 const { GET: liteRoute } = await import('../../src/routes/api/events/[code]/lite/+server.ts');
 const { load: teamsLoad } =
 	await import('../../src/routes/(app)/events/[code]/teams/+page.server.ts');
+const { loadRpCounts } = await import('../../src/routes/(app)/events/[code]/rp.server.ts');
+const { load: matchLoad } =
+	await import('../../src/routes/(app)/events/[code]/matches/[key]/+page.server.ts');
+const { fixtureBundle } = await import('../../src/lib/components/event/test-fixtures.ts');
 
 const bundle = {
 	event: { code: 'USAZGIQ', start: '2026-11-14', end: '2026-11-14', timezone: 'America/Phoenix' },
@@ -164,3 +170,43 @@ describe('score breakdowns', () => {
 		expect(setHeaders).toHaveBeenCalledWith({ 'cache-control': CACHE_CONTROL.short });
 	});
 });
+
+describe('ranking point counts', () => {
+	it('reuses the cached bundle and leaves the cache header to the layout', async () => {
+		const montana = fixtureBundle('USMTBUQ-final');
+		server.loadEventBundle.mockResolvedValue({ ...montana, cacheControl: CACHE_CONTROL.finished });
+		const parent = vi.fn(async () => ({}));
+		const data = await loadRpCounts({ params: { code: 'USMTBUQ' }, parent });
+		expect(parent).toHaveBeenCalled();
+		expect(Object.keys(data.rp ?? {})).toHaveLength(montana.rankings.length);
+	});
+
+	it('skips league meets whose rankings include earlier meets', async () => {
+		const league = fixtureBundle('USMIWMM8');
+		server.loadEventBundle.mockResolvedValue({ ...league, cacheControl: CACHE_CONTROL.finished });
+		const data = await loadRpCounts({ params: { code: 'USMIWMM8' }, parent: async () => ({}) });
+		expect(data.rp).toBeNull();
+	});
+});
+
+describe('match page', () => {
+	it('sends only the OPR moves for the teams in that match', async () => {
+		server.loadEventBundle.mockResolvedValue({ ...bundle, cacheControl: CACHE_CONTROL.finished });
+		server.loadEventAnalysisEntry.mockResolvedValue({
+			cacheControl: CACHE_CONTROL.finished,
+			analysis: {
+				ratings: [
+					{ team: 1, prior: 20, history: [{ key: 'q3', time: 3, opr: 24 }] },
+					{ team: 2, prior: 30, history: [{ key: 'q1', time: 1, opr: 31 }] }
+				]
+			}
+		});
+		const data = await matchLoad({
+			params: { code: 'USAZGIQ', key: 'Q3' },
+			parent: async () => ({ cacheControl: CACHE_CONTROL.short }),
+			setHeaders: vi.fn()
+		} as never);
+		expect(data).toMatchObject({ oprShifts: { 1: { before: 20, after: 24 } } });
+	});
+});
+
