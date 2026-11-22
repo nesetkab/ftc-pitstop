@@ -1,0 +1,43 @@
+{
+	"code": "USMIWMM8",
+	"note": "league meet whose rankings cover the whole league, 13 of 33 teams here",
+	"recordedAt": "2026-11-22T05:13:17.518Z",
+	"endpoints": {
+		"event": { "path": "events?eventCode=USMIWMM8", "status": 200, "lastModified": null },
+		"teams": { "path": "teams?eventCode=USMIWMM8", "status": 200, "lastModified": null },
+		"rankings": { "path": "rankings/USMIWMM8", "status": 200, "lastModified": null },
+		"schedule-qual": {
+			"path": "schedule/USMIWMM8/qual/hybrid",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 16:19:48 GMT"
+		},
+		"schedule-playoff": {
+			"path": "schedule/USMIWMM8/playoff/hybrid",
+			"status": 200,
+			"lastModified": null
+		},
+		"matches-qual": {
+			"path": "matches/USMIWMM8?tournamentLevel=qual",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 16:19:48 GMT"
+		},
+		"matches-playoff": {
+			"path": "matches/USMIWMM8?tournamentLevel=playoff",
+			"status": 200,
+			"lastModified": null
+		},
+		"scores-qual": {
+			"path": "scores/USMIWMM8/qual",
+			"status": 200,
+			"lastModified": "Sat, 21 Nov 2026 16:19:48 GMT"
+		},
+		"scores-playoff": { "path": "scores/USMIWMM8/playoff", "status": 200, "lastModified": null },
+		"alliances": {
+			"path": "alliances/USMIWMM8",
+			"status": 200,
+			"lastModified": "Sun, 22 Nov 2026 05:13:17 GMT"
+		},
+		"awards": { "path": "awards/USMIWMM8", "status": 200, "lastModified": null },
+		"advancement": { "path": "advancement/USMIWMM8", "status": 200, "lastModified": null }
+	}
+}

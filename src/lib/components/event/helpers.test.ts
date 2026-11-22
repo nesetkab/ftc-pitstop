@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Award, EventSummary } from '#lib/types.ts';
-import { groupAwards } from './awards.ts';
+import { groupAwards, noAwardsText } from './awards.ts';
 import { eventMeta } from './event-meta.ts';
 import { filterEvents, groupByWeek, listed, regionGroups } from './event-list.ts';
 import { fixtureBundle } from './test-fixtures.ts';
@@ -92,6 +92,11 @@ describe('event meta', () => {
 });
 
 describe('awards', () => {
+	it('explains that league meets give no awards', () => {
+		expect(noAwardsText('LeagueMeet').title).toBe("League meets don't give awards.");
+		expect(noAwardsText('Qualifier').title).toBe('No awards yet.');
+	});
+
 	it('groups placements and alliance roles and skips awards not given', () => {
 		const groups = groupAwards(fixtureBundle('USAZGIQ').awards as Award[]);
 		const byName = new Map(groups.map((group) => [group.name, group.entries]));

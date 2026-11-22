@@ -64,8 +64,11 @@
 	let tab = $state<'team' | 'matches'>('team');
 
 	const timeZone = $derived(event.timezone);
+	const selectionAhead = $derived(
+		view.hasPlayoffs && (view.phase === 'upcoming' || view.phase === 'quals')
+	);
 	const alertOptions = $derived(
-		ALERT_OPTIONS.filter((option) => view.hasPlayoffs || option.key !== 'selectionStarts')
+		ALERT_OPTIONS.filter((option) => selectionAhead || option.key !== 'selectionStarts')
 	);
 	const next = $derived(view.next);
 	const text = $derived(next ? heroText(next, call, now, timeZone, view.delaySeconds) : null);
@@ -241,29 +244,32 @@
 				</section>
 			{/if}
 
-			<section class="sec">
-				<h2 class="sec-title">Alerts</h2>
-				{#each alertOptions as option (option.key)}
-					<Toggle
-						label={option.label}
-						checked={alerts[option.key] && permission === 'granted'}
-						disabled={blocked}
-						onchange={(on) => onalert(option.key, on)}
-					/>
-				{/each}
-				{#if permission === 'denied'}
-					<p class="note">
-						Notifications are blocked for this site. Allow them in your browser settings to use
-						alerts.
-					</p>
-				{:else if permission === 'unsupported'}
-					<p class="note">
-						This browser can't show notifications. On iPhone, add PitStop to your home screen first.
-					</p>
-				{:else}
-					<p class="note">Alerts arrive while this page is open.</p>
-				{/if}
-			</section>
+			{#if view.phase !== 'done'}
+				<section class="sec">
+					<h2 class="sec-title">Alerts</h2>
+					{#each alertOptions as option (option.key)}
+						<Toggle
+							label={option.label}
+							checked={alerts[option.key] && permission === 'granted'}
+							disabled={blocked}
+							onchange={(on) => onalert(option.key, on)}
+						/>
+					{/each}
+					{#if permission === 'denied'}
+						<p class="note">
+							Notifications are blocked for this site. Allow them in your browser settings to use
+							alerts.
+						</p>
+					{:else if permission === 'unsupported'}
+						<p class="note">
+							This browser can't show notifications. On iPhone, add PitStop to your home screen
+							first.
+						</p>
+					{:else}
+						<p class="note">Alerts arrive while this page is open.</p>
+					{/if}
+				</section>
+			{/if}
 		{:else}
 			<section class="sec">
 				<h2 class="sec-title">All matches</h2>

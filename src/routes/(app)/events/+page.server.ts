@@ -3,7 +3,7 @@ import { listed, regionGroups } from '#lib/components/event/event-list.ts';
 import { loadSeasonEvents } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
-import { loadTeamCounts } from './team-counts.server.ts';
+import { loadTeamCounts, teamCount } from './team-counts.server.ts';
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
 	const [list, counts] = await Promise.all([
@@ -12,11 +12,12 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 	]);
 	if (!list) error(503, 'The event list is unavailable right now');
 	setHeaders({ 'cache-control': CACHE_CONTROL.short });
+	const now = Date.now();
 	return {
-		events: list.events.map((event) => listed(event, counts?.[event.code] || null)),
+		events: list.events.map((event) => listed(event, teamCount(event, counts?.[event.code], now))),
 		regions: regionGroups(list.events),
 		fetchedAt: list.fetchedAt,
 		stale: list.stale,
-		renderedAt: Date.now()
+		renderedAt: now
 	};
 };

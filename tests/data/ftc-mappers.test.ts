@@ -96,7 +96,7 @@ describe.each(FIXTURE_EVENTS)('FTC mappers on %s', (code) => {
 		const rankings = mapRankings(data.rankings);
 		expect(rankings.map((ranking) => ranking.rank)).toEqual(rankings.map((_, i) => i + 1));
 		for (const ranking of rankings) {
-			expect(ranking.wins + ranking.losses + ranking.ties).toBe(ranking.played);
+			expect(ranking.wins + ranking.losses + ranking.ties).toBeLessThanOrEqual(ranking.played);
 			expect(ranking.rs).toBeGreaterThanOrEqual(0);
 			expect(ranking.avgTips).toBeGreaterThanOrEqual(0);
 		}

@@ -1,0 +1,33 @@
+{
+	"events": [
+		{
+			"eventId": "7c11ac77-f249-9844-bcf7-ea446d4f4727",
+			"code": "USMIWMM8",
+			"divisionCode": null,
+			"name": "West Michigan Meet 8",
+			"remote": false,
+			"hybrid": false,
+			"fieldCount": 1,
+			"published": true,
+			"type": "1",
+			"typeName": "League Meet",
+			"regionCode": "USMI",
+			"leagueCode": "WM",
+			"districtCode": "",
+			"venue": "GVSU Shape IDC",
+			"address": "227 Winter Ave. NW",
+			"city": "Grand Rapids",
+			"stateprov": "MI",
+			"country": "USA",
+			"website": "https://firstinmichigan.us/FTC/events/",
+			"liveStreamUrl": "https://www.youtube.com/@firstalumninetworkgrandvalley/streams",
+			"volunteerUrl": "https://my.firstinspires.org/Volunteers/Wizard/Search/2?EventId=82504",
+			"coordinates": { "type": "Point", "coordinates": [-85.68156, 42.96813] },
+			"webcasts": null,
+			"timezone": "America/New_York",
+			"dateStart": "2026-11-21T00:00:00",
+			"dateEnd": "2026-11-21T00:00:00"
+		}
+	],
+	"eventCount": 1
+}

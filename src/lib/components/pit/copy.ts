@@ -24,8 +24,14 @@ export function awayText(matches: number): string {
 	return matches === 1 ? '1 match from now' : `${matches} matches from now`;
 }
 
+const CARRIED_OVER_SECONDS = 4 * 3600;
+
+function shown(seconds: number | null): seconds is number {
+	return seconds !== null && Math.abs(seconds) < CARRIED_OVER_SECONDS;
+}
+
 export function delayText(seconds: number | null): string | null {
-	if (seconds === null) return null;
+	if (!shown(seconds)) return null;
 	const minutes = Math.round(Math.abs(seconds) / 60);
 	if (minutes === 0) return 'The field is on schedule.';
 	const unit = minutes === 1 ? 'minute' : 'minutes';
@@ -33,7 +39,7 @@ export function delayText(seconds: number | null): string | null {
 }
 
 export function shortDelay(seconds: number | null): string | null {
-	if (seconds === null) return null;
+	if (!shown(seconds)) return null;
 	const minutes = Math.round(Math.abs(seconds) / 60);
 	if (minutes === 0) return 'Field is on schedule.';
 	return `Field is ${minutes} min ${seconds > 0 ? 'behind' : 'ahead'}.`;

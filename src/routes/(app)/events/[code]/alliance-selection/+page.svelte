@@ -167,7 +167,7 @@
 					<h3 class="sec-title">Alliances</h3>
 					<AllianceTable {selection} {me} />
 				</div>
-				{#if analysis?.playoffs && analysis.playoffs.length > 0}
+				{#if analysis?.playoffs && analysis.playoffs.length > 0 && bundle.phase !== 'done'}
 					<div class="panel">
 						<h3 class="sec-title">Chance to win the event</h3>
 						<PlayoffOdds odds={analysis.playoffs} />

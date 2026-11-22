@@ -71,7 +71,11 @@
 			<tr class:me={followed.has(row.team)}>
 				<td class="l">{row.rank}</td>
 				<td class="team">
-					<TeamCell number={row.team} name={names.get(row.team)} href="/teams/{row.team}" />
+					<TeamCell
+						number={row.team}
+						name={names.get(row.team) ?? row.name}
+						href="/teams/{row.team}"
+					/>
 				</td>
 				<td>{fixed(row.rs, 2)}</td>
 				<td>{record(row.wins, row.losses, row.ties)}</td>

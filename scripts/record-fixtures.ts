@@ -20,7 +20,8 @@ const EVENTS: Record<string, string> = {
 	USALATQ: 'qualifier with 2 alliances',
 	UZTAQ1: 'qualifier with 4 alliances, many no-shows and surrogates',
 	USMISOQ: 'qualifier with 6 alliances and 11 playoff matches',
-	USUTSAS1: 'scrimmage whose second alliance captain is placeholder team 99999'
+	USUTSAS1: 'scrimmage whose second alliance captain is placeholder team 99999',
+	USMIWMM8: 'league meet whose rankings cover the whole league, 13 of 33 teams here'
 };
 
 function endpoints(code: string): [string, string][] {

@@ -391,7 +391,10 @@ function standings(bundle: EventBundle): AllianceStanding[] {
 
 export function pitView(input: PitInput): PitView {
 	const { bundle, analysis, queue, team } = input;
-	const names = new Map(bundle.teams.map((entry) => [entry.number, entry.name]));
+	const names = new Map([
+		...bundle.rankings.flatMap((row) => (row.name ? [[row.team, row.name] as const] : [])),
+		...bundle.teams.map((entry) => [entry.number, entry.name] as const)
+	]);
 	const ratings = new Map((analysis?.ratings ?? []).map((rating) => [rating.team, rating]));
 	const ranks = new Map(bundle.rankings.map((row) => [row.team, row]));
 	const quals = bundle.matches.filter((match) => match.level === 'qual');
@@ -479,7 +482,9 @@ export function pitView(input: PitInput): PitView {
 		awards: bundle.awards.filter((award) => award.team === team),
 		eventAwards: bundle.awards.filter((award) => award.team !== null),
 		advancing:
-			bundle.advancement?.teams.some((slot) => slot.team === team && !slot.declined) ?? false,
+			bundle.advancement?.teams.some(
+				(slot) => slot.team === team && !slot.declined && slot.status !== 'ineligible'
+			) ?? false,
 		advancesTo: bundle.advancement?.advancesToName ?? bundle.advancement?.advancesTo ?? null
 	};
 }
