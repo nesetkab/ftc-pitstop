@@ -102,10 +102,12 @@
 					<tr class={{ champion: side.champion }}>
 						<th scope="row" class="side">
 							<span class="side-inner">
-								<span class="seed"
-									>{#if side.seed !== null}<span class="visually-hidden">{'Alliance '}</span
-										>{side.seed}{/if}</span
-								>
+								<span class="seed">
+									{#if side.seed !== null}
+										<span class="visually-hidden">Alliance</span>
+										{side.seed}
+									{/if}
+								</span>
 								<span class="teams">
 									{#if side.teams.length > 0}
 										{#each side.teams as team (team)}

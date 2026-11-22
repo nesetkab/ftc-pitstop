@@ -3,30 +3,34 @@
 	import HeadToHead from '#lib/components/compare/HeadToHead.svelte';
 	import SharedEvents from '#lib/components/compare/SharedEvents.svelte';
 	import TeamPicker from '#lib/components/compare/TeamPicker.svelte';
+	import { compareHref } from '#lib/components/compare/compare.ts';
+	import { siteTitle } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Seo from '#lib/ui/Seo.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	const view = $derived(data.view);
+	const paired = $derived(view.teams.length >= 2);
+	const names = $derived(view.teams.map((team) => `${team.number} ${team.name}`));
 	const title = $derived(
-		view.teams.length >= 2
-			? `${view.teams.map((team) => team.number).join(' vs ')} - PitStop`
-			: 'Compare teams - PitStop'
+		paired
+			? siteTitle(`${view.teams.map((team) => team.number).join(' vs ')}, compare FTC teams`)
+			: siteTitle('Compare FTC teams')
+	);
+	const description = $derived(
+		paired
+			? `Compare FTC teams ${names.slice(0, -1).join(', ')} and ${names.at(-1)} side by side: OPR by part, records, shared events and results against each other.`
+			: 'Compare up to four FTC teams side by side: OPR by part, records, shared events and results against each other.'
+	);
+	const canonical = $derived(
+		compareHref(view.teams.map((team) => team.number).toSorted((a, b) => a - b))
 	);
 </script>
 
-<svelte:head>
-	<title>{title}</title>
-	<meta
-		name="description"
-		content="Compare up to four FTC teams side by side: OPR by part, records, shared events and results against each other."
-	/>
-	{#if view.teams.length < 2}
-		<meta name="robots" content="noindex" />
-	{/if}
-</svelte:head>
+<Seo {title} {description} path={canonical} noindex={!paired} />
 
 <PageHeader
 	title="Compare teams"

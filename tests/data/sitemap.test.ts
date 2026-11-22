@@ -3,7 +3,10 @@ import { describe, expect, it, vi } from 'vitest';
 const server = vi.hoisted(() => ({
 	searchIndex: vi.fn(async () => ({
 		teams: [{ number: 3747 }, { number: 14624 }],
-		events: [{ code: 'USMTBUQ' }],
+		events: [
+			{ code: 'USMTBUQ', end: '2025-11-22' },
+			{ code: 'USWAFUTURE', end: '2999-01-01' }
+		],
 		fetchedAt: 1
 	}))
 }));
@@ -28,12 +31,21 @@ describe('sitemap', () => {
 			'https://www.ftcpitstop.com/events',
 			'https://www.ftcpitstop.com/leaderboards',
 			'https://www.ftcpitstop.com/records',
-			'https://www.ftcpitstop.com/compare',
 			'https://www.ftcpitstop.com/accuracy',
 			'https://www.ftcpitstop.com/events/USMTBUQ',
+			'https://www.ftcpitstop.com/events/USWAFUTURE',
 			'https://www.ftcpitstop.com/teams/3747',
 			'https://www.ftcpitstop.com/teams/14624'
 		]);
+	});
+
+	it('dates finished events by their last day and leaves the rest undated', async () => {
+		const xml = await (await get()).text();
+		expect(xml).toContain(
+			'<url><loc>https://www.ftcpitstop.com/events/USMTBUQ</loc><lastmod>2025-11-22</lastmod></url>'
+		);
+		expect(xml).toContain('<url><loc>https://www.ftcpitstop.com/events/USWAFUTURE</loc></url>');
+		expect(xml).not.toContain('/compare');
 	});
 
 	it('still answers with the main pages when the lists are down', async () => {
@@ -41,6 +53,6 @@ describe('sitemap', () => {
 		const response = await get();
 		const xml = await response.text();
 		expect(response.headers.get('cache-control')).toBe('public, s-maxage=300');
-		expect(xml.match(/<loc>/g)).toHaveLength(6);
+		expect(xml.match(/<loc>/g)).toHaveLength(5);
 	});
 });

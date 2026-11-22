@@ -13,10 +13,6 @@
 	const empty = $derived(noAwardsText(bundle.event.type));
 </script>
 
-<svelte:head>
-	<title>Awards at {bundle.event.name}</title>
-</svelte:head>
-
 {#if given}
 	<AwardsList awards={bundle.awards} teams={bundle.teams} followed={view.followed} />
 {:else}

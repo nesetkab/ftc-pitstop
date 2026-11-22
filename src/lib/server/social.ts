@@ -19,17 +19,20 @@ export function withSocialTags(html: string, url: URL): string {
 	if (head === -1 || html.includes('property="og:title"')) return html;
 	const title = /<title>([^<]*)<\/title>/.exec(html)?.[1]?.trim();
 	const description = /<meta name="description" content="([^"]*)"/.exec(html)?.[1];
+	const canonical = /<link rel="canonical" href="([^"]*)"/.exec(html)?.[1];
 	const image = `${url.origin}${ogImagePath(url.pathname)}`;
 	const tags: [string, string, string | undefined][] = [
 		['property', 'og:site_name', SITE_NAME],
 		['property', 'og:type', 'website'],
-		['property', 'og:url', `${url.origin}${url.pathname}`],
+		['property', 'og:url', canonical ?? `${url.origin}${url.pathname}`],
 		['property', 'og:title', title ? quoted(title) : undefined],
 		['property', 'og:description', description],
 		['property', 'og:image', image],
 		['property', 'og:image:width', '1200'],
 		['property', 'og:image:height', '630'],
 		['name', 'twitter:card', 'summary_large_image'],
+		['name', 'twitter:title', title ? quoted(title) : undefined],
+		['name', 'twitter:description', description],
 		['name', 'twitter:image', image]
 	];
 	const markup = tags

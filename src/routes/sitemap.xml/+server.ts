@@ -1,7 +1,9 @@
 import { searchIndex } from '#lib/server/event.ts';
 import type { RequestHandler } from './$types';
 
-const PAGES = ['/', '/events', '/leaderboards', '/records', '/compare', '/accuracy'];
+const PAGES = ['/', '/events', '/leaderboards', '/records', '/accuracy'];
+
+type Page = { path: string; lastmod?: string };
 
 function escapeXml(text: string): string {
 	return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
@@ -9,12 +11,19 @@ function escapeXml(text: string): string {
 
 export const GET: RequestHandler = async ({ url }) => {
 	const index = await searchIndex().catch(() => null);
-	const paths = [
-		...PAGES,
-		...(index?.events ?? []).map((event) => `/events/${event.code}`),
-		...(index?.teams ?? []).map((team) => `/teams/${team.number}`)
+	const today = new Date().toISOString().slice(0, 10);
+	const pages: Page[] = [
+		...PAGES.map((path) => ({ path })),
+		...(index?.events ?? []).map((event) => ({
+			path: `/events/${event.code}`,
+			lastmod: event.end < today ? event.end : undefined
+		})),
+		...(index?.teams ?? []).map((team) => ({ path: `/teams/${team.number}` }))
 	];
-	const entries = paths.map((path) => `<url><loc>${escapeXml(url.origin + path)}</loc></url>`);
+	const entries = pages.map(({ path, lastmod }) => {
+		const loc = `<loc>${escapeXml(url.origin + path)}</loc>`;
+		return `<url>${loc}${lastmod ? `<lastmod>${lastmod}</lastmod>` : ''}</url>`;
+	});
 	const body = [
 		'<?xml version="1.0" encoding="UTF-8"?>',
 		'<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',

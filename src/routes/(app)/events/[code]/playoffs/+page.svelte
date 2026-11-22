@@ -8,10 +8,6 @@
 	const view = getEventView();
 </script>
 
-<svelte:head>
-	<title>Playoffs at {data.bundle.event.name}</title>
-</svelte:head>
-
 <PlayoffsView
 	bundle={data.bundle}
 	odds={data.analysis?.playoffs ?? null}

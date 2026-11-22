@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import Comparison from '#lib/components/team/Comparison.svelte';
 	import FollowButton from '#lib/components/team/FollowButton.svelte';
 	import LastSeason from '#lib/components/team/LastSeason.svelte';
@@ -6,8 +7,10 @@
 	import TeamAwards from '#lib/components/team/TeamAwards.svelte';
 	import TeamEvents from '#lib/components/team/TeamEvents.svelte';
 	import TeamStats from '#lib/components/team/TeamStats.svelte';
+	import { breadcrumbs, teamDescription, teamJsonLd, teamTitle } from '#lib/seo.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import type { PageProps } from './$types';
 
@@ -24,13 +27,19 @@
 	);
 </script>
 
-<svelte:head>
-	<title>{view.team.number} {view.team.name} - PitStop</title>
-	<meta
-		name="description"
-		content="Season stats, OPR, events and awards for FTC team {view.team.number} {view.team.name}."
-	/>
-</svelte:head>
+<Seo
+	title={teamTitle(view.team)}
+	description={teamDescription(view.team, view.stats)}
+	path="/teams/{view.team.number}"
+	data={[
+		teamJsonLd(page.url.origin, view.team),
+		breadcrumbs(page.url.origin, [
+			{ name: 'PitStop', path: '/' },
+			{ name: 'Leaderboards', path: '/leaderboards' },
+			{ name: `${view.team.number} ${view.team.name}`, path: `/teams/${view.team.number}` }
+		])
+	]}
+/>
 
 <PageHeader title="{view.team.number} {view.team.name}" meta={meta ? `${meta}.` : undefined}>
 	{#snippet status()}

@@ -109,7 +109,7 @@
 </script>
 
 <svelte:head>
-	<title>Team workspace</title>
+	<title>Team workspace - PitStop</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 

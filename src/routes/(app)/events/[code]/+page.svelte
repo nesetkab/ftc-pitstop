@@ -13,10 +13,6 @@
 	);
 </script>
 
-<svelte:head>
-	<title>{bundle.event.name}</title>
-</svelte:head>
-
 {#if started}
 	<RankingsView {bundle} analysis={data.analysis} followed={view.followed} />
 {:else}

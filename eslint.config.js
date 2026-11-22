@@ -45,6 +45,10 @@ export default defineConfig(
 		}
 	},
 	{
+		files: ['src/lib/ui/Seo.svelte'],
+		rules: { 'svelte/no-at-html-tags': 'off' }
+	},
+	{
 		files: ['src/lib/components/pit/feed.svelte.ts', 'src/lib/components/pit/notify.svelte.ts'],
 		rules: { 'svelte/prefer-svelte-reactivity': 'off' }
 	}

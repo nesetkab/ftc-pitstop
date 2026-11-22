@@ -7,7 +7,8 @@
 </script>
 
 <svelte:head>
-	<title>{missing ? 'Not found' : 'Unavailable'}</title>
+	<title>{missing ? 'Not found' : 'Unavailable'} - PitStop</title>
+	<meta name="robots" content="noindex" />
 </svelte:head>
 
 <PageHeader title={missing ? page.error?.message || 'Not found' : 'Event data is unavailable'} />

@@ -1,14 +1,25 @@
 <script lang="ts">
+	import { page } from '$app/state';
 	import RecordsTable from '#lib/components/records/RecordsTable.svelte';
 	import type { RecordFilters } from '#lib/components/records/records.ts';
 	import EventTable from '#lib/components/team/EventTable.svelte';
 	import FollowedTeams from '#lib/components/team/FollowedTeams.svelte';
 	import PitDisplayLink from '#lib/components/team/PitDisplayLink.svelte';
+	import { SEASON_NAME, SITE_NAME } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { searchDialog } from '#lib/ui/search.svelte.ts';
+	import Seo from '#lib/ui/Seo.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const website = $derived({
+		'@context': 'https://schema.org',
+		'@type': 'WebSite',
+		name: SITE_NAME,
+		url: `${page.url.origin}/`,
+		description: 'FIRST Tech Challenge event results, rankings and team stats.'
+	});
 
 	const recent: RecordFilters = {
 		part: 'total',
@@ -21,13 +32,12 @@
 	};
 </script>
 
-<svelte:head>
-	<title>PitStop</title>
-	<meta
-		name="description"
-		content="FTC event results, team stats and a pit display for your team's matches."
-	/>
-</svelte:head>
+<Seo
+	title="PitStop: FTC event results, rankings and team stats"
+	description="Live FIRST Tech Challenge results, rankings, match predictions and team OPR for the {SEASON_NAME} season, plus a pit display for your team's matches."
+	path="/"
+	data={[website]}
+/>
 
 <h1 class="visually-hidden">PitStop</h1>
 

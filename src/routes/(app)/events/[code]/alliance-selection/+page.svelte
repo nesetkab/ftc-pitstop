@@ -129,10 +129,6 @@
 	});
 </script>
 
-<svelte:head>
-	<title>Alliance selection at {bundle.event.name}</title>
-</svelte:head>
-
 <div class="page">
 	<div class="head">
 		<h2>Alliance selection</h2>

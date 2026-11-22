@@ -6,7 +6,7 @@
 </script>
 
 <svelte:head>
-	<title>Strategy board, team tools</title>
+	<title>Strategy board, team tools - PitStop</title>
 </svelte:head>
 
 <StrategyBoard

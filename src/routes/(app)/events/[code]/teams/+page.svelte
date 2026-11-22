@@ -17,10 +17,6 @@
 	);
 </script>
 
-<svelte:head>
-	<title>Teams at {bundle.event.name}</title>
-</svelte:head>
-
 {#if bundle.teams.length === 0}
 	<p class="muted">No teams have registered yet.</p>
 {:else}

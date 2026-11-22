@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>Batteries, team tools</title>
+	<title>Batteries, team tools - PitStop</title>
 </svelte:head>
 
 <BatteryLog

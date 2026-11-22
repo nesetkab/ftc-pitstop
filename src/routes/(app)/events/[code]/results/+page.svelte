@@ -14,10 +14,6 @@
 	let order = $state<'asc' | 'desc'>(initialOrder());
 </script>
 
-<svelte:head>
-	<title>Results at {bundle.event.name}</title>
-</svelte:head>
-
 {#if played}
 	<ResultsTable
 		code={bundle.event.code}
