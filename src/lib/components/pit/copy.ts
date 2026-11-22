@@ -125,13 +125,9 @@ function withPartners(partners: number[]): string {
 	return partners.length > 0 ? `with ${partners.join(', ')}` : '';
 }
 
-const STALE_SCHEDULE = 30 * 60_000;
-
 export function plannedTime(match: PitMatch): { at: number; estimate: boolean } | null {
-	const { scheduled, expected } = match;
-	if (expected === null) return scheduled === null ? null : { at: scheduled, estimate: false };
-	const stale = scheduled === null || Math.abs(expected - scheduled) >= STALE_SCHEDULE;
-	return stale ? { at: expected, estimate: true } : { at: scheduled, estimate: false };
+	if (match.expected !== null) return { at: match.expected, estimate: true };
+	return match.scheduled === null ? null : { at: match.scheduled, estimate: false };
 }
 
 function plannedText(match: PitMatch, now: number, timeZone: string): string {

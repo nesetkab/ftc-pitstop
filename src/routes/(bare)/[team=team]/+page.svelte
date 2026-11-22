@@ -42,7 +42,7 @@
 		const view = session?.view;
 		const timeZone = session?.bundle?.event.timezone;
 		if (!view || !timeZone) return;
-		untrack(() => alerts.observe(view, timeZone));
+		untrack(() => alerts.observe(view, timeZone, session.clock));
 	});
 </script>
 

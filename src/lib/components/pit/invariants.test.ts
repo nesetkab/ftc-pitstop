@@ -3,10 +3,18 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
-import { sameDay } from '#lib/format/time.ts';
+import { dayTime, sameDay } from '#lib/format/time.ts';
 import { replayBundle, revealTime } from '#lib/game/replay.ts';
 import type { EventBundle } from '#lib/types.ts';
-import { heroText, matchItems, plannedTime, playoffResult, qualsDoneText } from './copy.ts';
+import { DEFAULT_ALERTS, alertSnapshot, alertsBetween } from './alerts.ts';
+import {
+	heroText,
+	matchItems,
+	phoneDetail,
+	plannedTime,
+	playoffResult,
+	qualsDoneText
+} from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { pitView, sideOf } from './view.ts';
@@ -70,6 +78,29 @@ function check(full: EventBundle, team: number, now: number): string[] {
 		for (const value of shownTimes) {
 			if (value === null || sameDay(value, now, zone)) continue;
 			if (!WEEKDAY.test(text)) say(`hero time on another day: ${text}`);
+		}
+		const after = alertSnapshot(view);
+		for (const alert of alertsBetween({ ...after, next: null }, after, DEFAULT_ALERTS, zone, now)) {
+			const body = `${alert.title} ${alert.body}`;
+			if (/NaN|undefined|null/.test(body)) say(`broken alert: ${body}`);
+			if (next.queueAt === null || sameDay(next.queueAt, now, zone)) continue;
+			if (!WEEKDAY.test(alert.body)) say(`alert time on another day: ${body}`);
+		}
+		const listed = matchItems(view.matches, next.key, zone, now).find(
+			(item) => item.label === next.label
+		);
+		if (next.started === null && listed) {
+			const field = next.expectedStart ?? next.scheduled;
+			const clock = field === null ? '' : dayTime(field, now, zone);
+			const want = next.expectedStart === null ? clock : `~${clock}`;
+			if (listed.status !== want) say(`list ${listed.status} but hero time ${want}`);
+			const phone = phoneDetail(next, zone, view.delaySeconds, now);
+			if (next.expectedStart !== null && !text.includes(clock)) {
+				say(`hero ${text} misses list time ${want}`);
+			}
+			if (next.expectedStart !== null && !phone.includes(clock)) {
+				say(`phone ${phone} misses list time ${want}`);
+			}
 		}
 		if (view.phase === 'done') say(`next match ${next.label} after the event`);
 		if (call && next.expectedStart !== null && next.expectedStart - now > 45 * MINUTE) {

@@ -27,7 +27,7 @@ const match = (key: string) => full.matches.find((item) => item.key === key)!;
 
 describe('alertsBetween', () => {
 	it('says nothing on the first look', () => {
-		expect(alertsBetween(null, snapshot(at('Q22')), all, ZONE)).toEqual([]);
+		expect(alertsBetween(null, snapshot(at('Q22')), all, ZONE, at('Q22'))).toEqual([]);
 	});
 
 	it('warns two matches before ours', () => {
@@ -35,7 +35,8 @@ describe('alertsBetween', () => {
 			snapshot(at('Q22')),
 			snapshot(match('q23').actualTime!),
 			all,
-			ZONE
+			ZONE,
+			match('q23').actualTime!
 		);
 		expect(alerts).toContainEqual({
 			id: 'away:q26',
@@ -46,7 +47,8 @@ describe('alertsBetween', () => {
 			snapshot(match('q23').actualTime!),
 			snapshot(match('q24').actualTime!),
 			all,
-			ZONE
+			ZONE,
+			match('q24').actualTime!
 		);
 		expect(again.some((alert) => alert.id === 'away:q26')).toBe(false);
 	});
@@ -54,7 +56,7 @@ describe('alertsBetween', () => {
 	it('posts our score and rank changes', () => {
 		const before = snapshot(match('q26').postedTime! - 1000);
 		const after = snapshot(match('q26').postedTime!);
-		const alerts = alertsBetween(before, after, all, ZONE);
+		const alerts = alertsBetween(before, after, all, ZONE, match('q26').postedTime!);
 		expect(alerts).toContainEqual({
 			id: 'score:q26',
 			title: 'Q26: won 75–64',
@@ -67,7 +69,13 @@ describe('alertsBetween', () => {
 
 	it('announces alliance selection', () => {
 		const lastQual = match('q34').postedTime!;
-		const alerts = alertsBetween(snapshot(lastQual - 1000), snapshot(lastQual), all, ZONE);
+		const alerts = alertsBetween(
+			snapshot(lastQual - 1000),
+			snapshot(lastQual),
+			all,
+			ZONE,
+			lastQual
+		);
 		expect(alerts).toContainEqual({
 			id: 'selection',
 			title: 'Alliance selection is starting',
@@ -75,7 +83,9 @@ describe('alertsBetween', () => {
 		});
 		const window = selectionWindow(full)!;
 		expect(
-			alertsBetween(snapshot(window.start), snapshot(window.end), all, ZONE).map((a) => a.id)
+			alertsBetween(snapshot(window.start), snapshot(window.end), all, ZONE, window.end).map(
+				(a) => a.id
+			)
 		).not.toContain('selection');
 	});
 
@@ -88,10 +98,29 @@ describe('alertsBetween', () => {
 			rankChanges: false,
 			selectionStarts: false
 		};
-		expect(alertsBetween(before, after, none, ZONE)).toEqual([]);
-		const defaults = alertsBetween(before, after, DEFAULT_ALERTS, ZONE).map((alert) => alert.id);
+		const now = match('q26').postedTime!;
+		expect(alertsBetween(before, after, none, ZONE, now)).toEqual([]);
+		const defaults = alertsBetween(before, after, DEFAULT_ALERTS, ZONE, now).map(
+			(alert) => alert.id
+		);
 		expect(defaults).toContain('score:q26');
 		expect(defaults.some((id) => id.startsWith('rank:'))).toBe(false);
+	});
+
+	it('names the day when the queue time is not today', () => {
+		const after = snapshot(match('q23').actualTime!);
+		const queueAt = Date.parse('2026-11-15T02:47:00Z');
+		const later = { ...after, next: { ...after.next!, queueAt } };
+		const alert = (now: number) =>
+			alertsBetween({ ...after, next: null }, later, all, ZONE, now).find((item) =>
+				item.id.startsWith('away:')
+			)?.body;
+		expect(alert(Date.parse('2026-11-14T06:00:00Z'))).toBe(
+			'Red alliance with 25620. Queue at Sat 7:47\u00a0PM.'
+		);
+		expect(alert(Date.parse('2026-11-14T20:00:00Z'))).toBe(
+			'Red alliance with 25620. Queue at 7:47\u00a0PM.'
+		);
 	});
 });
 

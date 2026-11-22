@@ -1,5 +1,5 @@
 import { ordinal } from '#lib/format/ordinal.ts';
-import { time } from '#lib/format/time.ts';
+import { dayTime } from '#lib/format/time.ts';
 import type { EventPhase } from '#lib/types.ts';
 import type { Outcome, PitView } from './view.ts';
 
@@ -115,7 +115,8 @@ export function alertsBetween(
 	before: AlertSnapshot | null,
 	after: AlertSnapshot,
 	settings: AlertSettings,
-	timeZone: string
+	timeZone: string,
+	now: number
 ): PitAlert[] {
 	if (!before) return [];
 	const alerts: PitAlert[] = [];
@@ -123,7 +124,8 @@ export function alertsBetween(
 	if (settings.twoBefore && next && next.matchesAway <= 2) {
 		const previous = before.next?.key === next.key ? before.next.matchesAway : Infinity;
 		if (previous > 2) {
-			const queue = next.queueAt === null ? '' : ` Queue at ${time(next.queueAt, timeZone)}.`;
+			const queue =
+				next.queueAt === null ? '' : ` Queue at ${dayTime(next.queueAt, now, timeZone)}.`;
 			alerts.push({
 				id: `away:${next.key}`,
 				title: `${next.label} ${AWAY[next.matchesAway]}`,

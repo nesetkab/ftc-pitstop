@@ -158,7 +158,26 @@ function isUnplayed(match: Match): boolean {
 	return match.actualTime === null && match.result === null;
 }
 
-function pitMatch(match: Match, team: number, analysis: EventAnalysis | null): PitMatch | null {
+function expectedStart(
+	key: string,
+	analysis: EventAnalysis | null,
+	queue: QueueStatusSnapshot | null
+): number | null {
+	const times = queue?.matches.find((item) => item.key === key)?.times;
+	return (
+		times?.estimatedStart ??
+		times?.estimatedOnField ??
+		analysis?.timing.matches[key]?.expectedStart ??
+		null
+	);
+}
+
+function pitMatch(
+	match: Match,
+	team: number,
+	analysis: EventAnalysis | null,
+	queue: QueueStatusSnapshot | null
+): PitMatch | null {
 	const alliance = sideOf(match, team);
 	if (!alliance) return null;
 	const other = opposite(alliance);
@@ -180,9 +199,7 @@ function pitMatch(match: Match, team: number, analysis: EventAnalysis | null): P
 		partners: match[alliance].filter((slot) => slot.team !== team).map((slot) => slot.team),
 		opponents: match[other].map((slot) => slot.team),
 		scheduled: match.scheduledTime,
-		expected: isUnplayed(match)
-			? (analysis?.timing.matches[match.key]?.expectedStart ?? null)
-			: null,
+		expected: isUnplayed(match) ? expectedStart(match.key, analysis, queue) : null,
 		started: match.actualTime,
 		outcome,
 		score: result ? { ours: result[alliance].total, theirs: result[other].total } : null,
@@ -408,7 +425,7 @@ export function pitView(input: PitInput): PitView {
 	const quals = bundle.matches.filter((match) => match.level === 'qual');
 	const postedQuals = quals.filter((match) => match.result !== null);
 	const ours = bundle.matches
-		.map((match) => pitMatch(match, team, analysis))
+		.map((match) => pitMatch(match, team, analysis, queue))
 		.filter((match): match is PitMatch => match !== null);
 	const active = bundle.matches.findLastIndex(
 		(match) => match.actualTime !== null || match.result !== null
@@ -436,11 +453,7 @@ export function pitView(input: PitInput): PitView {
 			blue: match.blue.map((entry) => slot(entry.team)),
 			forecast: analysis?.forecasts[match.key] ?? null,
 			queueAt: nexusMatch?.times.estimatedQueue ?? queueTime(timing),
-			expectedStart:
-				nexusMatch?.times.estimatedStart ??
-				nexusMatch?.times.estimatedOnField ??
-				timing?.expectedStart ??
-				null,
+			expectedStart: expectedStart(match.key, analysis, queue),
 			matchesAway: bundle.matches.slice(active + 1, nextIndex).filter(isUnplayed).length,
 			pending: filled.pending.get(match.key)?.[opposite(base.alliance)] ?? null,
 			nexus: {

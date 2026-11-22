@@ -53,9 +53,9 @@ export class PitAlerts {
 		}
 	}
 
-	observe(view: PitView, timeZone: string): PitAlert[] {
+	observe(view: PitView, timeZone: string, now: number): PitAlert[] {
 		const snapshot = alertSnapshot(view);
-		const alerts = alertsBetween(this.#snapshot, snapshot, this.settings, timeZone).filter(
+		const alerts = alertsBetween(this.#snapshot, snapshot, this.settings, timeZone, now).filter(
 			(alert) => !this.#sent.has(alert.id)
 		);
 		this.#snapshot = snapshot;
