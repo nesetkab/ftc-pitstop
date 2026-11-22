@@ -11,6 +11,7 @@
 	import TeamStats from '#lib/components/team/TeamStats.svelte';
 	import { breadcrumbs, teamDescription, teamJsonLd, teamTitle } from '#lib/seo.ts';
 	import Button from '#lib/ui/Button.svelte';
+	import CalendarMenu from '#lib/ui/CalendarMenu.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
@@ -54,6 +55,11 @@
 		<Button variant="secondary" href="/compare?teams={view.team.number}">Compare</Button>
 		<Button variant="secondary" href="/{view.team.number}/tv">Pit display</Button>
 		<Button variant="secondary" href="/{view.team.number}">Phone view</Button>
+		<CalendarMenu
+			path="/teams/{view.team.number}/calendar.ics"
+			filename="{view.team.number}.ics"
+			note="This team's events and matches with estimated start times. Subscribed calendars update as schedules come out."
+		/>
 	{/snippet}
 </PageHeader>
 

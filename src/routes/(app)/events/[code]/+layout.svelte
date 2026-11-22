@@ -9,6 +9,7 @@
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import { breadcrumbs, eventDescription, eventJsonLd, siteTitle } from '#lib/seo.ts';
 	import Button from '#lib/ui/Button.svelte';
+	import CalendarMenu from '#lib/ui/CalendarMenu.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
@@ -164,7 +165,12 @@
 	{/if}
 {/snippet}
 
-{#snippet streamLink()}
+{#snippet headerActions()}
+	<CalendarMenu
+		path="{base}/calendar.ics"
+		filename="{event.code}.ics"
+		note="Every match at this event with estimated start times. Subscribed calendars update as the day runs."
+	/>
 	{#if stream}
 		<Button variant="secondary" href={stream} target="_blank" rel="noopener noreferrer">
 			Watch the stream
@@ -183,7 +189,7 @@
 		title={event.name}
 		meta={eventMeta(event, scheduled ? null : bundle.teams.length)}
 		status={scheduled || started ? statusLine : undefined}
-		actions={stream ? streamLink : undefined}
+		actions={headerActions}
 	/>
 	{#if scheduled || started}
 		<Tabs {tabs} {current} label="Event" />
