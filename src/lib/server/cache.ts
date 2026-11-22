@@ -22,6 +22,8 @@ export interface CachePolicy {
 	maxStale: number;
 }
 
+export type PolicyChoice<T> = CachePolicy | ((body: T | null) => CachePolicy);
+
 export interface CacheStore {
 	get(key: string): Promise<CacheEntry | null>;
 	set(key: string, entry: CacheEntry, ttlSeconds: number): Promise<void>;
@@ -67,6 +69,7 @@ export class LruMap<V> {
 }
 
 export const SHARED_MIN_TTL = 120;
+const WARM_MS = 5_000;
 
 export interface CacheOptions {
 	maxEntries?: number;
@@ -93,7 +96,8 @@ function logError(key: string, error: unknown) {
 }
 
 export function createCache(options: CacheOptions = {}) {
-	const memory = new LruMap<CacheEntry>(options.maxEntries ?? 400);
+	const memory = new LruMap<CacheEntry>(options.maxEntries ?? 1500);
+	const warming = new LruMap<{ at: number; read: Promise<CacheEntry | null> }>(200);
 	const inflight = new Map<string, Promise<CacheEntry>>();
 	const failures = new Map<string, number>();
 	const store = options.store ?? null;
@@ -125,13 +129,29 @@ export function createCache(options: CacheOptions = {}) {
 		}
 	}
 
+	function prefetch(keys: string[]) {
+		if (!store) return;
+		for (const key of keys) {
+			if (memory.get(key) || warming.get(key)) continue;
+			warming.set(key, { at: now(), read: readStore(key) });
+		}
+	}
+
+	function warmRead(key: string): Promise<CacheEntry | null> | null {
+		const warm = warming.get(key);
+		if (!warm) return null;
+		if (now() - warm.at < WARM_MS) return warm.read;
+		warming.delete(key);
+		return null;
+	}
+
 	function age(entry: CacheEntry): number {
 		return (now() - entry.fetchedAt) / 1000;
 	}
 
 	function refresh(
 		key: string,
-		policy: CachePolicy,
+		choose: (body: unknown) => CachePolicy,
 		fetcher: Fetcher<unknown>,
 		checkStore: boolean
 	): Promise<CacheEntry> {
@@ -143,7 +163,7 @@ export function createCache(options: CacheOptions = {}) {
 				const shared = await readStore(key);
 				if (shared && (!previous || shared.fetchedAt > previous.fetchedAt)) {
 					memory.set(key, shared);
-					if (age(shared) < policy.ttl) return shared;
+					if (age(shared) < choose(shared.body).ttl) return shared;
 					previous = shared;
 				}
 			}
@@ -162,7 +182,7 @@ export function createCache(options: CacheOptions = {}) {
 						};
 			memory.set(key, entry);
 			failures.delete(key);
-			await writeStore(key, entry, policy);
+			await writeStore(key, entry, choose(entry.body));
 			return entry;
 		})();
 		const tracked = task
@@ -177,17 +197,20 @@ export function createCache(options: CacheOptions = {}) {
 
 	async function get<T>(
 		key: string,
-		policy: CachePolicy,
+		choice: PolicyChoice<T>,
 		fetcher: Fetcher<T>
 	): Promise<CachedValue<T>> {
+		const choose = (body: unknown) =>
+			typeof choice === 'function' ? choice(body as T | null) : choice;
 		let entry = memory.get(key) ?? null;
-		let checkStore = shared(policy);
+		let checkStore = shared(choose(null));
 		if (!entry && checkStore) {
-			entry = await readStore(key);
+			entry = await (warmRead(key) ?? readStore(key));
 			checkStore = false;
 			if (entry) memory.set(key, entry);
 		}
 		const run = fetcher as Fetcher<unknown>;
+		const policy = choose(entry?.body ?? null);
 		if (entry) {
 			const seconds = age(entry);
 			const failedAt = failures.get(key) ?? 0;
@@ -196,14 +219,14 @@ export function createCache(options: CacheOptions = {}) {
 			if (seconds < policy.ttl + policy.maxStale) {
 				if (!failed || now() - failedAt >= policy.ttl * 1000) {
 					background(
-						refresh(key, policy, run, checkStore).catch((error: unknown) => onError(key, error))
+						refresh(key, choose, run, checkStore).catch((error: unknown) => onError(key, error))
 					);
 				}
 				return { ...(entry as CacheEntry<T>), stale: failed };
 			}
 		}
 		try {
-			const fresh = await refresh(key, policy, run, checkStore);
+			const fresh = await refresh(key, choose, run, checkStore);
 			return { ...(fresh as CacheEntry<T>), stale: false };
 		} catch (error) {
 			if (entry) return { ...(entry as CacheEntry<T>), stale: true };
@@ -213,10 +236,12 @@ export function createCache(options: CacheOptions = {}) {
 
 	return {
 		get,
+		prefetch,
 		peek: (key: string) => memory.get(key) ?? null,
 		delete: (key: string) => memory.delete(key),
 		clear: () => {
 			memory.clear();
+			warming.clear();
 			failures.clear();
 		},
 		pending: () => inflight.size

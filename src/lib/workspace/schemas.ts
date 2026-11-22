@@ -1,5 +1,8 @@
 import { z } from 'zod';
+import { browser } from '$app/env';
 import { CODE_PATTERN } from '#lib/workspace/code.ts';
+
+if (browser) z.config({ jitless: true });
 
 export const DOC_NAMES = ['picklist', 'batteries', 'checklist', 'boards'] as const;
 

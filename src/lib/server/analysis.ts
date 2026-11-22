@@ -19,7 +19,10 @@ import {
 } from '#lib/server/cache.ts';
 import { DataError, describeError, unavailable } from '#lib/server/errors.ts';
 import {
+	analysisKey,
+	ARCHIVE_POLICY,
 	eventTier,
+	isArchived,
 	loaders as defaultLoaders,
 	normalizeEventCode,
 	normalizeTeamNumber,
@@ -176,10 +179,12 @@ export function createAnalysis(deps: AnalysisDeps) {
 		const { cacheControl, ...bundle } = await loaders.loadEventBundle(code);
 		const teams = teamsOf(bundle);
 		const day = dayNumber(bundle.event.start);
-		const policy = analysisPolicy(eventTier(bundle.event, now()), bundle.phase);
+		const policy = isArchived(bundle.event, now())
+			? ARCHIVE_POLICY
+			: analysisPolicy(eventTier(bundle.event, now()), bundle.phase);
 		try {
 			const value = await cache.get<EventAnalysis>(
-				`analysis:${SEASON}:event:v1:${bundle.event.code}`,
+				analysisKey(bundle.event.code),
 				policy,
 				async () => {
 					const season = await within(model, deadline - now()).catch(() => {
