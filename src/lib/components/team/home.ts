@@ -1,7 +1,14 @@
+import {
+	compareToday,
+	todayState,
+	type EventLeader,
+	type EventProgress,
+	type TodayState
+} from '#lib/components/home/today.ts';
+import { placeName } from '#lib/format/places.ts';
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';
 import { addDays, daysBetween, localDay, shortRange } from './dates.ts';
-import { placeName } from '#lib/format/places.ts';
 
 export interface HomeEvent {
 	code: string;
@@ -12,8 +19,14 @@ export interface HomeEvent {
 	status: string;
 }
 
+export interface TodayEvent extends HomeEvent {
+	state: TodayState;
+	leader: EventLeader | null;
+	leaderLabel: string;
+}
+
 export interface HomeEvents {
-	today: HomeEvent[] | null;
+	today: TodayEvent[] | null;
 	week: HomeEvent[] | null;
 }
 
@@ -34,14 +47,16 @@ function byName(a: EventSummary, b: EventSummary): number {
 	return a.name.localeCompare(b.name);
 }
 
-function todayRow(event: EventSummary, now: number): HomeEvent {
+function todayRow(event: EventSummary, progress: EventProgress | null, now: number): TodayEvent {
 	const length = daysBetween(event.start, event.end) + 1;
 	const day = daysBetween(event.start, localDay(now, event.timezone)) + 1;
-	return row(
-		event,
-		length > 1 ? `Day ${day} of ${length}` : 'Today',
-		event.hasMatches ? 'Matches posted' : 'No matches posted'
-	);
+	const status = progress?.label ?? (event.hasMatches ? 'Matches posted' : 'Not started');
+	return {
+		...row(event, length > 1 ? `Day ${day} of ${length}` : 'Today', status),
+		state: todayState(progress, event.hasMatches),
+		leader: progress?.leader ?? null,
+		leaderLabel: progress?.phase === 'quals' ? 'Leading' : 'Top seed'
+	};
 }
 
 function weekRow(event: EventSummary, now: number): HomeEvent {
@@ -53,17 +68,22 @@ function weekRow(event: EventSummary, now: number): HomeEvent {
 	);
 }
 
+export function todayCompetitions(events: EventSummary[]): EventSummary[] {
+	return events.filter((event) => isCompetition(event.type));
+}
+
 export function buildHomeEvents(
-	input: { today: EventSummary[] | null; season: EventSummary[] | null },
+	input: {
+		today: EventSummary[] | null;
+		season: EventSummary[] | null;
+		progress?: Record<string, EventProgress>;
+	},
 	now: number
 ): HomeEvents {
 	const today = input.today
-		? input.today
-				.filter((event) => isCompetition(event.type))
-				.sort(
-					(a, b) => Number(Boolean(b.hasMatches)) - Number(Boolean(a.hasMatches)) || byName(a, b)
-				)
-				.map((event) => todayRow(event, now))
+		? todayCompetitions(input.today)
+				.map((event) => todayRow(event, input.progress?.[event.code] ?? null, now))
+				.sort(compareToday)
 		: null;
 
 	const week = input.season

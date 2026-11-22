@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { follows } from '#lib/components/team/follow.svelte.ts';
-import type { HomeEvent } from '#lib/components/team/home.ts';
+import type { HomeEvent, TodayEvent } from '#lib/components/team/home.ts';
 import { searchDialog } from '#lib/ui/search.svelte.ts';
 import Page from './+page.svelte';
 
@@ -21,14 +21,28 @@ afterEach(() => {
 	cleanup();
 });
 
-const today: HomeEvent[] = [
+const today: TodayEvent[] = [
 	{
 		code: 'USAZGIQ',
 		name: 'Roadrunner - Gilbert Qualifier',
 		type: 'Qualifier',
 		place: 'Gilbert, AZ',
 		dates: 'Today',
-		status: 'Matches posted'
+		status: 'Q23 of 40',
+		state: 'live',
+		leader: { team: 26670, name: 'SCA Iron Eagles' },
+		leaderLabel: 'Leading'
+	},
+	{
+		code: 'USAZTUQ',
+		name: 'Tucson Qualifier',
+		type: 'Qualifier',
+		place: 'Tucson, AZ',
+		dates: 'Today',
+		status: 'Not started',
+		state: 'waiting',
+		leader: null,
+		leaderLabel: 'Top seed'
 	}
 ];
 
@@ -43,7 +57,11 @@ const week: HomeEvent[] = [
 	}
 ];
 
-function show(data: { today: HomeEvent[] | null; week: HomeEvent[] | null; records?: unknown }) {
+function show(data: {
+	today: TodayEvent[] | null;
+	week: HomeEvent[] | null;
+	highlights?: unknown;
+}) {
 	return render(Page, { props: { data } as never });
 }
 
@@ -54,17 +72,32 @@ describe('home page', () => {
 		expect(searchDialog.open).toBe(true);
 	});
 
-	it('lists events today with their status', () => {
+	it('lists events today with their progress and leader', () => {
 		show({ today, week });
+		expect(screen.getByText('1 of 2 running now')).toBeInTheDocument();
 		const table = screen.getByRole('table', { name: 'Events running today' });
-		const row = within(table).getAllByRole('row')[1];
-		expect([...row.querySelectorAll('td')].map((cell) => cell.textContent)).toEqual([
-			'Roadrunner - Gilbert Qualifier Gilbert, AZ',
+		const [first, second] = within(table).getAllByRole('row').slice(1);
+		const cells = (row: HTMLElement) =>
+			[...row.querySelectorAll('td')].map((cell) => cell.textContent?.replace(/\s+/g, ' ').trim());
+		expect(cells(first)).toEqual([
+			'Roadrunner - Gilbert Qualifier Gilbert, AZ · Qualifier',
 			'Gilbert, AZ',
-			'Qualifier',
 			'Today',
-			'Matches posted'
+			'Q23 of 40 Leading 26670',
+			'Leading 26670 SCA Iron Eagles'
 		]);
+		expect(cells(second)[3]).toBe('Not started');
+		expect(within(first).getAllByRole('link', { name: /26670/ })[0]).toHaveAttribute(
+			'href',
+			'/teams/26670'
+		);
+	});
+
+	it('leaves out the leader column when no event has one', () => {
+		show({ today: [today[1]], week });
+		const table = screen.getByRole('table', { name: 'Events running today' });
+		expect(within(table).queryByRole('columnheader', { name: 'Leader' })).not.toBeInTheDocument();
+		expect(screen.queryByText(/running now/)).not.toBeInTheDocument();
 	});
 
 	it('lists events starting this week with when they start', () => {
@@ -112,53 +145,43 @@ describe('home page', () => {
 		).toBeInTheDocument();
 	});
 
-	it('shows the highest scores of the last 7 days when they are ready', () => {
+	it('shows the best matches with links to each match', () => {
+		const item = {
+			event: 'USAZGIQ',
+			key: 'p7',
+			label: 'M7',
+			red: [13684, 10016],
+			blue: [1, 2],
+			redScore: 288,
+			blueScore: 155,
+			winner: 'red',
+			chance: null
+		};
 		show({
 			today,
 			week,
-			records: {
-				rows: [
-					{
-						event: 'USAZGIQ',
-						day: '2026-11-14',
-						type: 'Qualifier',
-						region: 'USAZ',
-						key: 'p7',
-						label: 'M7',
-						level: 'playoff',
-						alliance: 'red',
-						teams: [13684, 10016],
-						opponents: [1, 2],
-						result: 'win',
-						total: 288,
-						opponent: 155,
-						auto: 76,
-						teleop: 212,
-						hive: 200,
-						flower: 0,
-						garden: 2,
-						park: 10,
-						rank: 1
-					}
-				],
-				names: { teams: { 13684: 'Infinity Tech' }, events: { USAZGIQ: 'Gilbert Qualifier' } }
+			highlights: {
+				range: 'today',
+				highest: [item],
+				closest: [{ ...item, key: 'q3', label: 'Q3', blueScore: 286 }],
+				upsets: [{ ...item, key: 'q9', label: 'Q9', chance: 0.18 }],
+				names: { teams: {}, events: { USAZGIQ: 'Gilbert Qualifier' } }
 			}
 		});
-		const table = screen.getByRole('table', { name: 'Highest alliance scores in the last 7 days' });
-		expect(within(table).getByRole('link', { name: 'M7' })).toHaveAttribute(
-			'href',
-			'/events/USAZGIQ/matches/p7'
-		);
-		expect(within(table).getByText('Infinity Tech')).toBeInTheDocument();
-		expect(within(table).queryByRole('link', { name: 'Auto' })).not.toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: 'Best matches today' })).toBeInTheDocument();
+		const highest = screen.getByRole('list', { name: 'Highest scores' });
+		expect(within(highest).getByRole('link')).toHaveAttribute('href', '/events/USAZGIQ/matches/p7');
+		expect(within(highest).getByRole('link')).toHaveTextContent('288–155 M7 · Gilbert Qualifier');
+		expect(screen.getByText('Won by 2')).toBeInTheDocument();
+		expect(screen.getByText('Won with a 18% chance')).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'More records' })).toHaveAttribute(
 			'href',
 			'/records?range=7'
 		);
 	});
 
-	it('leaves out the scores section until the season is loaded', () => {
-		show({ today, week, records: null });
-		expect(screen.queryByText('Highest scores in the last 7 days')).not.toBeInTheDocument();
+	it('leaves out the best matches until the season is loaded', () => {
+		show({ today, week, highlights: null });
+		expect(screen.queryByText(/Best matches/)).not.toBeInTheDocument();
 	});
 });

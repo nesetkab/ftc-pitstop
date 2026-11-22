@@ -6,7 +6,7 @@ import type {
 	TeamSeason,
 	TeamSeasonEvent
 } from '#lib/types.ts';
-import type { FollowedBundle } from './follow-status.ts';
+import type { LiveBundle } from '#lib/components/home/followed.ts';
 
 export function eventSummary(overrides: Partial<EventSummary> = {}): EventSummary {
 	return {
@@ -107,6 +107,6 @@ export function ranking(rank: number, team: number, wins: number, losses: number
 	};
 }
 
-export function followedBundle(matches: Match[], rankings: Ranking[]): FollowedBundle {
+export function followedBundle(matches: Match[], rankings: Ranking[]): LiveBundle {
 	return { matches, rankings, event: { timezone: 'America/Phoenix' } };
 }

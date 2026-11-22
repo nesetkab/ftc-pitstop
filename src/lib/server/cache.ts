@@ -98,6 +98,7 @@ function logError(key: string, error: unknown) {
 export function createCache(options: CacheOptions = {}) {
 	const memory = new LruMap<CacheEntry>(options.maxEntries ?? 1500);
 	const warming = new LruMap<{ at: number; read: Promise<CacheEntry | null> }>(200);
+	const absent = new LruMap<number>(500);
 	const inflight = new Map<string, Promise<CacheEntry>>();
 	const failures = new Map<string, number>();
 	const store = options.store ?? null;
@@ -234,14 +235,42 @@ export function createCache(options: CacheOptions = {}) {
 		}
 	}
 
+	async function lookup(keys: string[], maxAgeMs: number): Promise<Map<string, CacheEntry>> {
+		const found = new Map<string, CacheEntry>();
+		const missing: string[] = [];
+		for (const key of new Set(keys)) {
+			const entry = memory.get(key);
+			const missedAt = absent.get(key);
+			if (entry && now() - entry.fetchedAt < maxAgeMs) found.set(key, entry);
+			else if (!entry && missedAt !== undefined && now() - missedAt < maxAgeMs) continue;
+			else missing.push(key);
+		}
+		const loaded = await Promise.all(missing.map((key) => readStore(key)));
+		missing.forEach((key, index) => {
+			const kept = memory.get(key);
+			const shared = loaded[index];
+			const best = shared && (!kept || shared.fetchedAt > kept.fetchedAt) ? shared : kept;
+			if (!best) {
+				if (store) absent.set(key, now());
+				return;
+			}
+			absent.delete(key);
+			if (best === shared) memory.set(key, shared);
+			found.set(key, best);
+		});
+		return found;
+	}
+
 	return {
 		get,
 		prefetch,
+		lookup,
 		peek: (key: string) => memory.get(key) ?? null,
 		delete: (key: string) => memory.delete(key),
 		clear: () => {
 			memory.clear();
 			warming.clear();
+			absent.clear();
 			failures.clear();
 		},
 		pending: () => inflight.size
