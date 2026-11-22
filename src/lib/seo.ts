@@ -37,6 +37,29 @@ export function breadcrumbs(origin: string, items: { name: string; path: string 
 	};
 }
 
+type SeoArticle = {
+	path: string;
+	headline: string;
+	description: string;
+	sections: string[];
+};
+
+export function articleJsonLd(origin: string, article: SeoArticle): JsonLd {
+	const site = { '@type': 'WebSite', name: SITE_NAME, url: `${origin}/` };
+	return {
+		'@context': 'https://schema.org',
+		'@type': 'TechArticle',
+		headline: article.headline,
+		description: article.description,
+		url: `${origin}${article.path}`,
+		mainEntityOfPage: `${origin}${article.path}`,
+		inLanguage: 'en',
+		articleSection: article.sections,
+		isPartOf: site,
+		publisher: { '@type': 'Organization', name: SITE_NAME, url: `${origin}/` }
+	};
+}
+
 type SeoTeam = { number: number; name: string; place: string; rookieYear: number | null };
 
 type SeoTeamStats = {

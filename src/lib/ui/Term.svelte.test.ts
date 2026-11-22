@@ -19,6 +19,17 @@ describe('Term', () => {
 		expect(container.querySelector('abbr')).toHaveAttribute('title', explain('Auto OPR'));
 	});
 
+	it('links a known term to its glossary entry', () => {
+		const { container } = render(Term, { props: { label: 'Auto', term: 'Auto OPR' } });
+		expect(container.querySelector('a')).toHaveAttribute('href', '/about#term-auto-opr');
+	});
+
+	it('can skip the link when it sits inside another link', () => {
+		const { container } = render(Term, { props: { label: 'RS', link: false } });
+		expect(container.querySelector('a')).toBeNull();
+		expect(container.querySelector('abbr')).toHaveAttribute('title', explain('RS'));
+	});
+
 	it('leaves plain words alone', () => {
 		const { container } = render(Term, { props: { label: 'Team' } });
 		expect(container.querySelector('abbr')).toBeNull();
