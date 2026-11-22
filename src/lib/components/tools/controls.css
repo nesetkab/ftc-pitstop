@@ -126,3 +126,11 @@ a.ctl-btn:hover {
 	background-size: 12px 12px;
 	cursor: pointer;
 }
+
+@media (pointer: coarse) {
+	.ctl-btn,
+	.ctl-select,
+	.ctl-input:not(.ctl-quiet) {
+		min-height: 40px;
+	}
+}

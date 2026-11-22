@@ -143,7 +143,7 @@
 				</thead>
 				<tbody>
 					{#each batteries.items as battery (battery.id)}
-						<tr class={{ me: battery.id === suggestedId, dim: battery.status === 'not-in-use' }}>
+						<tr class={{ next: battery.id === suggestedId, dim: battery.status === 'not-in-use' }}>
 							<td class="l name" data-label="Battery">
 								{#if update}
 									<input
@@ -312,7 +312,7 @@
 		gap: 4px 12px;
 		padding: 12px 16px;
 		border-radius: var(--radius-control);
-		background: var(--accent-wash);
+		background: var(--surface);
 	}
 
 	.picking b {
@@ -384,6 +384,10 @@
 		gap: 8px 16px;
 	}
 
+	table.sheet tr.next td {
+		background: var(--surface);
+	}
+
 	@media (max-width: 720px) {
 		table.sheet,
 		table.sheet tbody {
@@ -404,12 +408,12 @@
 			border-radius: var(--radius-panel);
 		}
 
-		table.sheet tr.me {
-			background: var(--accent-wash);
+		table.sheet tr.next {
+			background: var(--surface);
 		}
 
 		table.sheet td,
-		table.sheet tr.me td {
+		table.sheet tr.next td {
 			display: grid;
 			gap: 2px;
 			align-content: start;

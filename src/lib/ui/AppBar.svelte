@@ -65,8 +65,10 @@
 
 	.home {
 		grid-area: home;
+		justify-self: start;
 		display: block;
-		padding-block: 4px;
+		margin-block: -8px;
+		padding-block: 12px;
 		color: var(--text);
 	}
 

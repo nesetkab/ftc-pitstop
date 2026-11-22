@@ -78,8 +78,11 @@
 		color: var(--text-2);
 	}
 
-	.me td {
+	.me {
 		background: var(--accent);
+	}
+
+	.me td {
 		color: var(--on-accent);
 		font-weight: 600;
 	}
