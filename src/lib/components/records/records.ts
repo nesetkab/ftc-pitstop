@@ -11,6 +11,8 @@ import type {
 
 export const RECORDS_PAGE_SIZE = 50;
 
+export const RECORDS_CSV_LIMIT = 1000;
+
 export const RECORD_PARTS = [
 	{ key: 'total', label: 'Total' },
 	{ key: 'auto', label: 'Auto' },

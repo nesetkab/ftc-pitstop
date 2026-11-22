@@ -18,7 +18,12 @@
 </svelte:head>
 
 {#if started}
-	<RankingsView {bundle} analysis={data.analysis} followed={view.followed} />
+	<RankingsView
+		{bundle}
+		analysis={data.analysis}
+		followed={view.followed}
+		csvHref="/events/{bundle.event.code}/rankings.csv"
+	/>
 {:else}
 	<EventPreview
 		code={bundle.event.code}

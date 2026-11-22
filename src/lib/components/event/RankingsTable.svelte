@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Projection, TeamRating } from '#lib/analysis/types.ts';
-	import { fixed } from '#lib/format/number.ts';
+	import { fixed, integer } from '#lib/format/number.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { record } from '#lib/format/record.ts';
 	import type { Ranking, Team } from '#lib/types.ts';
@@ -15,6 +15,7 @@
 		ratings?: TeamRating[] | null;
 		projections?: Projection[] | null;
 		qualCount?: number;
+		npMax?: ReadonlyMap<number, number> | null;
 		followed?: ReadonlySet<number>;
 	}
 
@@ -24,6 +25,7 @@
 		ratings = null,
 		projections = null,
 		qualCount = 0,
+		npMax = null,
 		followed = new Set()
 	}: Props = $props();
 
@@ -36,7 +38,7 @@
 			? new Map(projections.map((projection) => [projection.team, projection]))
 			: null
 	);
-	const baseColumns = $derived(opr ? 7 : 6);
+	const baseColumns = $derived(6 + (opr ? 1 : 0) + (npMax ? 1 : 0));
 </script>
 
 <Table>
@@ -54,6 +56,11 @@
 			<th scope="col">RS</th>
 			<th class={{ opt: projected !== null }} scope="col">Record</th>
 			<th class="opt" scope="col">TBP</th>
+			{#if npMax}
+				<th class="opt" scope="col"
+					><abbr title="Best score without opponent fouls">NP max</abbr></th
+				>
+			{/if}
 			<th class="opt" scope="col">Avg tips</th>
 			{#if opr}
 				<th scope="col">OPR</th>
@@ -80,6 +87,9 @@
 				<td>{fixed(row.rs, 2)}</td>
 				<td class={{ opt: projected !== null }}>{record(row.wins, row.losses, row.ties)}</td>
 				<td class="opt">{fixed(row.tbp)}</td>
+				{#if npMax}
+					<td class="opt">{integer(npMax.get(row.team))}</td>
+				{/if}
 				<td class="opt">{fixed(row.avgTips)}</td>
 				{#if opr}
 					<td>{fixed(opr.get(row.team))}</td>

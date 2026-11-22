@@ -12,4 +12,9 @@
 	<title>Rankings at {data.bundle.event.name}</title>
 </svelte:head>
 
-<RankingsView bundle={data.bundle} analysis={data.analysis} followed={view.followed} />
+<RankingsView
+	bundle={data.bundle}
+	analysis={data.analysis}
+	followed={view.followed}
+	csvHref="/events/{data.bundle.event.code}/rankings.csv"
+/>

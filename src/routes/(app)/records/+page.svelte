@@ -1,7 +1,12 @@
 <script lang="ts">
 	import RecordFilters from '#lib/components/records/RecordFilters.svelte';
 	import RecordsTable from '#lib/components/records/RecordsTable.svelte';
-	import { RECORD_PARTS, RECORD_RANGES, recordQuery } from '#lib/components/records/records.ts';
+	import {
+		RECORD_PARTS,
+		RECORD_RANGES,
+		RECORDS_CSV_LIMIT,
+		recordQuery
+	} from '#lib/components/records/records.ts';
 	import Pagination from '#lib/components/team/Pagination.svelte';
 	import { integer } from '#lib/format/index.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -69,7 +74,23 @@
 	is the other alliance's score. Click a column to sort by it.
 </p>
 
+{#if data.total > 0}
+	<p class="csv">
+		<a href="/records.csv{recordQuery({ ...data.filters, page: 1 })}" download>Download CSV</a>
+		{#if data.total > RECORDS_CSV_LIMIT}
+			<span class="faint">The top {integer(RECORDS_CSV_LIMIT)} scores for these filters.</span>
+		{/if}
+	</p>
+{/if}
+
 <style>
+	.csv {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 12px;
+		font-size: 14px;
+	}
+
 	.count {
 		font-size: 14px;
 		color: var(--text-2);
