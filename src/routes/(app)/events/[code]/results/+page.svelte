@@ -22,8 +22,8 @@
 		bind:order
 	/>
 	<p class="note">
-		Hive is tips plus pollen and nectar scored in the hive. Fouls are points from the other alliance's fouls. Totals include
-		fouls.
+		Hive is tips plus pollen and nectar scored in the hive. Fouls are points from the other
+		alliance's fouls. Totals include fouls.
 	</p>
 {:else}
 	<EmptyState title="No results yet.">Scores show here as soon as matches are played.</EmptyState>
