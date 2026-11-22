@@ -89,6 +89,14 @@
 		font-size: 14px;
 	}
 
+	@media (pointer: coarse) {
+		.csv a {
+			display: inline-block;
+			margin-block: -10px;
+			padding-block: 10px;
+		}
+	}
+
 	.panel {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);

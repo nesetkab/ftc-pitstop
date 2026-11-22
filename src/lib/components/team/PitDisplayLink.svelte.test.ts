@@ -27,6 +27,14 @@ describe('pit display link', () => {
 		expect(open()).toBeDisabled();
 	});
 
+	it('makes the whole address box a tap target for the field', () => {
+		render(PitDisplayLink);
+		const box = field().closest('label');
+		expect(box).toContainElement(screen.getByText('ftcpitstop.com/'));
+		expect(box).toContainElement(screen.getByText('/tv'));
+		expect((field() as HTMLInputElement).labels).toHaveLength(1);
+	});
+
 	it('opens the pit display for the team number that was typed', async () => {
 		render(PitDisplayLink);
 		await fireEvent.input(field(), { target: { value: '26670' } });

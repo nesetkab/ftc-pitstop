@@ -143,9 +143,27 @@ describe('accuracy page', () => {
 	it('gives the calibration numbers in a table', () => {
 		show();
 		const table = within(section('Win chance calibration')).getByRole('table');
-		const rows = within(table).getAllByRole('row');
-		expect(rows).toHaveLength(12);
-		expect(cells(rows[2])).toEqual(['0% to 10%', '5.5%', '5.3%', '6,722', '5.5%', '4.9%', '399']);
+		const rows = [...table.querySelectorAll('tbody tr')] as HTMLElement[];
+		expect(rows).toHaveLength(10);
+		expect(rows[0].querySelector('td .full')).toHaveTextContent('0% to 10%');
+		expect(cells(rows[0]).slice(1)).toEqual(['5.5%', '5.3%', '6,722', '5.5%', '4.9%', '399']);
+	});
+
+	it('fits the calibration table on a phone without losing the predicted and won numbers', () => {
+		show();
+		const table = within(section('Win chance calibration')).getByRole('table');
+		const first = table.querySelector('tbody tr') as HTMLElement;
+		expect(first.querySelector('td span.short[aria-hidden="true"]')).toHaveTextContent('0–10%');
+		expect(first.querySelector('td .visually-hidden')).toHaveTextContent('0% to 10%');
+		const optional = [...first.querySelectorAll('td.opt')].map((cell) => cell.textContent?.trim());
+		expect(optional).toEqual(['6,722', '399']);
+		const headers = within(table).getAllByRole('columnheader', { name: 'Matches' });
+		expect(headers.every((header) => header.classList.contains('opt'))).toBe(true);
+		expect(within(table).getAllByRole('columnheader', { name: 'Predicted' })).toHaveLength(2);
+		const spans = [...table.querySelectorAll('thead tr.short th.group')].map((th) =>
+			th.getAttribute('colspan')
+		);
+		expect(spans).toEqual(['2', '2']);
 	});
 
 	it('shows ranking point calibration with the base rate Brier score', () => {

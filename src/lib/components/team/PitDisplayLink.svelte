@@ -15,7 +15,7 @@
 <form onsubmit={open} aria-labelledby="pit-label">
 	<h2 class="sec-title" id="pit-label">Open the pit display for your team</h2>
 	<div class="row">
-		<div class="address">
+		<label class="address">
 			<span class="host">ftcpitstop.com/</span>
 			<input
 				name="team"
@@ -28,7 +28,7 @@
 				bind:value
 			/>
 			<span class="host">/tv</span>
-		</div>
+		</label>
 		<Button type="submit" disabled={team === null}>Open</Button>
 	</div>
 </form>
@@ -48,15 +48,24 @@
 
 	.address {
 		display: inline-flex;
-		align-items: baseline;
-		padding: 6px 10px;
+		align-items: center;
+		padding: 0 10px;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);
+		background: var(--bg);
 		font-size: 14px;
+		line-height: 1.4;
+		cursor: text;
+	}
+
+	.address:hover {
+		border-color: var(--text-3);
 	}
 
 	.address:focus-within {
 		border-color: var(--text-3);
+		outline: 2px solid var(--text);
+		outline-offset: 2px;
 	}
 
 	.host {
@@ -65,12 +74,19 @@
 
 	input {
 		width: 8.5em;
-		padding: 0 2px;
+		padding: 7px 2px;
 		border: 0;
 		background: transparent;
 		font-size: 14px;
+		line-height: 1.4;
 		font-variant-numeric: tabular-nums;
 		outline: none;
+	}
+
+	@media (pointer: coarse) {
+		input {
+			min-height: 38px;
+		}
 	}
 
 	input::placeholder {

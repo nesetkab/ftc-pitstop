@@ -246,6 +246,18 @@
 		text-decoration: underline;
 	}
 
+	@media (pointer: coarse) {
+		.box {
+			position: relative;
+		}
+
+		a.label::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+		}
+	}
+
 	.slot {
 		display: grid;
 		grid-template-columns: 14px minmax(0, 1fr) auto;

@@ -83,6 +83,12 @@
 		min-width: 9em;
 	}
 
+	@media (max-width: 600px) {
+		td.label {
+			min-width: 7em;
+		}
+	}
+
 	th.section {
 		padding: 22px 10px 8px;
 		font-size: 14px;

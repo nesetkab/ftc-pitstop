@@ -391,6 +391,7 @@
 		}
 	}
 	@media (pointer: coarse) {
+		input,
 		.seg button {
 			min-height: 40px;
 		}
