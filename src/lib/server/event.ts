@@ -39,6 +39,7 @@ import {
 	fetchTeamSeason,
 	type FtcScoutClient
 } from '#lib/server/ftcscout.ts';
+import { CACHE_CONTROL } from '#lib/server/http.ts';
 import { nexus as defaultNexus, type NexusClient } from '#lib/server/nexus.ts';
 import { addDays, localDate, startOfLocalDay } from '#lib/server/time.ts';
 import type {
@@ -144,11 +145,10 @@ export function cachePhase(
 	return last !== null && now - last < AWARDS_WAIT_MS ? 'playoffs' : phase;
 }
 
-export function cacheControlFor(tier: EventTier, phase: EventPhase): string {
-	if (tier === 'finished') return 'public, s-maxage=86400';
-	if (tier === 'upcoming') return 'public, s-maxage=300, stale-while-revalidate=3600';
-	if (phase === 'done') return 'public, s-maxage=300, stale-while-revalidate=3600';
-	return 'public, s-maxage=30, stale-while-revalidate=300';
+export function cacheControlFor(tier: EventTier, phase: EventPhase, stale = false): string {
+	if (tier === 'finished') return stale ? CACHE_CONTROL.short : CACHE_CONTROL.finished;
+	if (tier === 'upcoming' || phase === 'done') return CACHE_CONTROL.short;
+	return CACHE_CONTROL.live;
 }
 
 export function normalizeEventCode(input: string): string {
@@ -317,7 +317,7 @@ export function createLoaders(deps: LoaderDeps) {
 			fetchedAt: value.fetchedAt,
 			stale: true,
 			source: 'ftcscout',
-			cacheControl: cacheControlFor(tier, phase)
+			cacheControl: cacheControlFor(tier, phase, true)
 		};
 	}
 
@@ -460,6 +460,9 @@ export function createLoaders(deps: LoaderDeps) {
 			.map((part) => part.fetchedAt)
 			.filter((value): value is number => value !== null);
 
+		const stale =
+			eventValue.stale || parts.some((part) => part.stale) || Boolean(advancement?.stale);
+
 		return {
 			event,
 			teams: teams.body ? mapTeams(teams.body) : [],
@@ -470,9 +473,9 @@ export function createLoaders(deps: LoaderDeps) {
 			advancement: advancementList,
 			phase,
 			fetchedAt: live.length > 0 ? Math.min(...live) : eventValue.fetchedAt,
-			stale: eventValue.stale || parts.some((part) => part.stale) || Boolean(advancement?.stale),
+			stale,
 			source: 'ftc',
-			cacheControl: cacheControlFor(tier, caching)
+			cacheControl: cacheControlFor(tier, caching, stale)
 		};
 	}
 

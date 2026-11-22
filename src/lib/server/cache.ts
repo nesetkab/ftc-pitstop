@@ -66,9 +66,12 @@ export class LruMap<V> {
 	}
 }
 
+export const SHARED_MIN_TTL = 120;
+
 export interface CacheOptions {
 	maxEntries?: number;
 	store?: CacheStore | null;
+	sharedMinTtl?: number;
 	now?: () => number;
 	onError?: (key: string, error: unknown) => void;
 	background?: (task: Promise<unknown>) => void;
@@ -97,6 +100,11 @@ export function createCache(options: CacheOptions = {}) {
 	const now = options.now ?? Date.now;
 	const onError = options.onError ?? logError;
 	const background = options.background ?? keepAlive;
+	const sharedMinTtl = options.sharedMinTtl ?? SHARED_MIN_TTL;
+
+	function shared(policy: CachePolicy): boolean {
+		return store !== null && policy.ttl >= sharedMinTtl;
+	}
 
 	async function readStore(key: string): Promise<CacheEntry | null> {
 		if (!store) return null;
@@ -109,7 +117,7 @@ export function createCache(options: CacheOptions = {}) {
 	}
 
 	async function writeStore(key: string, entry: CacheEntry, policy: CachePolicy) {
-		if (!store) return;
+		if (!store || !shared(policy)) return;
 		try {
 			await store.set(key, entry, Math.ceil(policy.ttl + policy.maxStale));
 		} catch (error) {
@@ -173,8 +181,8 @@ export function createCache(options: CacheOptions = {}) {
 		fetcher: Fetcher<T>
 	): Promise<CachedValue<T>> {
 		let entry = memory.get(key) ?? null;
-		let checkStore = true;
-		if (!entry) {
+		let checkStore = shared(policy);
+		if (!entry && checkStore) {
 			entry = await readStore(key);
 			checkStore = false;
 			if (entry) memory.set(key, entry);
@@ -231,10 +239,38 @@ async function gunzip(base64: string): Promise<string> {
 	return new Response(stream).text();
 }
 
+interface PendingRead {
+	key: string;
+	resolve: (raw: unknown) => void;
+	reject: (error: unknown) => void;
+}
+
 export function redisStore(redis: RedisLike, prefix = 'pitstop:cache:'): CacheStore {
+	let queue: PendingRead[] = [];
+
+	async function flush() {
+		const batch = queue;
+		queue = [];
+		const keys = [...new Set(batch.map((read) => read.key))];
+		try {
+			const values = await redis.mget(...keys);
+			const found = new Map(keys.map((key, index) => [key, values[index]]));
+			for (const read of batch) read.resolve(found.get(read.key));
+		} catch (error) {
+			for (const read of batch) read.reject(error);
+		}
+	}
+
+	function read(key: string): Promise<unknown> {
+		return new Promise((resolve, reject) => {
+			if (queue.length === 0) setTimeout(() => void flush(), 0);
+			queue.push({ key, resolve, reject });
+		});
+	}
+
 	return {
 		async get(key) {
-			const raw = await redis.get(prefix + key);
+			const raw = await read(prefix + key);
 			if (typeof raw !== 'string') return null;
 			const json = raw.startsWith('gz:') ? await gunzip(raw.slice(3)) : raw;
 			return JSON.parse(json) as CacheEntry;

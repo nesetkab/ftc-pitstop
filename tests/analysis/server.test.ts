@@ -68,7 +68,7 @@ describe('createAnalysis', () => {
 	it('analyzes an event with priors from earlier events only', async () => {
 		const data = setup();
 		const { analysis, cacheControl } = await data.loadEventAnalysisEntry('usazgiq');
-		expect(cacheControl).toBe('public, s-maxage=86400');
+		expect(cacheControl).toBe(CACHE_CONTROL.finished);
 		const teams = analysis.ratings.map((r) => r.team);
 		const before = await data.priorsForTeams(teams, Date.parse('2026-11-14T00:00:00Z'));
 		expect(Object.keys(before.states)).toHaveLength(27);
@@ -150,5 +150,42 @@ describe('createAnalysis', () => {
 		expect(await data.loadTeamRatingHistory(99998)).toBeNull();
 		await expect(data.loadTeamRatingHistory(999998)).rejects.toMatchObject({ status: 404 });
 		await expect(data.loadTeamRatingHistory('abc')).rejects.toMatchObject({ status: 404 });
+	});
+});
+
+describe('live analysis', () => {
+	it('reuses the analysis while the event data is unchanged and only redoes the timing', async () => {
+		let time = Date.parse('2026-11-14T19:00:00Z');
+		let bundle = { ...gilbert, phase: 'playoffs' as const };
+		const cache = createCache({ onError: () => {}, now: () => time });
+		const analysis = createAnalysis({
+			loaders: {
+				loadEventBundle: async () => ({ ...bundle, cacheControl: CACHE_CONTROL.live }),
+				loadSeasonMatches: async () => ({
+					matches: earlier,
+					fetchedAt: NOW,
+					stale: false,
+					missing: []
+				})
+			},
+			cache,
+			previous,
+			now: () => time,
+			background: () => {}
+		});
+		const next = async () => {
+			time += 60_000;
+			await analysis.loadEventAnalysisEntry('USAZGIQ');
+			await vi.waitFor(() => expect(cache.pending()).toBe(0));
+			return (await analysis.loadEventAnalysisEntry('USAZGIQ')).analysis;
+		};
+		const first = (await analysis.loadEventAnalysisEntry('USAZGIQ')).analysis;
+		const second = await next();
+		expect(second.generatedAt).toBe(time);
+		expect(second.forecasts).toBe(first.forecasts);
+		expect(second.ratings).toBe(first.ratings);
+		bundle = { ...bundle, matches: bundle.matches.slice(0, -1) };
+		const third = await next();
+		expect(third.forecasts).not.toBe(first.forecasts);
 	});
 });

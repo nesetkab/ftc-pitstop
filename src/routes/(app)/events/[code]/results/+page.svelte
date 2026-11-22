@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { getEventView } from '#lib/components/event/context.ts';
 	import ResultsTable from '#lib/components/event/ResultsTable.svelte';
+	import { withBreakdowns } from '#lib/game/breakdowns.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
 
 	const view = getEventView();
-	const bundle = $derived(data.bundle);
+	const bundle = $derived(withBreakdowns(data.bundle, data.breakdowns));
 	const played = $derived(bundle.matches.some((match) => match.result !== null));
 	const initialOrder = () => (data.bundle.phase === 'done' ? 'asc' : 'desc');
 	let order = $state<'asc' | 'desc'>(initialOrder());

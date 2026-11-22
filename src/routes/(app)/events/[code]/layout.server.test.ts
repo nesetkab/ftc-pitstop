@@ -1,10 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { DataError } from '#lib/server/errors.ts';
+import { CACHE_CONTROL } from '#lib/server/http.ts';
 import { load } from './+layout.server.ts';
 
 const server = vi.hoisted(() => ({
 	loadEventBundle: vi.fn(),
-	loadEventAnalysis: vi.fn()
+	loadEventAnalysisEntry: vi.fn()
 }));
 
 vi.mock('#lib/server/event.ts', async (importOriginal) => ({
@@ -12,15 +13,18 @@ vi.mock('#lib/server/event.ts', async (importOriginal) => ({
 	loadEventBundle: server.loadEventBundle
 }));
 
-vi.mock('#lib/server/analysis.ts', () => ({ loadEventAnalysis: server.loadEventAnalysis }));
+vi.mock('#lib/server/analysis.ts', () => ({
+	loadEventAnalysisEntry: server.loadEventAnalysisEntry
+}));
 
 const setHeaders = vi.fn();
 
-function run(code: string, path = `/events/${code}`, search = '') {
+function run(code: string, path = `/events/${code}`, search = '', route = '/(app)/events/[code]') {
 	const url = new URL(`http://localhost${path}${search}`);
 	return load({
 		params: { code },
 		url,
+		route: { id: route },
 		setHeaders,
 		depends: vi.fn(),
 		untrack: <T>(fn: () => T) => fn()
@@ -29,27 +33,67 @@ function run(code: string, path = `/events/${code}`, search = '') {
 
 beforeEach(() => {
 	setHeaders.mockReset();
-	server.loadEventBundle.mockReset().mockResolvedValue({ event: { code: 'USAZGIQ' } });
-	server.loadEventAnalysis.mockReset().mockResolvedValue(null);
+	server.loadEventBundle.mockReset().mockResolvedValue(bundleWith(CACHE_CONTROL.finished));
+	server.loadEventAnalysisEntry.mockReset().mockImplementation(async () => ({
+		analysis: { code: 'USAZGIQ' },
+		cacheControl: (await server.loadEventBundle()).cacheControl
+	}));
 });
 
+function bundleWith(cacheControl: string) {
+	return { event: { code: 'USAZGIQ' }, matches: [], cacheControl };
+}
+
 describe('event layout', () => {
-	it('lets the CDN cache live events briefly and quiet ones longer', async () => {
-		server.loadEventBundle.mockResolvedValue({ event: { code: 'USAZGIQ' }, phase: 'quals' });
-		await run('USAZGIQ');
-		expect(setHeaders).toHaveBeenLastCalledWith({
-			'cache-control': 'public, s-maxage=30, stale-while-revalidate=300'
+	it.each([CACHE_CONTROL.live, CACHE_CONTROL.short, CACHE_CONTROL.finished])(
+		'lets the CDN keep the page as long as the event data allows (%s)',
+		async (cacheControl) => {
+			server.loadEventBundle.mockResolvedValue(bundleWith(cacheControl));
+			await run('USAZGIQ');
+			expect(setHeaders).toHaveBeenLastCalledWith({ 'cache-control': cacheControl });
+		}
+	);
+
+	it('keeps a finished event page only briefly when the analysis is missing or cold', async () => {
+		server.loadEventAnalysisEntry.mockRejectedValue(new Error('boom'));
+		const data = await run('USAZGIQ');
+		expect(data.analysis).toBeNull();
+		expect(setHeaders).toHaveBeenLastCalledWith({ 'cache-control': CACHE_CONTROL.live });
+		server.loadEventAnalysisEntry.mockResolvedValue({
+			analysis: {},
+			cacheControl: CACHE_CONTROL.live
 		});
-		server.loadEventBundle.mockResolvedValue({ event: { code: 'USAZGIQ' }, phase: 'done' });
 		await run('USAZGIQ');
-		expect(setHeaders).toHaveBeenLastCalledWith({
-			'cache-control': 'public, s-maxage=300, stale-while-revalidate=3600'
+		expect(setHeaders).toHaveBeenLastCalledWith({ 'cache-control': CACHE_CONTROL.live });
+	});
+
+	it('leaves the header to pages that pick their own', async () => {
+		const data = await run('USAZGIQ', '/events/USAZGIQ/teams', '', '/(app)/events/[code]/teams');
+		expect(setHeaders).not.toHaveBeenCalled();
+		expect(data).toMatchObject({ cacheControl: CACHE_CONTROL.finished });
+	});
+
+	it('sends the pages the event without score breakdowns', async () => {
+		const result = {
+			red: { total: 1, breakdown: { auto: {} } },
+			blue: { total: 0, breakdown: null }
+		};
+		server.loadEventBundle.mockResolvedValue({
+			...bundleWith(CACHE_CONTROL.live),
+			matches: [{ key: 'q1', result }]
 		});
+		const data = (await run('USAZGIQ')) as { bundle: { matches: (typeof result)[] } };
+		expect(data.bundle.matches).toEqual([
+			{
+				key: 'q1',
+				result: { red: { total: 1, breakdown: null }, blue: { total: 0, breakdown: null } }
+			}
+		]);
 	});
 
 	it('loads the event for a clean code', async () => {
 		const data = await run('USAZGIQ');
-		expect(data.bundle).toEqual({ event: { code: 'USAZGIQ' } });
+		expect(data.bundle).toEqual({ event: { code: 'USAZGIQ' }, matches: [] });
 		expect(server.loadEventBundle).toHaveBeenCalledWith('USAZGIQ');
 	});
 
@@ -86,7 +130,7 @@ describe('event layout', () => {
 			status: 404
 		});
 		expect(server.loadEventBundle).not.toHaveBeenCalled();
-		expect(server.loadEventAnalysis).not.toHaveBeenCalled();
+		expect(server.loadEventAnalysisEntry).not.toHaveBeenCalled();
 	});
 
 	it('maps missing events to 404 and other trouble to 503', async () => {

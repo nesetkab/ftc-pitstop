@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 		loadTeamCounts()
 	]);
 	if (!list) error(503, 'The event list is unavailable right now');
-	setHeaders({ 'cache-control': CACHE_CONTROL.short });
+	setHeaders({ 'cache-control': CACHE_CONTROL.list });
 	const now = Date.now();
 	return {
 		events: list.events.map((event) => listed(event, teamCount(event, counts?.[event.code], now))),

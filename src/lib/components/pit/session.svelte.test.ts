@@ -1,8 +1,8 @@
 import { flushSync } from 'svelte';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { replayStart } from '#lib/game/replay.ts';
 import { fixtureBundle } from './fixtures.ts';
-import { PitSession, type SessionOptions } from './session.svelte.ts';
+import { analysisLoader, PitSession, type SessionOptions } from './session.svelte.ts';
 
 const full = fixtureBundle('USAZGIQ');
 const q23 = full.matches.find((match) => match.key === 'q23')!;
@@ -58,5 +58,28 @@ describe('PitSession', () => {
 		expect(session.takeover).toBeNull();
 		expect(session.call?.key).toBe('q26');
 		stop();
+	});
+});
+
+describe('analysisLoader', () => {
+	it('reads live analysis from the shared CDN cache, one address per data version', async () => {
+		const fetcher = vi.fn(async () => Response.json({ code: 'USAZGIQ' }));
+		const replay = vi.fn(async () => null);
+		const load = analysisLoader(replay, fetcher as unknown as typeof fetch);
+		expect(await load({ code: 'USAZGIQ', at: null, version: 'USAZGIQ:quals:44:3' })).toEqual({
+			code: 'USAZGIQ'
+		});
+		expect(fetcher).toHaveBeenCalledWith('/api/events/USAZGIQ/analysis?v=USAZGIQ%3Aquals%3A44%3A3');
+		expect(replay).not.toHaveBeenCalled();
+	});
+
+	it('leaves replays to the server function and reports failures', async () => {
+		const fetcher = vi.fn(async () => new Response('down', { status: 503 }));
+		const replay = vi.fn(async () => null);
+		const load = analysisLoader(replay, fetcher as unknown as typeof fetch);
+		await load({ code: 'USAZGIQ', at: 5, version: 'v' });
+		expect(replay).toHaveBeenCalledOnce();
+		expect(fetcher).not.toHaveBeenCalled();
+		await expect(load({ code: 'USAZGIQ', at: null, version: 'v' })).rejects.toThrow();
 	});
 });

@@ -1,7 +1,7 @@
 import { flushSync } from 'svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AllianceSelection, Team } from '#lib/types.ts';
-import { fetchTeamName, SelectionFeed } from '#lib/workspace/feed.svelte.ts';
+import { fetchTeamName, SelectionFeed, SETTLED_INTERVAL } from '#lib/workspace/feed.svelte.ts';
 
 const alliances: AllianceSelection[] = [
 	{ seed: 1, name: 'Alliance 1', captain: 100, picks: [101], backup: null, backupReplaced: null },
@@ -58,7 +58,7 @@ describe('selection feed', () => {
 		const fetcher = vi.fn(async () => respond({ alliances, teams }));
 		const { feed, stop } = start(() => 'USAZGIQ', fetcher as unknown as typeof fetch);
 		await vi.advanceTimersByTimeAsync(0);
-		expect(fetcher).toHaveBeenCalledWith('/api/events/USAZGIQ');
+		expect(fetcher).toHaveBeenCalledWith('/api/events/USAZGIQ/lite');
 		expect(feed.labels.get(101)).toBe('Picked by alliance 1');
 		expect(feed.labels.get(100)).toBe('Captain of alliance 1');
 		expect(feed.labels.has(2844)).toBe(false);
@@ -96,5 +96,21 @@ describe('selection feed', () => {
 		await vi.advanceTimersByTimeAsync(15_000);
 		expect(feed.labels.get(101)).toBe('Picked by alliance 1');
 		stop();
+	});
+
+	it('stops asking once the event is done and slows down during playoffs', async () => {
+		const done = vi.fn(async () => respond({ alliances, teams, phase: 'done' }));
+		const first = start(() => 'USAZGIQ', done as unknown as typeof fetch);
+		await vi.advanceTimersByTimeAsync(10 * 60_000);
+		expect(done).toHaveBeenCalledTimes(1);
+		first.stop();
+
+		const playoffs = vi.fn(async () => respond({ alliances, teams, phase: 'playoffs' }));
+		const second = start(() => 'USAZGIQ', playoffs as unknown as typeof fetch);
+		await vi.advanceTimersByTimeAsync(SETTLED_INTERVAL - 1);
+		expect(playoffs).toHaveBeenCalledTimes(1);
+		await vi.advanceTimersByTimeAsync(1);
+		expect(playoffs).toHaveBeenCalledTimes(2);
+		second.stop();
 	});
 });

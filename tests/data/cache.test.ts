@@ -236,13 +236,20 @@ describe('cache refresh pacing', () => {
 describe('cache stores', () => {
 	function fakeRedis() {
 		const data = new Map<string, string>();
-		const redis: RedisLike & { data: Map<string, string>; ttl: Map<string, number> } = {
+		const redis: RedisLike & {
+			data: Map<string, string>;
+			ttl: Map<string, number>;
+			calls: string[];
+		} = {
 			data,
 			ttl: new Map(),
-			async get(key) {
-				return data.get(key) ?? null;
+			calls: [],
+			async mget(...keys) {
+				redis.calls.push(`mget ${keys.length}`);
+				return keys.map((key) => data.get(key) ?? null);
 			},
 			async set(key, value, options) {
+				redis.calls.push('set');
 				data.set(key, value);
 				redis.ttl.set(key, options.ex);
 				return 'OK';
@@ -257,15 +264,17 @@ describe('cache stores', () => {
 		expect((await cache.get('x', policy, counter(['memory']))).body).toBe('memory');
 	});
 
+	const shared = { ttl: 300, maxStale: 3600 };
+
 	it('shares entries between instances through Redis', async () => {
 		const time = clock();
 		const redis = fakeRedis();
 		const first = createCache({ now: time.now, store: redisStore(redis) });
 		const second = createCache({ now: time.now, store: redisStore(redis) });
-		await first.get('event', policy, counter(['from first']));
-		expect(redis.ttl.get('pitstop:cache:event')).toBe(policy.ttl + policy.maxStale);
+		await first.get('event', shared, counter(['from first']));
+		expect(redis.ttl.get('pitstop:cache:event')).toBe(shared.ttl + shared.maxStale);
 		const fetcher = counter(['from second']);
-		expect((await second.get('event', policy, fetcher)).body).toBe('from first');
+		expect((await second.get('event', shared, fetcher)).body).toBe('from first');
 		expect(fetcher).not.toHaveBeenCalled();
 	});
 
@@ -274,16 +283,42 @@ describe('cache stores', () => {
 		const redis = fakeRedis();
 		const first = createCache({ now: time.now, store: redisStore(redis) });
 		const second = createCache({ now: time.now, store: redisStore(redis) });
-		await first.get('event', policy, counter(['v1']));
-		await second.get('event', policy, counter(['unused']));
-		time.advance(31);
-		await first.get('event', policy, counter(['v2']));
+		await first.get('event', shared, counter(['v1']));
+		await second.get('event', shared, counter(['unused']));
+		time.advance(301);
+		await first.get('event', shared, counter(['v2']));
 		await settle(first);
 		const fetcher = counter(['v3']);
-		await second.get('event', policy, fetcher);
+		await second.get('event', shared, fetcher);
 		await settle(second);
 		expect(fetcher).not.toHaveBeenCalled();
-		expect((await second.get('event', policy, fetcher)).body).toBe('v2');
+		expect((await second.get('event', shared, fetcher)).body).toBe('v2');
+	});
+
+	it('keeps entries that refresh every few seconds out of Redis', async () => {
+		const time = clock();
+		const redis = fakeRedis();
+		const cache = createCache({ now: time.now, store: redisStore(redis) });
+		for (let i = 0; i < 10; i++) {
+			await cache.get('live', policy, counter([`v${i}`]));
+			await settle(cache);
+			time.advance(policy.ttl + 1);
+		}
+		expect(redis.calls).toEqual([]);
+	});
+
+	it('reads keys asked for together with one Redis command', async () => {
+		const time = clock();
+		const redis = fakeRedis();
+		const writer = createCache({ now: time.now, store: redisStore(redis) });
+		for (const key of ['a', 'b', 'c']) await writer.get(key, shared, counter([key]));
+		redis.calls.length = 0;
+		const reader = createCache({ now: time.now, store: redisStore(redis) });
+		const values = await Promise.all(
+			['a', 'b', 'c', 'a'].map((key) => reader.get(key, shared, counter(['unused'])))
+		);
+		expect(values.map((value) => value.body)).toEqual(['a', 'b', 'c', 'a']);
+		expect(redis.calls).toEqual(['mget 3']);
 	});
 
 	it('compresses large entries and skips ones that are too big', async () => {
@@ -309,7 +344,7 @@ describe('cache stores', () => {
 		};
 		const onError = vi.fn();
 		const cache = createCache({ store: broken, onError });
-		expect((await cache.get('a', policy, counter(['ok']))).body).toBe('ok');
+		expect((await cache.get('a', shared, counter(['ok']))).body).toBe('ok');
 		expect(onError).toHaveBeenCalled();
 	});
 });

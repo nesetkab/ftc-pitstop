@@ -25,6 +25,20 @@ export interface SessionOptions {
 	replay: ReplaySettings | null;
 	loadAnalysis?: AnalysisLoader;
 	fetch?: typeof fetch;
+	pollHidden?: () => boolean;
+}
+
+export function analysisLoader(
+	replay: AnalysisLoader,
+	fetcher: typeof fetch = fetch
+): AnalysisLoader {
+	return async (request) => {
+		if (request.at !== null) return replay(request);
+		const version = encodeURIComponent(request.version);
+		const response = await fetcher(`/api/events/${request.code}/analysis?v=${version}`);
+		if (!response.ok) throw new Error(`Analysis returned ${response.status}`);
+		return (await response.json()) as EventAnalysis;
+	};
 }
 
 const LIVE = new Set(['quals', 'selection', 'playoffs']);
@@ -93,7 +107,8 @@ export class PitSession {
 			bundle: options.bundle,
 			queue: options.queue,
 			nexus: options.nexus,
-			fetch: options.fetch
+			fetch: options.fetch,
+			pollHidden: options.pollHidden
 		});
 		this.#version = untrack(() => this.signature);
 	}

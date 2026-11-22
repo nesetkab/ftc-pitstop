@@ -1,4 +1,5 @@
-import { analyzeEvent } from '#lib/analysis/analyze.ts';
+import { createHash } from 'node:crypto';
+import { analyzeEvent, retime } from '#lib/analysis/analyze.ts';
 import { buildSeason, contextFor, teamHistory, type SeasonModel } from '#lib/analysis/season.ts';
 import type {
 	AnalysisContext,
@@ -11,6 +12,7 @@ import { dayNumber, previousFrom } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import {
 	keepAlive,
+	LruMap,
 	cache as sharedCache,
 	type Cache,
 	type CachePolicy
@@ -37,7 +39,20 @@ export function analysisPolicy(tier: EventTier, phase: EventPhase): CachePolicy 
 	if (tier === 'finished') return { ttl: DAY_SECONDS, maxStale: 7 * DAY_SECONDS };
 	if (tier === 'upcoming') return { ttl: 600, maxStale: DAY_SECONDS };
 	if (phase === 'done') return { ttl: 300, maxStale: DAY_SECONDS };
-	return { ttl: 30, maxStale: 300 };
+	return { ttl: 15, maxStale: 300 };
+}
+
+function fingerprint(bundle: EventBundle, season: SeasonModel): string {
+	const content = JSON.stringify([
+		season.generatedAt,
+		bundle.event,
+		bundle.teams,
+		bundle.matches,
+		bundle.rankings,
+		bundle.alliances,
+		bundle.phase
+	]);
+	return createHash('sha1').update(content).digest('base64');
 }
 
 class ColdStart extends Error {}
@@ -96,6 +111,18 @@ export function createAnalysis(deps: AnalysisDeps) {
 	let current: { model: SeasonModel; expires: number } | null = null;
 	let pending: Promise<SeasonModel> | null = null;
 	let pendingSince = 0;
+	const analyzed = new LruMap<{ key: string; analysis: EventAnalysis }>(100);
+
+	function analyzeOnce(bundle: EventBundle, season: SeasonModel, teams: number[], day: number) {
+		const time = now();
+		const key = fingerprint(bundle, season);
+		const known = analyzed.get(bundle.event.code);
+		if (known?.key === key) return retime(known.analysis, bundle, time);
+		const context = contextFor(season, teams, day, previous);
+		const analysis = analyzeEvent(bundle, context, { now: time });
+		analyzed.set(bundle.event.code, { key, analysis });
+		return analysis;
+	}
 
 	async function build(): Promise<SeasonModel> {
 		const season = await loaders.loadSeasonMatches();
@@ -158,8 +185,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 					const season = await within(model, deadline - now()).catch(() => {
 						throw new ColdStart();
 					});
-					const context = contextFor(season, teams, day, previous);
-					return { status: 'ok', body: analyzeEvent(bundle, context, { now: now() }) };
+					return { status: 'ok', body: analyzeOnce(bundle, season, teams, day) };
 				}
 			);
 			return { analysis: value.body, cacheControl };

@@ -7,7 +7,7 @@ import {
 } from '$app/env/private';
 
 export interface RedisLike {
-	get(key: string): Promise<unknown>;
+	mget(...keys: string[]): Promise<unknown[]>;
 	set(key: string, value: string, options: { ex: number }): Promise<unknown>;
 }
 
