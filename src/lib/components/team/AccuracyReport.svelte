@@ -40,6 +40,7 @@
 		Every match below was predicted using only matches played before it. Parameters were set on
 		{seasonRange(report.method.train)}, the model was chosen on
 		{seasonRange(report.method.validation)}, and {seasonRange(report.method.test)} was not used for either.
+		Matches with impossible scores are left out.
 	</p>
 </section>
 

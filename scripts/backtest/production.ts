@@ -21,7 +21,9 @@ export function toProdParams(p: OprParams): ProdParams {
 		q: p.q,
 		qWeek: p.qWeek,
 		carry: p.carry,
-		drift: p.drift
+		drift: p.drift,
+		scoreCommon: p.scoreCommon ?? 0,
+		scoreQ: p.scoreQ ?? 0
 	};
 }
 

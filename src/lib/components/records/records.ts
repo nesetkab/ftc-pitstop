@@ -2,6 +2,7 @@ import { addDays } from '#lib/components/team/dates.ts';
 import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
 import { regionName } from '#lib/format/places.ts';
 import { EVENT_TYPE_NAMES } from '#lib/game/event-types.ts';
+import { plausibleScore } from '#lib/model/types.ts';
 import type {
 	AllianceColor,
 	EventType,
@@ -185,13 +186,8 @@ function byLabel(a: RecordOption, b: RecordOption): number {
 	return a.label.localeCompare(b.label, 'en', { numeric: true });
 }
 
-const PLAUSIBLE_SCORE = 600;
-
 function plausible(alliance: SeasonMatchAlliance): boolean {
-	return (
-		alliance.total <= PLAUSIBLE_SCORE &&
-		Math.abs(alliance.auto + alliance.teleop - alliance.preFoulTotal) <= 1
-	);
+	return plausibleScore(alliance.total, alliance.preFoulTotal, alliance.auto, alliance.teleop);
 }
 
 export function plausibleMatch(match: SeasonMatch): boolean {

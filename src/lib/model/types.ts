@@ -48,3 +48,20 @@ export type Alliance = 'red' | 'blue';
 export function isPlayed(m: ModelMatch): boolean {
 	return m.redNp !== null && m.blueNp !== null;
 }
+
+export const PLAUSIBLE_SCORE = 600;
+
+export function plausibleScore(total: number, np: number, auto?: number, teleop?: number): boolean {
+	if (total > PLAUSIBLE_SCORE) return false;
+	return auto === undefined || teleop === undefined || Math.abs(auto + teleop - np) <= 1;
+}
+
+export function plausibleMatch(m: ModelMatch): boolean {
+	const side = (total: number | null, np: number | null, detail?: AllianceDetail) =>
+		np === null || plausibleScore(total ?? np, np, detail?.autoPoints, detail?.teleopPoints);
+	return side(m.redScore, m.redNp, m.redDetail) && side(m.blueScore, m.blueNp, m.blueDetail);
+}
+
+export function rated(m: ModelMatch): boolean {
+	return isPlayed(m) && plausibleMatch(m);
+}

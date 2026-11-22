@@ -23,15 +23,25 @@ export const SWARM_MODEL: SwarmModel = { prior: 1.5, carry: 0.1 };
 
 export type Platt = { a: number; b: number };
 
-export const RP_CALIBRATION: { swarm: Platt; pollinator1: Platt; pollinator2: Platt } = {
-	swarm: { a: 0.2496, b: 1.0491 },
-	pollinator1: { a: 1.0793, b: 1.6114 },
-	pollinator2: { a: 0.6465, b: 1.1286 }
+export type SwarmCalibration = { a: number; robots: number; points: number; sd: number };
+
+export const RP_CALIBRATION: {
+	swarm: SwarmCalibration;
+	pollinator1: Platt;
+	pollinator2: Platt;
+} = {
+	swarm: { a: 0.4822, robots: 0.6466, points: 0.6034, sd: 8 },
+	pollinator1: { a: 0.5819, b: 1.4889 },
+	pollinator2: { a: 0.0892, b: 1.1317 }
 };
 
-export function recalibrate(p: number, c: Platt): number {
+export function logit(p: number): number {
 	const q = clamp(p, 1e-6, 1 - 1e-6);
-	return 1 / (1 + Math.exp(-(c.a + c.b * Math.log(q / (1 - q)))));
+	return Math.log(q / (1 - q));
+}
+
+export function recalibrate(p: number, c: Platt): number {
+	return 1 / (1 + Math.exp(-(c.a + c.b * logit(p))));
 }
 
 export function calibratedTips(
@@ -48,8 +58,10 @@ export function calibratedTips(
 	};
 }
 
-export function calibratedSwarm(raw: number, cal = RP_CALIBRATION): number {
-	return recalibrate(raw, cal.swarm);
+export function calibratedSwarm(robots: number, points: number, cal = RP_CALIBRATION): number {
+	const c = cal.swarm;
+	const z = c.a + c.robots * logit(robots) + c.points * logit(swarmFromMean(points, c.sd));
+	return 1 / (1 + Math.exp(-z));
 }
 
 export type RpChances = {

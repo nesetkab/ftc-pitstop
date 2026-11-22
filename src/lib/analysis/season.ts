@@ -23,7 +23,7 @@ import {
 	type TeamState
 } from '#lib/model/opr.ts';
 import { SwarmBook } from '#lib/model/rp.ts';
-import { isPlayed, type ModelEvent } from '#lib/model/types.ts';
+import { rated, type ModelEvent } from '#lib/model/types.ts';
 import type { SeasonMatch } from '#lib/types.ts';
 
 export type SeasonModel = {
@@ -154,7 +154,7 @@ export function contextFor(
 		addSums(sums, model.sums[i]);
 		const ordered = orderMatches(event.matches);
 		book.enterEvent(event.code, [...new Set(ordered.flatMap((m) => [...m.red, ...m.blue]))]);
-		for (const m of ordered) if (isPlayed(m)) book.update(m);
+		for (const m of ordered) if (rated(m)) book.update(m);
 	});
 	return {
 		teams,

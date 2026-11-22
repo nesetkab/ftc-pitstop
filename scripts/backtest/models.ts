@@ -38,6 +38,8 @@ export type OprParams = {
 	huber: number;
 	qWeek: number;
 	history: boolean;
+	scoreCommon?: number;
+	scoreQ?: number;
 };
 
 export type EpaParams = {
@@ -64,6 +66,26 @@ type TeamState = {
 	rel: number;
 	day: number;
 };
+
+function rowSums(P: Float64Array, ph: Float64Array, n: number, idx: number[]): number {
+	ph.fill(0);
+	for (const i of idx) {
+		const row = i * n;
+		for (let k = 0; k < n; k++) ph[k] += P[row + k];
+	}
+	let hph = 0;
+	for (const i of idx) hph += ph[i];
+	return hph;
+}
+
+function downdate(P: Float64Array, ph: Float64Array, n: number, s: number): void {
+	for (let a = 0; a < n; a++) {
+		const fa = ph[a] / s;
+		if (fa === 0) continue;
+		const row = a * n;
+		for (let b = 0; b < n; b++) P[row + b] -= fa * ph[b];
+	}
+}
 
 function eventTeams(event: PEvent): number[] {
 	const set = new Set<number>();
@@ -101,9 +123,11 @@ export class KalmanOpr implements Model {
 	prior = new Float64Array(0);
 	priorNu = new Float64Array(0);
 	P = new Float64Array(0);
+	S = new Float64Array(0);
 	n = 0;
 	played = new Int32Array(0);
 	ph = new Float64Array(0);
+	sh = new Float64Array(0);
 
 	constructor(name: string, p: OprParams) {
 		this.name = name;
@@ -153,14 +177,25 @@ export class KalmanOpr implements Model {
 			this.nu[i] = this.priorNu[i] = pr.nu;
 			this.P[i * n + i] = 1 / pr.prec;
 		});
+		if (this.split()) {
+			this.S = new Float64Array(n * n).fill(this.p.scoreCommon ?? 0);
+			for (let i = 0; i < n; i++) this.S[i * n + i] += this.P[i * n + i];
+			this.sh = new Float64Array(n);
+		}
+	}
+
+	split(): boolean {
+		return (this.p.scoreCommon ?? 0) > 0 || (this.p.scoreQ ?? 0) > 0;
 	}
 
 	refresh(team: number, ctx: Ctx): void {
 		const i = this.index.get(team)!;
 		if (this.played[i] > 0) return;
 		const pr = this.priorFor(team, ctx);
-		this.mu[i] = this.prior[i] = pr.mu;
-		this.nu[i] = this.priorNu[i] = pr.nu;
+		this.mu[i] += pr.mu - this.prior[i];
+		this.nu[i] += pr.nu - this.priorNu[i];
+		this.prior[i] = pr.mu;
+		this.priorNu[i] = pr.nu;
 	}
 
 	value(team: number, ctx: Ctx, score: boolean): number {
@@ -206,19 +241,12 @@ export class KalmanOpr implements Model {
 
 	observe(teams: number[], y: number, ctx: Ctx): void {
 		const n = this.n;
-		const P = this.P;
-		const ph = this.ph;
+		const split = this.split();
 		const idx = teams.map((t) => this.index.get(t)!);
-		ph.fill(0);
-		for (const i of idx) {
-			const row = i * n;
-			for (let k = 0; k < n; k++) ph[k] += P[row + k];
-		}
-		let hph = 0;
+		const hph = rowSums(this.P, this.ph, n, idx);
 		let pred = 0;
 		let predNu = 0;
 		for (const i of idx) {
-			hph += ph[i];
 			pred += this.mu[i];
 			predNu += this.nu[i];
 		}
@@ -229,17 +257,13 @@ export class KalmanOpr implements Model {
 			const z = Math.abs(resid) / (this.p.sobs * ctx.sd * Math.sqrt(s));
 			if (z > this.p.huber) s = hph + z / this.p.huber;
 		}
-		for (let k = 0; k < n; k++) {
-			const g = ph[k] / s;
-			this.mu[k] += g * resid;
-			this.nu[k] += g * residNu;
-		}
-		for (let a = 0; a < n; a++) {
-			const fa = ph[a] / s;
-			if (fa === 0) continue;
-			const row = a * n;
-			for (let b = 0; b < n; b++) P[row + b] -= fa * ph[b];
-		}
+		for (let k = 0; k < n; k++) this.mu[k] += (this.ph[k] / s) * resid;
+		if (!split) for (let k = 0; k < n; k++) this.nu[k] += (this.ph[k] / s) * residNu;
+		downdate(this.P, this.ph, n, s);
+		if (!split) return;
+		const ss = rowSums(this.S, this.sh, n, idx) + 1;
+		for (let k = 0; k < n; k++) this.nu[k] += (this.sh[k] / ss) * residNu;
+		downdate(this.S, this.sh, n, ss);
 	}
 
 	update(m: PMatch, ctx: Ctx): void {
@@ -248,6 +272,13 @@ export class KalmanOpr implements Model {
 			for (const t of [...m.redUpd, ...m.blueUpd]) {
 				const i = this.index.get(t)!;
 				this.P[i * n + i] += this.p.qMatch;
+			}
+		}
+		const scoreQ = this.p.scoreQ ?? 0;
+		if (scoreQ > 0 && this.split()) {
+			for (const t of [...m.redUpd, ...m.blueUpd]) {
+				const i = this.index.get(t)!;
+				this.S[i * n + i] += scoreQ;
 			}
 		}
 		if (m.redOk) this.observe(m.redUpd, m.redNp, ctx);

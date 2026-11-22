@@ -109,17 +109,21 @@ export const CANDIDATES: Candidate[] = [
 		family: 'opr',
 		base: MAP_BASE,
 		space: {
-			lamNew: [1.6, 2.4, 3.2, 4],
-			lamPrevSeason: [1.5, 2, 2.5, 3],
-			q: [0.05, 0.075, 0.1, 0.15],
+			lamNew: [1.2, 1.6, 2, 2.4, 3.2],
+			lamPrevSeason: [1, 1.5, 2, 2.5, 3],
+			q: [0.075, 0.1, 0.15, 0.2, 0.3],
 			qWeek: [0, 0.01, 0.02, 0.04],
 			carry: [0.9, 0.95, 1, 1.05],
-			drift: [0.25, 0.5, 0.75],
-			beta: [0.4, 0.5, 0.6, 0.7],
+			drift: [0.1, 0.25, 0.5, 0.75],
+			beta: [0.2, 0.3, 0.4, 0.5, 0.6, 0.7],
 			rhoNew: [0.1, 0.2, 0.3, 0.4],
 			rhoPrev: [0.3, 0.4, 0.5, 0.6]
 		},
-		scoreSpace: SCORE_SPACE
+		scoreSpace: {
+			...SCORE_SPACE,
+			scoreCommon: [0, 0.05, 0.1, 0.2, 0.3],
+			scoreQ: [0, 0.02, 0.03, 0.05, 0.08]
+		}
 	},
 	{
 		id: 'epa',

@@ -62,11 +62,11 @@ describe('predictMatch', () => {
 		const tips = calibratedTips(3);
 		expect(p.red.rp.pollinator1).toBeCloseTo(tips.pollinator1, 10);
 		expect(p.red.rp.pollinator2).toBeLessThanOrEqual(p.red.rp.pollinator1);
-		expect(p.red.rp.swarm).toBeCloseTo(calibratedSwarm(0.5), 10);
+		expect(p.red.rp.swarm).toBeCloseTo(calibratedSwarm(0.5, 0), 10);
 		expect(p.red.rp.expected).toBeCloseTo(
-			3 * p.redWin + p.tie + calibratedSwarm(0.5) + tips.pollinator1 + tips.pollinator2,
+			3 * p.redWin + p.tie + calibratedSwarm(0.5, 0) + tips.pollinator1 + tips.pollinator2,
 			10
 		);
-		expect(p.blue.rp.swarm).toBeCloseTo(calibratedSwarm(0.25), 10);
+		expect(p.blue.rp.swarm).toBeCloseTo(calibratedSwarm(0.25, 0), 10);
 	});
 });
