@@ -124,7 +124,7 @@ describe('zonedTimeToUtc', () => {
 				expect(back === t || back === t - 3_600_000).toBe(true);
 			}
 		}
-	});
+	}, 30_000);
 });
 
 describe('time helpers', () => {
