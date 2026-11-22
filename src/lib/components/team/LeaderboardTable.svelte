@@ -71,7 +71,7 @@
 					>
 						{#if filters}
 							<a href={sortHref(column.key)} data-sveltekit-reset="false">
-								<Term label={column.label} term={oprTerm(column.label)} />{#if active}<span
+								<Term label={column.label} term={oprTerm(column.label)} nested />{#if active}<span
 										aria-hidden="true"
 									>
 										↓</span

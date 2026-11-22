@@ -43,7 +43,7 @@
 						aria-sort={active ? 'descending' : undefined}
 					>
 						<a href={sortHref(part.key)} data-sveltekit-noscroll>
-							<Term label={part.label} />{#if active}<span aria-hidden="true"> ↓</span>{/if}
+							<Term label={part.label} nested />{#if active}<span aria-hidden="true"> ↓</span>{/if}
 						</a>
 					</th>
 				{/each}

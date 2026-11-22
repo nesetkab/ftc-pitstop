@@ -5,6 +5,7 @@
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
+	import Term from '#lib/ui/Term.svelte';
 	import {
 		cellText,
 		phoneHidden,
@@ -58,15 +59,15 @@
 	}
 </script>
 
-{#snippet sorter(key: SortKey, label: string, title?: string)}
+{#snippet sorter(key: SortKey, label: string)}
 	<a
 		href={hrefFor(sortBy(choice, key))}
 		onclick={(event) => choose(event, key)}
 		data-sveltekit-replacestate
 		data-sveltekit-reset="false"
 	>
-		{#if title}<abbr {title}>{label}</abbr>{:else}{label}{/if}{#if choice.sort === key}<span
-				aria-hidden="true">{choice.dir === 'asc' ? ' ↑' : ' ↓'}</span
+		<Term {label} nested />{#if choice.sort === key}<span aria-hidden="true"
+				>{choice.dir === 'asc' ? ' ↑' : ' ↓'}</span
 			>{/if}
 	</a>
 {/snippet}
@@ -96,7 +97,7 @@
 					scope="col"
 					aria-sort={ariaSort(key)}
 				>
-					{@render sorter(key, column.label, column.title)}
+					{@render sorter(key, column.label)}
 				</th>
 			{/each}
 			{#if projected}
