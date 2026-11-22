@@ -5,6 +5,7 @@
 	import InsightsTable from '#lib/components/event/InsightsTable.svelte';
 	import { integer } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Segmented from '#lib/ui/Segmented.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -14,11 +15,18 @@
 	const base = $derived(`/events/${code}/insights`);
 	const averages = $derived(data.averages);
 	const basis = $derived(averages.playoff ? 'all matches' : 'quals');
-	const levels = [
-		{ key: '', label: 'All matches' },
-		{ key: 'qual', label: 'Quals' },
-		{ key: 'playoff', label: 'Playoffs' }
-	] as const;
+	const levels = $derived(
+		(
+			[
+				{ value: '', label: 'All matches' },
+				{ value: 'qual', label: 'Quals' },
+				{ value: 'playoff', label: 'Playoffs' }
+			] as const
+		).map((level) => ({
+			...level,
+			href: `${base}${insightQuery({ ...data.filters, level: level.value, all: false })}`
+		}))
+	);
 	const sortLabel = $derived(
 		INSIGHT_PARTS.find((part) => part.key === data.filters.sort)?.label.toLowerCase() ?? 'total'
 	);
@@ -49,15 +57,7 @@
 	<section class="panel" aria-labelledby="scores-title">
 		<div class="head">
 			<h2 class="sec-title" id="scores-title">Highest scores</h2>
-			<nav class="levels" aria-label="Match type">
-				{#each levels as level (level.key)}
-					<a
-						href="{base}{insightQuery({ ...data.filters, level: level.key, all: false })}"
-						aria-current={data.filters.level === level.key ? 'page' : undefined}
-						data-sveltekit-noscroll>{level.label}</a
-					>
-				{/each}
-			</nav>
+			<Segmented label="Match type" options={levels} value={data.filters.level} />
 		</div>
 		<InsightsTable {code} rows={data.rows} filters={data.filters} followed={view.followed} />
 		<p class="note">
@@ -98,28 +98,8 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 8px 20px;
-		align-items: baseline;
+		align-items: center;
 		justify-content: space-between;
-	}
-
-	.levels {
-		display: flex;
-		gap: 16px;
-		font-size: 14px;
-		color: var(--text-2);
-	}
-
-	.levels a {
-		text-decoration: none;
-	}
-
-	.levels a:hover {
-		color: var(--text);
-	}
-
-	.levels a[aria-current='page'] {
-		color: var(--text);
-		font-weight: 600;
 	}
 
 	.links {
@@ -130,7 +110,6 @@
 	}
 
 	@media (pointer: coarse) {
-		.levels a,
 		.links a {
 			margin-block: -10px;
 			padding-block: 10px;

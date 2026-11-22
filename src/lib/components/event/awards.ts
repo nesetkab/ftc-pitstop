@@ -13,23 +13,69 @@ export type AwardGroup = {
 	entries: AwardEntry[];
 };
 
-const PLACE = /\s+\d+(?:st|nd|rd|th)\s+place$/i;
+const PLACE = /\s+(\d+)(?:st|nd|rd|th)\s+place$/i;
 const ROLE = /\s+-\s+/;
+const PICK = /^(\d+(?:st|nd|rd|th)) team selected$/i;
+const ALLIANCES: Record<string, string> = {
+	'winning alliance': 'Winning alliance',
+	'finalist alliance': 'Finalist alliance'
+};
 
 export function plainName(name: string): string {
 	return name
 		.replace(/<[^>]*>/g, '')
 		.replace(/&amp;/g, '&')
+		.replace(/®/g, '')
 		.replace(/\s+/g, ' ')
 		.trim();
 }
 
-function split(name: string): { base: string; role: string | null } {
+function baseName(name: string): string {
+	return ALLIANCES[name.toLowerCase()] ?? name;
+}
+
+function roleName(role: string): string {
+	const pick = PICK.exec(role);
+	if (pick) return `${pick[1]} pick`;
+	return role.toLowerCase() === 'captain' ? 'captain' : role;
+}
+
+function placeName(placement: number): string {
+	return `${ordinal(placement)} place`;
+}
+
+function capitalize(text: string): string {
+	return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function split(name: string): { base: string; role: string | null; place: number | null } {
 	const clean = plainName(name);
 	const role = ROLE.exec(clean);
-	if (role)
-		return { base: clean.slice(0, role.index), role: clean.slice(role.index + role[0].length) };
-	return { base: clean.replace(PLACE, ''), role: null };
+	if (role) {
+		return {
+			base: baseName(clean.slice(0, role.index)),
+			role: roleName(clean.slice(role.index + role[0].length)),
+			place: null
+		};
+	}
+	const place = PLACE.exec(clean);
+	return {
+		base: baseName(place ? clean.slice(0, place.index) : clean),
+		role: null,
+		place: place ? Number(place[1]) : null
+	};
+}
+
+export function awardName(award: { name: string; placement?: number }): string {
+	const { base, role, place } = split(award.name);
+	const placement = place ?? award.placement ?? 1;
+	const detail = role ?? (placement > 1 ? placeName(placement) : null);
+	return detail ? `${base} ${detail}` : base;
+}
+
+function labelFor(role: string | null, placement: number, placed: boolean): string | null {
+	if (role) return capitalize(role);
+	return placed ? capitalize(placeName(placement)) : null;
 }
 
 export function groupAwards(awards: Award[]): AwardGroup[] {
@@ -52,7 +98,7 @@ export function groupAwards(awards: Award[]): AwardGroup[] {
 			id,
 			name: group.name,
 			entries: given.map((item) => ({
-				label: item.role ?? (placements.size > 1 ? `${ordinal(item.placement)} place` : null),
+				label: labelFor(item.role, item.placement, placements.size > 1),
 				team: item.team,
 				person: item.person
 			}))

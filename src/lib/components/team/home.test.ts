@@ -129,7 +129,7 @@ describe('buildHomeEvents', () => {
 				name: 'Late',
 				type: 'Qualifier',
 				place: 'Gilbert, AZ',
-				dates: 'Nov 21 and 22',
+				dates: 'Nov 21–22',
 				status: 'In 7 days'
 			}
 		]);

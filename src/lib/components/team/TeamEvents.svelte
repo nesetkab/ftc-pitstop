@@ -2,7 +2,7 @@
 	import { fixed, MISSING, record } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
-	import { shortRange } from './dates.ts';
+	import { shortRange } from '#lib/format/time.ts';
 	import type { TeamEventRow } from './team-view.ts';
 
 	interface Props {

@@ -2,9 +2,10 @@
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { setEventView } from '#lib/components/event/context.ts';
-	import { eventStatus, shortRange } from '#lib/components/event/dates.ts';
+	import { eventStatus } from '#lib/components/event/dates.ts';
 	import { eventMeta } from '#lib/components/event/event-meta.ts';
 	import { watchFollowed } from '#lib/components/event/follow.ts';
+	import { shortRange } from '#lib/format/time.ts';
 	import { httpUrl } from '#lib/format/url.ts';
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import { breadcrumbs, eventDescription, eventJsonLd, siteTitle } from '#lib/seo.ts';
@@ -113,12 +114,12 @@
 		];
 		const rootTopic = started ? TOPICS.rankings.topic : 'Teams, match schedule and predictions.';
 		const showsRankings = !tab || (section === 'rankings' && started);
+		const year = event.end.slice(0, 4);
+		const when = shortRange(event.start, event.end);
 		return {
 			title: tab
 				? siteTitle(`${tab.label} at ${event.name}`)
-				: siteTitle(
-						`${event.name}, ${shortRange(event.start, event.end)}, ${event.end.slice(0, 4)}`
-					),
+				: siteTitle(`${event.name}, ${when.includes(year) ? when : `${when}, ${year}`}`),
 			description: eventDescription(event, status, tab ? tab.topic : rootTopic),
 			path: showsRankings ? base : `${base}/${section}`,
 			data: [

@@ -1,3 +1,4 @@
+import { awardName as sharedAwardName } from '#lib/components/event/awards.ts';
 import { fixed } from '#lib/format/number.ts';
 import { ordinal } from '#lib/format/ordinal.ts';
 import { pct } from '#lib/format/pct.ts';
@@ -281,11 +282,7 @@ export function playoffResult(view: PitView): string | null {
 }
 
 export function awardName(name: string): string {
-	return name
-		.replace(/<[^>]*>/g, '')
-		.replace(/®/g, '')
-		.replace(/\s+/g, ' ')
-		.trim();
+	return sharedAwardName({ name });
 }
 
 function callText(next: NextMatch, call: QueueCall | null): string | null {

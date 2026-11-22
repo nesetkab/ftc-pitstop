@@ -34,7 +34,7 @@
 {/if}
 
 <section aria-labelledby="method-title">
-	<h2 id="method-title">Method</h2>
+	<h2 class="sec-title" id="method-title">Method</h2>
 	<p>{description}</p>
 	<p>
 		Every match below was predicted using only matches played before it. Parameters were set on
@@ -45,7 +45,7 @@
 </section>
 
 <section aria-labelledby="seasons-title">
-	<h2 id="seasons-title">Results by season</h2>
+	<h2 class="sec-title" id="seasons-title">Results by season</h2>
 	<SeasonResults seasons={report.seasons} models={report.models} chosen={report.chosen.id} />
 	<dl class="terms">
 		<div>
@@ -78,7 +78,7 @@
 
 {#if hasCalibration}
 	<section aria-labelledby="calibration-title">
-		<h2 id="calibration-title">Win chance calibration</h2>
+		<h2 class="sec-title" id="calibration-title">Win chance calibration</h2>
 		<p>
 			Matches are grouped by the predicted chance that red wins. Each point shows how often red won
 			in that group, for the model used on this site. Points on the dashed line mean the predicted
@@ -90,7 +90,7 @@
 
 {#if report.rp}
 	<section aria-labelledby="rp-title">
-		<h2 id="rp-title">Ranking point chances</h2>
+		<h2 class="sec-title" id="rp-title">Ranking point chances</h2>
 		<p>
 			Chances that an alliance earns each ranking point, checked against {report.rp.season} qualification
 			results.
@@ -101,7 +101,7 @@
 
 {#if report.schedule}
 	<section aria-labelledby="queue-title">
-		<h2 id="queue-title">Queue time estimates</h2>
+		<h2 class="sec-title" id="queue-title">Queue time estimates</h2>
 		<p>
 			Each estimate is made when a match starts and predicts when a later match will start. The
 			columns show how many matches later that match is.
@@ -118,11 +118,6 @@
 		grid-template-columns: minmax(0, 1fr);
 		gap: 12px;
 		max-width: 920px;
-	}
-
-	h2 {
-		font-size: 19px;
-		line-height: 1.3;
 	}
 
 	p {

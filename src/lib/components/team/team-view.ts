@@ -4,10 +4,11 @@ import type {
 	SeasonRating,
 	SeasonRatings
 } from '#lib/analysis/types.ts';
-import { matchLabel, ordinal, parseMatchKey, shortDate } from '#lib/format/index.ts';
-import { GAME_NAME, SEASON } from '#lib/game/biobuzz.ts';
+import { matchLabel, parseMatchKey, shortDate } from '#lib/format/index.ts';
+import { GAME_NAME, PART_LABELS, SEASON } from '#lib/game/biobuzz.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import type { Award, EventBundle, QuickStat, QuickStats, TeamSeason } from '#lib/types.ts';
+import { awardName } from '#lib/components/event/awards.ts';
 import { localDay } from './dates.ts';
 import { placeName } from '#lib/format/places.ts';
 import { teamMatches, type TeamMatchEvent } from './matches.ts';
@@ -160,9 +161,10 @@ export function rankPercentile(rank: number, of: number): number | null {
 }
 
 export function awardLabel(award: Award): string {
-	if (award.id === WINNING_ALLIANCE) return 'Winning alliance';
-	if (award.id === FINALIST_ALLIANCE) return 'Finalist alliance';
-	return award.placement > 1 ? `${award.name}, ${ordinal(award.placement)} place` : award.name;
+	if (award.id === WINNING_ALLIANCE || award.id === FINALIST_ALLIANCE) {
+		return awardName({ name: award.name });
+	}
+	return awardName(award);
 }
 
 function measure(
@@ -180,53 +182,53 @@ function ratingComparison(mine: SeasonRating, pool: SeasonRating[]): TeamCompari
 	return [
 		measure(
 			'total',
-			'Total',
+			PART_LABELS.total,
 			mine.opr,
 			pool.map((entry) => entry.opr)
 		),
 		measure(
 			'auto',
-			'Auto',
+			PART_LABELS.auto,
 			parts.auto,
 			pool.map((entry) => entry.parts.auto)
 		),
 		measure(
 			'teleop',
-			'Teleop',
+			PART_LABELS.teleop,
 			mine.opr - parts.auto,
 			pool.map((entry) => entry.opr - entry.parts.auto)
 		),
 		measure(
 			'hive',
-			'Hive',
+			PART_LABELS.hive,
 			parts.hive,
 			pool.map((entry) => entry.parts.hive),
 			true
 		),
 		measure(
 			'flower',
-			'Flower',
+			PART_LABELS.flower,
 			parts.flower,
 			pool.map((entry) => entry.parts.flower),
 			true
 		),
 		measure(
 			'garden',
-			'Garden',
+			PART_LABELS.garden,
 			parts.garden,
 			pool.map((entry) => entry.parts.garden),
 			true
 		),
 		measure(
 			'park',
-			'Park',
+			PART_LABELS.park,
 			parts.park,
 			pool.map((entry) => entry.parts.park),
 			true
 		),
 		measure(
 			'tips',
-			'Tips',
+			PART_LABELS.tips,
 			parts.tips,
 			pool.map((entry) => entry.parts.tips),
 			true

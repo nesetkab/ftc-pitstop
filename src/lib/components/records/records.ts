@@ -1,6 +1,7 @@
 import { addDays } from '#lib/components/team/dates.ts';
 import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
 import { regionName } from '#lib/format/places.ts';
+import { PART_LABELS } from '#lib/game/biobuzz.ts';
 import { EVENT_TYPE_NAMES } from '#lib/game/event-types.ts';
 import { plausibleScore } from '#lib/model/types.ts';
 import type {
@@ -16,12 +17,12 @@ export const RECORDS_PAGE_SIZE = 50;
 export const RECORDS_CSV_LIMIT = 1000;
 
 export const RECORD_PARTS = [
-	{ key: 'total', label: 'Total' },
-	{ key: 'auto', label: 'Auto' },
-	{ key: 'teleop', label: 'Teleop' },
-	{ key: 'hive', label: 'Hive' },
-	{ key: 'flower', label: 'Flower' },
-	{ key: 'garden', label: 'Garden' }
+	{ key: 'total', label: PART_LABELS.total },
+	{ key: 'auto', label: PART_LABELS.auto },
+	{ key: 'teleop', label: PART_LABELS.teleop },
+	{ key: 'hive', label: PART_LABELS.hive },
+	{ key: 'flower', label: PART_LABELS.flower },
+	{ key: 'garden', label: PART_LABELS.garden }
 ] as const;
 
 export type RecordPart = (typeof RECORD_PARTS)[number]['key'];

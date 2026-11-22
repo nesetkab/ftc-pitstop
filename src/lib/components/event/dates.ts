@@ -1,5 +1,3 @@
-import { shortDate } from '#lib/format/time.ts';
-
 export type EventStatus = 'live' | 'upcoming' | 'done';
 
 type Dated = { start: string; end: string; timezone: string };
@@ -50,14 +48,6 @@ export function eventStatus(event: Dated, now: number): EventStatus {
 
 export function isMultiDay(event: Pick<Dated, 'start' | 'end'>): boolean {
 	return event.end > event.start;
-}
-
-export function shortRange(start: string, end: string): string {
-	if (end <= start) return shortDate(start);
-	const first = shortDate(start);
-	const last = shortDate(end);
-	if (start.slice(0, 7) === end.slice(0, 7)) return `${first}–${last.split(' ')[1]}`;
-	return `${first}–${last}`;
 }
 
 const weekdays = new Map<string, Intl.DateTimeFormat>();

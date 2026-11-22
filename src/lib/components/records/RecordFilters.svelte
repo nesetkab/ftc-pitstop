@@ -75,7 +75,7 @@
 			inputmode="numeric"
 			pattern="[0-9]*"
 			maxlength="6"
-			placeholder="Any"
+			placeholder="Team number"
 			autocomplete="off"
 			value={filters.team ?? ''}
 		/>
@@ -114,7 +114,7 @@
 	}
 
 	input {
-		width: 96px;
+		width: 128px;
 		padding: 7px 10px;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);

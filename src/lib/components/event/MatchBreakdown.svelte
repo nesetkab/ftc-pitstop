@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { POINTS } from '#lib/game/biobuzz.ts';
+	import { PART_LABELS, POINTS } from '#lib/game/biobuzz.ts';
 	import type { MatchResult, RobotPair, ScoreBreakdown } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -21,47 +21,47 @@
 	const robots = (pair: RobotPair) => Number(pair[0]) + Number(pair[1]);
 
 	const lines: Line[] = [
-		{ label: 'Auto', kind: 'head', points: (b) => b.points.auto },
+		{ label: PART_LABELS.auto, kind: 'head', points: (b) => b.points.auto },
 		{
-			label: 'Leave',
+			label: PART_LABELS.leave,
 			kind: 'item',
 			count: (b) => robots(b.auto.leave),
 			points: (b) => b.points.autoLeave
 		},
 		{
-			label: 'Park',
+			label: PART_LABELS.park,
 			kind: 'item',
 			count: (b) => robots(b.auto.park),
 			points: (b) => b.points.autoPark
 		},
 		{
-			label: 'Tips',
+			label: PART_LABELS.hiveTips,
 			kind: 'item',
 			count: (b) => b.auto.tips,
 			points: (b) => b.points.autoHive
 		},
-		{ label: 'Teleop', kind: 'head', points: (b) => b.points.teleop },
+		{ label: PART_LABELS.teleop, kind: 'head', points: (b) => b.points.teleop },
 		{
-			label: 'Tips',
+			label: PART_LABELS.hiveTips,
 			kind: 'item',
 			count: (b) => b.teleop.tips,
 			points: (b) => b.teleop.tips * POINTS.tip
 		},
 		{
-			label: 'Cell balls',
+			label: PART_LABELS.hivePieces,
 			kind: 'item',
 			count: (b) => b.teleop.cellBalls,
 			points: (b) => b.teleop.cellBalls * POINTS.cellBall
 		},
-		{ label: 'Flowers', kind: 'item', points: (b) => b.points.teleopFlower },
+		{ label: PART_LABELS.flower, kind: 'item', points: (b) => b.points.teleopFlower },
 		{
-			label: 'Garden balls',
+			label: PART_LABELS.gardenPieces,
 			kind: 'item',
 			count: (b) => b.teleop.gardenBalls,
 			points: (b) => b.points.teleopGarden
 		},
 		{
-			label: 'Park',
+			label: PART_LABELS.park,
 			kind: 'item',
 			count: (b) => robots(b.teleop.park),
 			points: (b) => b.points.teleopPark
@@ -74,7 +74,7 @@
 			kind: 'item',
 			points: (_, color) => result[color].foulPoints
 		},
-		{ label: 'Total', kind: 'total', points: (_, color) => result[color].total }
+		{ label: PART_LABELS.total, kind: 'total', points: (_, color) => result[color].total }
 	];
 
 	const sides = $derived(
@@ -165,11 +165,5 @@
 		grid-template-columns: minmax(0, 1fr);
 		gap: 12px;
 		align-content: start;
-	}
-
-	h3.sec-title {
-		font-size: 15px;
-		line-height: 1.4;
-		letter-spacing: 0;
 	}
 </style>

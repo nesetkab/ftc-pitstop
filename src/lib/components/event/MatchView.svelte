@@ -184,12 +184,6 @@
 		gap: 22px;
 	}
 
-	h2.sec-title {
-		font-size: 15px;
-		line-height: 1.4;
-		letter-spacing: 0;
-	}
-
 	@media (max-width: 1120px) {
 		.layout {
 			grid-template-columns: minmax(0, 1fr);

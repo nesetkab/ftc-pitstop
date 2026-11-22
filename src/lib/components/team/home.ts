@@ -8,7 +8,8 @@ import {
 import { placeName } from '#lib/format/places.ts';
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';
-import { addDays, daysBetween, localDay, shortRange } from './dates.ts';
+import { shortRange } from '#lib/format/time.ts';
+import { addDays, daysBetween, localDay } from './dates.ts';
 
 export interface HomeEvent {
 	code: string;

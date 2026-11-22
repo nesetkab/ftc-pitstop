@@ -1,17 +1,17 @@
 import type { RankedRecord, RecordRow } from '#lib/components/records/records.ts';
 import { localDay } from '#lib/components/team/dates.ts';
-import { breakdownParts, tips } from '#lib/game/biobuzz.ts';
+import { breakdownParts, PART_LABELS, tips } from '#lib/game/biobuzz.ts';
 import type { AllianceColor, Event, Match, TournamentLevel } from '#lib/types.ts';
 
 export const INSIGHT_PARTS = [
-	{ key: 'total', label: 'Total' },
-	{ key: 'auto', label: 'Auto' },
-	{ key: 'teleop', label: 'Teleop' },
-	{ key: 'hive', label: 'Hive' },
-	{ key: 'flower', label: 'Flower' },
-	{ key: 'garden', label: 'Garden' },
-	{ key: 'park', label: 'Park' },
-	{ key: 'tips', label: 'Tips' }
+	{ key: 'total', label: PART_LABELS.total },
+	{ key: 'auto', label: PART_LABELS.auto },
+	{ key: 'teleop', label: PART_LABELS.teleop },
+	{ key: 'hive', label: PART_LABELS.hive },
+	{ key: 'flower', label: PART_LABELS.flower },
+	{ key: 'garden', label: PART_LABELS.garden },
+	{ key: 'park', label: PART_LABELS.park },
+	{ key: 'tips', label: PART_LABELS.tips }
 ] as const;
 
 export type InsightPart = (typeof INSIGHT_PARTS)[number]['key'];

@@ -1,6 +1,7 @@
 import type { Projection, TeamRating } from '#lib/analysis/types.ts';
 import { fixed } from '#lib/format/number.ts';
 import { record } from '#lib/format/record.ts';
+import { PART_LABELS } from '#lib/game/biobuzz.ts';
 import type { Match, Ranking } from '#lib/types.ts';
 
 export type ScoreStats = { avg: number; max: number; min: number; sd: number; count: number };
@@ -31,9 +32,10 @@ function ranking<K extends string>(
 	label: string,
 	name: string,
 	digits: number,
-	get: (ranking: Ranking) => number
+	get: (ranking: Ranking) => number,
+	title?: string
 ): RankingColumn & { key: K } {
-	return { key, label, name, source: 'ranking', digits, value: (row) => get(row.ranking) };
+	return { key, label, name, title, source: 'ranking', digits, value: (row) => get(row.ranking) };
 }
 
 function score<K extends string>(
@@ -59,6 +61,8 @@ function score<K extends string>(
 	};
 }
 
+const OPR_TITLE = 'Offensive power rating, estimated points per match';
+
 function rating<K extends string>(
 	key: K,
 	label: string,
@@ -70,6 +74,7 @@ function rating<K extends string>(
 		key,
 		label,
 		name,
+		title: key === 'opr' ? OPR_TITLE : `${OPR_TITLE} from ${name.toLowerCase()}`,
 		source: 'rating',
 		digits,
 		value: (row) => (row.rating ? get(row.rating) : null)
@@ -82,7 +87,14 @@ function winShare(row: Ranking): number {
 }
 
 export const RANKING_COLUMNS = [
-	ranking('rs', 'RS', 'Ranking score (RS)', 2, (row) => row.rs),
+	ranking(
+		'rs',
+		'RS',
+		'Ranking score (RS)',
+		2,
+		(row) => row.rs,
+		'Ranking score, average ranking points per match'
+	),
 	{
 		...ranking('record', 'Record', 'Record', 0, winShare),
 		text: (row: RankingRow) => record(row.ranking.wins, row.ranking.losses, row.ranking.ties),
@@ -92,7 +104,14 @@ export const RANKING_COLUMNS = [
 		}
 	},
 	ranking('played', 'Played', 'Matches played', 0, (row) => row.played),
-	ranking('tbp', 'TBP', 'Tiebreaker (TBP)', 1, (row) => row.tbp),
+	ranking(
+		'tbp',
+		'TBP',
+		'Tiebreaker (TBP)',
+		1,
+		(row) => row.tbp,
+		'Tiebreaker points, average match score without penalties'
+	),
 	score(
 		'npavg',
 		'NP avg',
@@ -111,15 +130,33 @@ export const RANKING_COLUMNS = [
 		1,
 		(stats) => stats.sd
 	),
-	ranking('avgtips', 'Avg tips', 'Average tips', 1, (row) => row.avgTips),
+	ranking('avgtips', 'Avg tips', 'Average tips', 1, (row) => row.avgTips, 'Average tips per match'),
 	rating('opr', 'OPR', 'Total', 1, (row) => row.opr),
-	rating('opr-auto', 'Auto OPR', 'Auto', 1, (row) => row.parts.auto),
-	rating('opr-teleop', 'Teleop OPR', 'Teleop', 1, (row) => row.opr - row.parts.auto),
-	rating('opr-hive', 'Hive OPR', 'Hive', 1, (row) => row.parts.hive),
-	rating('opr-flower', 'Flower OPR', 'Flower', 1, (row) => row.parts.flower),
-	rating('opr-garden', 'Garden OPR', 'Garden', 1, (row) => row.parts.garden),
-	rating('opr-park', 'Park OPR', 'Park', 1, (row) => row.parts.park),
-	rating('opr-tips', 'Tips OPR', 'Tips', 2, (row) => row.parts.tips)
+	rating('opr-auto', `${PART_LABELS.auto} OPR`, PART_LABELS.auto, 1, (row) => row.parts.auto),
+	rating(
+		'opr-teleop',
+		`${PART_LABELS.teleop} OPR`,
+		PART_LABELS.teleop,
+		1,
+		(row) => row.opr - row.parts.auto
+	),
+	rating('opr-hive', `${PART_LABELS.hive} OPR`, PART_LABELS.hive, 1, (row) => row.parts.hive),
+	rating(
+		'opr-flower',
+		`${PART_LABELS.flower} OPR`,
+		PART_LABELS.flower,
+		1,
+		(row) => row.parts.flower
+	),
+	rating(
+		'opr-garden',
+		`${PART_LABELS.garden} OPR`,
+		PART_LABELS.garden,
+		1,
+		(row) => row.parts.garden
+	),
+	rating('opr-park', `${PART_LABELS.park} OPR`, PART_LABELS.park, 1, (row) => row.parts.park),
+	rating('opr-tips', `${PART_LABELS.tips} OPR`, PART_LABELS.tips, 2, (row) => row.parts.tips)
 ] as const satisfies readonly RankingColumn[];
 
 export type ColumnKey = (typeof RANKING_COLUMNS)[number]['key'];

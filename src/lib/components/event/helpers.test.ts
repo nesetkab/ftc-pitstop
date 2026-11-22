@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Award, EventSummary } from '#lib/types.ts';
-import { groupAwards, noAwardsText } from './awards.ts';
+import { awardName, groupAwards, noAwardsText } from './awards.ts';
 import { eventMeta } from './event-meta.ts';
 import {
 	filterEvents,
@@ -167,14 +167,27 @@ describe('awards', () => {
 			{ label: '2nd place', team: 18420, person: null },
 			{ label: '3rd place', team: 2844, person: null }
 		]);
-		expect(byName.get('Winning Alliance')).toEqual([
+		expect(byName.get('Winning alliance')).toEqual([
 			{ label: 'Captain', team: 18420, person: null },
-			{ label: '1st Team Selected', team: 25620, person: null }
+			{ label: '1st pick', team: 25620, person: null }
 		]);
 		expect(byName.get('Connect Award')).toEqual([{ label: null, team: 14254, person: null }]);
 		expect(byName.get('Volunteer Award')).toEqual([
 			{ label: null, team: null, person: 'Hunter Kotora' }
 		]);
-		expect(byName.has('FIRST® Leadership Award Semi-Finalists')).toBe(false);
+		expect(byName.has('FIRST Leadership Award Semi-Finalists')).toBe(false);
+	});
+
+	it('writes one display name for raw and split award names', () => {
+		expect(awardName({ name: 'Inspire Award 2nd Place' })).toBe('Inspire Award 2nd place');
+		expect(awardName({ name: 'Inspire Award', placement: 3 })).toBe('Inspire Award 3rd place');
+		expect(awardName({ name: 'Think Award', placement: 1 })).toBe('Think Award');
+		expect(awardName({ name: 'Winning Alliance - Captain' })).toBe('Winning alliance captain');
+		expect(awardName({ name: 'Finalist Alliance - 1st Team Selected' })).toBe(
+			'Finalist alliance 1st pick'
+		);
+		expect(awardName({ name: '<i>FIRST</i><sup>®</sup> Leadership Award Semi-Finalists' })).toBe(
+			'FIRST Leadership Award Semi-Finalists'
+		);
 	});
 });

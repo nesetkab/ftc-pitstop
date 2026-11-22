@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fixed } from '#lib/format/index.ts';
+	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import type { TeamPartRow } from './team-view.ts';
 
@@ -12,14 +13,14 @@
 	type Part = 'opr' | 'auto' | 'teleop' | 'hive' | 'flower' | 'garden' | 'park' | 'tips';
 
 	const columns: { key: Part; label: string; nested?: boolean; opt?: boolean }[] = [
-		{ key: 'opr', label: 'Total' },
-		{ key: 'auto', label: 'Auto' },
-		{ key: 'teleop', label: 'Teleop' },
-		{ key: 'hive', label: 'Hive', nested: true },
-		{ key: 'flower', label: 'Flower', nested: true, opt: true },
-		{ key: 'garden', label: 'Garden', nested: true, opt: true },
-		{ key: 'park', label: 'Park', nested: true, opt: true },
-		{ key: 'tips', label: 'Tips', opt: true }
+		{ key: 'opr', label: PART_LABELS.total },
+		{ key: 'auto', label: PART_LABELS.auto },
+		{ key: 'teleop', label: PART_LABELS.teleop },
+		{ key: 'hive', label: PART_LABELS.hive, nested: true },
+		{ key: 'flower', label: PART_LABELS.flower, nested: true, opt: true },
+		{ key: 'garden', label: PART_LABELS.garden, nested: true, opt: true },
+		{ key: 'park', label: PART_LABELS.park, nested: true, opt: true },
+		{ key: 'tips', label: PART_LABELS.tips, opt: true }
 	];
 
 	const events = $derived(rows.filter((row) => row.code !== null));

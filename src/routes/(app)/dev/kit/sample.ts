@@ -152,7 +152,7 @@ export const pointBars: Bar[] = [
 	{ label: 'Auto', value: 17.7 },
 	{ label: 'Park', value: 7.3 },
 	{ label: 'Garden', value: 1.5 },
-	{ label: 'Flowers', value: 0 }
+	{ label: 'Flower', value: 0 }
 ];
 
 export const epaLine: LinePoint[] = [
