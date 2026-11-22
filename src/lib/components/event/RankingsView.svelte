@@ -3,8 +3,18 @@
 	import { RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
 	import type { EventBundle } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import { npMax } from './insights.ts';
+	import ColumnMenu from './ColumnMenu.svelte';
 	import { quals } from './matches.ts';
+	import {
+		availableSources,
+		DEFAULT_CHOICE,
+		rankingQuery,
+		rankingRows,
+		scoreStats,
+		sortRankingRows,
+		visibleColumns,
+		type RankingChoice
+	} from './ranking-columns.ts';
 	import RankingsTable from './RankingsTable.svelte';
 	import RpSources from './RpSources.svelte';
 	import type { RpCounts } from './standings.ts';
@@ -16,18 +26,32 @@
 		rp?: Record<number, RpCounts> | null;
 		followed?: ReadonlySet<number>;
 		csvHref?: string;
+		choice?: RankingChoice;
+		onchoose?: (choice: RankingChoice) => void;
 	}
 
-	let { bundle, analysis = null, rp = null, followed = new Set(), csvHref }: Props = $props();
+	let {
+		bundle,
+		analysis = null,
+		rp = null,
+		followed = new Set(),
+		csvHref,
+		choice = DEFAULT_CHOICE,
+		onchoose
+	}: Props = $props();
 
 	const qualMatches = $derived(quals(bundle.matches));
 	const remaining = $derived(qualMatches.filter((match) => !match.result).length);
-	const best = $derived.by(() => {
-		const scores = npMax(qualMatches);
-		return scores.size > 0 ? scores : null;
-	});
+	const stats = $derived(scoreStats(qualMatches));
 	const projections = $derived(remaining > 0 ? (analysis?.projections ?? null) : null);
 	const ratings = $derived(analysis && analysis.ratings.length > 0 ? analysis.ratings : null);
+	const sources = $derived(availableSources(ratings, stats));
+	const columns = $derived(visibleColumns(choice, sources));
+	const shown = $derived(new Set(columns.map((column) => column.key)));
+	const rows = $derived(
+		sortRankingRows(rankingRows(bundle.rankings, ratings, stats, projections), choice)
+	);
+	const query = $derived(rankingQuery(choice));
 	const strength = $derived(analysis?.strength ?? []);
 	const strengthTitle = $derived(remaining > 0 ? 'Schedule so far' : 'Schedule strength');
 	const elsewhere = $derived.by(() => {
@@ -39,10 +63,12 @@
 			elsewhere
 				? "These are league rankings, so they include teams that didn't play at this meet."
 				: null,
-			'RS is the average ranking points per match.',
-			'TBP is the average match score without penalties.',
-			best ? 'NP max is the best qualification score without points from opponent fouls.' : null,
-			ratings ? "OPR is each team's estimated share of its alliance's score." : null,
+			shown.has('rs') ? 'RS is the average ranking points per match.' : null,
+			shown.has('tbp') ? 'TBP is the average match score without penalties.' : null,
+			sources.has('score') && ['npavg', 'npmax', 'npmin', 'npsd'].some((key) => shown.has(key))
+				? 'NP scores leave out points from opponent fouls and count qualification matches only. Spread is how much those scores vary.'
+				: null,
+			sources.has('rating') ? "OPR is each team's estimated share of its alliance's score." : null,
 			projections
 				? `Projections play out the ${remaining} remaining qualification ${remaining === 1 ? 'match' : 'matches'}.`
 				: null
@@ -57,18 +83,26 @@
 		Rankings show here after the first qualification match is played.
 	</EmptyState>
 {:else}
+	<div class="bar">
+		<p class="note">Click a column to sort by it.</p>
+		{#if onchoose}
+			<ColumnMenu {choice} {sources} {onchoose} />
+		{/if}
+	</div>
 	<RankingsTable
-		rankings={bundle.rankings}
+		{rows}
 		teams={bundle.teams}
-		{ratings}
-		{projections}
+		{columns}
+		{choice}
+		projected={projections !== null && projections.length > 0}
 		qualCount={qualMatches.length}
-		npMax={best}
+		hrefFor={(next) => rankingQuery(next) || '?'}
+		{onchoose}
 		{followed}
 	/>
 	<p class="note">{note}</p>
 	{#if csvHref}
-		<p class="csv"><a href={csvHref} download>Download CSV</a></p>
+		<p class="csv"><a href="{csvHref}{query}" download>Download CSV</a></p>
 	{/if}
 	{#if rp}
 		<section class="panel" aria-labelledby="rp-title">
@@ -101,6 +135,18 @@
 {/if}
 
 <style>
+	.bar {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 16px;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.bar .note {
+		margin: 0;
+	}
+
 	.csv {
 		font-size: 14px;
 	}

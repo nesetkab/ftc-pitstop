@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup, render, screen, within } from '@testing-library/svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { parseRankingChoice } from './ranking-columns.ts';
 import RankingsView from './RankingsView.svelte';
 import { rpCounts } from './standings.ts';
 import { fakeAnalysis, fixtureBundle, unplay } from './test-fixtures.ts';
@@ -23,7 +24,7 @@ function bodyRows(table: HTMLElement) {
 describe('RankingsView', () => {
 	it('shows the FTC rankings without any analysis', () => {
 		render(RankingsView, { props: { bundle: finished } });
-		expect(headers()).toEqual(['Rank', 'Team', 'RS', 'Record', 'TBP', 'NP max', 'Avg tips']);
+		expect(headers()).toEqual(['Rank ↑', 'Team', 'RS', 'Record', 'TBP', 'NP max', 'Avg tips']);
 		const table = screen.getByRole('table', { name: 'Rankings' });
 		const rows = bodyRows(table);
 		expect(rows).toHaveLength(27);
@@ -136,5 +137,82 @@ describe('RankingsView', () => {
 	it('leaves the ranking point table out without match detail', () => {
 		render(RankingsView, { props: { bundle: finished } });
 		expect(screen.queryByRole('table', { name: 'Where ranking points came from' })).toBeNull();
+	});
+
+	it('shows the chosen columns sorted by the chosen one', () => {
+		const choice = parseRankingChoice(
+			new URLSearchParams('cols=rs,npavg,npsd,opr,opr-auto,opr-teleop&sort=npavg')
+		);
+		render(RankingsView, {
+			props: {
+				bundle: finished,
+				analysis: fakeAnalysis(finished),
+				choice,
+				onchoose: () => {},
+				csvHref: '/events/USAZGIQ/rankings.csv'
+			}
+		});
+		const table = screen.getByRole('table', { name: 'Rankings' });
+		const cells = within(table).getAllByRole('columnheader');
+		expect(cells.map((cell) => cell.textContent?.trim())).toEqual([
+			'Rank',
+			'Team',
+			'RS',
+			'NP avg ↓',
+			'Spread',
+			'OPR',
+			'Auto OPR',
+			'Teleop OPR'
+		]);
+		const averages = bodyRows(table).map((row) =>
+			Number(row.querySelectorAll('td')[3].textContent)
+		);
+		expect(averages).toEqual([...averages].sort((a, b) => b - a));
+		expect(screen.getByRole('columnheader', { name: /NP avg/ })).toHaveAttribute(
+			'aria-sort',
+			'descending'
+		);
+		expect(table.querySelectorAll('.opt')).toHaveLength(0);
+		expect(screen.getByRole('link', { name: 'Download CSV' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/rankings.csv?cols=rs,npavg,npsd,opr,opr-auto,opr-teleop&sort=npavg'
+		);
+	});
+
+	it('links every header to its sort and hands clicks to the page', async () => {
+		const onchoose = vi.fn();
+		render(RankingsView, { props: { bundle: finished, onchoose } });
+		const tbp = screen.getByRole('link', { name: 'TBP' });
+		expect(tbp).toHaveAttribute('href', '?sort=tbp');
+		expect(screen.getByRole('link', { name: /Rank/ })).toHaveAttribute('href', '?dir=desc');
+		await fireEvent.click(tbp);
+		expect(onchoose).toHaveBeenCalledWith(expect.objectContaining({ sort: 'tbp', dir: 'desc' }));
+	});
+
+	it('picks columns from a keyboard friendly menu', async () => {
+		const onchoose = vi.fn();
+		render(RankingsView, {
+			props: { bundle: finished, analysis: fakeAnalysis(finished), onchoose }
+		});
+		const trigger = screen.getByRole('button', { name: /Columns/ });
+		expect(trigger).toHaveAttribute('aria-expanded', 'false');
+		await fireEvent.click(trigger);
+		expect(trigger).toHaveAttribute('aria-expanded', 'true');
+		const panel = screen.getByRole('group', { name: 'Choose columns' });
+		expect(within(panel).getByRole('checkbox', { name: 'Ranking score (RS)' })).toBeChecked();
+		await fireEvent.click(within(panel).getByRole('checkbox', { name: 'Hive' }));
+		expect(onchoose).toHaveBeenCalledWith(
+			expect.objectContaining({ columns: expect.arrayContaining(['opr-hive']) })
+		);
+		await fireEvent.keyDown(panel, { key: 'Escape' });
+		expect(trigger).toHaveAttribute('aria-expanded', 'false');
+		expect(trigger).toHaveFocus();
+	});
+
+	it('greys out OPR columns before the model has run', async () => {
+		render(RankingsView, { props: { bundle: finished, onchoose: () => {} } });
+		await fireEvent.click(screen.getByRole('button', { name: /Columns/ }));
+		expect(screen.getByRole('checkbox', { name: 'Auto' })).toBeDisabled();
+		expect(screen.getByRole('checkbox', { name: 'Average' })).toBeEnabled();
 	});
 });

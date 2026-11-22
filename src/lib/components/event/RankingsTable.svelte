@@ -1,109 +1,212 @@
 <script lang="ts">
-	import type { Projection, TeamRating } from '#lib/analysis/types.ts';
-	import { fixed, integer } from '#lib/format/number.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
-	import { record } from '#lib/format/record.ts';
-	import type { Ranking, Team } from '#lib/types.ts';
+	import type { Team } from '#lib/types.ts';
 	import FinishSpark from '#lib/ui/FinishSpark.svelte';
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
+	import {
+		cellText,
+		phoneHidden,
+		sortBy,
+		type ColumnKey,
+		type RankingChoice,
+		type RankingColumn,
+		type RankingRow,
+		type SortKey
+	} from './ranking-columns.ts';
 
 	interface Props {
-		rankings: Ranking[];
+		rows: RankingRow[];
 		teams: Team[];
-		ratings?: TeamRating[] | null;
-		projections?: Projection[] | null;
+		columns: RankingColumn[];
+		choice: RankingChoice;
+		projected?: boolean;
 		qualCount?: number;
-		npMax?: ReadonlyMap<number, number> | null;
+		hrefFor: (choice: RankingChoice) => string;
+		onchoose?: (choice: RankingChoice) => void;
 		followed?: ReadonlySet<number>;
 	}
 
 	let {
-		rankings,
+		rows,
 		teams,
-		ratings = null,
-		projections = null,
+		columns,
+		choice,
+		projected = false,
 		qualCount = 0,
-		npMax = null,
+		hrefFor,
+		onchoose,
 		followed = new Set()
 	}: Props = $props();
 
 	const names = $derived(new Map(teams.map((team) => [team.number, team.name])));
-	const opr = $derived(
-		ratings ? new Map(ratings.map((rating) => [rating.team, rating.opr])) : null
-	);
-	const projected = $derived(
-		projections && projections.length > 0
-			? new Map(projections.map((projection) => [projection.team, projection]))
-			: null
-	);
-	const baseColumns = $derived(6 + (opr ? 1 : 0) + (npMax ? 1 : 0));
+
+	function ariaSort(key: SortKey) {
+		if (choice.sort !== key) return undefined;
+		return choice.dir === 'asc' ? 'ascending' : 'descending';
+	}
+
+	function choose(event: MouseEvent, key: SortKey) {
+		if (!onchoose || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+		event.preventDefault();
+		onchoose(sortBy(choice, key));
+	}
+
+	function hidden(key: ColumnKey) {
+		return phoneHidden(key, choice, projected);
+	}
 </script>
 
-<Table>
+{#snippet sorter(key: SortKey, label: string, title?: string)}
+	<a
+		href={hrefFor(sortBy(choice, key))}
+		onclick={(event) => choose(event, key)}
+		data-sveltekit-replacestate
+		data-sveltekit-reset="false"
+	>
+		{#if title}<abbr {title}>{label}</abbr>{:else}{label}{/if}{#if choice.sort === key}<span
+				aria-hidden="true">{choice.dir === 'asc' ? ' ↑' : ' ↓'}</span
+			>{/if}
+	</a>
+{/snippet}
+
+<Table class="rankings">
 	<caption class="visually-hidden">Rankings</caption>
 	<thead>
 		{#if projected}
 			<tr class="opt">
-				<td colspan={baseColumns}></td>
+				<td class="pin rank"></td>
+				<td class="pin team"></td>
+				<td colspan={columns.length}></td>
 				<th colspan="3" scope="colgroup" class="group sep">Projected after {qualCount} matches</th>
 			</tr>
 		{/if}
 		<tr>
-			<th class="l" scope="col">Rank</th>
-			<th class="l" scope="col">Team</th>
-			<th scope="col">RS</th>
-			<th class={{ opt: projected !== null }} scope="col">Record</th>
-			<th class="opt" scope="col">TBP</th>
-			{#if npMax}
-				<th class="opt" scope="col"
-					><abbr title="Best score without opponent fouls">NP max</abbr></th
+			<th class="l pin rank" scope="col" aria-sort={ariaSort('rank')}
+				>{@render sorter('rank', 'Rank')}</th
+			>
+			<th class="l pin team" scope="col" aria-sort={ariaSort('team')}
+				>{@render sorter('team', 'Team')}</th
+			>
+			{#each columns as column (column.key)}
+				{@const key = column.key as ColumnKey}
+				<th
+					class={{ opt: hidden(key), active: choice.sort === key }}
+					scope="col"
+					aria-sort={ariaSort(key)}
 				>
-			{/if}
-			<th class="opt" scope="col">Avg tips</th>
-			{#if opr}
-				<th scope="col">OPR</th>
-			{/if}
+					{@render sorter(key, column.label, column.title)}
+				</th>
+			{/each}
 			{#if projected}
-				<th class="sep opt" scope="col">Finish, 1st to {ordinal(rankings.length)}</th>
-				<th class="opt" scope="col">Top 4</th>
-				<th scope="col">Top 8</th>
+				<th
+					class={{ sep: true, opt: choice.sort !== 'finish', active: choice.sort === 'finish' }}
+					scope="col"
+					aria-sort={ariaSort('finish')}
+				>
+					{@render sorter('finish', `Finish, 1st to ${ordinal(rows.length)}`)}
+				</th>
+				<th
+					class={{ opt: choice.sort !== 'top4', active: choice.sort === 'top4' }}
+					scope="col"
+					aria-sort={ariaSort('top4')}
+				>
+					{@render sorter('top4', 'Top 4')}
+				</th>
+				<th class={{ active: choice.sort === 'top8' }} scope="col" aria-sort={ariaSort('top8')}>
+					{@render sorter('top8', 'Top 8')}
+				</th>
 			{/if}
 		</tr>
 	</thead>
 	<tbody>
-		{#each rankings as row (row.team)}
-			{@const projection = projected?.get(row.team)}
-			<tr class:me={followed.has(row.team)}>
-				<td class="l">{row.rank}</td>
-				<td class="team">
-					<TeamCell
-						number={row.team}
-						name={names.get(row.team) ?? row.name}
-						href="/teams/{row.team}"
-					/>
+		{#each rows as row (row.ranking.team)}
+			{@const team = row.ranking.team}
+			<tr class:me={followed.has(team)}>
+				<td class="l pin rank">{row.ranking.rank}</td>
+				<td class="pin team">
+					<TeamCell number={team} name={names.get(team) ?? row.ranking.name} href="/teams/{team}" />
 				</td>
-				<td>{fixed(row.rs, 2)}</td>
-				<td class={{ opt: projected !== null }}>{record(row.wins, row.losses, row.ties)}</td>
-				<td class="opt">{fixed(row.tbp)}</td>
-				{#if npMax}
-					<td class="opt">{integer(npMax.get(row.team))}</td>
-				{/if}
-				<td class="opt">{fixed(row.avgTips)}</td>
-				{#if opr}
-					<td>{fixed(opr.get(row.team))}</td>
-				{/if}
+				{#each columns as column (column.key)}
+					<td class={{ opt: hidden(column.key as ColumnKey), strong: choice.sort === column.key }}>
+						{cellText(column, row)}
+					</td>
+				{/each}
 				{#if projected}
-					<td class="sep opt">
-						{#if projection}
-							<FinishSpark dist={projection.rankChances} />
+					<td class={{ sep: true, opt: choice.sort !== 'finish' }}>
+						{#if row.projection}
+							<FinishSpark dist={row.projection.rankChances} />
 						{/if}
 					</td>
-					<ProbCell p={projection?.top4} class="opt" />
-					<ProbCell p={projection?.top8} />
+					<ProbCell p={row.projection?.top4} class={choice.sort === 'top4' ? undefined : 'opt'} />
+					<ProbCell p={row.projection?.top8} />
 				{/if}
 			</tr>
 		{/each}
 	</tbody>
 </Table>
+
+<style>
+	th a {
+		color: inherit;
+	}
+
+	th.active {
+		color: var(--text);
+	}
+
+	th abbr {
+		text-decoration: none;
+	}
+
+	td.strong {
+		font-weight: 600;
+	}
+
+	.pin {
+		position: sticky;
+		z-index: 1;
+		background: var(--bg);
+	}
+
+	.rank {
+		left: 0;
+		box-sizing: border-box;
+		width: var(--rank-w);
+		min-width: var(--rank-w);
+		max-width: var(--rank-w);
+	}
+
+	.team {
+		left: var(--rank-w);
+	}
+
+	tr.me .pin {
+		background-color: var(--bg);
+		background-image: linear-gradient(var(--accent-wash), var(--accent-wash));
+	}
+
+	:global(.table-wrap.rankings) {
+		--rank-w: 64px;
+	}
+
+	@media (max-width: 600px) {
+		:global(.table-wrap.rankings) {
+			--rank-w: 54px;
+		}
+
+		th.rank {
+			white-space: nowrap;
+		}
+
+		td.team,
+		th.team {
+			box-shadow: inset -1px 0 var(--line);
+		}
+
+		td.team :global(.team-cell .name) {
+			max-width: min(8em, 24vw);
+		}
+	}
+</style>
