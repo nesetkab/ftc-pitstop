@@ -27,6 +27,10 @@
 		season={data.season}
 		seasonCount={data.seasonCount}
 		followed={view.followed}
+		eventCode={bundle.event.code}
 	/>
-	<p class="note">{note}</p>
+	<p class="note">
+		{note} Open a team for its scouting report, or
+		<a href="/events/{bundle.event.code}/scouting">print reports for every team</a>.
+	</p>
 {/if}

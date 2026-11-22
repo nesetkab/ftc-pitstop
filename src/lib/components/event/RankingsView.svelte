@@ -28,6 +28,7 @@
 		csvHref?: string;
 		choice?: RankingChoice;
 		onchoose?: (choice: RankingChoice) => void;
+		eventCode?: string;
 	}
 
 	let {
@@ -37,7 +38,8 @@
 		followed = new Set(),
 		csvHref,
 		choice = DEFAULT_CHOICE,
-		onchoose
+		onchoose,
+		eventCode
 	}: Props = $props();
 
 	const qualMatches = $derived(quals(bundle.matches));
@@ -99,6 +101,7 @@
 		hrefFor={(next) => rankingQuery(next) || '?'}
 		{onchoose}
 		{followed}
+		{eventCode}
 	/>
 	<p class="note">{note}</p>
 	{#if csvHref}

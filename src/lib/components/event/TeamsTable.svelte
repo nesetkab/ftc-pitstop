@@ -10,6 +10,7 @@
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import { placeName } from '#lib/format/places.ts';
+	import { teamHref } from './matches.ts';
 
 	interface Props {
 		teams: Team[];
@@ -18,6 +19,7 @@
 		season?: Record<number, SeasonStanding> | null;
 		seasonCount?: number | null;
 		followed?: ReadonlySet<number>;
+		eventCode?: string;
 	}
 
 	let {
@@ -26,7 +28,8 @@
 		ratings = null,
 		season = null,
 		seasonCount = null,
-		followed = new Set()
+		followed = new Set(),
+		eventCode
 	}: Props = $props();
 
 	const ranks = $derived(new Map(rankings.map((row) => [row.team, row.rank])));
@@ -61,7 +64,7 @@
 			{@const standing = season?.[team.number]}
 			<tr class:me={followed.has(team.number)}>
 				<td class="team">
-					<TeamCell number={team.number} name={team.name} href="/teams/{team.number}" />
+					<TeamCell number={team.number} name={team.name} href={teamHref(team.number, eventCode)} />
 				</td>
 				<td class={['l muted', { opt: stats }]}>
 					{placeName(team)}

@@ -20,6 +20,7 @@
 		rp={data.rp}
 		followed={view.followed}
 		csvHref="/events/{bundle.event.code}/rankings.csv"
+		eventCode={bundle.event.code}
 	/>
 {:else}
 	<EventPreview
