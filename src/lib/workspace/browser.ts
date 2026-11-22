@@ -4,6 +4,7 @@ import {
 	type DeviceStore,
 	type StorageLike
 } from '#lib/workspace/device-store.ts';
+import { createPendingStore } from '#lib/workspace/pending.ts';
 import { createRemoteStore } from '#lib/workspace/remote-store.ts';
 import type { WorkspaceAccess } from '#lib/workspace/workspace.svelte.ts';
 import type { WorkspaceStore } from '#lib/workspace/types.ts';
@@ -26,6 +27,10 @@ export function browserWorkspaces(shared: boolean): BrowserWorkspaces {
 		persistent,
 		device,
 		remote,
-		access: { stores: remote ? [remote, device] : [device], cache }
+		access: {
+			stores: remote ? [remote, device] : [device],
+			cache,
+			pending: remote ? createPendingStore(storage) : null
+		}
 	};
 }
