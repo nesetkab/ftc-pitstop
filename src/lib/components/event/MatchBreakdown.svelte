@@ -166,10 +166,4 @@
 		gap: 12px;
 		align-content: start;
 	}
-
-	h3.sec-title {
-		font-size: 15px;
-		line-height: 1.4;
-		letter-spacing: 0;
-	}
 </style>
