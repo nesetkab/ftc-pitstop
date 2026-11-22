@@ -255,14 +255,44 @@ describe('PhoneScreen', () => {
 		phone('default');
 		expect(screen.getByRole('switch', { name: 'Alliance selection starts' })).toBeInTheDocument();
 		cleanup();
-		const meet = fixtureBundle('USFLORM1');
-		const team = meet.rankings[0].team;
+		const recorded = fixtureBundle('USFLORM1');
+		const meet = replayBundle(recorded, replayStart('Q5', recorded)!);
+		const team = recorded.rankings[0].team;
 		render(PhoneScreen, {
 			props: {
 				...props(at('Q22')),
 				view: pitView({ bundle: meet, analysis: null, queue: null, team }),
 				event: meet.event,
 				matches: meet.matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default' as const
+			}
+		});
+		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).toBeInTheDocument();
+		expect(screen.queryByRole('switch', { name: 'Alliance selection starts' })).toBeNull();
+	});
+
+	it('drops alerts once the event is over', () => {
+		const time = at('M10') + 20 * 60_000;
+		render(PhoneScreen, {
+			props: {
+				...props(time),
+				matches: replayBundle(full, time).matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default' as const
+			}
+		});
+		expect(screen.getByText('Final rank')).toBeInTheDocument();
+		expect(screen.queryByRole('heading', { name: 'Alerts' })).toBeNull();
+		expect(screen.queryByRole('switch')).toBeNull();
+	});
+
+	it('drops the alliance selection alert once selection has started', () => {
+		const time = at('M1');
+		render(PhoneScreen, {
+			props: {
+				...props(time),
+				matches: replayBundle(full, time).matches,
 				alerts: DEFAULT_ALERTS,
 				permission: 'default' as const
 			}
