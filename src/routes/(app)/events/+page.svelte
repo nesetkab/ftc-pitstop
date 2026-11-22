@@ -16,6 +16,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import Segmented from '#lib/ui/Segmented.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import type { PageProps } from './$types';
@@ -151,17 +152,7 @@
 			{/each}
 		</select>
 	</label>
-	<div class="seg" role="group" aria-label="Dates">
-		{#each WHEN as option (option.value)}
-			<button
-				type="button"
-				aria-pressed={when === option.value}
-				onclick={() => (when = option.value)}
-			>
-				{option.label}
-			</button>
-		{/each}
-	</div>
+	<Segmented label="Dates" options={WHEN} value={when} onselect={(value) => (when = value)} />
 </form>
 
 {#if shown.length === 0}
@@ -258,40 +249,6 @@
 
 	input::placeholder {
 		color: var(--text-3);
-	}
-
-	.seg {
-		display: inline-flex;
-		flex: none;
-		border: 1px solid var(--line-2);
-		border-radius: var(--radius-control);
-		overflow: hidden;
-	}
-
-	.seg button {
-		min-height: calc(var(--control-h) - 2px);
-		padding: 8px 12px;
-		border: 0;
-		background: transparent;
-		color: var(--text-2);
-		font: 500 13px/1 var(--font);
-	}
-
-	.seg button + button {
-		border-left: 1px solid var(--line-2);
-	}
-
-	.seg button:hover {
-		color: var(--text);
-	}
-
-	.seg button[aria-pressed='true'] {
-		background: var(--surface);
-		color: var(--text);
-	}
-
-	.seg button:focus-visible {
-		outline-offset: -2px;
 	}
 
 	.count {
@@ -393,8 +350,7 @@
 		}
 	}
 	@media (pointer: coarse) {
-		input,
-		.seg button {
+		input {
 			min-height: 40px;
 		}
 	}
