@@ -157,7 +157,7 @@
 	.standings li.mine {
 		margin: 0 -0.5em;
 		padding-inline: 0.5em;
-		background: var(--accent-wash);
+		background: var(--line);
 	}
 
 	.standings li.out .teams,

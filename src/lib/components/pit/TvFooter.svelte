@@ -40,7 +40,7 @@
 <footer class={['foot', { stale }]}>
 	<span class="state"><span class={['dot', connection]}></span>{STATE[connection]}</span>
 	{#if updated !== null}
-		<span>
+		<span class="updated">
 			Updated {timeWithSeconds(updated, timeZone)} from {from}{stale
 				? `, ${relative(updated, now)}`
 				: ''}
@@ -76,6 +76,17 @@
 		font-weight: 500;
 	}
 
+	.foot > span {
+		flex: none;
+	}
+
+	.foot > .updated {
+		flex: 0 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	.state {
 		display: inline-flex;
 		align-items: center;
@@ -104,7 +115,7 @@
 		box-shadow: none;
 	}
 
-	.space {
-		flex: 1;
+	.foot > .space {
+		flex: 1 1 0;
 	}
 </style>
