@@ -27,6 +27,7 @@ import type { SeasonMatch } from '#lib/types.ts';
 export type SeasonModel = {
 	generatedAt: number;
 	complete: boolean;
+	matches: SeasonMatch[];
 	events: ModelEvent[];
 	days: number[];
 	sums: Sums[];
@@ -100,6 +101,7 @@ export function buildSeason(
 	return {
 		generatedAt: options.now,
 		complete: options.complete ?? true,
+		matches,
 		events,
 		days,
 		sums: events.map((event) => matchSums(event.matches)),

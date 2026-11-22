@@ -217,6 +217,10 @@ export function createAnalysis(deps: AnalysisDeps) {
 		return result;
 	}
 
+	function loadSeasonModelWithin(ms: number = budget): Promise<SeasonModel | null> {
+		return settleWithin(loadSeasonModel(), ms);
+	}
+
 	function loadSeasonRatingsWithin(ms: number = budget): Promise<SeasonRatings | null> {
 		return settleWithin(loadSeasonRatings(), ms);
 	}
@@ -236,6 +240,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 
 	return {
 		loadSeasonModel,
+		loadSeasonModelWithin,
 		loadEventAnalysis,
 		loadEventAnalysisEntry,
 		loadSeasonRatings,
@@ -251,6 +256,7 @@ export type Analysis = ReturnType<typeof createAnalysis>;
 export const analysis = createAnalysis({ loaders: defaultLoaders, cache: sharedCache });
 
 export const {
+	loadSeasonModelWithin,
 	loadEventAnalysis,
 	loadEventAnalysisEntry,
 	loadSeasonRatings,

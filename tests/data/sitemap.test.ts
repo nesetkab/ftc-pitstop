@@ -27,6 +27,8 @@ describe('sitemap', () => {
 			'https://www.ftcpitstop.com/',
 			'https://www.ftcpitstop.com/events',
 			'https://www.ftcpitstop.com/leaderboards',
+			'https://www.ftcpitstop.com/records',
+			'https://www.ftcpitstop.com/compare',
 			'https://www.ftcpitstop.com/accuracy',
 			'https://www.ftcpitstop.com/events/USMTBUQ',
 			'https://www.ftcpitstop.com/teams/3747',
@@ -39,6 +41,6 @@ describe('sitemap', () => {
 		const response = await get();
 		const xml = await response.text();
 		expect(response.headers.get('cache-control')).toBe('public, s-maxage=300');
-		expect(xml.match(/<loc>/g)).toHaveLength(4);
+		expect(xml.match(/<loc>/g)).toHaveLength(6);
 	});
 });

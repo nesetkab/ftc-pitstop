@@ -12,7 +12,9 @@
 	const links = [
 		{ href: '/events', label: 'Events' },
 		{ href: '/teams', label: 'Teams' },
-		{ href: '/leaderboards', label: 'Leaderboards' }
+		{ href: '/leaderboards', label: 'Leaderboards' },
+		{ href: '/records', label: 'Records' },
+		{ href: '/compare', label: 'Compare' }
 	];
 
 	function current(href: string) {

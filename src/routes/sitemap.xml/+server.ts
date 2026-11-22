@@ -1,7 +1,7 @@
 import { searchIndex } from '#lib/server/event.ts';
 import type { RequestHandler } from './$types';
 
-const PAGES = ['/', '/events', '/leaderboards', '/accuracy'];
+const PAGES = ['/', '/events', '/leaderboards', '/records', '/compare', '/accuracy'];
 
 function escapeXml(text: string): string {
 	return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
