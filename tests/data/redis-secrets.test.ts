@@ -34,7 +34,6 @@ vi.mock('@upstash/redis', () => {
 		mget = vi.fn(async () => broken());
 		set = vi.fn(async () => broken());
 		incr = vi.fn(async () => broken());
-		decr = vi.fn(async () => broken());
 		expire = vi.fn(async () => broken());
 	}
 	return { Redis };

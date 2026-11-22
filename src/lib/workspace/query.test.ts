@@ -37,4 +37,12 @@ describe('load options', () => {
 		expect(parse(`docs=${flood}`).docs).toEqual(['boards']);
 		expect(parse('docs=nope,,').docs).toBeUndefined();
 	});
+
+	it('carry the workspace version and drop one that looks wrong', () => {
+		const rev = '0123456789abcdef0123456789abcdef';
+		expect(parse(encodeLoadOptions({ rev })).rev).toBe(rev);
+		expect(parse('rev=short').rev).toBeUndefined();
+		expect(parse(`rev=${'a'.repeat(41)}`).rev).toBeUndefined();
+		expect(parse('rev=ABC*DEF1234').rev).toBeUndefined();
+	});
 });

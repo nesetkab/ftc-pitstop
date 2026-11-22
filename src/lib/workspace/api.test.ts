@@ -222,9 +222,20 @@ describe('workspace api', () => {
 		expect(poll.status).toBe(200);
 		expect(await poll.json()).toEqual({
 			meta: expect.objectContaining({ code }),
-			docs: {}
+			docs: {},
+			rev: expect.any(String),
+			key: expect.any(String)
 		});
 		expect((await get(code, `?known=checklist.${saved.updatedAt + 1}`)).status).toBe(429);
+	});
+
+	it('lets people who opened the workspace keep polling with its key, and nobody else', async () => {
+		const { code } = await create();
+		const { key } = (await (await get(code)).json()) as { key: string };
+		for (let i = 0; i < RATE.miss.limit; i++) await get('ZZZZZZ');
+		expect((await get(code, `?key=${key}`)).status).toBe(200);
+		expect((await get(code, `?key=${'0'.repeat(32)}`)).status).toBe(429);
+		expect((await get('ZZZZZZ', `?key=${key}`)).status).toBe(429);
 	});
 
 	it('does not charge people who open a workspace they have the code for', async () => {
@@ -237,7 +248,7 @@ describe('workspace api', () => {
 	it('never lets the bookkeeping field out', async () => {
 		const { code } = await create();
 		const body = (await (await get(code)).json()) as Record<string, unknown>;
-		expect(Object.keys(body).sort()).toEqual(['docs', 'meta']);
+		expect(Object.keys(body).sort()).toEqual(['docs', 'key', 'meta', 'rev']);
 	});
 
 	it('applies the guessing limit to writes too', async () => {

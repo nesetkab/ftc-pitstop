@@ -60,6 +60,8 @@ export class Workspace {
 	#cache: DeviceStore | null = null;
 	#store: WorkspaceStore | null = null;
 	#versions: Versions = {};
+	#rev: string | undefined;
+	#key: string | undefined;
 	#pending: Partial<Record<DocName, AnyChange[]>> = {};
 	#timers: Partial<Record<DocName, ReturnType<typeof setTimeout>>> = {};
 	#running: Partial<Record<DocName, boolean>> = {};
@@ -114,7 +116,12 @@ export class Workspace {
 			stops.push(
 				store.watch(
 					this.code,
-					() => ({ known: { ...this.#versions }, docs: this.names }),
+					() => ({
+						known: { ...this.#versions },
+						docs: this.names,
+						rev: this.#rev,
+						key: this.#key
+					}),
 					(snapshot) => this.#apply(snapshot, true)
 				)
 			);
@@ -179,10 +186,15 @@ export class Workspace {
 
 	#apply(snapshot: Snapshot, confirmed: boolean) {
 		this.meta = snapshot.meta;
+		if (confirmed) {
+			this.#rev = snapshot.rev ?? this.#rev;
+			this.#key = snapshot.key ?? this.#key;
+		}
 		let docs = this.docs;
 		for (const name of this.names) {
 			const stamped = snapshot.docs[name];
 			if (!stamped) continue;
+			if (confirmed && stamped.updatedAt < (this.#versions[name] ?? 0)) continue;
 			if (confirmed) this.#versions[name] = stamped.updatedAt;
 			docs = withDoc(docs, name, this.#rebase(name, stamped.data));
 		}

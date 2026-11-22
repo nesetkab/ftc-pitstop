@@ -1,3 +1,4 @@
+import * as z from 'zod/mini';
 import { generateCode, type RandomBytes } from '#lib/workspace/code.ts';
 import type { LimiterRedis } from '#lib/workspace/limit.ts';
 import {
@@ -7,7 +8,7 @@ import {
 	stampedSchemas,
 	type DocMap,
 	type DocName,
-	type Snapshot,
+	type Docs,
 	type Stamped,
 	type WorkspaceMeta
 } from '#lib/workspace/schemas.ts';
@@ -37,6 +38,22 @@ export interface RedisStoreOptions {
 	ttl?: number;
 	now?: () => number;
 	random?: RandomBytes;
+	cacheTtl?: number;
+	cacheSize?: number;
+}
+
+const storedMetaSchema = z.extend(metaSchema, {
+	rev: z.optional(z.string()),
+	key: z.optional(z.string())
+});
+
+type StoredMeta = WorkspaceMeta & { rev: string; key: string };
+
+interface Entry {
+	meta: StoredMeta;
+	checkedAt: number;
+	docs: Docs;
+	loaded: Set<DocName>;
 }
 
 function decode(raw: unknown): unknown {
@@ -48,6 +65,14 @@ function decode(raw: unknown): unknown {
 	}
 }
 
+function token(): string {
+	return crypto.randomUUID().replaceAll('-', '');
+}
+
+function publicMeta({ code, teamNumber, createdAt }: WorkspaceMeta): WorkspaceMeta {
+	return { code, teamNumber, createdAt };
+}
+
 export function createRedisStore(
 	redis: WorkspaceRedis,
 	options: RedisStoreOptions = {}
@@ -55,11 +80,14 @@ export function createRedisStore(
 	const prefix = options.prefix ?? 'pitstop:ws:';
 	const ttl = options.ttl ?? WORKSPACE_TTL_SECONDS;
 	const now = options.now ?? Date.now;
+	const cacheTtl = options.cacheTtl ?? 4_000;
+	const cacheSize = options.cacheSize ?? 100;
+	const cache = new Map<string, Entry>();
 	const metaKey = (code: string) => `${prefix}${code}:meta`;
 	const docKey = (code: string, name: DocName) => `${prefix}${code}:${name}`;
 
-	function parseMeta(raw: unknown): WorkspaceMeta | null {
-		const result = metaSchema.safeParse(decode(raw));
+	function parseMeta(raw: unknown) {
+		const result = storedMetaSchema.safeParse(decode(raw));
 		return result.success ? result.data : null;
 	}
 
@@ -68,36 +96,107 @@ export function createRedisStore(
 		return result.success ? (result.data as Stamped<DocMap[K]>) : null;
 	}
 
+	function remember(code: string, entry: Entry): Entry {
+		cache.delete(code);
+		cache.set(code, entry);
+		if (cache.size > cacheSize) cache.delete(cache.keys().next().value as string);
+		return entry;
+	}
+
+	async function saveMeta(
+		code: string,
+		meta: WorkspaceMeta & { key?: string }
+	): Promise<StoredMeta> {
+		const stored = { ...publicMeta(meta), rev: token(), key: meta.key ?? token() };
+		await redis.set(metaKey(code), JSON.stringify(stored), { ex: ttl });
+		return stored;
+	}
+
+	async function refresh(code: string, names: readonly DocName[]): Promise<Entry | null> {
+		const [rawMeta, ...rawDocs] =
+			names.length > 0
+				? await redis.mget(metaKey(code), ...names.map((name) => docKey(code, name)))
+				: [await redis.get(metaKey(code))];
+		const meta = parseMeta(rawMeta);
+		if (!meta) {
+			cache.delete(code);
+			return null;
+		}
+		const entry: Entry = {
+			meta: meta as StoredMeta,
+			checkedAt: now(),
+			docs: {},
+			loaded: new Set()
+		};
+		if (!meta.rev || !meta.key) {
+			entry.meta = await saveMeta(code, meta);
+			return remember(code, entry);
+		}
+		const previous = cache.get(code);
+		if (previous?.meta.rev === meta.rev) {
+			entry.docs = { ...previous.docs };
+			entry.loaded = new Set(previous.loaded);
+		}
+		names.forEach((name, index) => {
+			const stamped = parseStamped(name, rawDocs[index]);
+			if (stamped) putDoc(entry.docs, name, stamped);
+			else delete entry.docs[name];
+			entry.loaded.add(name);
+		});
+		return remember(code, entry);
+	}
+
 	return {
 		kind: 'shared',
 
 		async create({ teamNumber }) {
 			for (let attempt = 0; attempt < 12; attempt++) {
 				const code = generateCode(options.random);
-				const meta: WorkspaceMeta = { code, teamNumber, createdAt: now() };
+				const meta: StoredMeta = {
+					code,
+					teamNumber,
+					createdAt: now(),
+					rev: token(),
+					key: token()
+				};
 				const stored = await redis.set(metaKey(code), JSON.stringify(meta), { nx: true, ex: ttl });
-				if (stored === 'OK') return meta;
+				if (stored === 'OK') {
+					remember(code, { meta, checkedAt: now(), docs: {}, loaded: new Set(DOC_NAMES) });
+					return publicMeta(meta);
+				}
 			}
 			throw new WorkspaceError('unavailable', 'No free join code was found');
 		},
 
 		async load(code, loadOptions: LoadOptions = {}) {
 			const names = loadOptions.docs ?? DOC_NAMES;
-			const [rawMeta, ...rawDocs] = await redis.mget(
-				metaKey(code),
-				...names.map((name) => docKey(code, name))
-			);
-			const meta = parseMeta(rawMeta);
-			if (!meta) return null;
-			const snapshot: Snapshot = { meta, docs: {} };
-			const matched: DocName[] = [];
-			names.forEach((name, index) => {
-				const stamped = parseStamped(name, rawDocs[index]);
-				if (!stamped) return;
-				if (loadOptions.known?.[name] === stamped.updatedAt) matched.push(name);
-				else putDoc(snapshot.docs, name, stamped);
-			});
-			return { ...snapshot, matched };
+			const { rev, known, key } = loadOptions;
+			const cached = cache.get(code);
+			const usable = cached !== undefined && now() - cached.checkedAt < cacheTtl;
+			const entry = usable ? cached : await refresh(code, rev === undefined ? names : []);
+			if (!entry) return null;
+			const meta = publicMeta(entry.meta);
+			const owned = { rev: entry.meta.rev, key: entry.meta.key };
+			if (rev === entry.meta.rev) return { meta, docs: {}, ...owned, proven: true };
+			const missing = names.filter((name) => !entry.loaded.has(name));
+			if (missing.length > 0) {
+				const raws = await redis.mget(...missing.map((name) => docKey(code, name)));
+				missing.forEach((name, index) => {
+					const stamped = parseStamped(name, raws[index]);
+					if (stamped) putDoc(entry.docs, name, stamped);
+					entry.loaded.add(name);
+				});
+			}
+			const docs: Docs = {};
+			let proven = key === entry.meta.key;
+			for (const name of names) {
+				const stamped = entry.docs[name];
+				if (!stamped) continue;
+				const version = known?.[name];
+				if (version === stamped.updatedAt) proven = true;
+				if (version === undefined || version < stamped.updatedAt) putDoc(docs, name, stamped);
+			}
+			return { meta, docs, ...owned, proven };
 		},
 
 		async write<K extends DocName>(
@@ -107,7 +206,11 @@ export function createRedisStore(
 			base?: number | null
 		): Promise<WriteResult<K>> {
 			const [rawMeta, rawCurrent] = await redis.mget(metaKey(code), docKey(code, doc));
-			if (!parseMeta(rawMeta)) throw new WorkspaceError('not-found', 'No workspace uses this code');
+			const stored = parseMeta(rawMeta);
+			if (!stored) {
+				cache.delete(code);
+				throw new WorkspaceError('not-found', 'No workspace uses this code');
+			}
 			const current = parseStamped(doc, rawCurrent);
 			if (base !== undefined && current && current.updatedAt !== base) {
 				return { ok: false, current };
@@ -121,7 +224,10 @@ export function createRedisStore(
 				throw new WorkspaceError('too-large', 'This is too large to save');
 			}
 			await redis.set(docKey(code, doc), payload, { ex: ttl });
-			await redis.expire(metaKey(code), ttl);
+			const meta = await saveMeta(code, stored);
+			const docs: Docs = {};
+			putDoc(docs, doc, stamped);
+			remember(code, { meta, checkedAt: now(), docs, loaded: new Set([doc]) });
 			return { ok: true, stamped };
 		}
 	};

@@ -21,10 +21,15 @@ export interface RemoteStoreOptions {
 	base?: string;
 	interval?: number;
 	idleInterval?: number;
+	slowInterval?: number;
+	slowAfter?: number;
+	activeFor?: number;
 	isVisible?: () => boolean;
 }
 
 const KEEPALIVE_LIMIT = 60_000;
+const WAKE_GAP = 2_000;
+const ACTIVITY = ['pointerdown', 'keydown', 'wheel', 'touchstart'] as const;
 
 const FAILURES: Record<number, [WorkspaceErrorCode, string]> = {
 	400: ['invalid', 'The workspace rejected the request'],
@@ -46,6 +51,9 @@ export function createRemoteStore(options: RemoteStoreOptions = {}): WorkspaceSt
 	const base = options.base ?? '/api/workspace';
 	const interval = options.interval ?? 10_000;
 	const idleInterval = Math.max(interval, options.idleInterval ?? 30_000);
+	const slowInterval = Math.max(idleInterval, options.slowInterval ?? 60_000);
+	const slowAfter = options.slowAfter ?? 300_000;
+	const activeFor = options.activeFor ?? 60_000;
 	const nudges = new Set<() => void>();
 	const isVisible =
 		options.isVisible ?? (() => typeof document === 'undefined' || !document.hidden);
@@ -128,50 +136,68 @@ export function createRemoteStore(options: RemoteStoreOptions = {}): WorkspaceSt
 			let stopped = false;
 			let timer: ReturnType<typeof setTimeout> | undefined;
 			let delay = interval;
-			let nudged = false;
+			let lastPoll = Date.now();
+			let lastChange = lastPoll;
+			let lastTouch = -Infinity;
 
 			function schedule(wait: number) {
 				clearTimeout(timer);
-				if (!stopped) timer = setTimeout(tick, wait);
+				if (!stopped) timer = setTimeout(tick, Math.max(0, wait));
+			}
+
+			function backoff(changed: boolean): number {
+				const now = Date.now();
+				if (changed || now - lastTouch < activeFor) return interval;
+				const quiet = now - Math.max(lastTouch, lastChange);
+				return Math.min(quiet < slowAfter ? idleInterval : slowInterval, Math.round(delay * 1.5));
 			}
 
 			async function tick() {
 				if (stopped) return;
 				if (isVisible()) {
-					const snapshot = await store.load(code, request()).catch(() => null);
+					lastPoll = Date.now();
+					const asked = request();
+					const snapshot = await store.load(code, asked).catch(() => null);
 					if (stopped) return;
+					const moved = snapshot?.rev !== undefined && snapshot.rev !== asked.rev;
 					const changed = hasDocs(snapshot);
-					if (changed) onChange(snapshot);
-					delay = changed || nudged ? interval : Math.min(idleInterval, Math.round(delay * 1.5));
-					nudged = false;
+					if (changed) lastChange = Date.now();
+					if (snapshot && (changed || moved)) onChange(snapshot);
+					delay = backoff(changed);
 				}
 				schedule(delay);
 			}
 
-			function wake() {
-				if (stopped || !isVisible()) return;
-				delay = interval;
-				clearTimeout(timer);
-				void tick();
-			}
-
-			function nudge() {
-				nudged = true;
+			function hurry() {
+				lastTouch = Date.now();
 				if (delay === interval) return;
 				delay = interval;
-				schedule(interval);
+				schedule(lastPoll + interval - Date.now());
 			}
 
-			nudges.add(nudge);
+			function wake() {
+				if (stopped || !isVisible()) return;
+				lastTouch = Date.now();
+				delay = interval;
+				const since = Date.now() - lastPoll;
+				schedule(since < WAKE_GAP ? interval - since : 0);
+			}
+
+			const listen = { capture: true, passive: true };
+			nudges.add(hurry);
 			document.addEventListener('visibilitychange', wake);
+			window.addEventListener('focus', wake);
 			window.addEventListener('online', wake);
+			for (const type of ACTIVITY) document.addEventListener(type, hurry, listen);
 			schedule(interval);
 			return () => {
 				stopped = true;
 				clearTimeout(timer);
-				nudges.delete(nudge);
+				nudges.delete(hurry);
 				document.removeEventListener('visibilitychange', wake);
+				window.removeEventListener('focus', wake);
 				window.removeEventListener('online', wake);
+				for (const type of ACTIVITY) document.removeEventListener(type, hurry, listen);
 			};
 		}
 	};

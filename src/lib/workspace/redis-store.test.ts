@@ -79,6 +79,32 @@ describe('redis workspace store', () => {
 		expect(same?.docs).toEqual({});
 	});
 
+	it('gives a workspace from before versions a version and a key the first time it opens', async () => {
+		const meta = { code: 'QWERTY', teamNumber: 7, createdAt: time };
+		await redis.set('pitstop:ws:QWERTY:meta', JSON.stringify(meta));
+		await redis.set(
+			'pitstop:ws:QWERTY:checklist',
+			JSON.stringify({ updatedAt: 5, data: checklist('Old') })
+		);
+		const snapshot = await store.load('QWERTY');
+		expect(snapshot?.meta).toEqual(meta);
+		expect(snapshot?.rev).toMatch(/^[a-f0-9]{32}$/);
+		expect(snapshot?.docs.checklist?.data.items[0].text).toBe('Old');
+		const stored = JSON.parse((await redis.get('pitstop:ws:QWERTY:meta')) as string);
+		expect(stored).toMatchObject({ ...meta, rev: snapshot?.rev, key: snapshot?.key });
+	});
+
+	it('changes the version on every write and keeps the key', async () => {
+		const { code } = await store.create({ teamNumber: 7 });
+		const before = await store.load(code);
+		await store.write(code, 'checklist', checklist('One'));
+		const after = await store.load(code, { rev: before?.rev });
+		expect(after?.rev).not.toBe(before?.rev);
+		expect(after?.key).toBe(before?.key);
+		expect(after?.docs.checklist?.data.items[0].text).toBe('One');
+		expect((await store.load(code, { rev: after?.rev }))?.docs).toEqual({});
+	});
+
 	it('requires the workspace to exist before writing', async () => {
 		await expect(store.write('ZZZZZZ', 'checklist', checklist('x'))).rejects.toMatchObject({
 			code: 'not-found'
@@ -172,7 +198,6 @@ describe('redis workspace store', () => {
 				(await redis.mget(...keys)).map((raw) => (typeof raw === 'string' ? JSON.parse(raw) : raw)),
 			set: redis.set.bind(redis),
 			incr: redis.incr.bind(redis),
-			decr: redis.decr.bind(redis),
 			expire: redis.expire.bind(redis)
 		};
 		const other = createRedisStore(decoded, { now: () => time });
@@ -198,17 +223,6 @@ describe('rate limiter', () => {
 		await limiter.allow('a', 1, 60);
 		expect(await limiter.allow('b', 1, 60)).toBe(true);
 		expect(await limiter.used('missing', 60)).toBe(0);
-		time += 130_000;
-		expect(redis.keys()).toEqual([]);
-	});
-
-	it('refunds a slot without leaving a key that never expires', async () => {
-		const limiter = createLimiter(redis, { now: () => time });
-		await limiter.allow('key', 1, 60);
-		await limiter.release('key', 60);
-		expect(await limiter.allow('key', 1, 60)).toBe(true);
-		time += 61_000;
-		await limiter.release('key', 60);
 		time += 130_000;
 		expect(redis.keys()).toEqual([]);
 	});
