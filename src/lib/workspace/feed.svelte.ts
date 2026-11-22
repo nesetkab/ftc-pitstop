@@ -31,22 +31,30 @@ export async function fetchTeamName(
 	return typeof name === 'string' && name.trim() ? name.trim() : null;
 }
 
+function combine(
+	ranks: ReadonlyMap<number, number>,
+	oprs: ReadonlyMap<number, number>
+): ReadonlyMap<number, PickStat> {
+	const stats = new SvelteMap<number, PickStat>();
+	for (const [team, rank] of ranks) stats.set(team, { opr: null, rank });
+	for (const [team, opr] of oprs) stats.set(team, { opr, rank: ranks.get(team) ?? null });
+	return stats;
+}
+
 export class SelectionFeed {
 	labels = $state.raw<ReadonlyMap<number, string>>(new SvelteMap());
 	names = $state.raw<ReadonlyMap<number, string>>(new SvelteMap());
-	stats = $state.raw<ReadonlyMap<number, PickStat>>(new SvelteMap());
-
-	#ranks = new Map<number, number>();
-	#oprs = new Map<number, number>();
+	#ranks = $state.raw<ReadonlyMap<number, number>>(new SvelteMap());
+	#oprs = $state.raw<ReadonlyMap<number, number>>(new SvelteMap());
+	stats = $derived<ReadonlyMap<number, PickStat>>(combine(this.#ranks, this.#oprs));
 
 	constructor(event: () => string | null, interval = 15_000, fetcher: typeof fetch = fetch) {
 		$effect(() => {
 			const code = event();
 			this.labels = new SvelteMap();
 			this.names = new SvelteMap();
-			this.#ranks = new Map();
-			this.#oprs = new Map();
-			this.stats = new SvelteMap();
+			this.#ranks = new SvelteMap();
+			this.#oprs = new SvelteMap();
 			if (!code) return;
 			let stopped = false;
 			let timer: ReturnType<typeof setTimeout> | undefined;
@@ -86,23 +94,11 @@ export class SelectionFeed {
 	apply(bundle: FeedBundle) {
 		this.labels = new SvelteMap(takenLabels(deriveSelection(bundle.alliances ?? [])));
 		this.names = new SvelteMap((bundle.teams ?? []).map((team) => [team.number, team.name]));
-		this.#ranks = new Map((bundle.rankings ?? []).map((row) => [row.team, row.rank]));
-		this.#combine();
+		this.#ranks = new SvelteMap((bundle.rankings ?? []).map((row) => [row.team, row.rank]));
 	}
 
 	rate(body: Ratings) {
-		this.#oprs = new Map((body.ratings ?? []).map((row) => [row.team, row.opr]));
-		this.#combine();
-	}
-
-	#combine() {
-		const teams = new Set([...this.#ranks.keys(), ...this.#oprs.keys()]);
-		this.stats = new SvelteMap(
-			[...teams].map((team) => [
-				team,
-				{ opr: this.#oprs.get(team) ?? null, rank: this.#ranks.get(team) ?? null }
-			])
-		);
+		this.#oprs = new SvelteMap((body.ratings ?? []).map((row) => [row.team, row.opr]));
 	}
 
 	name(team: number): Promise<string | null> {

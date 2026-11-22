@@ -1,4 +1,10 @@
-import { LIMITS, PICK_TAGS, type PickEntry, type PickList, type PickTag } from '#lib/workspace/schemas.ts';
+import {
+	LIMITS,
+	PICK_TAGS,
+	type PickEntry,
+	type PickList,
+	type PickTag
+} from '#lib/workspace/schemas.ts';
 
 export type AddStatus = 'ok' | 'duplicate' | 'invalid' | 'full';
 

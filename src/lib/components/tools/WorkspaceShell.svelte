@@ -100,11 +100,7 @@
 {:else}
 	<PageHeader title="Team tools" {meta}>
 		{#snippet status()}
-			<StorageNotice
-				kind={workspace.kind}
-				sync={workspace.sync}
-				savedAt={workspace.savedAt}
-			/>
+			<StorageNotice kind={workspace.kind} sync={workspace.sync} savedAt={workspace.savedAt} />
 		{/snippet}
 		{#snippet actions()}
 			<div class="match">
