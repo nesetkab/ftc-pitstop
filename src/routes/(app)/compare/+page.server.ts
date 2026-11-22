@@ -24,10 +24,7 @@ async function settled<T>(task: Promise<T>): Promise<T | null> {
 export const load: PageServerLoad = async ({ url, setHeaders }) => {
 	const requested = url.searchParams.get('teams');
 	const numbers = parseTeamList(requested, url.searchParams.get('add'));
-	if (
-		url.searchParams.has('add') ||
-		(requested !== null && compareHref(numbers) !== `${url.pathname}${url.search}`)
-	) {
+	if (url.searchParams.has('add') || (requested !== null && requested !== numbers.join(','))) {
 		redirect(303, compareHref(numbers));
 	}
 

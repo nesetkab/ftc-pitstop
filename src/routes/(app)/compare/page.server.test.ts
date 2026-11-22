@@ -68,6 +68,11 @@ describe('compare load', () => {
 		});
 	});
 
+	it('does not redirect a canonical link however its commas are encoded', async () => {
+		await expect(call('?teams=100%2C200').result).resolves.toMatchObject({ numbers: [100, 200] });
+		await expect(call('?teams=100,200').result).resolves.toMatchObject({ numbers: [100, 200] });
+	});
+
 	it('loads each team once and only the events they shared', async () => {
 		const { result, setHeaders } = call('?teams=100,200,404');
 		const data = await result;
