@@ -34,9 +34,10 @@
 	<thead>
 		<tr>
 			<th class="l" scope="col">Part</th>
-			<th scope="col">Quals</th>
+			<th class={{ opt: playoff }} scope="col">Quals</th>
 			{#if playoff}
-				<th scope="col">Playoffs</th>
+				<th class="opt" scope="col">Playoffs</th>
+				<th scope="col">All matches</th>
 			{/if}
 			<th class="opt" scope="col">Best here</th>
 			{#if season}
@@ -49,9 +50,10 @@
 		{#each INSIGHT_PARTS as part (part.key)}
 			<tr>
 				<th class={['l', 'part', { nested: NESTED.has(part.key) }]} scope="row">{part.label}</th>
-				<td class={{ strong: part.key === 'total' }}>{value(qual, part.key)}</td>
+				<td class={{ strong: part.key === 'total', opt: playoff }}>{value(qual, part.key)}</td>
 				{#if playoff}
-					<td class={{ strong: part.key === 'total' }}>{value(playoff, part.key)}</td>
+					<td class={{ strong: part.key === 'total', opt: true }}>{value(playoff, part.key)}</td>
+					<td class={{ strong: part.key === 'total' }}>{value(event, part.key)}</td>
 				{/if}
 				<td class="opt">{value(high, part.key, 0)}</td>
 				{#if season}

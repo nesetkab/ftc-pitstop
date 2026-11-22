@@ -13,6 +13,7 @@
 	const code = $derived(data.bundle.event.code);
 	const base = $derived(`/events/${code}/insights`);
 	const averages = $derived(data.averages);
+	const basis = $derived(averages.playoff ? 'all matches' : 'quals');
 	const levels = [
 		{ key: '', label: 'All matches' },
 		{ key: 'qual', label: 'Quals' },
@@ -46,7 +47,7 @@
 			From {integer(averages.event.count)} alliance scores. Scores leave out points from the other alliance's
 			fouls. Tips is a count, not points.
 			{#if averages.season}
-				Season is every alliance score this season, and vs season compares this event's average with
+				Season is every alliance score this season. Vs season compares this event's {basis} average with
 				it.
 			{:else}
 				The season comparison shows once season data has loaded.
