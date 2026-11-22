@@ -74,4 +74,11 @@
 			align-items: start;
 		}
 	}
+
+	@media (max-width: 600px) {
+		.actions:has(> :global(:nth-child(3))) {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
 </style>

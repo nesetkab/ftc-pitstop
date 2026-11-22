@@ -52,11 +52,15 @@
 					{@const active = filters.part === part.key}
 					<th
 						scope="col"
-						class={{ optional: compact && part.key !== 'total', active }}
+						class={{
+							optional: compact && part.key !== 'total',
+							opt: part.key !== 'total' && !active,
+							active
+						}}
 						aria-sort={active ? 'descending' : undefined}
 					>
 						{#if sortable}
-							<a href={sortHref(part.key)} data-sveltekit-noscroll>
+							<a href={sortHref(part.key)} data-sveltekit-reset="false">
 								{part.label}{#if active}<span aria-hidden="true"> ↓</span>{/if}
 							</a>
 						{:else}
@@ -67,7 +71,7 @@
 				<th class="l" scope="col">Alliance</th>
 				<th class="optional" scope="col">Opp.</th>
 				<th class="l" scope="col">Event</th>
-				<th class="l" scope="col">Match</th>
+				<th class="l opt" scope="col">Match</th>
 			</tr>
 		</thead>
 		<tbody>
@@ -78,6 +82,7 @@
 						<td
 							class={{
 								optional: compact && part.key !== 'total',
+								opt: part.key !== 'total' && filters.part !== part.key,
 								strong: filters.part === part.key
 							}}>{integer(row[part.key])}</td
 						>
@@ -94,10 +99,15 @@
 					</td>
 					<td class="optional muted">{integer(row.opponent)}</td>
 					<td class="l event">
-						<a href="/events/{row.event}">{names.events[row.event] ?? row.event}</a>
+						<a class="event-name" href="/events/{row.event}"
+							>{names.events[row.event] ?? row.event}</a
+						>
 						<span class="date">{shortDate(row.day)}</span>
+						<a class="phone" href="/events/{row.event}/matches/{row.key}"
+							>{row.label} {row.alliance === 'red' ? 'Red' : 'Blue'}</a
+						>
 					</td>
-					<td class="l">
+					<td class="l opt">
 						<a class="match" href="/events/{row.event}/matches/{row.key}">{row.label}</a>
 						<span class={['side', row.alliance]}>{row.alliance === 'red' ? 'Red' : 'Blue'}</span>
 					</td>
@@ -145,7 +155,7 @@
 		max-width: 260px;
 	}
 
-	.event a {
+	.event-name {
 		display: block;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -158,6 +168,10 @@
 
 	.match {
 		font-weight: 600;
+	}
+
+	.phone {
+		display: none;
 	}
 
 	.side {
@@ -181,6 +195,23 @@
 		.teams a,
 		.event {
 			max-width: 180px;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.teams a {
+			max-width: 34vw;
+		}
+
+		.event {
+			max-width: 34vw;
+		}
+
+		.phone {
+			display: inline;
+			margin-left: 4px;
+			font-size: 12.5px;
+			font-weight: 600;
 		}
 	}
 </style>

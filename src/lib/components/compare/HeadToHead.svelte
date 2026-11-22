@@ -42,8 +42,8 @@
 		{#each pairs as pair (`${pair.a}-${pair.b}`)}
 			<tr>
 				<th class="l pair" scope="row">{pair.a} and {pair.b}</th>
-				<td class="l" class:dim={count(pair.against) === 0}>{against(pair)}</td>
-				<td class="l" class:dim={count(pair.together) === 0}>{together(pair)}</td>
+				<td class="l wrap" class:dim={count(pair.against) === 0}>{against(pair)}</td>
+				<td class="l wrap" class:dim={count(pair.together) === 0}>{together(pair)}</td>
 			</tr>
 		{/each}
 	</tbody>
@@ -56,7 +56,7 @@
 		<caption class="visually-hidden">Matches with two or more of these teams</caption>
 		<thead>
 			<tr>
-				<th class="l" scope="col">Event</th>
+				<th class="l opt" scope="col">Event</th>
 				<th class="l" scope="col">Match</th>
 				<th class="l" scope="col">Red</th>
 				<th class="l" scope="col">Blue</th>
@@ -66,12 +66,13 @@
 		<tbody>
 			{#each meetings as meeting (`${meeting.code}:${meeting.key}`)}
 				<tr>
-					<td class="l event">
+					<td class="l event opt">
 						<a href="/events/{meeting.code}">{meeting.event}</a>
 						<span class="date">{shortDate(meeting.start)}</span>
 					</td>
 					<td class="l">
 						<a class="match" href="/events/{meeting.code}/matches/{meeting.key}">{meeting.label}</a>
+						<span class="phone">{shortDate(meeting.start)} · {meeting.event}</span>
 					</td>
 					{#each ['red', 'blue'] as const as color (color)}
 						<td class="l">
@@ -125,6 +126,10 @@
 		font-weight: 600;
 	}
 
+	.phone {
+		display: none;
+	}
+
 	.chips {
 		display: inline-flex;
 		gap: 4px;
@@ -161,5 +166,26 @@
 
 	.dash {
 		margin-inline: 2px;
+	}
+
+	@media (max-width: 600px) {
+		th.pair {
+			padding-inline: 6px;
+			white-space: normal;
+		}
+
+		.phone {
+			display: block;
+			max-width: 34vw;
+			overflow: hidden;
+			font-size: 12.5px;
+			color: var(--text-3);
+			text-overflow: ellipsis;
+		}
+
+		.chips {
+			flex-direction: column;
+			align-items: flex-start;
+		}
 	}
 </style>

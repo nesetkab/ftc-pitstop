@@ -116,4 +116,12 @@
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}
+
+	@media (pointer: coarse) {
+		.more a {
+			display: inline-block;
+			margin-block: -10px;
+			padding-block: 10px;
+		}
+	}
 </style>
