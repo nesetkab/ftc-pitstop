@@ -9,6 +9,7 @@ export {
 	timeWithSeconds,
 	longDate,
 	shortDate,
+	shortRange,
 	relativeDay,
 	dateRange,
 	dayTime,

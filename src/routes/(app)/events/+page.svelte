@@ -2,7 +2,6 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
-	import { shortRange } from '#lib/components/event/dates.ts';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import {
 		filterEvents,
@@ -12,6 +11,7 @@
 		type DateFilter
 	} from '#lib/components/event/event-list.ts';
 	import { integer } from '#lib/format/number.ts';
+	import { shortRange } from '#lib/format/time.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';

@@ -3,7 +3,7 @@
 	import { MISSING, record } from '#lib/format/index.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
-	import { shortRange } from './dates.ts';
+	import { shortRange } from '#lib/format/time.ts';
 	import type { MatchOutcome, TeamMatchEvent, TeamMatchParts } from './matches.ts';
 
 	interface Props {

@@ -17,6 +17,7 @@ import {
 	relativeDay,
 	shortDate,
 	shortMatchLabel,
+	shortRange,
 	signed,
 	time,
 	timeWithSeconds
@@ -129,6 +130,14 @@ describe('time', () => {
 		expect(dateRange('2026-11-20', '2026-11-22')).toBe('November 20 to 22, 2026');
 		expect(dateRange('2026-10-31', '2026-11-01')).toBe('October 31 and November 1, 2026');
 		expect(dateRange('2026-12-31', '2027-01-02')).toBe('December 31, 2026 to January 2, 2027');
+	});
+
+	it('formats short date ranges for tables and lists', () => {
+		expect(shortRange('2026-11-14', '2026-11-14')).toBe('Nov 14');
+		expect(shortRange('2026-11-20', '2026-11-21')).toBe('Nov 20–21');
+		expect(shortRange('2026-11-20', '2026-11-22')).toBe('Nov 20–22');
+		expect(shortRange('2026-11-30', '2026-12-01')).toBe('Nov 30–Dec 1');
+		expect(shortRange('2026-12-31', '2027-01-02')).toBe('Dec 31, 2026 – Jan 2, 2027');
 	});
 });
 

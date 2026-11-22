@@ -3,7 +3,8 @@ import {
 	type SeasonEventRatings,
 	type SeasonRatings
 } from '#lib/analysis/types.ts';
-import { addDays, shortRange, weekStart } from '#lib/components/event/dates.ts';
+import { addDays, weekStart } from '#lib/components/event/dates.ts';
+import { shortRange } from '#lib/format/time.ts';
 import { shortDate } from '#lib/format/time.ts';
 import { EVENT_TYPE_NAMES, isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary, EventType, SearchTeam } from '#lib/types.ts';

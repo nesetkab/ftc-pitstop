@@ -83,6 +83,18 @@ export function relativeDay(input: DateInput, now: DateInput, timeZone?: string)
 	return `on ${shortDate(input, timeZone)}`;
 }
 
+export function shortRange(start: DateInput, end: DateInput, timeZone?: string): string {
+	const first = calendarDay(start, timeZone);
+	const last = calendarDay(end, timeZone);
+	const from = shortDate(start, timeZone);
+	if (last.serial <= first.serial) return from;
+	if (first.year !== last.year) {
+		return `${from}, ${first.year} – ${shortDate(end, timeZone)}, ${last.year}`;
+	}
+	if (first.month !== last.month) return `${from}–${shortDate(end, timeZone)}`;
+	return `${from}–${last.day}`;
+}
+
 export function dateRange(start: DateInput, end: DateInput, timeZone?: string): string {
 	const first = calendarDay(start, timeZone);
 	const last = calendarDay(end, timeZone);

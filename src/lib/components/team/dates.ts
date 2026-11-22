@@ -1,5 +1,3 @@
-import { shortDate } from '#lib/format/index.ts';
-
 const DAY_MS = 86_400_000;
 const formatters = new Map<string, Intl.DateTimeFormat>();
 
@@ -40,12 +38,4 @@ export function daysBetween(from: string, to: string): number {
 
 export function addDays(day: string, days: number): string {
 	return new Date((serial(day) + days) * DAY_MS).toISOString().slice(0, 10);
-}
-
-export function shortRange(start: string, end: string): string {
-	const length = daysBetween(start, end);
-	if (length <= 0) return shortDate(start);
-	const sameMonth = start.slice(5, 7) === end.slice(5, 7);
-	const last = sameMonth ? String(Number(end.slice(8, 10))) : shortDate(end);
-	return `${shortDate(start)} ${length === 1 ? 'and' : 'to'} ${last}`;
 }
