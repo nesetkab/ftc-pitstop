@@ -151,9 +151,17 @@
 
 	@media (max-width: 600px) {
 		.inner {
+			grid-template-columns: minmax(0, 1fr);
 			grid-template-areas:
-				'home nav'
-				'search search';
+				'home'
+				'nav'
+				'search';
+		}
+
+		nav {
+			flex-wrap: wrap;
+			justify-content: space-between;
+			gap: 0 12px;
 		}
 
 		.theme {
@@ -161,7 +169,9 @@
 		}
 
 		.on-home {
-			grid-template-areas: 'home nav';
+			grid-template-areas:
+				'home'
+				'nav';
 		}
 
 		.on-home .search {
