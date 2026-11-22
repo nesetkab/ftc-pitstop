@@ -49,7 +49,7 @@
 	const groups = $derived(groupByWeek(shown.slice(0, limit), now));
 	const elsewhere = $derived(
 		shown.length === 0 && when !== 'all'
-			? filterEvents(events, { ...filters, when: 'all' }, now).length
+			? filterEvents(events, { ...filters, when: 'all' }, now, finished).length
 			: 0
 	);
 

@@ -143,6 +143,15 @@ export function currentWeek(now: number): { start: string; end: string } {
 	return { start, end: addDays(start, 6) };
 }
 
+export function listStatus(
+	event: ListedEvent,
+	now: number,
+	finished: ReadonlySet<string> = new Set()
+): EventStatus {
+	const status = eventStatus(event, now);
+	return status === 'live' && finished.has(event.code) ? 'done' : status;
+}
+
 export function filterEvents(
 	events: ListedEvent[],
 	filters: EventFilters,
@@ -155,11 +164,11 @@ export function filterEvents(
 		if (filters.region && event.region !== filters.region) return [];
 		if (filters.type && event.type !== filters.type) return [];
 		if (!matchesQuery(event, words)) return [];
-		const status = eventStatus(event, now);
+		const status = listStatus(event, now, finished);
 		if (filters.when === 'week' && (event.start > week.end || event.end < week.start)) return [];
 		if (filters.when === 'upcoming' && status === 'done') return [];
 		if (filters.when === 'past' && status !== 'done') return [];
-		return [{ ...event, status: status === 'live' && finished.has(event.code) ? 'done' : status }];
+		return [{ ...event, status }];
 	});
 	const ascending = (a: ListedEvent, b: ListedEvent) =>
 		a.start.localeCompare(b.start) || a.name.localeCompare(b.name);
