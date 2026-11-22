@@ -467,13 +467,15 @@ describe('rankWindow', () => {
 
 	it('keeps short tables whole and trims long ones around us', () => {
 		expect(rankWindow(rows, TEAM, 30)).toHaveLength(27);
-		expect(rankWindow(rows, 15058, 10).map((row) => row?.team)).toEqual(
-			rows.slice(0, 10).map((row) => row.team)
-		);
+		const top = rankWindow(rows, rows[2].team, 10);
+		expect(top.slice(0, 9)).toEqual(rows.slice(0, 9));
+		expect(top[9]).toEqual({ hidden: 18 });
 		const trimmed = rankWindow(rows, rows[25].team, 12);
 		expect(trimmed).toHaveLength(12);
-		expect(trimmed[8]).toBeNull();
-		expect(trimmed.slice(9).map((row) => row?.rank)).toEqual([25, 26, 27]);
+		expect(trimmed[8]).toEqual({ hidden: 16 });
+		expect(trimmed.slice(9)).toEqual(rows.slice(24, 27));
+		const middle = rankWindow(rows, rows[15].team, 12);
+		expect(middle.slice(7)).toEqual([{ hidden: 7 }, ...rows.slice(14, 17), { hidden: 10 }]);
 	});
 
 	it('changes signature only when the data does', () => {

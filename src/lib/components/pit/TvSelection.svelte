@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fixed } from '#lib/format/number.ts';
 	import Facts from './Facts.svelte';
+	import RowFit from './RowFit.svelte';
 	import TeamTag from './TeamTag.svelte';
 	import { eventFacts, roleText, standingText } from './copy.ts';
 	import type { PitView } from './view.ts';
@@ -10,7 +11,7 @@
 		availableRows?: number;
 	}
 
-	let { view, availableRows = 14 }: Props = $props();
+	let { view, availableRows = 16 }: Props = $props();
 
 	const picked = $derived(view.role !== null);
 	const withOpr = $derived(view.available.some((team) => team.opr !== null));
@@ -73,31 +74,35 @@
 			<p class="sub">Alliances show up here as teams are picked.</p>
 		{/if}
 	</section>
-	<section>
+	<section class="fill">
 		<h2 class="tv-label">
 			{view.picksFor === null ? 'Available teams' : `Best picks for alliance ${view.picksFor}`}
 		</h2>
-		<table class="available">
-			<caption class="visually-hidden">Available teams</caption>
-			<thead>
-				<tr>
-					<th class="l" scope="col">#</th>
-					<th class="l" scope="col">Team</th>
-					<th class="l" scope="col"><span class="visually-hidden">Name</span></th>
-					<th scope="col">{withOpr ? 'OPR' : 'RS'}</th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each available as team (team.number)}
-					<tr class={{ me: team.number === view.team }}>
-						<td class="l">{team.rank ?? ''}</td>
-						<td class="l">{team.number}</td>
-						<td class="name">{team.name ?? ''}</td>
-						<td>{withOpr ? fixed(team.opr, 1) : fixed(team.rs, 2)}</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
+		<RowFit count={available.length}>
+			{#snippet children(shown)}
+				<table class="available">
+					<caption class="visually-hidden">Available teams</caption>
+					<thead>
+						<tr>
+							<th class="l" scope="col">#</th>
+							<th class="l" scope="col">Team</th>
+							<th class="l" scope="col"><span class="visually-hidden">Name</span></th>
+							<th scope="col">{withOpr ? 'OPR' : 'RS'}</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each available.slice(0, shown) as team (team.number)}
+							<tr class={{ me: team.number === view.team }}>
+								<td class="l">{team.rank ?? ''}</td>
+								<td class="l">{team.number}</td>
+								<td class="name">{team.name ?? ''}</td>
+								<td>{withOpr ? fixed(team.opr, 1) : fixed(team.rs, 2)}</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			{/snippet}
+		</RowFit>
 	</section>
 </div>
 
@@ -156,7 +161,7 @@
 	.alliances li.mine {
 		margin: 0 -0.5em;
 		padding-inline: 0.5em;
-		background: var(--accent-wash);
+		background: var(--line);
 	}
 
 	.seed {
@@ -180,21 +185,21 @@
 	.available {
 		width: 100%;
 		border-collapse: collapse;
-		font-size: 0.8em;
 		font-variant-numeric: tabular-nums;
 	}
 
 	th {
-		padding: 0 0.5em 0.4em;
-		border-bottom: 1px solid var(--line-2);
+		padding-inline: 0.5em;
+		box-shadow: inset 0 -1px var(--line-2);
 		color: var(--text-3);
 		font-weight: 500;
 		text-align: right;
+		vertical-align: bottom;
 	}
 
 	td {
-		padding: 0.32em 0.5em;
-		border-bottom: 1px solid var(--line);
+		padding-inline: 0.5em;
+		box-shadow: inset 0 -1px var(--line);
 		text-align: right;
 		white-space: nowrap;
 	}
@@ -204,7 +209,8 @@
 	}
 
 	.name {
-		max-width: 12em;
+		width: 100%;
+		max-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		text-align: left;
@@ -213,11 +219,8 @@
 
 	.me td {
 		background: var(--accent);
+		box-shadow: 1px 0 var(--accent);
 		color: var(--on-accent);
 		font-weight: 600;
-	}
-
-	.me .name {
-		color: var(--on-accent);
 	}
 </style>

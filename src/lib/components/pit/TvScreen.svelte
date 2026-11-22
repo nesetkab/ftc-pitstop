@@ -100,6 +100,26 @@
 		font-size: min(1.25vw, 2.2222vh);
 		line-height: 1.25;
 		font-variant-numeric: tabular-nums;
+		animation: drift 2400s step-end infinite;
+	}
+
+	@keyframes drift {
+		0% {
+			translate: 0 0;
+		}
+		25% {
+			translate: 2px 1px;
+		}
+		50% {
+			translate: 1px 3px;
+		}
+		75% {
+			translate: -1px 2px;
+		}
+	}
+
+	.tv :global(.ml .next) {
+		background: var(--line);
 	}
 
 	.main {
@@ -123,6 +143,11 @@
 		min-height: 0;
 		padding: 1.3em 1.4em;
 		overflow: hidden;
+	}
+
+	.tv :global(.cols > section.fill) {
+		grid-template-rows: auto minmax(0, 1fr);
+		align-content: stretch;
 	}
 
 	.tv :global(.cols > section + section) {
@@ -163,19 +188,12 @@
 
 	@media (orientation: portrait) {
 		.tv {
-			grid-template-rows: 2.6em minmax(max-content, 1fr) 2.1em;
 			font-size: max(10px, min(2.45vw, 1.45vh));
-			overflow-y: auto;
-		}
-
-		.main {
-			overflow: visible;
 		}
 
 		.tv :global(.cols) {
 			grid-template-columns: repeat(2, minmax(0, 1fr));
-			align-content: start;
-			height: auto;
+			grid-template-rows: auto minmax(0, 1fr);
 		}
 
 		.tv :global(.cols > section:first-child) {

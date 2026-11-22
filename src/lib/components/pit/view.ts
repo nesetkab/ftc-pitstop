@@ -513,15 +513,44 @@ export function pitView(input: PitInput): PitView {
 	};
 }
 
-export type RankRow = Ranking | null;
+export interface RankGap {
+	hidden: number;
+}
+
+export type RankRow = Ranking | RankGap;
+
+export const ROW_FIT = { min: 0.7, max: 0.95, row: 1.75 };
+
+export function isGap(row: RankRow): row is RankGap {
+	return 'hidden' in row;
+}
+
+export function rowCapacity(height: number, em: number, row = ROW_FIT.row): number | null {
+	if (!(height > 0) || !(em > 0)) return null;
+	return Math.max(1, Math.floor(height / (em * ROW_FIT.min * row)) - 1);
+}
 
 export function rankWindow(rankings: Ranking[], team: number, size: number): RankRow[] {
 	if (rankings.length <= size) return rankings;
 	const index = rankings.findIndex((row) => row.team === team);
-	if (index < size - 1) return rankings.slice(0, size);
-	const head = rankings.slice(0, size - 4);
-	const around = rankings.slice(Math.max(size - 4, index - 1), index + 2);
-	return [...head, null, ...around];
+	if (index < size - 1) {
+		const head = Math.max(0, size - 1);
+		return [...rankings.slice(0, head), { hidden: rankings.length - head }];
+	}
+	for (const before of [1, 0]) {
+		const start = Math.max(0, index - before);
+		const end = Math.min(rankings.length, index + 1 + before);
+		const tail = rankings.length - end;
+		const head = size - (end - start) - 1 - (tail > 0 ? 1 : 0);
+		if (head < 1) continue;
+		return [
+			...rankings.slice(0, head),
+			{ hidden: start - head },
+			...rankings.slice(start, end),
+			...(tail > 0 ? [{ hidden: tail }] : [])
+		];
+	}
+	return [rankings[index]];
 }
 
 export function bundleSignature(bundle: EventBundle): string {

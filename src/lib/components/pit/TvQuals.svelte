@@ -5,19 +5,17 @@
 	import RankTable from './RankTable.svelte';
 	import { eventFacts, lastResultItem, matchItems, qualsDoneText } from './copy.ts';
 	import type { QueueCall } from './queue.ts';
-	import { rankWindow, type PitView } from './view.ts';
+	import type { PitView } from './view.ts';
 
 	interface Props {
 		view: PitView;
 		call: QueueCall | null;
 		now: number;
 		timeZone: string;
-		rankRows?: number;
 	}
 
-	let { view, call, now, timeZone, rankRows = 27 }: Props = $props();
+	let { view, call, now, timeZone }: Props = $props();
 
-	const rows = $derived(rankWindow(view.rankings, view.team, rankRows));
 	const rankLabel = $derived(view.rankedAfter ? `Rankings after ${view.rankedAfter}` : 'Rankings');
 	const done = $derived(qualsDoneText(view));
 </script>
@@ -32,10 +30,10 @@
 			<p class="sub">{done.detail}</p>
 		{/if}
 	</section>
-	<section>
+	<section class="fill">
 		<h2 class="tv-label">{rankLabel}</h2>
-		{#if rows.length > 0}
-			<RankTable {rows} team={view.team} names={view.names} caption={rankLabel} />
+		{#if view.rankings.length > 0}
+			<RankTable rankings={view.rankings} team={view.team} names={view.names} caption={rankLabel} />
 		{:else}
 			<p class="sub">Rankings show up after the first match is posted.</p>
 		{/if}

@@ -5,7 +5,7 @@ import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { dayTime, sameDay } from '#lib/format/time.ts';
 import { replayBundle, revealTime } from '#lib/game/replay.ts';
-import type { EventBundle } from '#lib/types.ts';
+import type { EventBundle, Ranking } from '#lib/types.ts';
 import { DEFAULT_ALERTS, alertSnapshot, alertsBetween } from './alerts.ts';
 import {
 	heroText,
@@ -17,7 +17,7 @@ import {
 } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
-import { pitView, sideOf } from './view.ts';
+import { isGap, pitView, rankWindow, ROW_FIT, rowCapacity, sideOf } from './view.ts';
 
 const MINUTE = 60_000;
 const EVENTS = readdirSync(join(process.cwd(), 'tests/fixtures/ftc/2026/'));
@@ -148,5 +148,47 @@ describe('pit flow invariants across every fixture', () => {
 			}
 		}
 		expect([...problems].slice(0, 20)).toEqual([]);
+	});
+});
+
+describe('rankings always fit the screen', () => {
+	it.each(EVENTS)('%s keeps every window honest', (code) => {
+		const { rankings } = fixtureBundle(code);
+		const problems = new Set<string>();
+		for (const { team } of rankings) {
+			for (let size = 1; size <= rankings.length + 2; size++) {
+				const rows = rankWindow(rankings, team, size);
+				const say = (text: string) => problems.add(`${code} ${team} size ${size}: ${text}`);
+				const shown = rows.filter((row): row is Ranking => !isGap(row));
+				const hidden = rows.reduce((sum, row) => sum + (isGap(row) ? row.hidden : 0), 0);
+				if (rows.length > size) say(`${rows.length} rows`);
+				if (size >= 4 && shown.length + hidden !== rankings.length) say('rows lost');
+				if (!shown.some((row) => row.team === team)) say('our team missing');
+				if (rows.some((row) => isGap(row) && row.hidden < 1)) say('empty gap');
+				if (rows.some((row, index) => isGap(row) && index > 0 && isGap(rows[index - 1]))) {
+					say('gaps touch');
+				}
+				if (size >= 4 && shown[0].rank !== rankings[0].rank) say('leader missing');
+				if (size >= rankings.length && rows.length !== rankings.length)
+					say('cut a table that fits');
+				const index = rankings.findIndex((row) => row.team === team);
+				if (size >= 6 && index > 0 && !shown.includes(rankings[index - 1])) {
+					say('no team just above ours');
+				}
+				const ranks = shown.map((row) => rankings.indexOf(row));
+				if (ranks.some((rank, index) => index > 0 && rank <= ranks[index - 1])) say('out of order');
+			}
+		}
+		expect([...problems].slice(0, 20)).toEqual([]);
+	});
+
+	it('turns the measured height into rows at the smallest readable size', () => {
+		const pitch = 24 * ROW_FIT.min * ROW_FIT.row;
+		expect(rowCapacity(0, 24)).toBeNull();
+		expect(rowCapacity(800, 0)).toBeNull();
+		expect(rowCapacity(800, Number.NaN)).toBeNull();
+		expect(rowCapacity(pitch * 28, 24)).toBe(27);
+		expect(rowCapacity(pitch * 28 - 1, 24)).toBe(26);
+		expect(rowCapacity(pitch, 24)).toBe(1);
 	});
 });

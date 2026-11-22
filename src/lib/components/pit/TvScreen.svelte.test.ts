@@ -6,7 +6,7 @@ import PhoneScreen from './PhoneScreen.svelte';
 import { DEFAULT_ALERTS } from './alerts.ts';
 import { queueCall } from './queue.ts';
 import TvScreen from './TvScreen.svelte';
-import { pitView, sideOf } from './view.ts';
+import { pitView, ROW_FIT, sideOf } from './view.ts';
 
 const TEAM = 14624;
 const full = fixtureBundle('USAZGIQ');
@@ -197,6 +197,88 @@ describe('TvScreen', () => {
 		const view = pitView({ bundle, analysis: null, queue: null, team: 99999 });
 		const { container } = render(TvScreen, { props: { ...props(at('Q22')), view } });
 		expect(text(container)).toContain('99999 is not on the team list for this event.');
+	});
+});
+
+describe('TvScreen rankings fit', () => {
+	const EM = 20;
+	const pitch = EM * ROW_FIT.min * ROW_FIT.row;
+	const final = fixtureBundle('USMTBUQ-final');
+
+	function measure(rows: number) {
+		const height = vi
+			.spyOn(HTMLElement.prototype, 'clientHeight', 'get')
+			.mockImplementation(function (this: HTMLElement) {
+				return this.classList.contains('fit') ? pitch * (rows + 1) : 0;
+			});
+		const style = window.getComputedStyle;
+		vi.spyOn(window, 'getComputedStyle').mockImplementation((element, pseudo) =>
+			(element as HTMLElement).classList.contains('fit')
+				? ({ fontSize: `${EM}px`, getPropertyValue: () => '' } as unknown as CSSStyleDeclaration)
+				: style(element, pseudo)
+		);
+		vi.stubGlobal(
+			'ResizeObserver',
+			class {
+				constructor(private callback: () => void) {}
+				observe() {
+					this.callback();
+				}
+				disconnect() {}
+			}
+		);
+		return height;
+	}
+
+	function done(team: number) {
+		const view = pitView({ bundle: final, analysis: null, queue: null, team });
+		return { ...props(final.fetchedAt), view, event: final.event };
+	}
+
+	const ranked = (container: HTMLElement) =>
+		[...container.querySelectorAll('table.rank tbody tr')].map((row) =>
+			row.classList.contains('gap') ? row.textContent?.trim() : row.firstElementChild?.textContent
+		);
+
+	afterEach(() => {
+		vi.restoreAllMocks();
+		vi.unstubAllGlobals();
+	});
+
+	it('shows every team when they all fit', () => {
+		measure(31);
+		const { container } = render(TvScreen, { props: done(final.rankings[0].team) });
+		expect(container.querySelector('[data-phase="done"]')).not.toBeNull();
+		expect(ranked(container)).toHaveLength(31);
+		expect(ranked(container).at(-1)).toBe('31');
+	});
+
+	it('marks the teams it leaves out below the leaders', () => {
+		measure(27);
+		const { container } = render(TvScreen, { props: done(final.rankings[0].team) });
+		const rows = ranked(container);
+		expect(rows).toHaveLength(27);
+		expect(rows.slice(0, 3)).toEqual(['1', '2', '3']);
+		expect(rows.at(-1)).toBe('5 more');
+		expect(container.querySelector('tr.me td')?.textContent).toBe('1');
+	});
+
+	it('keeps a last place team on screen with the leaders above a gap', () => {
+		measure(27);
+		const { container } = render(TvScreen, { props: done(final.rankings.at(-1)!.team) });
+		const rows = ranked(container);
+		expect(rows).toHaveLength(27);
+		expect(rows[0]).toBe('1');
+		expect(rows.slice(-3)).toEqual(['5 more', '30', '31']);
+		expect(container.querySelector('tr.me td')?.textContent).toBe('31');
+	});
+
+	it('shows the same your-team highlight in the awards list as in the rankings', () => {
+		measure(31);
+		const winner = final.awards.find((award) => award.team !== null)!.team!;
+		const { container } = render(TvScreen, { props: done(winner) });
+		expect(container.querySelector('.awards li.mine')).not.toBeNull();
+		expect(container.querySelector('table.rank tr.me')).not.toBeNull();
 	});
 });
 
