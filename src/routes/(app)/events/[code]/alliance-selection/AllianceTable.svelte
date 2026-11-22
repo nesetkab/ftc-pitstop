@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Table from '#lib/ui/Table.svelte';
+	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import type { SelectionState } from '#lib/workspace/selection.ts';
 
 	interface Props {
@@ -17,6 +18,10 @@
 	);
 	const hasBackup = $derived(selection.alliances.some((alliance) => alliance.backup !== null));
 
+	function pickLabel(index: number) {
+		return ['First pick', 'Second pick', 'Third pick'][index] ?? `Pick ${index + 1}`;
+	}
+
 	function members(alliance: SelectionState['alliances'][number]): number[] {
 		return [alliance.captain, ...alliance.picks, ...(alliance.backup ? [alliance.backup] : [])];
 	}
@@ -25,10 +30,10 @@
 <Table>
 	<thead>
 		<tr>
-			<th class="l" scope="col">#</th>
+			<th class="l" scope="col">Alliance</th>
 			<th class="l" scope="col">Captain</th>
 			{#each columns as column (column)}
-				<th class="l" scope="col">{columns.length > 1 ? `Pick ${column + 1}` : 'Pick'}</th>
+				<th class="l" scope="col">{pickLabel(column)}</th>
 			{/each}
 			{#if hasBackup}
 				<th class="l" scope="col">Backup</th>
@@ -40,16 +45,12 @@
 			<tr class:me={me !== null && members(alliance).includes(me)}>
 				<td class="l">{alliance.seed}</td>
 				<td class="l">
-					<a href="/teams/{alliance.captain}" class:mine={alliance.captain === me}>
-						{alliance.captain}
-					</a>
+					<TeamCell number={alliance.captain} href="/teams/{alliance.captain}" />
 				</td>
 				{#each columns as column (column)}
 					<td class="l">
 						{#if alliance.picks[column]}
-							<a href="/teams/{alliance.picks[column]}" class:mine={alliance.picks[column] === me}>
-								{alliance.picks[column]}
-							</a>
+							<TeamCell number={alliance.picks[column]} href="/teams/{alliance.picks[column]}" />
 						{:else if column === alliance.picks.length && alliance.progress !== 'complete'}
 							<span class="faint">{alliance.progress === 'picking' ? 'Picking' : 'Waiting'}</span>
 						{/if}
@@ -58,9 +59,7 @@
 				{#if hasBackup}
 					<td class="l">
 						{#if alliance.backup}
-							<a href="/teams/{alliance.backup}" class:mine={alliance.backup === me}>
-								{alliance.backup}
-							</a>
+							<TeamCell number={alliance.backup} href="/teams/{alliance.backup}" />
 						{/if}
 					</td>
 				{/if}
@@ -68,9 +67,3 @@
 		{/each}
 	</tbody>
 </Table>
-
-<style>
-	.mine {
-		font-weight: 600;
-	}
-</style>

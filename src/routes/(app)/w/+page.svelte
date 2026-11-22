@@ -150,7 +150,7 @@
 		</div>
 		<p class="note">
 			{data.shared
-				? 'You get a join code. Anyone with it can see and edit the workspace.'
+				? 'You get a join code to share with your team.'
 				: 'The workspace is saved in this browser, and the join code names it here.'}
 		</p>
 	</form>

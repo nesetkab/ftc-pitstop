@@ -20,3 +20,21 @@ describe('team param', () => {
 		}
 	);
 });
+
+function page(value: string): string | null {
+	const result = params.page['~standard'].validate(value) as { value?: string; issues?: unknown[] };
+	return result.issues ? null : (result.value ?? null);
+}
+
+describe('page param', () => {
+	it.each(['nope', 'a/b/c', 'apis', 'teams'])('accepts %j', (value) => {
+		expect(page(value)).toBe(value);
+	});
+
+	it.each(['api', 'api/nope', 'og', 'og/missing.png'])(
+		'leaves %j to the server routes',
+		(value) => {
+			expect(page(value)).toBeNull();
+		}
+	);
+});

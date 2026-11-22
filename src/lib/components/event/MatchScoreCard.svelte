@@ -127,8 +127,9 @@
 
 	.teams {
 		display: flex;
-		flex-wrap: wrap;
-		gap: 4px 14px;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 4px;
 		font-size: 14px;
 	}
 
@@ -202,7 +203,7 @@
 		}
 
 		.teams {
-			flex-flow: column nowrap;
+			align-items: stretch;
 			gap: 2px;
 		}
 
@@ -215,7 +216,7 @@
 
 	@media (pointer: coarse) {
 		.teams {
-			gap: 0 14px;
+			gap: 0;
 			margin-block: -10px;
 		}
 

@@ -24,6 +24,7 @@
 		align-items: center;
 		justify-content: center;
 		gap: 6px;
+		min-height: var(--control-h);
 		padding: 8px 12px;
 		border: 1px solid var(--text);
 		border-radius: var(--radius-control);
@@ -62,6 +63,7 @@
 	.secondary:disabled:hover {
 		background: transparent;
 	}
+
 	@media (pointer: coarse) {
 		.btn {
 			min-height: 40px;
