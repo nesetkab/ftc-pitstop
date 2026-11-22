@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
-import { heroText, matchItems, playoffResult } from './copy.ts';
+import { delayText, heroText, matchItems, playoffResult, shortDelay } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { bundleSignature, pitView, rankWindow } from './view.ts';
@@ -347,6 +347,18 @@ describe('pitView after quals', () => {
 		expect(pitView({ bundle: full, analysis: null, queue: null, team: 99999 }).registered).toBe(
 			false
 		);
+	});
+});
+
+describe('delay copy', () => {
+	it('says how far behind the field is', () => {
+		expect(delayText(120)).toBe('The field is running 2 minutes behind.');
+		expect(shortDelay(-300)).toBe('Field is 5 min ahead.');
+	});
+
+	it('drops the delay when matches carried over to the next day', () => {
+		expect(delayText(894 * 60)).toBeNull();
+		expect(shortDelay(894 * 60)).toBeNull();
 	});
 });
 
