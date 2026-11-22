@@ -3,7 +3,12 @@
 	import LeaderboardFilters from '#lib/components/team/LeaderboardFilters.svelte';
 	import LeaderboardTable from '#lib/components/team/LeaderboardTable.svelte';
 	import Pagination from '#lib/components/team/Pagination.svelte';
-	import { LEADERBOARD_SORTS, queryString } from '#lib/components/team/leaderboard.ts';
+	import {
+		LEADERBOARD_SORTS,
+		queryString,
+		typeLabel,
+		windowLabel
+	} from '#lib/components/team/leaderboard.ts';
 	import { integer } from '#lib/format/index.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -18,15 +23,24 @@
 	const sortLabel = $derived(
 		LEADERBOARD_SORTS.find((sort) => sort.key === data.filters.sort)?.label ?? 'OPR'
 	);
+	const scope = $derived(
+		[
+			data.filters.type ? typeLabel(data.filters.type) : '',
+			windowLabel(data.window, data.filters.dates === 'recent')
+		].filter(Boolean)
+	);
+	const scoped = $derived(scope.length > 0);
 	const summary = $derived(
 		[
+			scope.join(', '),
 			data.filters.sort === 'opr'
 				? ''
-				: `Sorted by ${data.filters.sort === 'matches' ? 'matches' : `${sortLabel.toLowerCase()} OPR`}`,
+				: `sorted by ${data.filters.sort === 'matches' ? 'matches' : `${sortLabel.toLowerCase()} OPR`}`,
 			data.filters.q ? `matching "${data.filters.q}"` : ''
 		]
 			.filter(Boolean)
 			.join(', ')
+			.replace(/^./, (letter) => letter.toUpperCase())
 	);
 	const missing = $derived(data.filters.team > 0 && !data.found);
 	const showing = $derived(
@@ -64,6 +78,8 @@
 	regions={data.regions}
 	countries={data.countries}
 	states={data.states}
+	types={data.types}
+	weeks={data.weeks}
 />
 
 <p class="count" aria-live="polite">
@@ -90,6 +106,11 @@
 		Season ratings are not available yet. Teams are ranked by their best event OPR from FTCScout,
 		and only the top {integer(data.population)} teams are listed. Matches are qualification matches at
 		that event.
+	</p>
+{:else if scoped}
+	<p class="note">
+		Each team's rating is as of its last event in this filter. Matches and events count only those
+		events. Click a column to sort by it.
 	</p>
 {:else}
 	<p class="note">

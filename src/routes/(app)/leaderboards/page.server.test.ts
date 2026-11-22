@@ -1,16 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SeasonRatings } from '#lib/analysis/types.ts';
+import type { SeasonEventRatings, SeasonRatings } from '#lib/analysis/types.ts';
 import type { LeaderboardRow } from '#lib/components/team/leaderboard.ts';
 import { load } from './+page.server.ts';
 
 const server = vi.hoisted(() => ({
 	loadSeasonRatingsWithin: vi.fn(),
+	loadSeasonEventRatingsWithin: vi.fn(),
 	searchIndex: vi.fn(),
 	scoutLoad: vi.fn()
 }));
 
 vi.mock('#lib/server/analysis.ts', () => ({
-	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin
+	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin,
+	loadSeasonEventRatingsWithin: server.loadSeasonEventRatingsWithin
 }));
 vi.mock('#lib/server/event.ts', () => ({ searchIndex: server.searchIndex }));
 vi.mock('./scout.server.ts', () => ({ scoutLeaderboard: { load: server.scoutLoad } }));
@@ -25,7 +27,20 @@ type Result = Awaited<ReturnType<typeof load>> & {
 	population: number;
 	states: { value: string; label: string }[];
 	regions: { value: string }[];
-	filters: { region: string; country: string; state: string; min: number; page: number };
+	filters: {
+		region: string;
+		country: string;
+		state: string;
+		min: number;
+		page: number;
+		type: string;
+		dates: string;
+		from: string;
+		to: string;
+	};
+	window: { from: string; to: string } | null;
+	types: { value: string; label: string }[];
+	weeks: { value: string; label: string }[];
 	found: boolean;
 };
 
@@ -59,7 +74,10 @@ const directory = {
 		{ number: 1001, name: 'Valley X', city: 'Chandler', state: 'AZ', country: 'USA' },
 		{ number: 1002, name: 'Los Robots', city: 'Los Angeles', state: 'CA', country: 'USA' }
 	],
-	events: [],
+	events: [
+		{ type: 'Qualifier', start: '2026-11-14', hasMatches: true },
+		{ type: 'LeagueMeet', start: '2026-11-07', hasMatches: true }
+	],
 	fetchedAt: 5
 };
 
@@ -67,6 +85,7 @@ beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
 	server.loadSeasonRatingsWithin.mockResolvedValue(null);
 	server.searchIndex.mockResolvedValue(directory);
+	server.loadSeasonEventRatingsWithin.mockResolvedValue(null);
 	server.scoutLoad.mockRejectedValue(new Error('down'));
 });
 
@@ -144,6 +163,91 @@ describe('leaderboards load with season ratings', () => {
 	});
 });
 
+function table(generatedAt = 7): SeasonEventRatings {
+	const flat = (teams: number[], opr: (team: number) => number) =>
+		teams.flatMap((team) => [team, opr(team), 10, 2, 5]);
+	const all = Array.from({ length: 120 }, (_, index) => 1000 + index);
+	return {
+		generatedAt,
+		events: [
+			{
+				code: 'MEET',
+				type: 'LeagueMeet',
+				start: '2026-11-07',
+				teams: flat(
+					all.filter((team) => team % 2 === 1),
+					(team) => team - 900
+				)
+			},
+			{
+				code: 'QUAL',
+				type: 'Qualifier',
+				start: '2026-11-14',
+				teams: flat(
+					all.filter((team) => team % 3 === 0),
+					(team) => 1200 - team
+				)
+			}
+		]
+	};
+}
+
+describe('leaderboards load with event filters', () => {
+	it('does not read event ratings for the whole season', async () => {
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 60));
+		const data = await call().result;
+		expect(server.loadSeasonEventRatingsWithin).not.toHaveBeenCalled();
+		expect(data.window).toBeNull();
+		expect(data.types.map((option) => option.value)).toEqual([
+			'official',
+			'LeagueMeet',
+			'Qualifier'
+		]);
+		expect(data.weeks.map((option) => option.value)).toEqual(['2026-11-09', '2026-11-02']);
+	});
+
+	it('ranks only the teams at the chosen event type by their rating there', async () => {
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 61));
+		server.loadSeasonEventRatingsWithin.mockResolvedValue(table());
+		const data = await call('?type=LeagueMeet').result;
+		expect(data.filters.type).toBe('LeagueMeet');
+		expect(data.total).toBe(51);
+		expect(data.population).toBe(51);
+		expect(data.rows[0]).toMatchObject({ team: 1117, opr: 217, matches: 5, events: 1 });
+		expect(data.rows.every((row) => row.team % 2 === 1)).toBe(true);
+	});
+
+	it('keeps the date range, sort, search and team jump working together', async () => {
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 62));
+		server.loadSeasonEventRatingsWithin.mockResolvedValue(table());
+		const week = await call('?from=2026-11-09&to=2026-11-15').result;
+		expect(week.window).toEqual({ from: '2026-11-09', to: '2026-11-15' });
+		expect(week.total).toBe(34);
+		expect(week.rows[0]).toMatchObject({ team: 1002, opr: 198 });
+		const jump = await call('?from=2026-11-09&to=2026-11-15&team=1110').result;
+		expect(jump).toMatchObject({ found: true, page: 1 });
+		const deep = await call('?type=Qualifier&team=1002').result;
+		expect(deep.found).toBe(true);
+		const found = await call('?type=Qualifier&q=valley').result;
+		expect(found.rows).toEqual([]);
+		const sorted = await call('?dates=recent&sort=matches&region=USAZ').result;
+		expect(sorted.rows.every((row) => row.region === 'USAZ')).toBe(true);
+	});
+
+	it('answers 503 while event ratings are still loading', async () => {
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 63));
+		await expect(call('?type=Qualifier').result).rejects.toMatchObject({ status: 503 });
+	});
+
+	it('ignores event filters when only FTCScout data is there', async () => {
+		server.scoutLoad.mockResolvedValue({ rows: [], fetchedAt: 9 });
+		const data = await call('?type=Qualifier&dates=recent').result;
+		expect(data.source).toBe('scout');
+		expect(data.filters).toMatchObject({ type: '', dates: '', from: '', to: '' });
+		expect(data.window).toBeNull();
+	});
+});
+
 describe('leaderboards load without season ratings', () => {
 	const rows: LeaderboardRow[] = [
 		{
@@ -182,7 +286,7 @@ describe('leaderboards load without season ratings', () => {
 		expect(data.source).toBe('scout');
 		expect(data.rows.map((row) => row.team)).toEqual([19666, 16010]);
 		expect(data.population).toBe(2);
-		expect(server.searchIndex).not.toHaveBeenCalled();
+		expect(data.types).toEqual([]);
 	});
 
 	it('uses FTCScout when ratings exist but no team has played', async () => {

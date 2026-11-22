@@ -1,10 +1,19 @@
 import { describe, expect, it } from 'vitest';
-import type { SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
+import type { SeasonEventRatings, SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import {
 	PAGE_SIZE,
 	buildRatingRows,
 	createDataset,
+	dateWindow,
+	datesChoice,
+	eventFilterOptions,
 	filterRows,
+	isScoped,
+	leaderboardScope,
+	matchesType,
+	scopeRows,
+	typeLabel,
+	windowLabel,
 	paginate,
 	parseFilters,
 	matchesQuery,
@@ -23,7 +32,11 @@ const none: LeaderboardFilters = {
 	sort: 'opr',
 	q: '',
 	team: 0,
-	page: 1
+	page: 1,
+	type: '',
+	dates: '',
+	from: '',
+	to: ''
 };
 
 function row(team: number, opr: number, overrides: Partial<LeaderboardRow> = {}): LeaderboardRow {
@@ -65,7 +78,11 @@ describe('parseFilters', () => {
 			sort: 'opr',
 			q: '',
 			team: 0,
-			page: 3
+			page: 3,
+			type: '',
+			dates: '',
+			from: '',
+			to: ''
 		});
 	});
 
@@ -102,7 +119,11 @@ describe('queryString', () => {
 			sort: 'auto',
 			q: 'robo',
 			team: 1234,
-			page: 4
+			page: 4,
+			type: 'Qualifier',
+			dates: '',
+			from: '2026-11-01',
+			to: '2026-11-15'
 		};
 		expect(parseFilters(new URLSearchParams(queryString(filters)))).toEqual(filters);
 	});
@@ -265,5 +286,170 @@ describe('speed', () => {
 			paginate(found, 1 + (run % 5));
 		}
 		expect(performance.now() - started).toBeLessThan(500);
+	});
+});
+
+describe('event filters in the query string', () => {
+	it('reads the event type and date range', () => {
+		expect(
+			parseFilters(new URLSearchParams('type=LeagueMeet&from=2026-11-01&to=2026-11-15'))
+		).toMatchObject({ type: 'LeagueMeet', dates: '', from: '2026-11-01', to: '2026-11-15' });
+		expect(parseFilters(new URLSearchParams('type=official')).type).toBe('official');
+	});
+
+	it('drops unknown types and impossible dates and swaps a backwards range', () => {
+		expect(parseFilters(new URLSearchParams('type=Bogus')).type).toBe('');
+		expect(parseFilters(new URLSearchParams('type=toString')).type).toBe('');
+		expect(parseFilters(new URLSearchParams('from=2026-02-30&to=nope'))).toMatchObject({
+			from: '',
+			to: ''
+		});
+		expect(parseFilters(new URLSearchParams('from=2026-11-20&to=2026-11-01'))).toMatchObject({
+			from: '2026-11-01',
+			to: '2026-11-20'
+		});
+	});
+
+	it('lets the last two weeks win over a written range', () => {
+		expect(
+			parseFilters(new URLSearchParams('dates=recent&from=2026-11-01&to=2026-11-02'))
+		).toMatchObject({ dates: 'recent', from: '', to: '' });
+		expect(parseFilters(new URLSearchParams('dates=forever')).dates).toBe('');
+	});
+
+	it('writes event filters into links', () => {
+		expect(queryString({ ...none, type: 'Qualifier', dates: 'recent' })).toBe(
+			'?type=Qualifier&dates=recent'
+		);
+		expect(queryString({ ...none, from: '2026-11-01' }, 2)).toBe('?from=2026-11-01&page=2');
+	});
+});
+
+describe('dateWindow', () => {
+	it('turns the filters into an inclusive range of event start dates', () => {
+		expect(dateWindow(none, '2026-11-22')).toBeNull();
+		expect(dateWindow({ ...none, dates: 'recent' }, '2026-11-22')).toEqual({
+			from: '2026-11-09',
+			to: '2026-11-22'
+		});
+		expect(dateWindow({ ...none, from: '2026-11-01' }, '2026-11-22')).toEqual({
+			from: '2026-11-01',
+			to: '9999-12-31'
+		});
+		expect(isScoped(leaderboardScope(none, '2026-11-22'))).toBe(false);
+		expect(isScoped(leaderboardScope({ ...none, type: 'Qualifier' }, '2026-11-22'))).toBe(true);
+	});
+
+	it('labels the range for the summary line', () => {
+		expect(windowLabel(null)).toBe('');
+		expect(windowLabel({ from: '2026-11-09', to: '2026-11-22' }, true)).toBe('last 2 weeks');
+		expect(windowLabel({ from: '2026-11-16', to: '2026-11-22' })).toBe('Nov 16–22');
+		expect(windowLabel({ from: '2026-11-01', to: '9999-12-31' })).toBe('since Nov 1');
+		expect(windowLabel({ from: '0000-01-01', to: '2026-11-15' })).toBe('through Nov 15');
+	});
+});
+
+describe('event types', () => {
+	it('matches one type or every official type', () => {
+		expect(matchesType('Qualifier', '')).toBe(true);
+		expect(matchesType('Qualifier', 'Qualifier')).toBe(true);
+		expect(matchesType('LeagueMeet', 'Qualifier')).toBe(false);
+		expect(matchesType('LeagueMeet', 'official')).toBe(true);
+		expect(matchesType('Scrimmage', 'official')).toBe(false);
+		expect(typeLabel('LeagueMeet')).toBe('League Meet events');
+		expect(typeLabel('official')).toBe('Official events');
+	});
+
+	it('offers the types and weeks of events that have started', () => {
+		const options = eventFilterOptions(
+			[
+				{ type: 'Qualifier', start: '2026-11-21', hasMatches: true },
+				{ type: 'Scrimmage', start: '2026-10-03', hasMatches: true },
+				{ type: 'LeagueMeet', start: '2026-11-18', hasMatches: null },
+				{ type: 'Championship', start: '2027-02-20', hasMatches: null },
+				{ type: 'Workshop', start: '2026-09-12', hasMatches: null },
+				{ type: 'OffSeason', start: '2026-09-12', hasMatches: false }
+			],
+			'2026-11-22'
+		);
+		expect(options.types.map((option) => option.value)).toEqual([
+			'official',
+			'Scrimmage',
+			'LeagueMeet',
+			'Qualifier'
+		]);
+		expect(options.weeks).toEqual([
+			{ value: '2026-11-16', label: 'Nov 16–22' },
+			{ value: '2026-09-28', label: 'Sep 28–Oct 4' }
+		]);
+	});
+
+	it('picks the dates option that matches the filters', () => {
+		const weeks = [{ value: '2026-11-16', label: 'Nov 16–22' }];
+		expect(datesChoice(none, weeks)).toBe('');
+		expect(datesChoice({ ...none, dates: 'recent' }, weeks)).toBe('recent');
+		expect(datesChoice({ ...none, from: '2026-11-16', to: '2026-11-22' }, weeks)).toBe(
+			'2026-11-16'
+		);
+		expect(datesChoice({ ...none, from: '2026-11-16', to: '2026-11-20' }, weeks)).toBe('custom');
+		expect(datesChoice({ ...none, from: '2026-11-09', to: '2026-11-15' }, weeks)).toBe('custom');
+	});
+});
+
+describe('scopeRows', () => {
+	const table: SeasonEventRatings = {
+		generatedAt: 1,
+		events: [
+			{ code: 'SCRIM', type: 'Scrimmage', start: '2026-10-03', teams: [1, 40, 10, 2, 5] },
+			{
+				code: 'MEET1',
+				type: 'LeagueMeet',
+				start: '2026-11-07',
+				teams: [1, 50, 12, 3, 6, 2, 70, 20, 4, 6]
+			},
+			{
+				code: 'QUAL',
+				type: 'Qualifier',
+				start: '2026-11-14',
+				teams: [1, 80, 22, 5, 8, 3, 60, 15, 2, 8]
+			}
+		]
+	};
+	const base = [row(1, 80), row(2, 70), row(3, 60), row(4, 50)];
+
+	it('uses everything for the whole season', () => {
+		const scoped = scopeRows(base, table, { type: '', window: null });
+		expect(scoped.map((entry) => [entry.team, entry.opr, entry.matches, entry.events])).toEqual([
+			[1, 80, 19, 3],
+			[2, 70, 6, 1],
+			[3, 60, 8, 1]
+		]);
+	});
+
+	it('rates each team as of its last event in the filter and counts only those events', () => {
+		const scoped = scopeRows(base, table, {
+			type: '',
+			window: { from: '2026-10-01', to: '2026-11-10' }
+		});
+		expect(scoped.map((entry) => entry.team)).toEqual([2, 1]);
+		expect(scoped[1]).toMatchObject({
+			team: 1,
+			opr: 50,
+			auto: 12,
+			teleop: 38,
+			tips: 3,
+			matches: 11,
+			events: 2,
+			name: 'Team 1',
+			region: 'USAZ'
+		});
+	});
+
+	it('filters by event type', () => {
+		const official = scopeRows(base, table, { type: 'official', window: null });
+		expect(official.find((entry) => entry.team === 1)).toMatchObject({ matches: 14, events: 2 });
+		const scrims = scopeRows(base, table, { type: 'Scrimmage', window: null });
+		expect(scrims.map((entry) => entry.team)).toEqual([1]);
+		expect(scopeRows(base, table, { type: 'Championship', window: null })).toEqual([]);
 	});
 });

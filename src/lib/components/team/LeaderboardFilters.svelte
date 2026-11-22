@@ -2,9 +2,12 @@
 	import { goto } from '$app/navigation';
 	import { onDestroy, untrack } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
+	import { addDays } from '#lib/components/event/dates.ts';
 	import {
 		LEADERBOARD_SORTS,
 		MIN_MATCH_CHOICES,
+		RECENT_DAYS,
+		datesChoice,
 		type FilterOption,
 		type LeaderboardFilters
 	} from './leaderboard.ts';
@@ -14,9 +17,15 @@
 		regions: FilterOption[];
 		countries: FilterOption[];
 		states: FilterOption[];
+		types?: FilterOption[];
+		weeks?: FilterOption[];
 	}
 
-	let { filters, regions, countries, states }: Props = $props();
+	let { filters, regions, countries, states, types = [], weeks = [] }: Props = $props();
+
+	let customOpen = $state(false);
+	const chosen = $derived(datesChoice(filters, weeks));
+	const custom = $derived(customOpen || chosen === 'custom');
 
 	let timer: ReturnType<typeof setTimeout> | undefined;
 	let sent = untrack(() => filters.q);
@@ -35,8 +44,32 @@
 		)
 	);
 	const active = $derived(
-		Boolean(filters.region || filters.country || filters.state || filters.min > 1 || filters.q)
+		Boolean(
+			filters.region ||
+			filters.country ||
+			filters.state ||
+			filters.min > 1 ||
+			filters.q ||
+			filters.type ||
+			filters.dates ||
+			filters.from ||
+			filters.to
+		)
 	);
+
+	function pickDates(params: URLSearchParams, choice: string): boolean {
+		params.delete('dates');
+		params.delete('from');
+		params.delete('to');
+		customOpen = choice === 'custom';
+		if (choice === 'custom') return false;
+		if (choice === 'recent') params.set('dates', 'recent');
+		else if (choice) {
+			params.set('from', choice);
+			params.set('to', addDays(choice, 6));
+		}
+		return true;
+	}
 
 	function navigate(form: HTMLFormElement, target: EventTarget | null) {
 		clearTimeout(timer);
@@ -45,6 +78,9 @@
 			if (typeof value === 'string' && value.trim() !== '') params.set(key, value.trim());
 		}
 		if (target instanceof HTMLSelectElement && target.name === 'country') params.delete('state');
+		if (target instanceof HTMLSelectElement && target.dataset.dates !== undefined) {
+			if (!pickDates(params, target.value)) return;
+		}
 		if (params.get('sort') === 'opr') params.delete('sort');
 		sent = params.get('q') ?? '';
 		const options =
@@ -108,6 +144,59 @@
 			{/each}
 		</select>
 	</label>
+	{#if types.length > 0}
+		<label>
+			<span>Event type</span>
+			<select name="type" value={filters.type}>
+				<option value="">All events</option>
+				{#each types as option (option.value)}
+					<option value={option.value}>{option.label}</option>
+				{/each}
+			</select>
+		</label>
+		<label>
+			<span>Dates</span>
+			<select data-dates value={custom ? 'custom' : chosen}>
+				<option value="">All season</option>
+				<option value="recent">Last {RECENT_DAYS / 7} weeks</option>
+				{#if weeks.length > 0}
+					<optgroup label="Week of">
+						{#each weeks as option (option.value)}
+							<option value={option.value}>{option.label}</option>
+						{/each}
+					</optgroup>
+				{/if}
+				<option value="custom">Custom range</option>
+			</select>
+		</label>
+		{#if custom}
+			<label>
+				<span>From</span>
+				<input
+					class="date"
+					name="from"
+					type="date"
+					value={filters.from}
+					max={filters.to || undefined}
+				/>
+			</label>
+			<label>
+				<span>To</span>
+				<input
+					class="date"
+					name="to"
+					type="date"
+					value={filters.to}
+					min={filters.from || undefined}
+				/>
+			</label>
+		{:else if filters.dates}
+			<input type="hidden" name="dates" value={filters.dates} />
+		{:else}
+			{#if filters.from}<input type="hidden" name="from" value={filters.from} />{/if}
+			{#if filters.to}<input type="hidden" name="to" value={filters.to} />{/if}
+		{/if}
+	{/if}
 	<label>
 		<span>Minimum matches</span>
 		<select name="min" value={filters.min > 1 ? String(filters.min) : ''}>
@@ -130,7 +219,7 @@
 	{/if}
 	<noscript><button type="submit">Apply</button></noscript>
 	{#if active}
-		<a class="clear" href="/leaderboards">Clear filters</a>
+		<a class="clear" href="/leaderboards" onclick={() => (customOpen = false)}>Clear filters</a>
 	{/if}
 </form>
 
@@ -168,6 +257,11 @@
 		border-color: var(--text-3);
 	}
 
+	.date {
+		width: 150px;
+		padding-block: 6px;
+	}
+
 	.sort {
 		display: none;
 	}
@@ -194,7 +288,8 @@
 		}
 
 		select,
-		input {
+		input,
+		.date {
 			min-width: 0;
 			width: 100%;
 		}

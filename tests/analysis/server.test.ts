@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { analyzeEvent } from '#lib/analysis/analyze.ts';
 import { toModelEvent } from '#lib/analysis/convert.ts';
 import { baseContext, buildSeason } from '#lib/analysis/season.ts';
+import { EVENT_RATING_STRIDE } from '#lib/analysis/types.ts';
 import { previousFrom, rateSeason } from '#lib/model/opr.ts';
 import previous2025 from '#lib/model/previous-2025.json';
 import { createAnalysis } from '#lib/server/analysis.ts';
@@ -139,6 +140,32 @@ describe('createAnalysis', () => {
 		const back = await analysis.loadSeasonModel();
 		expect(back).not.toBe(full);
 		expect(back.complete).toBe(true);
+	});
+
+	it('keeps each event rating so the leaderboard can filter by event', async () => {
+		const meet = seasonMatchesOf(gilbert, 'USAZLMQ', '2026-11-14').map((m) => ({
+			...m,
+			eventType: 'LeagueMeet' as const
+		}));
+		const data = setup({ season: async () => [...earlier, ...meet] });
+		const table = (await data.loadSeasonEventRatings())!;
+		const ratings = (await data.loadSeasonRatings())!;
+		expect(table.events.map((e) => [e.code, e.type, e.start])).toEqual([
+			['USAZXXQ', 'Qualifier', '2026-11-07'],
+			['USAZLMQ', 'LeagueMeet', '2026-11-14']
+		]);
+		const last = new Map<number, number[]>();
+		const teams = table.events[1].teams;
+		for (let i = 0; i < teams.length; i += EVENT_RATING_STRIDE)
+			last.set(teams[i], teams.slice(i, i + EVENT_RATING_STRIDE));
+		for (const team of ratings.teams) {
+			const [, opr, auto, tips] = last.get(team.team)!;
+			expect(opr).toBe(team.opr);
+			expect(auto).toBe(team.parts.auto);
+			expect(tips).toBe(team.parts.tips);
+		}
+		await data.loadSeasonEventRatings();
+		expect(data.season).toHaveBeenCalledTimes(1);
 	});
 
 	it('returns a team rating history', async () => {

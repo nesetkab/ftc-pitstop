@@ -1,5 +1,6 @@
 import type { Sums, TeamState } from '#lib/model/opr.ts';
 import type { SwarmState } from '#lib/model/rp.ts';
+import type { EventType } from '#lib/types.ts';
 
 export type Alliance = 'red' | 'blue';
 
@@ -137,6 +138,20 @@ export type SeasonRating = {
 export type SeasonRatings = {
 	generatedAt: number;
 	teams: SeasonRating[];
+};
+
+export const EVENT_RATING_STRIDE = 5;
+
+export type SeasonEventRating = {
+	code: string;
+	type: EventType;
+	start: string;
+	teams: number[];
+};
+
+export type SeasonEventRatings = {
+	generatedAt: number;
+	events: SeasonEventRating[];
 };
 
 export type AnalysisContext = {
