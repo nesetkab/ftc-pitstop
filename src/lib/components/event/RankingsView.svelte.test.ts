@@ -22,7 +22,7 @@ function bodyRows(table: HTMLElement) {
 describe('RankingsView', () => {
 	it('shows the FTC rankings without any analysis', () => {
 		render(RankingsView, { props: { bundle: finished } });
-		expect(headers()).toEqual(['Rank', 'Team', 'RS', 'Record', 'TBP', 'Avg tips']);
+		expect(headers()).toEqual(['Rank', 'Team', 'RS', 'Record', 'TBP', 'NP max', 'Avg tips']);
 		const table = screen.getByRole('table', { name: 'Rankings' });
 		const rows = bodyRows(table);
 		expect(rows).toHaveLength(27);
@@ -31,6 +31,7 @@ describe('RankingsView', () => {
 		expect(rows[0]).toHaveTextContent('SCA Iron Eagles');
 		expect(rows[0]).toHaveTextContent('4.40');
 		expect(rows[0]).toHaveTextContent('5-0-0');
+		expect(rows[0].querySelectorAll('td')[5]).toHaveTextContent('110');
 		expect(within(rows[0]).getByRole('link')).toHaveAttribute('href', '/teams/26670');
 		expect(screen.queryByText(/Projected after/)).toBeNull();
 		expect(screen.queryByText('Schedule so far')).toBeNull();
@@ -69,10 +70,27 @@ describe('RankingsView', () => {
 			.getAllByRole('columnheader')
 			.filter((cell) => cell.classList.contains('opt'))
 			.map((cell) => cell.textContent?.trim());
-		expect(optional).toEqual(['Record', 'TBP', 'Avg tips', 'Finish, 1st to 27th', 'Top 4']);
+		expect(optional).toEqual([
+			'Record',
+			'TBP',
+			'NP max',
+			'Avg tips',
+			'Finish, 1st to 27th',
+			'Top 4'
+		]);
 		const first = bodyRows(table)[0];
-		expect(first.querySelectorAll('td.opt')).toHaveLength(5);
+		expect(first.querySelectorAll('td.opt')).toHaveLength(6);
 		expect(screen.getByText('Projected after 34 matches').closest('tr')).toHaveClass('opt');
+	});
+
+	it('links the CSV download when given one', () => {
+		render(RankingsView, {
+			props: { bundle: finished, csvHref: '/events/USAZGIQ/rankings.csv' }
+		});
+		expect(screen.getByRole('link', { name: 'Download CSV' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/rankings.csv'
+		);
 	});
 
 	it('highlights followed teams', () => {

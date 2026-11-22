@@ -229,6 +229,28 @@ describe('team page', () => {
 		expect(within(last).getByText('Endgame')).toBeInTheDocument();
 	});
 
+	it('lists each match with partners, opponents and the score', () => {
+		show();
+		const table = screen.getByRole('table', {
+			name: 'Matches for 26670 at Roadrunner - Gilbert Qualifier'
+		});
+		expect(within(table).getByRole('link', { name: 'M10' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/matches/p10'
+		);
+		expect(within(table).getByRole('link', { name: '18420' })).toHaveAttribute(
+			'href',
+			'/teams/18420'
+		);
+		expect(within(table).getByText('L')).toBeInTheDocument();
+		expect(table).toHaveTextContent('81–178');
+	});
+
+	it('leaves out the matches section when no event has match data', () => {
+		show(view({ matches: [] }));
+		expect(screen.queryByRole('heading', { name: 'Matches' })).not.toBeInTheDocument();
+	});
+
 	it('leaves out the awards and last season sections when there is nothing to show', () => {
 		show(view({ awards: [], previous: null }));
 		expect(screen.queryByRole('heading', { name: 'Awards' })).not.toBeInTheDocument();
