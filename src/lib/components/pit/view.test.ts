@@ -3,7 +3,7 @@ import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
 import { time } from '#lib/format/time.ts';
-import { delayText, heroText, matchItems, playoffResult, shortDelay } from './copy.ts';
+import { absentText, delayText, heroText, matchItems, playoffResult, shortDelay } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { bundleSignature, pitView, rankWindow } from './view.ts';
@@ -408,6 +408,18 @@ describe('pitView after quals', () => {
 		const done = pitView({ bundle: meet, analysis: null, queue: null, team: 10104 });
 		expect(done.names.get(24371)).toBe('Proto Pioneers');
 		expect(done.names.get(10104)).toBe('That OTHER Team');
+	});
+
+	it('treats league teams that skipped the meet as not here', () => {
+		const meet = fixtureBundle('USMIWMM8');
+		const absent = pitView({ bundle: meet, analysis: null, queue: null, team: 24371 });
+		expect(absent).toMatchObject({ registered: false, ranking: null, matches: [] });
+		expect(absentText(absent).title).toBe('24371 is not at this meet.');
+		const here = pitView({ bundle: meet, analysis: null, queue: null, team: 10104 });
+		expect(here.registered).toBe(true);
+		expect(
+			absentText(pitView({ bundle: full, analysis: null, queue: null, team: 99999 })).title
+		).toBe('99999 is not on the team list for this event.');
 	});
 
 	it('knows when a team is not at the event', () => {

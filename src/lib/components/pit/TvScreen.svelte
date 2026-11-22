@@ -8,7 +8,7 @@
 	import TvQuals from './TvQuals.svelte';
 	import TvSelection from './TvSelection.svelte';
 	import TvUpcoming from './TvUpcoming.svelte';
-	import { heroText } from './copy.ts';
+	import { absentText, heroText } from './copy.ts';
 	import type { Connection } from './poll.ts';
 	import type { QueueCall } from './queue.ts';
 	import type { PitView } from './view.ts';
@@ -44,6 +44,7 @@
 	}: Props = $props();
 
 	const timeZone = $derived(event.timezone);
+	const absent = $derived(absentText(view));
 	const headline = $derived(
 		takeover && view.next
 			? heroText(view.next, takeover, now, timeZone, view.delaySeconds).headline
@@ -56,8 +57,8 @@
 	<main class="main">
 		{#if !view.registered}
 			<div class="message">
-				<p class="title">{view.team} is not on the team list for this event.</p>
-				<p class="sub">Check the team number or pick the event with ?event= in the address.</p>
+				<p class="title">{absent.title}</p>
+				<p class="sub">{absent.detail}</p>
 			</div>
 		{:else if view.phase === 'upcoming'}
 			<TvUpcoming {view} {event} {now} {phoneUrl} />

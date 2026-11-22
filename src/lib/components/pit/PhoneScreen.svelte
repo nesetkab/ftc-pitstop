@@ -15,6 +15,7 @@
 	import Toggle from '#lib/ui/Toggle.svelte';
 	import { ALERT_OPTIONS, type AlertKey, type AlertSettings } from './alerts.ts';
 	import {
+		absentText,
 		awardName,
 		colorName,
 		heroText,
@@ -132,7 +133,8 @@
 
 		{#if tab === 'team'}
 			{#if !view.registered}
-				<EmptyState title="{view.team} is not on the team list for this event." />
+				{@const absent = absentText(view)}
+				<EmptyState title={absent.title}>{absent.detail}</EmptyState>
 			{:else if next && text && view.phase !== 'upcoming'}
 				<section class="next">
 					<span class="muted">Next match</span>
@@ -204,7 +206,7 @@
 				</section>
 			{/if}
 
-			{#if facts.length > 0}
+			{#if view.registered && facts.length > 0}
 				<KeyValue items={facts} />
 			{/if}
 

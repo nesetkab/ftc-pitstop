@@ -207,6 +207,19 @@ export function qualsDoneText(view: PitView): { headline: string; detail: string
 	};
 }
 
+export function absentText(view: PitView): { title: string; detail: string } {
+	if (view.rankings.some((row) => row.team === view.team)) {
+		return {
+			title: `${view.team} is not at this meet.`,
+			detail: `It is in the league rankings but not on the team list for this meet, so there are no matches to show.`
+		};
+	}
+	return {
+		title: `${view.team} is not on the team list for this event.`,
+		detail: 'Check the team number or pick the event with ?event= in the address.'
+	};
+}
+
 export function roleText(view: PitView): string {
 	const seed = view.alliance?.seed;
 	if (view.role === 'captain') return `Captain of alliance ${seed}`;

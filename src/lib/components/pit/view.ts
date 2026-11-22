@@ -455,7 +455,9 @@ export function pitView(input: PitInput): PitView {
 	const live = bundle.phase !== 'upcoming' && bundle.phase !== 'done';
 	const firstUnplayed = bundle.matches.find((match, index) => index > active && isUnplayed(match));
 	const registered =
-		bundle.teams.some((entry) => entry.number === team) || ours.length > 0 || ranks.has(team);
+		bundle.teams.some((entry) => entry.number === team) ||
+		ours.length > 0 ||
+		(bundle.teams.length === 0 && ranks.has(team));
 	return {
 		team,
 		teamName: names.get(team) ?? null,
@@ -464,7 +466,7 @@ export function pitView(input: PitInput): PitView {
 		registered,
 		names,
 		rankings: bundle.rankings,
-		ranking: standing && standing.played > 0 ? standing : null,
+		ranking: registered && standing && standing.played > 0 ? standing : null,
 		teamCount: Math.max(bundle.teams.length, bundle.rankings.length),
 		rankedAfter: postedQuals.at(-1)?.label ?? null,
 		qualsPlayed: postedQuals.length,
