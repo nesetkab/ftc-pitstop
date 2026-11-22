@@ -363,6 +363,46 @@ describe('one handed controls', () => {
 	});
 });
 
+describe('keyboard focus', () => {
+	function live(initial: PickListData) {
+		const state = { current: initial };
+		const view = render(PickList, {
+			props: { list: initial, update: (change: Change) => apply(change) }
+		});
+		function apply(change: Change) {
+			state.current = change(state.current);
+			view.rerender({ list: state.current, update: (next: Change) => apply(next) });
+		}
+		return state;
+	}
+
+	it('moves focus to the handle when a move button runs out of room', async () => {
+		live(list(1, 2, 3));
+		const up = screen.getByRole('button', { name: 'Move 2 up' });
+		up.focus();
+		await fireEvent.click(up);
+		await vi.waitFor(() => expect(screen.getByRole('button', { name: 'Move 2' })).toHaveFocus());
+	});
+
+	it('moves focus to the next team after removing one', async () => {
+		live(list(1, 2, 3));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 2' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Remove 2' }));
+		await vi.waitFor(() =>
+			expect(screen.getByRole('button', { name: 'More for 3' })).toHaveFocus()
+		);
+	});
+
+	it('follows a team into the do not pick section', async () => {
+		live(list(1, 2));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 1' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Do not pick' }));
+		await vi.waitFor(() =>
+			expect(screen.getByRole('button', { name: 'More for 1' })).toHaveFocus()
+		);
+	});
+});
+
 describe('stats and export', () => {
 	it('shows OPR and rank next to each team', () => {
 		setup(list(1, 2), { stats: new Map([[1, { opr: 45.25, rank: 3 }]]) });

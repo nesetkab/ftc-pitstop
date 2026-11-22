@@ -44,4 +44,17 @@ describe('undo offer', () => {
 		expect(first).not.toHaveBeenCalled();
 		expect(second).toHaveBeenCalledTimes(1);
 	});
+
+	it('waits while held and restarts the clock on release', () => {
+		const offer = new UndoOffer(1000);
+		offer.offer('Removed 3.', vi.fn());
+		offer.hold();
+		vi.advanceTimersByTime(5000);
+		expect(offer.label).toBe('Removed 3.');
+		offer.release();
+		vi.advanceTimersByTime(999);
+		expect(offer.label).toBe('Removed 3.');
+		vi.advanceTimersByTime(1);
+		expect(offer.label).toBeNull();
+	});
 });
