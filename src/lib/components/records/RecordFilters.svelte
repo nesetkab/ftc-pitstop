@@ -75,7 +75,7 @@
 			inputmode="numeric"
 			pattern="[0-9]*"
 			maxlength="6"
-			placeholder="Any"
+			placeholder="Team number"
 			autocomplete="off"
 			value={filters.team ?? ''}
 		/>

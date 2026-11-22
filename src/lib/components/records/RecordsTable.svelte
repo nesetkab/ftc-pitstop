@@ -69,10 +69,7 @@
 					</th>
 				{/each}
 				<th class="l" scope="col">Alliance</th>
-				<th class="optional" scope="col"
-					><span aria-hidden="true">Opp.</span><span class="visually-hidden">Opponent score</span
-					></th
-				>
+				<th class="optional" scope="col">Opponent</th>
 				<th class="l" scope="col">Event</th>
 				<th class="l opt" scope="col">Match</th>
 			</tr>

@@ -39,6 +39,9 @@
 	const selection = $derived(deriveSelection(bundle.alliances));
 	const table = $derived(selectionTable(bundle, analysis, selection));
 	const labels = $derived(takenLabels(selection));
+	const ongoing = $derived(
+		bundle.phase === 'selection' && (!selection.started || selection.picking !== null)
+	);
 	const me = $derived(recents.find((recent) => recent.code === chosen)?.teamNumber ?? null);
 	const picker = $derived(
 		selection.picking
@@ -136,6 +139,7 @@
 			<StaleNotice
 				updated={bundle.fetchedAt}
 				timeZone={bundle.event.timezone}
+				staleAfter={ongoing ? undefined : Infinity}
 			/>{#if refreshFailed}. The page could not refresh just now.{/if}
 		</p>
 	</div>
