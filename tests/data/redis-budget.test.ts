@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { eventSummary, teamSeason } from '#lib/components/team/fixtures.ts';
 import { createAnalysis } from '#lib/server/analysis.ts';
+import { teamFeed } from '#lib/server/calendar/load.ts';
 import { createCache, redisStore } from '#lib/server/cache.ts';
 import { createLoaders, teamPolicy } from '#lib/server/event.ts';
 import { createHome } from '#lib/server/home.ts';
@@ -187,6 +188,25 @@ describe('redis commands for the home page', () => {
 			[3747, 'The Hive', true]
 		]);
 		expect(await commands(redis, () => fresh.home.loadFollowed([26670, 3747]))).toEqual([]);
+	});
+});
+
+describe('redis commands for a team calendar', () => {
+	it('reads the team, the event list and every event in three batches, then nothing', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		await instance(redis, clock).eventPage('USAZGIQ');
+		const season = teamSeason(26670, 'SCA Iron Eagles', [
+			{ event: eventSummary({ code: 'USAZGIQ' }), stats: null, awards: [] },
+			{ event: eventSummary({ code: 'USAZCMP', start: '2027-02-20', end: '2027-02-20' }), stats: null, awards: [] }
+		]);
+		const entry = { body: season, lastModified: null, fetchedAt: LIVE };
+		await redis.set('pitstop:cache:scout:2026:team:26670', JSON.stringify(entry), { ex: 3600 });
+		const fresh = instance(redis, clock);
+		const feed = () => teamFeed(fresh.loaders, 26670, 'https://www.ftcpitstop.com', clock.now);
+		const calls = await commands(redis, feed);
+		expect(reads(calls)).toEqual(['mget', 'mget', 'mget']);
+		expect(await commands(redis, feed)).toEqual([]);
 	});
 });
 
