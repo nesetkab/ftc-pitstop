@@ -9,7 +9,10 @@ import {
 } from '#lib/components/records/records.ts';
 import { localDay } from '#lib/components/team/dates.ts';
 import { loadSeasonModelWithin } from '#lib/server/analysis.ts';
+import { settleWithin } from '#lib/server/cache.ts';
 import { searchIndex } from '#lib/server/event.ts';
+
+const NAMES_WAIT_MS = 2_000;
 
 let memo: { generatedAt: number; dataset: RecordDataset } | null = null;
 let averagesMemo: { generatedAt: number; averages: PartAverages | null } | null = null;
@@ -43,7 +46,7 @@ export async function recordNames(
 	teams: number[],
 	events: string[]
 ): Promise<{ teams: Record<number, string>; events: Record<string, string> }> {
-	const index = await searchIndex().catch(() => null);
+	const index = await settleWithin(searchIndex(), NAMES_WAIT_MS);
 	if (index && directory?.fetchedAt !== index.fetchedAt) {
 		directory = {
 			fetchedAt: index.fetchedAt,

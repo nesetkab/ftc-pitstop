@@ -13,6 +13,8 @@ export interface RedisLike {
 
 let client: Redis | null | undefined;
 
+export const REDIS_TIMEOUT_MS = 1_500;
+
 export function redisConfig(): { url: string; token: string } | null {
 	const url = UPSTASH_REDIS_REST_URL ?? KV_REST_API_URL;
 	const token = UPSTASH_REDIS_REST_TOKEN ?? KV_REST_API_TOKEN;
@@ -22,7 +24,14 @@ export function redisConfig(): { url: string; token: string } | null {
 export function getRedis(): Redis | null {
 	if (client === undefined) {
 		const config = redisConfig();
-		client = config ? new Redis({ ...config, automaticDeserialization: false }) : null;
+		client = config
+			? new Redis({
+					...config,
+					automaticDeserialization: false,
+					retry: { retries: 1, backoff: () => 100 },
+					signal: () => AbortSignal.timeout(REDIS_TIMEOUT_MS)
+				})
+			: null;
 	}
 	return client;
 }

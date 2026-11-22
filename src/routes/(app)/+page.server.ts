@@ -1,6 +1,6 @@
 import type { EventProgress } from '#lib/components/home/today.ts';
 import { buildHomeEvents, todayCompetitions } from '#lib/components/team/home.ts';
-import { keepAlive } from '#lib/server/cache.ts';
+import { keepAlive, settleWithin } from '#lib/server/cache.ts';
 import { loadEventsToday, loadSeasonEvents } from '#lib/server/event.ts';
 import { loadHighlights, loadTodayProgress } from '#lib/server/home.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
@@ -9,6 +9,7 @@ import type { EventSummary } from '#lib/types.ts';
 import type { PageServerLoad } from './$types';
 
 const PROGRESS_WAIT_MS = 600;
+const LIST_WAIT_MS = 4_000;
 
 async function progressFor(events: EventSummary[] | null): Promise<Record<string, EventProgress>> {
 	if (!events) return {};
@@ -35,12 +36,13 @@ async function highlightsWithNames() {
 }
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
-	const todayTask = loadEventsToday().catch(() => null);
+	const todayTask = settleWithin(loadEventsToday(), LIST_WAIT_MS);
 	const [today, season, progress, highlights] = await Promise.all([
 		todayTask,
-		loadSeasonEvents()
-			.then((list) => list.events)
-			.catch(() => null),
+		settleWithin(
+			loadSeasonEvents().then((list) => list.events),
+			LIST_WAIT_MS
+		),
 		todayTask.then(progressFor),
 		highlightsWithNames()
 	]);

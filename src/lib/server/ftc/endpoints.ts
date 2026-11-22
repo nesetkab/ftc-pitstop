@@ -57,9 +57,10 @@ export function ftcEndpoint<E extends FtcEndpoint>(
 export async function ftcAllPages(
 	client: FtcClient,
 	pathFor: (page: number) => string,
-	concurrency = 4
+	concurrency = 4,
+	init: FtcRequestOptions = {}
 ): Promise<FtcBody<'teams'>[]> {
-	const first = await ftcEndpoint(client, 'teams', pathFor(1));
+	const first = await ftcEndpoint(client, 'teams', pathFor(1), init);
 	if (first.status !== 'ok') return [];
 	const total = Math.min(first.body.pageTotal ?? 1, 200);
 	const pages: FtcBody<'teams'>[] = [first.body];
@@ -68,7 +69,9 @@ export async function ftcAllPages(
 			{ length: Math.min(concurrency, total - page + 1) },
 			(_, i) => page + i
 		);
-		const responses = await Promise.all(batch.map((n) => ftcEndpoint(client, 'teams', pathFor(n))));
+		const responses = await Promise.all(
+			batch.map((n) => ftcEndpoint(client, 'teams', pathFor(n), init))
+		);
 		for (const response of responses) if (response.status === 'ok') pages.push(response.body);
 	}
 	return pages;

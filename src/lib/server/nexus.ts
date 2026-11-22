@@ -1,6 +1,7 @@
 import * as z from 'zod';
 import { NEXUS_API_KEY } from '$app/env/private';
 import { SEASON } from '#lib/game/biobuzz.ts';
+import { createBreaker, type Breaker } from '#lib/server/breaker.ts';
 import type { QueueMatch, QueueStatus, QueueStatusSnapshot } from '#lib/types.ts';
 
 export const NEXUS_API_ROOT = 'https://ftc.nexus/api/v1/';
@@ -127,20 +128,42 @@ export interface NexusClientOptions {
 	apiKey?: string;
 	fetch?: typeof fetch;
 	timeoutMs?: number;
+	breaker?: Breaker;
+}
+
+function isOutage(status: number): boolean {
+	return status === 401 || status === 403 || status === 429 || status >= 500;
 }
 
 export function createNexusClient(options: NexusClientOptions = {}) {
-	const timeoutMs = options.timeoutMs ?? 10_000;
+	const timeoutMs = options.timeoutMs ?? 3_000;
+	const breaker = options.breaker ?? createBreaker({ threshold: 3 });
 
 	async function eventStatus(code: string): Promise<QueueStatusSnapshot | null> {
 		if (!options.apiKey) return null;
+		if (!breaker.allow()) throw new NexusError(503, 'Nexus is paused after errors');
+		try {
+			const status = await fetchStatus(code, options.apiKey);
+			breaker.success();
+			return status;
+		} catch (error) {
+			if (error instanceof NexusError && isOutage(error.status)) breaker.failure();
+			else breaker.success();
+			throw error;
+		}
+	}
+
+	async function fetchStatus(code: string, apiKey: string): Promise<QueueStatusSnapshot | null> {
 		let response: Response;
 		try {
 			response = await (options.fetch ?? fetch)(`${NEXUS_API_ROOT}event/${nexusEventKey(code)}`, {
-				headers: { 'Nexus-Api-Key': options.apiKey, accept: 'application/json' },
+				headers: { 'Nexus-Api-Key': apiKey, accept: 'application/json' },
 				signal: AbortSignal.timeout(timeoutMs)
 			});
-		} catch {
+		} catch (error) {
+			if (error instanceof Error && error.name === 'TimeoutError') {
+				throw new NexusError(504, 'Nexus timed out');
+			}
 			throw new NexusError(502, 'Nexus is unreachable');
 		}
 		if (response.status === 404) {
@@ -155,12 +178,14 @@ export function createNexusClient(options: NexusClientOptions = {}) {
 					: `Nexus error ${response.status}`;
 			throw new NexusError(response.status, message);
 		}
-		const parsed = nexusEventStatus.safeParse(await response.json().catch(() => null));
+		const raw: unknown = await response.json().catch(() => undefined);
+		if (raw === undefined) throw new NexusError(502, 'Nexus sent a response that is not JSON');
+		const parsed = nexusEventStatus.safeParse(raw);
 		if (!parsed.success) throw new NexusError(502, 'Nexus sent data in an unexpected shape');
 		return mapNexusStatus(parsed.data);
 	}
 
-	return { configured: Boolean(options.apiKey), eventStatus };
+	return { configured: Boolean(options.apiKey), eventStatus, breaker };
 }
 
 export type NexusClient = ReturnType<typeof createNexusClient>;

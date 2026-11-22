@@ -2,6 +2,7 @@ import * as z from 'zod';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { EVENT_TYPE_NAMES, eventTypeFromName } from '#lib/game/event-types.ts';
 import { httpUrl } from '#lib/format/url.ts';
+import { createBreaker, type Breaker } from '#lib/server/breaker.ts';
 import { isValidTimeZone } from '#lib/server/time.ts';
 import type {
 	AllianceColor,
@@ -41,6 +42,7 @@ export interface FtcScoutClientOptions {
 	sleep?: (ms: number) => Promise<void>;
 	now?: () => number;
 	pauseMs?: number;
+	breaker?: Breaker;
 }
 
 const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
@@ -53,6 +55,10 @@ function isTimeout(error: unknown): boolean {
 	return error instanceof Error && (error.name === 'TimeoutError' || error.name === 'AbortError');
 }
 
+function isOutage(status: number): boolean {
+	return status === 429 || status >= 500;
+}
+
 function mediaType(response: Response): string {
 	return response.headers.get('content-type')?.split(';')[0].trim() || 'a response';
 }
@@ -63,12 +69,13 @@ interface Payload {
 }
 
 export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
-	const timeoutMs = options.timeoutMs ?? 15_000;
+	const timeoutMs = options.timeoutMs ?? 5_000;
 	const retries = options.retries ?? 1;
 	const sleep = options.sleep ?? defaultSleep;
 	const now = options.now ?? Date.now;
 	const pauseMs = options.pauseMs ?? PAUSE_MS;
 	const paused = new Map<string, { failures: number; until: number }>();
+	const breaker = options.breaker ?? createBreaker({ now });
 
 	function pause(body: string) {
 		const failures = (paused.get(body)?.failures ?? 0) + 1;
@@ -78,7 +85,7 @@ export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 		paused.set(body, { failures, until: now() + wait });
 	}
 
-	async function send(body: string, wait: number): Promise<Payload> {
+	async function fetchPayload(body: string, wait: number): Promise<Payload> {
 		for (let attempt = 0; ; attempt++) {
 			let response: Response;
 			try {
@@ -130,6 +137,18 @@ export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 		}
 	}
 
+	async function send(body: string, wait: number): Promise<Payload> {
+		try {
+			const payload = await fetchPayload(body, wait);
+			breaker.success();
+			return payload;
+		} catch (error) {
+			if (error instanceof FtcScoutError && isOutage(error.status)) breaker.failure();
+			else breaker.success();
+			throw error;
+		}
+	}
+
 	async function query<S extends z.ZodType>(
 		operationName: string,
 		document: string,
@@ -140,6 +159,7 @@ export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 		const body = JSON.stringify({ operationName, query: document, variables });
 		const pausedUntil = paused.get(body)?.until ?? 0;
 		if (now() < pausedUntil) throw new FtcScoutError(503, 'FTCScout is paused after errors');
+		if (!breaker.allow()) throw new FtcScoutError(503, 'FTCScout is paused after errors');
 		try {
 			const payload = await send(body, init.timeoutMs ?? timeoutMs);
 			if (payload.errors?.length && !payload.data) {
@@ -160,7 +180,7 @@ export function createFtcScoutClient(options: FtcScoutClientOptions = {}) {
 		}
 	}
 
-	return { query };
+	return { query, breaker };
 }
 
 export type FtcScoutClient = ReturnType<typeof createFtcScoutClient>;
@@ -809,24 +829,25 @@ export function mapSeasonMatches(data: z.output<typeof seasonMatchesSchema>): Se
 	return matches;
 }
 
-const client = createFtcScoutClient();
+export const scoutClient = createFtcScoutClient();
 
 export async function fetchSeasonEvents(
 	season = SEASON,
-	scout: FtcScoutClient = client
+	scout: FtcScoutClient = scoutClient
 ): Promise<EventSummary[]> {
 	const data = await scout.query(
 		'EventsSearch',
 		`query EventsSearch($season: Int!) { eventsSearch(season: $season) { ${EVENT_SUMMARY_FIELDS} } }`,
 		{ season },
-		seasonEvents
+		seasonEvents,
+		{ timeoutMs: 6_000 }
 	);
 	return data.eventsSearch.map(mapEventSummary).sort(compareEvents);
 }
 
 export async function fetchEventsOnDate(
 	date: string,
-	scout: FtcScoutClient = client
+	scout: FtcScoutClient = scoutClient
 ): Promise<EventSummary[]> {
 	const data = await scout.query(
 		'EventsOnDate',
@@ -840,10 +861,10 @@ export async function fetchEventsOnDate(
 export async function fetchEventByCode(
 	code: string,
 	season = SEASON,
-	scout: FtcScoutClient = client
+	scout: FtcScoutClient = scoutClient
 ): Promise<ScoutEventData | null> {
 	const data = await scout.query('EventByCode', EVENT_BY_CODE, { season, code }, eventByCode, {
-		timeoutMs: 30_000
+		timeoutMs: 6_000
 	});
 	return mapEventByCode(data);
 }
@@ -851,7 +872,7 @@ export async function fetchEventByCode(
 export async function fetchTeamSeason(
 	number: number,
 	season = SEASON,
-	scout: FtcScoutClient = client
+	scout: FtcScoutClient = scoutClient
 ): Promise<ScoutTeamSeason | null> {
 	const document = `query TeamSeason($number: Int!, $season: Int!, $previous: Int!) {
 		teamByNumber(number: $number) {
@@ -878,7 +899,7 @@ export async function fetchTeamSeason(
 export async function fetchQuickStats(
 	numbers: number[],
 	season = SEASON - 1,
-	scout: FtcScoutClient = client
+	scout: FtcScoutClient = scoutClient
 ): Promise<Map<number, QuickStats>> {
 	const result = new Map<number, QuickStats>();
 	const unique = [...new Set(numbers.filter((number) => Number.isInteger(number) && number > 0))];
@@ -907,7 +928,7 @@ export async function fetchQuickStats(
 
 export async function fetchSeasonMatches(
 	options: { season?: number; start: string; end: string },
-	scout: FtcScoutClient = client
+	scout: FtcScoutClient = scoutClient
 ): Promise<SeasonMatch[]> {
 	const document = `query EventsSearch($season: Int!, $start: Date, $end: Date) {
 		eventsSearch(season: $season, hasMatches: true, start: $start, end: $end) {
@@ -924,7 +945,7 @@ export async function fetchSeasonMatches(
 		document,
 		{ season: options.season ?? SEASON, start: options.start, end: options.end },
 		seasonMatchesSchema,
-		{ timeoutMs: 60_000 }
+		{ timeoutMs: 20_000 }
 	);
 	return mapSeasonMatches(data);
 }

@@ -79,6 +79,7 @@ export const load: LayoutServerLoad = async ({ params, url, setHeaders }) => {
 		reason = pick.reason;
 	}
 
+	const queued = queueStatus(code);
 	const loaded = await eventBundle(code);
 	const bundle = loaded?.bundle ?? null;
 	const replay = bundle ? replaySettings(url.searchParams, bundle) : null;
@@ -88,7 +89,7 @@ export const load: LayoutServerLoad = async ({ params, url, setHeaders }) => {
 					replayAt: replay?.start ?? null
 				})
 			: null,
-		replay ? { queue: null, nexus: false } : queueStatus(code)
+		replay ? { queue: null, nexus: false } : queued
 	]);
 	setHeaders({
 		'cache-control': shortestCache(

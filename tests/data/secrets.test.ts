@@ -31,6 +31,8 @@ const { load: teamPage } = await import('../../src/routes/(app)/teams/[number]/+
 const { load: pitLayout } = await import('../../src/routes/(bare)/[team=team]/+layout.server.ts');
 const { cache } = await import('#lib/server/cache.ts');
 const { ftc } = await import('#lib/server/ftc/index.ts');
+const { scoutClient } = await import('#lib/server/ftcscout.ts');
+const { nexus } = await import('#lib/server/nexus.ts');
 
 const basic = btoa(`${USERNAME}:${KEY}`);
 const secrets = [KEY, basic, `${USERNAME}:${KEY}`, NEXUS_KEY, KEY.toLowerCase()];
@@ -94,6 +96,7 @@ let logs: string[] = [];
 beforeEach(() => {
 	vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
 	cache.clear();
+	for (const breaker of [ftc.breaker, scoutClient.breaker, nexus.breaker]) breaker.success();
 	logs = [];
 	for (const method of ['log', 'warn', 'error'] as const) {
 		vi.spyOn(console, method).mockImplementation((...args: unknown[]) => {

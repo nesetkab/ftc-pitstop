@@ -1,14 +1,12 @@
 import * as z from 'zod';
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { cache } from '#lib/server/cache.ts';
-import { createFtcScoutClient } from '#lib/server/ftcscout.ts';
+import { cache, keepAlive } from '#lib/server/cache.ts';
+import { scoutClient as scout } from '#lib/server/ftcscout.ts';
 import { localDate } from '#lib/server/time.ts';
 import type { EventSummary } from '#lib/types.ts';
 
 const DAY = 86_400;
-const WAIT_MS = 8_000;
-
-const scout = createFtcScoutClient();
+const WAIT_MS = 3_000;
 
 const schema = z.object({
 	eventsSearch: z.array(
@@ -71,6 +69,7 @@ export async function loadTeamCounts(): Promise<TeamCounts | null> {
 		(value) => value.body,
 		() => null
 	);
+	keepAlive(counts);
 	try {
 		return await Promise.race([counts, timeout]);
 	} finally {

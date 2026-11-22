@@ -5,9 +5,11 @@ import { CACHE_CONTROL } from '#lib/server/http.ts';
 import { loadRecordDataset, recordNames } from '#lib/server/records.ts';
 import type { PageServerLoad } from './$types';
 
+const RECORDS_WAIT_MS = 6_000;
+
 export const load: PageServerLoad = async ({ url, setHeaders }) => {
 	const filters = parseRecordFilters(url.searchParams);
-	const source = await loadRecordDataset(20_000).catch(() => null);
+	const source = await loadRecordDataset(RECORDS_WAIT_MS).catch(() => null);
 	if (!source) error(503, 'Season records are still loading. Try again in a minute.');
 	const { dataset } = source;
 	const sorted = filterRecords(dataset.rows, filters, localDay(Date.now(), 'UTC'));
