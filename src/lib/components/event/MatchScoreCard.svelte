@@ -208,9 +208,13 @@
 		}
 
 		.team {
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			line-clamp: 2;
 			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
+			overflow-wrap: anywhere;
+			line-height: 1.3;
 		}
 	}
 
