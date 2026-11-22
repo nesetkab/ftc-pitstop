@@ -124,6 +124,36 @@ describe('buildComparison', () => {
 		expect(rowOf('flower').best).toEqual([]);
 	});
 
+	it('marks every value that shows the same as the best one', () => {
+		const team = (number: number, wins: number, losses: number) =>
+			teamSeason(number, `T${number}`, [
+				attended(`E${number}`, '2026-11-07', stats(1, wins, losses))
+			]);
+		const close = buildComparison({
+			seasons: [team(1, 9, 2), team(2, 9, 2), team(3, 8, 2)],
+			ratings: ratings([
+				[1, 90.04],
+				[2, 90.01],
+				[3, 89.9]
+			]),
+			bundles: {}
+		});
+		const closeRow = (key: string) => close.rows.find((entry) => entry.key === key)!;
+		expect(closeRow('record')).toMatchObject({ values: ['9-2-0', '9-2-0', '8-2-0'], best: [0, 1] });
+		expect(closeRow('winrate')).toMatchObject({ values: ['82%', '82%', '80%'], best: [0, 1] });
+		expect(closeRow('opr')).toMatchObject({ values: ['90.0', '90.0', '89.9'], best: [0, 1] });
+		expect(closeRow('bestRank').best).toEqual([]);
+
+		const level = buildComparison({
+			seasons: [team(1, 9, 2), team(2, 18, 4)],
+			ratings: null,
+			bundles: {}
+		});
+		const levelRow = (key: string) => level.rows.find((entry) => entry.key === key)!;
+		expect(levelRow('record')).toMatchObject({ values: ['9-2-0', '18-4-0'], best: [] });
+		expect(levelRow('winrate')).toMatchObject({ values: ['82%', '82%'], best: [] });
+	});
+
 	it('counts results as partners and as opponents', () => {
 		expect(view.pairs).toEqual([
 			{

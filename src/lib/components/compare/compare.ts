@@ -98,13 +98,19 @@ export function compareHref(numbers: number[]): string {
 
 type Direction = 'high' | 'low' | null;
 
-function bestOf(values: (number | null)[], direction: Direction): number[] {
+const percent = (value: number) => `${Math.round(value * 100)}%`;
+
+function bestOf(
+	values: (number | null)[],
+	show: (value: number) => string,
+	direction: Direction
+): number[] {
 	if (!direction) return [];
 	const present = values.filter((value): value is number => value !== null);
 	if (present.length < 2) return [];
-	const target = direction === 'high' ? Math.max(...present) : Math.min(...present);
-	if (present.every((value) => value === target)) return [];
-	return values.flatMap((value, index) => (value === target ? [index] : []));
+	const top = show(direction === 'high' ? Math.max(...present) : Math.min(...present));
+	if (present.every((value) => show(value) === top)) return [];
+	return values.flatMap((value, index) => (value !== null && show(value) === top ? [index] : []));
 }
 
 function row(
@@ -119,10 +125,7 @@ function row(
 		key,
 		label,
 		values: values.map((value) => (value === null ? MISSING : show(value))),
-		best: bestOf(
-			values.map((value) => (value === null ? null : Math.round(value * 10) / 10)),
-			direction
-		),
+		best: bestOf(values, show, direction),
 		nested
 	};
 }
@@ -283,10 +286,10 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 			key: 'record',
 			label: 'Record',
 			values: tallies.map((t) => (t ? record(t.wins, t.losses, t.ties) : MISSING)),
-			best: bestOf(tallies.map(winRate), 'high'),
+			best: bestOf(tallies.map(winRate), percent, 'high'),
 			nested: false
 		},
-		row('winrate', 'Win rate', tallies.map(winRate), (v) => `${Math.round(v * 100)}%`, 'high'),
+		row('winrate', 'Win rate', tallies.map(winRate), percent, 'high'),
 		row(
 			'events',
 			'Events played',
