@@ -33,7 +33,7 @@ function steps(bundle: EventBundle): number[] {
 	if (times.length === 0) return [];
 	const start = Math.min(...times) - 30 * MINUTE;
 	const end = Math.max(...times) + 30 * MINUTE;
-	const step = Math.max(3 * MINUTE, (end - start) / 500);
+	const step = Math.max(5 * MINUTE, (end - start) / 250);
 	const list: number[] = [];
 	for (let time = start; time <= end; time += step) list.push(time);
 	for (const time of times) list.push(time - 1000, time + 1000);
@@ -98,7 +98,7 @@ function check(full: EventBundle, team: number, now: number): string[] {
 		if (planned.estimate && planned.at < now - 15 * MINUTE) {
 			say(`${item.label} estimate ${item.status} is already past`);
 		}
-		if (!sameDay(planned.at, now, zone) && !WEEKDAY.test(item.status)) {
+		if (!sameDay(planned.at, now, zone) && !WEEKDAY.test(item.status ?? '')) {
 			say(`${item.label} lists ${item.status} from another day`);
 		}
 	}
