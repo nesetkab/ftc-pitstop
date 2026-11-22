@@ -4,10 +4,11 @@ import type {
 	SeasonRating,
 	SeasonRatings
 } from '#lib/analysis/types.ts';
-import { matchLabel, ordinal, parseMatchKey, shortDate } from '#lib/format/index.ts';
+import { matchLabel, parseMatchKey, shortDate } from '#lib/format/index.ts';
 import { GAME_NAME, SEASON } from '#lib/game/biobuzz.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import type { Award, EventBundle, QuickStat, QuickStats, TeamSeason } from '#lib/types.ts';
+import { awardName } from '#lib/components/event/awards.ts';
 import { localDay } from './dates.ts';
 import { placeName } from '#lib/format/places.ts';
 import { teamMatches, type TeamMatchEvent } from './matches.ts';
@@ -160,9 +161,10 @@ export function rankPercentile(rank: number, of: number): number | null {
 }
 
 export function awardLabel(award: Award): string {
-	if (award.id === WINNING_ALLIANCE) return 'Winning alliance';
-	if (award.id === FINALIST_ALLIANCE) return 'Finalist alliance';
-	return award.placement > 1 ? `${award.name}, ${ordinal(award.placement)} place` : award.name;
+	if (award.id === WINNING_ALLIANCE || award.id === FINALIST_ALLIANCE) {
+		return awardName({ name: award.name });
+	}
+	return awardName(award);
 }
 
 function measure(

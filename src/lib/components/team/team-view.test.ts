@@ -135,14 +135,14 @@ describe('buildTeamPage without season ratings', () => {
 				record: { wins: 2, losses: 3, ties: 0 },
 				opr: expect.any(Number),
 				playoffs: null,
-				awards: ['Inspire Award, 3rd place']
+				awards: ['Inspire Award 3rd place']
 			}
 		]);
 		expect(view.awards).toEqual([
 			{
 				code: 'USAZGIQ',
 				event: 'Roadrunner - Gilbert Qualifier',
-				name: 'Inspire Award, 3rd place'
+				name: 'Inspire Award 3rd place'
 			}
 		]);
 	});
@@ -405,7 +405,7 @@ describe('awardLabel', () => {
 			'Inspire Award'
 		);
 		expect(awardLabel({ id: 11, name: 'Inspire Award', placement: 2, team: 1, person: null })).toBe(
-			'Inspire Award, 2nd place'
+			'Inspire Award 2nd place'
 		);
 	});
 });

@@ -52,7 +52,7 @@ const week: HomeEvent[] = [
 		name: 'Montana Qualifier - Butte MT-Tech',
 		type: 'Qualifier',
 		place: 'Butte, MT',
-		dates: 'Nov 20 and 21',
+		dates: 'Nov 20–21',
 		status: 'In 2 days'
 	}
 ];
@@ -108,7 +108,7 @@ describe('home page', () => {
 			'Montana Qualifier - Butte MT-Tech Butte, MT',
 			'Butte, MT',
 			'Qualifier',
-			'Nov 20 and 21',
+			'Nov 20–21',
 			'In 2 days'
 		]);
 		expect(screen.getByRole('link', { name: 'All events this season' })).toHaveAttribute(

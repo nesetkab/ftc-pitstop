@@ -268,7 +268,7 @@ describe('team page', () => {
 		const second = [...rows[1].querySelectorAll('td')].map((cell) => cell.textContent);
 		expect(second).toEqual([
 			'Phoenix Qualifier',
-			'Dec 5 and 6',
+			'Dec 5–6',
 			MISSING,
 			MISSING,
 			MISSING,
