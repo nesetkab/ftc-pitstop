@@ -43,7 +43,7 @@
 	<section>
 		<span class="tv-label">Our matches</span>
 		{#if view.matches.length > 0}
-			<MatchList items={matchItems(view.matches, view.next?.key ?? null, timeZone, 7)} />
+			<MatchList items={matchItems(view.matches, view.next?.key ?? null, timeZone, now, 7)} />
 		{:else}
 			<p class="sub">No matches scheduled for {view.team}.</p>
 		{/if}

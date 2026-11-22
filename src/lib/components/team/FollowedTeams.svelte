@@ -22,14 +22,15 @@
 		try {
 			const season = await getJson<TeamSeason>(`/api/teams/${team}`, signal);
 			if (!season) return unavailableRow(team);
-			const chosen = chooseEvent(season, Date.now());
+			const now = Date.now();
+			const chosen = chooseEvent(season, now);
 			const bundle =
 				chosen?.standing === 'now'
 					? await getJson<EventBundle>(`/api/events/${chosen.entry.event.code}`, signal).catch(
 							() => null
 						)
 					: null;
-			return followedRow(season, chosen, bundle);
+			return followedRow(season, chosen, bundle, now);
 		} catch {
 			return unavailableRow(team);
 		}

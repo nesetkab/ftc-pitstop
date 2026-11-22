@@ -3,7 +3,7 @@ import { ordinal } from '#lib/format/ordinal.ts';
 import { pct } from '#lib/format/pct.ts';
 import { record } from '#lib/format/record.ts';
 import { relative } from '#lib/format/relative.ts';
-import { time } from '#lib/format/time.ts';
+import { dayTime, time } from '#lib/format/time.ts';
 import type { MatchListItem } from '#lib/ui/MatchList.svelte';
 import type { AllianceColor } from '#lib/types.ts';
 import type { QueueCall } from './queue.ts';
@@ -99,7 +99,7 @@ export function heroText(
 	}
 	if (next.scheduled !== null) {
 		return {
-			headline: `Scheduled for ${time(next.scheduled, timeZone)}`,
+			headline: `Scheduled for ${dayTime(next.scheduled, now, timeZone)}`,
 			detail: present([field, delay]),
 			urgent: false
 		};
@@ -124,10 +124,27 @@ function withPartners(partners: number[]): string {
 	return partners.length > 0 ? `with ${partners.join(', ')}` : '';
 }
 
+const STALE_SCHEDULE = 30 * 60_000;
+
+export function plannedTime(match: PitMatch): { at: number; estimate: boolean } | null {
+	const { scheduled, expected } = match;
+	if (expected === null) return scheduled === null ? null : { at: scheduled, estimate: false };
+	const stale = scheduled === null || Math.abs(expected - scheduled) >= STALE_SCHEDULE;
+	return stale ? { at: expected, estimate: true } : { at: scheduled, estimate: false };
+}
+
+function plannedText(match: PitMatch, now: number, timeZone: string): string {
+	const planned = plannedTime(match);
+	if (!planned) return '';
+	const clock = dayTime(planned.at, now, timeZone);
+	return planned.estimate ? `~${clock}` : clock;
+}
+
 export function matchItem(
 	match: PitMatch,
 	nextKey: string | null,
 	timeZone: string,
+	now: number,
 	href?: string
 ): MatchListItem {
 	const partners = withPartners(match.partners);
@@ -141,15 +158,9 @@ export function matchItem(
 			href
 		};
 	}
-	const status =
-		match.started !== null
-			? 'On field'
-			: match.scheduled !== null
-				? time(match.scheduled, timeZone)
-				: '';
 	return {
 		label: match.label,
-		status,
+		status: match.started !== null ? 'On field' : plannedText(match, now, timeZone),
 		detail: present([colorName(match.alliance), partners]).join(', '),
 		value: match.win !== null ? pct(match.win) : '',
 		state: match.key === nextKey ? 'next' : 'upcoming',
@@ -161,6 +172,7 @@ export function matchItems(
 	matches: PitMatch[],
 	nextKey: string | null,
 	timeZone: string,
+	now: number,
 	limit = Infinity
 ): MatchListItem[] {
 	let shown = matches;
@@ -172,7 +184,7 @@ export function matchItems(
 				: Math.max(0, Math.min(firstOpen - 2, matches.length - limit));
 		shown = matches.slice(start, start + limit);
 	}
-	return shown.map((match) => matchItem(match, nextKey, timeZone));
+	return shown.map((match) => matchItem(match, nextKey, timeZone, now));
 }
 
 export function lastResultItem(result: LastResult): MatchListItem {

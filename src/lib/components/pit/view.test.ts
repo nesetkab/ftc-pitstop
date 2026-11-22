@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
+import { time } from '#lib/format/time.ts';
 import { delayText, heroText, matchItems, playoffResult, shortDelay } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
@@ -49,7 +51,7 @@ describe('pitView during quals', () => {
 			high: 97,
 			low: 45
 		});
-		expect(matchItems(current.matches, current.next?.key ?? null, ZONE)).toEqual([
+		expect(matchItems(current.matches, current.next?.key ?? null, ZONE, at('Q22'))).toEqual([
 			{
 				label: 'Q5',
 				status: 'Won',
@@ -213,6 +215,34 @@ describe('pitView during quals', () => {
 		expect(playing.next?.key).toBe('q26');
 		expect(playing.next?.started).not.toBeNull();
 		expect(playing.onField).toBe('Q26');
+	});
+});
+
+describe('matches carried over to the next day', () => {
+	const astana = fixtureBundle('KZASQ1');
+	const now = replayStart('Q30', astana)!;
+	const bundle = replayBundle(astana, now);
+	const zone = astana.event.timezone;
+	const items = (analysis: EventAnalysis | null) => {
+		const current = pitView({ bundle, analysis, queue: null, team: 36465 });
+		return matchItems(current.matches, current.next?.key ?? null, zone, now);
+	};
+
+	it('lists the estimate the headline uses instead of the stale schedule', () => {
+		const analysis = retime(
+			{ forecasts: {}, ratings: [] } as unknown as EventAnalysis,
+			bundle,
+			now
+		);
+		const q36 = items(analysis).find((item) => item.label === 'Q36')!;
+		const expected = analysis.timing.matches.q36.expectedStart!;
+		expect(q36.status).toBe(`~${time(expected, zone)}`);
+		expect(q36.status).not.toContain('7:47');
+	});
+
+	it('names the day when it falls back to an old scheduled time', () => {
+		const q36 = items(null).find((item) => item.label === 'Q36')!;
+		expect(q36.status).toBe(nb('Sat 7:47 PM'));
 	});
 });
 

@@ -44,6 +44,7 @@ export interface PitMatch {
 	partners: number[];
 	opponents: number[];
 	scheduled: number | null;
+	expected: number | null;
 	started: number | null;
 	outcome: Outcome | null;
 	score: { ours: number; theirs: number } | null;
@@ -179,6 +180,9 @@ function pitMatch(match: Match, team: number, analysis: EventAnalysis | null): P
 		partners: match[alliance].filter((slot) => slot.team !== team).map((slot) => slot.team),
 		opponents: match[other].map((slot) => slot.team),
 		scheduled: match.scheduledTime,
+		expected: isUnplayed(match)
+			? (analysis?.timing.matches[match.key]?.expectedStart ?? null)
+			: null,
 		started: match.actualTime,
 		outcome,
 		score: result ? { ours: result[alliance].total, theirs: result[other].total } : null,

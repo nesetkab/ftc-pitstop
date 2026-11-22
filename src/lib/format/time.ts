@@ -96,3 +96,13 @@ export function dateRange(start: DateInput, end: DateInput, timeZone?: string): 
 	}
 	return `${first.monthName} ${first.day} ${joiner} ${last.day}, ${last.year}`;
 }
+
+export function sameDay(a: DateInput, b: DateInput, timeZone?: string): boolean {
+	return calendarDay(a, timeZone).serial === calendarDay(b, timeZone).serial;
+}
+
+export function dayTime(input: DateInput, now: DateInput, timeZone?: string): string {
+	const clock = time(input, timeZone);
+	if (sameDay(input, now, timeZone)) return clock;
+	return `${format(input, { weekday: 'short' }, timeZone)} ${clock}`;
+}

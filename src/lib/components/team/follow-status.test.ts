@@ -58,8 +58,8 @@ describe('nextMatch and standing', () => {
 	);
 
 	it('names the next unplayed match with its time and alliance', () => {
-		expect(nextMatch(bundle, 26670)).toBe(`Q26 at 1:58${NBSP}PM, blue`);
-		expect(nextMatch(bundle, 14624)).toBe(`Q26 at 1:58${NBSP}PM, red`);
+		expect(nextMatch(bundle, 26670, NOW)).toBe(`Q26 at 1:58${NBSP}PM, blue`);
+		expect(nextMatch(bundle, 14624, NOW)).toBe(`Q26 at 1:58${NBSP}PM, red`);
 	});
 
 	it('says when a team has no matches left or is not scheduled', () => {
@@ -85,7 +85,7 @@ describe('followedRow', () => {
 			[match(26, [26670, 1], [2, 3], '2026-11-14T20:58:00Z', false)],
 			table
 		);
-		expect(followedRow(season, chooseEvent(season, NOW), bundle)).toEqual({
+		expect(followedRow(season, chooseEvent(season, NOW), bundle, NOW)).toEqual({
 			team: 26670,
 			name: 'SCA Iron Eagles',
 			eventCode: 'USAZGIQ',

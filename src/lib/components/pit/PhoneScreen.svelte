@@ -4,7 +4,7 @@
 	import { pct } from '#lib/format/pct.ts';
 	import { record } from '#lib/format/record.ts';
 	import { relative } from '#lib/format/relative.ts';
-	import { relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
+	import { dayTime, relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
 	import type { DataSource, Event, Match } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -74,7 +74,7 @@
 	const text = $derived(next ? heroText(next, call, now, timeZone, view.delaySeconds) : null);
 	const href = (key: string) => `/events/${event.code}/matches/${key}`;
 	const items = $derived(
-		view.matches.map((match) => matchItem(match, next?.key ?? null, timeZone, href(match.key)))
+		view.matches.map((match) => matchItem(match, next?.key ?? null, timeZone, now, href(match.key)))
 	);
 	const facts = $derived.by(() => {
 		const ranking = view.ranking;
@@ -284,7 +284,7 @@
 								{:else if match.actualTime !== null}
 									On field
 								{:else if match.scheduledTime !== null}
-									{time(match.scheduledTime, timeZone)}
+									{dayTime(match.scheduledTime, now, timeZone)}
 								{/if}
 							</span>
 							<span class="side red">
