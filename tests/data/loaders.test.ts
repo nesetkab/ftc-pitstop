@@ -55,7 +55,9 @@ describe('loadEventBundle', () => {
 			now: '2026-11-19T12:00:00Z',
 			scout: { EventsSearch: scoutSeasonList('USAZGIQ', 'USAZCMP') }
 		});
+		expect(data.finishedEvents()).toEqual([]);
 		const bundle = await data.loadEventBundle('usazgiq');
+		expect(data.finishedEvents()).toEqual(['USAZGIQ']);
 		expect(bundle.event.code).toBe('USAZGIQ');
 		expect(bundle).toMatchObject({
 			phase: 'done',

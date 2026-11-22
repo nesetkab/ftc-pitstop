@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { listed, regionGroups } from '#lib/components/event/event-list.ts';
-import { loadSeasonEvents } from '#lib/server/event.ts';
+import { finishedEvents, loadSeasonEvents } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
 import { loadTeamCounts, teamCount } from './team-counts.server.ts';
@@ -16,6 +16,7 @@ export const load: PageServerLoad = async ({ setHeaders }) => {
 	return {
 		events: list.events.map((event) => listed(event, teamCount(event, counts?.[event.code], now))),
 		regions: regionGroups(list.events),
+		finished: finishedEvents(),
 		fetchedAt: list.fetchedAt,
 		stale: list.stale,
 		renderedAt: now

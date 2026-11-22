@@ -40,7 +40,8 @@
 
 	const types = $derived(typeOptions(data.events));
 	const filters = $derived({ query, region, type, when });
-	const shown = $derived(filterEvents(data.events, filters, now));
+	const finished = $derived(new Set(data.finished));
+	const shown = $derived(filterEvents(data.events, filters, now, finished));
 	const groups = $derived(groupByWeek(shown.slice(0, limit), now));
 	const elsewhere = $derived(
 		shown.length === 0 && when !== 'all'

@@ -55,6 +55,20 @@ describe('event list', () => {
 		expect(codes({ query: 'tempe live' })).toEqual(['LIVE live']);
 	});
 
+	it('marks a live event done once it is known to be finished', () => {
+		const shown = filterEvents(
+			events,
+			{ query: '', region: '', type: '', when: 'upcoming' },
+			NOW,
+			new Set(['LIVE', 'SOON'])
+		);
+		expect(shown.map((event) => `${event.code} ${event.status}`)).toEqual([
+			'LIVE done',
+			'SOON upcoming',
+			'LATER upcoming'
+		]);
+	});
+
 	it('groups by week and labels regions with real place names', () => {
 		const groups = groupByWeek(
 			filterEvents(events, { query: '', region: '', type: '', when: 'all' }, NOW),
