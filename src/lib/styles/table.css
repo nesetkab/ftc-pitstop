@@ -83,3 +83,31 @@ table.t.sticky thead {
 	z-index: 1;
 	background: var(--bg);
 }
+
+@media (max-width: 600px) {
+	table.t th,
+	table.t td {
+		padding-inline: 6px;
+	}
+
+	table.t th {
+		white-space: normal;
+	}
+
+	table.t .opt {
+		display: none;
+	}
+
+	table.t .team-cell {
+		white-space: nowrap;
+	}
+
+	table.t .team-cell .name {
+		display: inline-block;
+		max-width: min(9em, 28vw);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		vertical-align: bottom;
+	}
+}

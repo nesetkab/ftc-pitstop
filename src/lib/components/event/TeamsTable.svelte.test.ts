@@ -18,4 +18,18 @@ describe('TeamsTable', () => {
 		const row = screen.getByRole('link', { name: new RegExp(String(team)) }).closest('tr')!;
 		expect(row.lastElementChild?.textContent?.replace(/\s+/g, ' ').trim()).toBe('850 of 3,274');
 	});
+
+	it('keeps the location on phones only when there are no stats', () => {
+		const { teams } = fixtureBundle('USAZGIQ');
+		render(TeamsTable, { props: { teams } });
+		expect(screen.getByRole('columnheader', { name: 'Location' })).not.toHaveClass('opt');
+		expect(screen.getByRole('columnheader', { name: 'Rookie year' })).toHaveClass('opt');
+		cleanup();
+		render(TeamsTable, {
+			props: { teams, season: { [teams[0].number]: { opr: 40.2, rank: 850 } } }
+		});
+		expect(screen.getByRole('columnheader', { name: 'Location' })).toHaveClass('opt');
+		expect(screen.getByRole('columnheader', { name: 'Season OPR' })).not.toHaveClass('opt');
+		expect(screen.getByRole('columnheader', { name: 'World rank' })).toHaveClass('opt');
+	});
 });

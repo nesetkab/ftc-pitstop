@@ -32,6 +32,16 @@ describe('placeName', () => {
 	});
 });
 
+describe('placeName with a city that already names its region', () => {
+	it('does not repeat the state or country', () => {
+		expect(placeName({ city: 'Plano, Texas', state: 'TX', country: 'USA' })).toBe('Plano, Texas');
+		expect(placeName({ city: 'Plano, TX', state: 'TX', country: 'USA' }, 'short')).toBe(
+			'Plano, TX'
+		);
+		expect(placeName({ city: 'Lima, Peru', state: null, country: 'Peru' })).toBe('Lima, Peru');
+	});
+});
+
 describe('stateName', () => {
 	it('maps known abbreviations and passes unknown ones through', () => {
 		expect(stateName('az', 'USA')).toBe('Arizona');

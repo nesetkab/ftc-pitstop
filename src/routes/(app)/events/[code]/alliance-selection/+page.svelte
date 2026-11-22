@@ -250,7 +250,7 @@
 		gap: 4px 12px;
 		padding: 12px 16px;
 		border-radius: var(--radius-control);
-		background: var(--accent-wash);
+		background: var(--surface);
 	}
 
 	.picking b {

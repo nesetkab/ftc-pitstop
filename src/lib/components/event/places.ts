@@ -97,6 +97,9 @@ export function placeName(
 	country: string | null
 ): string | null {
 	const area = areaName(state, country);
-	const parts = [city, area].filter((part): part is string => Boolean(part));
+	const repeated = Boolean(
+		city && area && `, ${city.toLowerCase()}`.endsWith(`, ${area.toLowerCase()}`)
+	);
+	const parts = [city, repeated ? null : area].filter((part): part is string => Boolean(part));
 	return parts.length > 0 ? parts.join(', ') : null;
 }

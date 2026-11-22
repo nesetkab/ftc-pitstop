@@ -478,16 +478,16 @@
 			grid-column: auto;
 			grid-template-columns: 22px minmax(0, 1fr) auto;
 			grid-template-areas:
-				'rank team actions'
-				'. note note';
+				'rank team team'
+				'. note actions';
 			padding: 8px 0;
 		}
 
 		.row.editable {
 			grid-template-columns: 22px 22px minmax(0, 1fr) auto;
 			grid-template-areas:
-				'handle rank team actions'
-				'. note note note';
+				'handle rank team team'
+				'. . note actions';
 		}
 
 		.handle {
@@ -513,6 +513,12 @@
 
 		.note-text:empty {
 			display: none;
+		}
+	}
+
+	@media (pointer: coarse) {
+		.handle {
+			height: 40px;
 		}
 	}
 </style>

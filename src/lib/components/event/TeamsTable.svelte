@@ -32,6 +32,7 @@
 	const opr = $derived(
 		ratings ? new Map(ratings.map((rating) => [rating.team, rating.opr])) : null
 	);
+	const stats = $derived(ranks.size > 0 || opr !== null || season !== null);
 	const sorted = $derived([...teams].sort((a, b) => a.number - b.number));
 </script>
 
@@ -40,8 +41,8 @@
 	<thead>
 		<tr>
 			<th class="l" scope="col">Team</th>
-			<th class="l" scope="col">Location</th>
-			<th scope="col">Rookie year</th>
+			<th class={['l', { opt: stats }]} scope="col">Location</th>
+			<th class="opt" scope="col">Rookie year</th>
 			{#if ranks.size > 0}
 				<th scope="col">Rank</th>
 			{/if}
@@ -50,7 +51,7 @@
 			{/if}
 			{#if season}
 				<th scope="col">Season OPR</th>
-				<th scope="col">World rank</th>
+				<th class="opt" scope="col">World rank</th>
 			{/if}
 		</tr>
 	</thead>
@@ -61,8 +62,10 @@
 				<td class="team">
 					<TeamCell number={team.number} name={team.name} href="/teams/{team.number}" />
 				</td>
-				<td class="l muted">{placeName(team.city, team.state, team.country) ?? ''}</td>
-				<td>{team.rookieYear ?? '—'}</td>
+				<td class={['l muted', { opt: stats }]}>
+					{placeName(team.city, team.state, team.country) ?? ''}
+				</td>
+				<td class="opt">{team.rookieYear ?? '—'}</td>
 				{#if ranks.size > 0}
 					<td>{ranks.get(team.number) ?? '—'}</td>
 				{/if}
@@ -71,7 +74,7 @@
 				{/if}
 				{#if season}
 					<td>{fixed(standing?.opr)}</td>
-					<td>
+					<td class="opt">
 						{#if standing}
 							{integer(standing.rank)}{#if seasonCount}<span class="faint"
 									>{` of ${integer(seasonCount)}`}</span

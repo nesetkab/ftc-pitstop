@@ -59,7 +59,7 @@ describe('home page', () => {
 		const table = screen.getByRole('table', { name: 'Events running today' });
 		const row = within(table).getAllByRole('row')[1];
 		expect([...row.querySelectorAll('td')].map((cell) => cell.textContent)).toEqual([
-			'Roadrunner - Gilbert Qualifier',
+			'Roadrunner - Gilbert Qualifier Gilbert, AZ',
 			'Gilbert, AZ',
 			'Qualifier',
 			'Today',
@@ -72,7 +72,7 @@ describe('home page', () => {
 		const table = screen.getByRole('table', { name: 'Events starting in the next 7 days' });
 		const row = within(table).getAllByRole('row')[1];
 		expect([...row.querySelectorAll('td')].map((cell) => cell.textContent)).toEqual([
-			'Montana Qualifier - Butte MT-Tech',
+			'Montana Qualifier - Butte MT-Tech Butte, MT',
 			'Butte, MT',
 			'Qualifier',
 			'Nov 20 and 21',

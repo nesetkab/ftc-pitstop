@@ -34,18 +34,18 @@
 				<th class="w" scope="col">Auto OPR</th>
 			{:else}
 				<th class="w" scope="col">RS</th>
-				<th class="w" scope="col">TBP</th>
+				<th class="w opt" scope="col">TBP</th>
 				<th class="w" scope="col">Avg auto</th>
 			{/if}
-			<th class="w" scope="col">Avg tips</th>
-			<th class="w" scope="col">Avg park</th>
+			<th class="w opt" scope="col">Avg tips</th>
+			<th class="w opt" scope="col">Avg park</th>
 			<th class="w" scope="col">Rank</th>
 			{#if table.picks}
-				<th class="w" scope="col">Win round 1</th>
-				<th class="w" scope="col">Reach upper final</th>
+				<th class="w opt" scope="col">Win round 1</th>
+				<th class="w opt" scope="col">Reach upper final</th>
 				<th class="w" scope="col">Win event</th>
 			{/if}
-			<th class="l" scope="col">Note</th>
+			<th class="l opt" scope="col">Note</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -60,24 +60,24 @@
 					<td>{fixed(row.autoOpr)}</td>
 				{:else}
 					<td>{fixed(row.rs, 2)}</td>
-					<td>{fixed(row.tbp)}</td>
+					<td class="opt">{fixed(row.tbp)}</td>
 					<td>{fixed(row.avgAuto)}</td>
 				{/if}
-				<td>{fixed(row.avgTips)}</td>
-				<td>{fixed(row.avgPark)}</td>
+				<td class="opt">{fixed(row.avgTips)}</td>
+				<td class="opt">{fixed(row.avgPark)}</td>
 				<td>{row.rank ?? MISSING}</td>
 				{#if table.picks}
 					{#if taken}
-						<td></td>
-						<td></td>
+						<td class="opt"></td>
+						<td class="opt"></td>
 						<td></td>
 					{:else}
-						<ProbCell p={row.winRound1} shade={false} />
-						<ProbCell p={row.reachUpperFinal} shade={false} />
+						<ProbCell p={row.winRound1} shade={false} class="opt" />
+						<ProbCell p={row.reachUpperFinal} shade={false} class="opt" />
 						<ProbCell p={row.winEvent} shade={false} />
 					{/if}
 				{/if}
-				<td class="l wrap note">{note(row)}</td>
+				<td class="l wrap note opt">{note(row)}</td>
 			</tr>
 		{/each}
 	</tbody>

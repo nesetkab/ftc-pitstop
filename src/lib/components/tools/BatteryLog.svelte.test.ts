@@ -49,8 +49,8 @@ describe('battery log', () => {
 		const banner = screen.getByText('Use next: B4').parentElement as HTMLElement;
 		expect(banner).toHaveTextContent('13.1 V');
 		expect(banner).toHaveTextContent('rested 24 min');
-		expect(row('B4')).toHaveClass('me');
-		expect(row('B1')).not.toHaveClass('me');
+		expect(row('B4')).toHaveClass('next');
+		expect(row('B1')).not.toHaveClass('next');
 		expect(within(row('B4')).getByText(/Use next/)).toBeInTheDocument();
 	});
 

@@ -132,7 +132,7 @@
 	.sample {
 		padding: 10px 14px;
 		border-radius: var(--radius-control);
-		background: var(--accent-wash);
+		background: var(--surface);
 		color: var(--text);
 		font-size: 14px;
 	}

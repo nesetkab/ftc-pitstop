@@ -136,29 +136,9 @@
 	{/if}
 {/if}
 
-<div class="event-pages">{@render children()}</div>
+{@render children()}
 
 <style>
-	.event-pages {
-		display: contents;
-	}
-
-	@media (max-width: 600px) {
-		.event-pages :global(table.t th),
-		.event-pages :global(table.t td) {
-			padding-inline: 6px;
-		}
-
-		.event-pages :global(table.t .team-cell .name) {
-			display: inline-block;
-			max-width: 9em;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-			vertical-align: bottom;
-		}
-	}
-
 	.crumb {
 		margin-bottom: -10px;
 		font-size: 14px;

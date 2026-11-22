@@ -48,11 +48,11 @@
 			</th>
 			<th class="l" scope="col">Teams</th>
 			<th scope="col">Auto</th>
-			<th scope="col">Hive</th>
-			<th scope="col">Flowers</th>
-			<th scope="col">Garden</th>
-			<th scope="col">Park</th>
-			<th scope="col">Fouls</th>
+			<th class="opt" scope="col">Hive</th>
+			<th class="opt" scope="col">Flowers</th>
+			<th class="opt" scope="col">Garden</th>
+			<th class="opt" scope="col">Park</th>
+			<th class="opt" scope="col">Fouls</th>
 			<th scope="col">Total</th>
 		</tr>
 	</thead>
@@ -75,9 +75,11 @@
 						</span>
 					</td>
 					{#each parts as part (part)}
-						<td>{detailed || part === 'auto' ? split[part] : '—'}</td>
+						<td class={{ opt: part !== 'auto' }}
+							>{detailed || part === 'auto' ? split[part] : '—'}</td
+						>
 					{/each}
-					<td>{split.fouls}</td>
+					<td class="opt">{split.fouls}</td>
 					<td class={['total', { won: match.result?.winner === color }]}>{score.total}</td>
 				</tr>
 			{/each}

@@ -46,7 +46,7 @@
 		margin-inline: -4px;
 		padding: 1px 4px;
 		border-radius: var(--radius-chip);
-		background: var(--accent-wash);
+		background: var(--surface);
 		color: var(--text);
 	}
 </style>

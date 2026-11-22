@@ -5,9 +5,10 @@
 	interface Props {
 		p: number | null | undefined;
 		shade?: boolean;
+		class?: string;
 	}
 
-	let { p, shade = true }: Props = $props();
+	let { p, shade = true, class: className }: Props = $props();
 </script>
 
-<td style:background={shade ? heatBackground(p) : undefined}>{pct(p)}</td>
+<td class={className} style:background={shade ? heatBackground(p) : undefined}>{pct(p)}</td>

@@ -365,4 +365,20 @@
 			min-width: 0;
 		}
 	}
+
+	@media (max-width: 600px) {
+		.rounds {
+			flex-direction: column;
+			gap: 16px;
+			overflow-x: visible;
+		}
+
+		.round-matches {
+			gap: 10px;
+		}
+
+		.box {
+			width: 100%;
+		}
+	}
 </style>

@@ -81,6 +81,14 @@ describe('ScheduleView', () => {
 		expect(cells[7]).toMatch(/^(Red|Blue) \d+%$/);
 	});
 
+	it('moves the time under the match label on phones', () => {
+		render(ScheduleView, { props: props() });
+		const table = screen.getAllByRole('table', { name: 'Match schedule' })[0];
+		expect(within(table).getByRole('columnheader', { name: 'Time' })).toHaveClass('opt');
+		const label = screen.getByRole('link', { name: 'Q1' }).closest('td')!;
+		expect(label.querySelector('.when')?.textContent).toMatch(/^10:30\s?AM$/);
+	});
+
 	it('marks followed teams', () => {
 		render(ScheduleView, { props: props({ followed: new Set([14624]) }) });
 		const marked = document.querySelectorAll('.team-chip.me');

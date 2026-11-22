@@ -858,4 +858,11 @@
 			padding: 12px;
 		}
 	}
+
+	@media (pointer: coarse) {
+		.swatch {
+			width: 30px;
+			height: 30px;
+		}
+	}
 </style>

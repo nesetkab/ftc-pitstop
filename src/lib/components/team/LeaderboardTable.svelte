@@ -37,7 +37,7 @@
 				<th class="optional" scope="col">Tips</th>
 				<th class="optional" scope="col">Matches</th>
 				{#if showEvents}
-					<th class="optional" scope="col">Events</th>
+					<th class="optional roomy" scope="col">Events</th>
 				{/if}
 			</tr>
 		</thead>
@@ -56,7 +56,7 @@
 					<td class="optional">{fixed(row.tips)}</td>
 					<td class="optional">{integer(row.matches)}</td>
 					{#if showEvents}
-						<td class="optional">{row.events === null ? MISSING : integer(row.events)}</td>
+						<td class="optional roomy">{row.events === null ? MISSING : integer(row.events)}</td>
 					{/if}
 				</tr>
 			{/each}
@@ -71,15 +71,15 @@
 		text-overflow: ellipsis;
 	}
 
+	@media (max-width: 900px) {
+		.roomy {
+			display: none;
+		}
+	}
+
 	@media (max-width: 640px) {
 		.optional {
 			display: none;
-		}
-
-		.team-name {
-			max-width: none;
-			overflow: visible;
-			white-space: normal;
 		}
 	}
 </style>

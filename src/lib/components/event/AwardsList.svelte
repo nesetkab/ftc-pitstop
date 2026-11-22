@@ -32,7 +32,7 @@
 					{#if index === 0}
 						<th class="l award" scope="rowgroup" rowspan={group.entries.length}>{group.name}</th>
 					{/if}
-					<td class="l muted">{entry.label ?? ''}</td>
+					<td class="l wrap muted">{entry.label ?? ''}</td>
 					<td class="team wrap">
 						{#if entry.person}
 							<span>{entry.person}</span>
@@ -65,5 +65,12 @@
 		vertical-align: top;
 		white-space: normal;
 		min-width: 180px;
+	}
+
+	@media (max-width: 600px) {
+		th.award {
+			padding-inline: 6px;
+			min-width: 0;
+		}
 	}
 </style>

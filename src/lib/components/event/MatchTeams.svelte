@@ -36,16 +36,16 @@
 			{#if rated}
 				<th scope="col">OPR</th>
 				<th scope="col">Auto</th>
-				<th scope="col">Hive</th>
-				<th scope="col">Park</th>
-				<th scope="col">Avg tips</th>
-				<th scope="col">Matches</th>
+				<th class="opt" scope="col">Hive</th>
+				<th class="opt" scope="col">Park</th>
+				<th class="opt" scope="col">Avg tips</th>
+				<th class="opt" scope="col">Matches</th>
 			{:else}
 				<th scope="col">Rank</th>
 				<th scope="col">RS</th>
 				<th scope="col">Record</th>
-				<th scope="col">Avg tips</th>
-				<th scope="col">Matches</th>
+				<th class="opt" scope="col">Avg tips</th>
+				<th class="opt" scope="col">Matches</th>
 			{/if}
 		</tr>
 	</thead>
@@ -64,16 +64,16 @@
 				{#if rated}
 					<td>{fixed(rating?.opr)}</td>
 					<td>{fixed(rating?.parts.auto)}</td>
-					<td>{fixed(rating?.parts.hive)}</td>
-					<td>{fixed(rating?.parts.park)}</td>
-					<td>{fixed(rating?.parts.tips, 2)}</td>
-					<td>{rating?.matches ?? '—'}</td>
+					<td class="opt">{fixed(rating?.parts.hive)}</td>
+					<td class="opt">{fixed(rating?.parts.park)}</td>
+					<td class="opt">{fixed(rating?.parts.tips, 2)}</td>
+					<td class="opt">{rating?.matches ?? '—'}</td>
 				{:else}
 					<td>{ranking?.rank ?? '—'}</td>
 					<td>{fixed(ranking?.rs, 2)}</td>
 					<td>{ranking ? record(ranking.wins, ranking.losses, ranking.ties) : '—'}</td>
-					<td>{fixed(ranking?.avgTips)}</td>
-					<td>{ranking?.played ?? '—'}</td>
+					<td class="opt">{fixed(ranking?.avgTips)}</td>
+					<td class="opt">{ranking?.played ?? '—'}</td>
 				{/if}
 			</tr>
 		{/each}

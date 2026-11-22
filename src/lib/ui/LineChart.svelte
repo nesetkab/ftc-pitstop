@@ -137,23 +137,25 @@
 		</div>
 	{/if}
 
-	<table class="visually-hidden">
-		<caption>{label}</caption>
-		<thead>
-			<tr>
-				<th scope="col">{xName}</th>
-				<th scope="col">{yName}</th>
-			</tr>
-		</thead>
-		<tbody>
-			{#each points as point, index (index)}
+	<div class="visually-hidden">
+		<table>
+			<caption>{label}</caption>
+			<thead>
 				<tr>
-					<td>{point.label}</td>
-					<td>{format(point.value)}</td>
+					<th scope="col">{xName}</th>
+					<th scope="col">{yName}</th>
 				</tr>
-			{/each}
-		</tbody>
-	</table>
+			</thead>
+			<tbody>
+				{#each points as point, index (index)}
+					<tr>
+						<td>{point.label}</td>
+						<td>{format(point.value)}</td>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</div>
 </div>
 
 <style>

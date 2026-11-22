@@ -26,7 +26,7 @@
 </script>
 
 <header class="appbar">
-	<div class="inner">
+	<div class={['inner', { 'on-home': page.url.pathname === '/' }]}>
 		<a class="home" href="/"><Logo height="15px" /></a>
 		<nav aria-label="Main">
 			{#each links as link (link.href)}
@@ -67,8 +67,10 @@
 
 	.home {
 		grid-area: home;
+		justify-self: start;
 		display: block;
-		padding-block: 4px;
+		margin-block: -8px;
+		padding-block: 12px;
 		color: var(--text);
 	}
 
@@ -81,6 +83,8 @@
 	}
 
 	nav a {
+		margin-block: -10px;
+		padding-block: 10px;
 		text-decoration: none;
 		white-space: nowrap;
 	}
@@ -155,11 +159,25 @@
 		.theme {
 			display: none;
 		}
+
+		.on-home {
+			grid-template-areas: 'home nav';
+		}
+
+		.on-home .search {
+			display: none;
+		}
 	}
 
 	@media (hover: none) {
 		.search kbd {
 			display: none;
+		}
+	}
+
+	@media (pointer: coarse) {
+		.search {
+			min-height: 40px;
 		}
 	}
 </style>

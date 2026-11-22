@@ -57,8 +57,22 @@ describe('RankingsView', () => {
 		render(RankingsView, { props: { bundle: finished, analysis: fakeAnalysis(finished) } });
 		expect(screen.queryByText(/Projected after/)).toBeNull();
 		expect(headers()).toContain('OPR');
+		expect(screen.getByRole('columnheader', { name: 'Record' })).not.toHaveClass('opt');
 		expect(screen.getByRole('table', { name: 'Schedule strength' })).toBeInTheDocument();
 		expect(screen.queryByText('Schedule so far')).toBeNull();
+	});
+
+	it('drops low-value columns on phones', () => {
+		render(RankingsView, { props: { bundle: midway, analysis: fakeAnalysis(midway) } });
+		const table = screen.getByRole('table', { name: 'Rankings' });
+		const optional = within(table)
+			.getAllByRole('columnheader')
+			.filter((cell) => cell.classList.contains('opt'))
+			.map((cell) => cell.textContent?.trim());
+		expect(optional).toEqual(['Record', 'TBP', 'Avg tips', 'Finish, 1st to 27th', 'Top 4']);
+		const first = bodyRows(table)[0];
+		expect(first.querySelectorAll('td.opt')).toHaveLength(5);
+		expect(screen.getByText('Projected after 34 matches').closest('tr')).toHaveClass('opt');
 	});
 
 	it('highlights followed teams', () => {
