@@ -83,8 +83,9 @@
 	function reset() {
 		const stamp = Date.now();
 		const before = checklist;
+		const checked = counts.done > 0;
 		update?.((current) => resetForNextMatch(current, stamp));
-		if (counts.done > 0) {
+		if (checked) {
 			undo.offer('Checks cleared for the next match.', () =>
 				update?.((current) => undoReset(current, before, stamp))
 			);
