@@ -118,7 +118,7 @@ describe('createDataset', () => {
 	it('lists regions, countries and the states of each country', () => {
 		expect(dataset.regions).toEqual([
 			{ value: 'USAZ', label: 'Arizona' },
-			{ value: 'USCALA', label: 'California SoCal' },
+			{ value: 'USCALA', label: 'California Los Angeles' },
 			{ value: 'CN', label: 'China' },
 			{ value: 'CAON', label: 'Ontario' }
 		]);

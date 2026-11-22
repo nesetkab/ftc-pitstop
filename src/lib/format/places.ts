@@ -115,7 +115,7 @@ export function placeName(place: Place, style: 'full' | 'short' = 'full'): strin
 
 const REGIONS: Record<string, string> = {
 	USARL: 'Adventist Robotics League',
-	USCALA: 'California SoCal',
+	USCALA: 'California Los Angeles',
 	USCALS: 'California LAUSD',
 	USCANO: 'California NorCal',
 	USCASD: 'California San Diego',
