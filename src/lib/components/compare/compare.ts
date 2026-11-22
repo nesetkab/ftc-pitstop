@@ -119,7 +119,10 @@ function row(
 		key,
 		label,
 		values: values.map((value) => (value === null ? MISSING : show(value))),
-		best: bestOf(values, direction),
+		best: bestOf(
+			values.map((value) => (value === null ? null : Math.round(value * 10) / 10)),
+			direction
+		),
 		nested
 	};
 }
