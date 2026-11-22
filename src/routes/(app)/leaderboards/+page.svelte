@@ -28,6 +28,7 @@
 			.filter(Boolean)
 			.join(', ')
 	);
+	const missing = $derived(data.filters.team > 0 && !data.found);
 	const showing = $derived(
 		`${summary ? `${summary}. ` : ''}Showing ${integer(first)} to ${integer(last)} of ${integer(data.total)} teams`
 	);
@@ -67,11 +68,11 @@
 
 <p class="count" aria-live="polite">
 	{#if data.total === 0}
-		No teams
+		No teams{missing ? '.' : ''}
 	{:else}
-		{showing}
+		{showing}{missing ? '.' : ''}
 	{/if}
-	{#if data.filters.team > 0 && !data.found}
+	{#if missing}
 		<span class="faint">Team {data.filters.team} is not in this list.</span>
 	{/if}
 </p>
