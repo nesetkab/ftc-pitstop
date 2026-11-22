@@ -43,7 +43,7 @@
 	}
 
 	b {
-		font-size: 9em;
+		font-size: min(9em, 15vw);
 		line-height: 0.9;
 		font-weight: 700;
 		letter-spacing: -0.04em;

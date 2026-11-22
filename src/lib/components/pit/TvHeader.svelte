@@ -56,6 +56,8 @@
 	}
 
 	.event {
+		flex-shrink: 10;
+		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		color: var(--text-2);
@@ -66,6 +68,9 @@
 	}
 
 	.me {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		font-size: inherit;
 		font-weight: 600;
 		line-height: inherit;

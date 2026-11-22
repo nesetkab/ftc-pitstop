@@ -32,6 +32,7 @@
 	}
 
 	.me {
-		box-shadow: inset 0 0 0 0.12em var(--accent);
+		background: var(--accent);
+		color: var(--on-accent);
 	}
 </style>

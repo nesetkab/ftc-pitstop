@@ -3,19 +3,18 @@
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { record } from '#lib/format/record.ts';
 	import RankTable from './RankTable.svelte';
+	import RowFit from './RowFit.svelte';
 	import { awardName, playoffResult } from './copy.ts';
-	import { rankWindow, type PitView } from './view.ts';
+	import type { PitView } from './view.ts';
 
 	interface Props {
 		view: PitView;
-		rankRows?: number;
 	}
 
-	let { view, rankRows = 27 }: Props = $props();
+	let { view }: Props = $props();
 
 	const ranking = $derived(view.ranking);
 	const result = $derived(playoffResult(view));
-	const rows = $derived(rankWindow(view.rankings, view.team, rankRows));
 </script>
 
 <div class="cols" style:--cols="31em minmax(0, 1fr) 23em">
@@ -47,30 +46,43 @@
 			</ul>
 		{/if}
 	</section>
-	<section>
+	<section class="fill event-awards">
 		<h2 class="tv-label">Awards</h2>
 		{#if view.eventAwards.length > 0}
-			<ul class="awards">
-				{#each view.eventAwards as award (`${award.id}-${award.placement}-${award.team}`)}
-					<li class={{ mine: award.team === view.team }}>
-						<span class="name">{awardName(award.name)}</span>
-						<span class="winner">
-							<b>{award.team}</b>
-							{view.names.get(award.team ?? 0) ?? ''}
-						</span>
-					</li>
-				{/each}
-			</ul>
+			<RowFit count={view.eventAwards.length}>
+				{#snippet children(shown)}
+					{@const cut = shown < view.eventAwards.length}
+					<ul class="awards">
+						{#each view.eventAwards.slice(0, cut ? shown - 1 : shown) as award (`${award.id}-${award.placement}-${award.team}`)}
+							<li class={{ mine: award.team === view.team }}>
+								<span class="name">{awardName(award.name)}</span>
+								<span class="winner">
+									<b>{award.team}</b>
+									{view.names.get(award.team ?? 0) ?? ''}
+								</span>
+							</li>
+						{/each}
+						{#if cut}
+							<li class="more">{view.eventAwards.length - shown + 1} more</li>
+						{/if}
+					</ul>
+				{/snippet}
+			</RowFit>
 		{:else if !view.hasPlayoffs}
 			<p class="sub">League meets don't give awards.</p>
 		{:else}
 			<p class="sub">Awards haven't been posted yet.</p>
 		{/if}
 	</section>
-	<section>
+	<section class="fill">
 		<h2 class="tv-label">Final rankings</h2>
-		{#if rows.length > 0}
-			<RankTable {rows} team={view.team} names={view.names} caption="Final rankings" />
+		{#if view.rankings.length > 0}
+			<RankTable
+				rankings={view.rankings}
+				team={view.team}
+				names={view.names}
+				caption="Final rankings"
+			/>
 		{/if}
 	</section>
 </div>
@@ -131,29 +143,50 @@
 		margin: 0;
 		padding: 0;
 		list-style: none;
-		font-size: 0.72em;
 	}
 
 	.awards li {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		align-items: center;
 		gap: 0.8em;
-		padding: 0.26em 0;
-		border-bottom: 1px solid var(--line);
+		padding-inline: 0.5em;
+		box-shadow: inset 0 -1px var(--line);
+		white-space: nowrap;
 	}
 
 	.awards li.mine {
-		margin: 0 -0.5em;
-		padding-inline: 0.5em;
-		background: var(--accent-wash);
+		box-shadow: none;
+		background: var(--accent);
+		color: var(--on-accent);
+		font-weight: 600;
+	}
+
+	.awards li.more {
+		display: flex;
+		color: var(--text-3);
 	}
 
 	.awards .name {
+		overflow: hidden;
+		text-overflow: ellipsis;
 		color: var(--text-2);
 	}
 
 	.awards li.mine .name {
-		color: var(--text);
+		color: var(--on-accent);
+	}
+
+	@media (orientation: portrait) {
+		.event-awards :global(.fit) {
+			--row: 2.75;
+		}
+
+		.awards li {
+			grid-template-columns: minmax(0, 1fr);
+			align-content: center;
+			gap: 0;
+		}
 	}
 
 	.winner {
