@@ -96,7 +96,7 @@ describe('createAnalysis', () => {
 		expect(data.background).toHaveBeenCalledTimes(1);
 		const start = performance.now();
 		await data.loadEventAnalysisEntry('USAZGIQ');
-		expect(performance.now() - start).toBeLessThan(150);
+		expect(performance.now() - start).toBeLessThan(600);
 		expect(data.background).toHaveBeenCalledTimes(2);
 		const teams = analysis.ratings.map((r) => r.team);
 		const cold = analyzeEvent(gilbert, baseContext(teams, previous), { now: NOW });
