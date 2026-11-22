@@ -10,7 +10,8 @@ const COLORS = {
 	text2: '#ababa5',
 	text3: '#7d7d78',
 	line: '#2c2c2b',
-	accent: '#ffd21a'
+	red: '#ff6257',
+	blue: '#5e8eff'
 };
 
 type Style = Record<string, string | number>;
@@ -37,6 +38,46 @@ export interface EventCard {
 	name: string;
 	place: string | null;
 	dates: string;
+	stats: Stat[];
+}
+
+export interface AllianceLine {
+	color: 'red' | 'blue';
+	teams: { number: number; name: string | null }[];
+	score: number | null;
+	won: boolean;
+}
+
+export interface MatchCard {
+	title: string;
+	event: string;
+	alliances: [AllianceLine, AllianceLine];
+	note: string;
+}
+
+export interface ListRow {
+	rank: string;
+	label: string;
+	detail: string | null;
+	value: string;
+}
+
+export interface ListCard {
+	kicker: string;
+	title: string;
+	rows: ListRow[];
+}
+
+export interface PageCard {
+	kicker: string;
+	title: string;
+	subtitle?: string;
+	stats?: Stat[];
+}
+
+export interface CompareColumn {
+	number: number;
+	name: string;
 	stats: Stat[];
 }
 
@@ -83,8 +124,12 @@ function frame(host: string, ...body: Child[]): OgNode {
 	);
 }
 
-function mark(): OgNode {
-	return h('div', { style: { width: 64, height: 8, background: COLORS.accent } });
+function kicker(text: string): OgNode {
+	return h(
+		'div',
+		{ style: oneLine({ fontSize: 28, color: COLORS.text2, letterSpacing: 0.2 }) },
+		text
+	);
 }
 
 function stats(items: Stat[]): OgNode | null {
@@ -110,11 +155,30 @@ function stats(items: Stat[]): OgNode | null {
 				),
 				h(
 					'div',
-					{ style: { display: 'flex', fontSize: 26, color: COLORS.text3, marginTop: 8 } },
+					{ style: oneLine({ fontSize: 26, color: COLORS.text3, marginTop: 8 }) },
 					item.label
 				)
 			)
 		)
+	);
+}
+
+function heading(text: string, size: number, marginTop: number): OgNode {
+	return h(
+		'div',
+		{
+			style: {
+				display: 'block',
+				fontSize: size,
+				fontWeight: 700,
+				lineHeight: 1.1,
+				letterSpacing: -1,
+				marginTop,
+				maxHeight: Math.round(size * 1.1 * 2 + 4),
+				overflow: 'hidden'
+			}
+		},
+		text
 	);
 }
 
@@ -123,8 +187,7 @@ export function teamCard(card: TeamCard, host: string): OgNode {
 		host,
 		h(
 			'div',
-			{ style: { display: 'flex', flexDirection: 'column', marginTop: 44 } },
-			mark(),
+			{ style: { display: 'flex', flexDirection: 'column', marginTop: 48 } },
 			h(
 				'div',
 				{
@@ -133,8 +196,7 @@ export function teamCard(card: TeamCard, host: string): OgNode {
 						fontSize: 112,
 						fontWeight: 700,
 						lineHeight: 1,
-						letterSpacing: -3,
-						marginTop: 24
+						letterSpacing: -3
 					}
 				},
 				String(card.number)
@@ -161,27 +223,253 @@ export function eventCard(card: EventCard, host: string): OgNode {
 		host,
 		h(
 			'div',
-			{ style: { display: 'flex', flexDirection: 'column', marginTop: 44 } },
-			mark(),
-			h(
-				'div',
-				{
-					style: {
-						display: 'block',
-						fontSize: 62,
-						fontWeight: 700,
-						lineHeight: 1.1,
-						letterSpacing: -1,
-						marginTop: 24,
-						maxHeight: 140,
-						overflow: 'hidden'
-					}
-				},
-				card.name
-			),
+			{ style: { display: 'flex', flexDirection: 'column', marginTop: 48 } },
+			heading(card.name, 62, 0),
 			h('div', { style: oneLine({ fontSize: 30, color: COLORS.text2, marginTop: 18 }) }, line)
 		),
 		stats(card.stats)
+	);
+}
+
+function allianceRow(line: AllianceLine, decided: boolean): OgNode {
+	const dim = decided && !line.won;
+	const numbers = line.teams.map((team) => team.number).join('  ');
+	const names = line.teams
+		.map((team) => team.name)
+		.filter(Boolean)
+		.join(' · ');
+	return h(
+		'div',
+		{
+			style: {
+				display: 'flex',
+				alignItems: 'center',
+				paddingTop: 18,
+				paddingBottom: 18,
+				borderTop: `2px solid ${COLORS.line}`
+			}
+		},
+		h('div', {
+			style: { width: 10, height: 76, background: COLORS[line.color], marginRight: 28 }
+		}),
+		h(
+			'div',
+			{ style: { display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0 } },
+			h(
+				'div',
+				{
+					style: oneLine({
+						fontSize: 48,
+						fontWeight: 700,
+						lineHeight: 1.1,
+						color: dim ? COLORS.text2 : COLORS.text
+					})
+				},
+				numbers || 'TBD'
+			),
+			names &&
+				h('div', { style: oneLine({ fontSize: 24, color: COLORS.text3, marginTop: 6 }) }, names)
+		),
+		h(
+			'div',
+			{
+				style: {
+					display: 'flex',
+					fontSize: 84,
+					fontWeight: 700,
+					lineHeight: 1,
+					letterSpacing: -2,
+					marginLeft: 32,
+					color: line.score === null ? COLORS.text3 : dim ? COLORS.text3 : COLORS.text
+				}
+			},
+			line.score === null ? '–' : String(line.score)
+		)
+	);
+}
+
+export function matchCard(card: MatchCard, host: string): OgNode {
+	const decided = card.alliances.some((line) => line.won);
+	return frame(
+		host,
+		h(
+			'div',
+			{ style: { display: 'flex', flexDirection: 'column', marginTop: 34 } },
+			kicker(card.event),
+			h(
+				'div',
+				{
+					style: oneLine({
+						fontSize: 56,
+						fontWeight: 700,
+						lineHeight: 1.1,
+						letterSpacing: -1,
+						marginTop: 6
+					})
+				},
+				card.title
+			)
+		),
+		h(
+			'div',
+			{ style: { display: 'flex', flexDirection: 'column', marginTop: 'auto' } },
+			...card.alliances.map((line) => allianceRow(line, decided)),
+			h(
+				'div',
+				{
+					style: oneLine({
+						fontSize: 26,
+						color: COLORS.text2,
+						paddingTop: 16,
+						borderTop: `2px solid ${COLORS.line}`
+					})
+				},
+				card.note
+			)
+		)
+	);
+}
+
+export function listCard(card: ListCard, host: string): OgNode {
+	return frame(
+		host,
+		h(
+			'div',
+			{ style: { display: 'flex', flexDirection: 'column', marginTop: 34 } },
+			kicker(card.kicker),
+			heading(card.title, 52, 6)
+		),
+		h(
+			'div',
+			{ style: { display: 'flex', flexDirection: 'column', marginTop: 'auto' } },
+			...card.rows.map((row) =>
+				h(
+					'div',
+					{
+						style: {
+							display: 'flex',
+							alignItems: 'baseline',
+							paddingTop: 14,
+							paddingBottom: 14,
+							borderTop: `2px solid ${COLORS.line}`
+						}
+					},
+					h(
+						'div',
+						{ style: { display: 'flex', width: 64, fontSize: 30, color: COLORS.text3 } },
+						row.rank
+					),
+					h(
+						'div',
+						{
+							style: oneLine({
+								fontSize: 36,
+								fontWeight: 700,
+								flexShrink: 0,
+								minWidth: 140,
+								maxWidth: 560
+							})
+						},
+						row.label
+					),
+					h(
+						'div',
+						{ style: oneLine({ flex: 1, fontSize: 28, color: COLORS.text2, marginLeft: 18 }) },
+						row.detail ?? ''
+					),
+					h(
+						'div',
+						{ style: { display: 'flex', fontSize: 40, fontWeight: 700, marginLeft: 24 } },
+						row.value
+					)
+				)
+			)
+		)
+	);
+}
+
+export function pageCard(card: PageCard, host: string): OgNode {
+	const hasStats = (card.stats ?? []).length > 0;
+	return frame(
+		host,
+		h(
+			'div',
+			{
+				style: {
+					display: 'flex',
+					flexDirection: 'column',
+					marginTop: hasStats ? 48 : 'auto',
+					marginBottom: hasStats ? 0 : 24
+				}
+			},
+			kicker(card.kicker),
+			heading(card.title, 62, 10),
+			card.subtitle &&
+				h(
+					'div',
+					{ style: { display: 'flex', fontSize: 30, color: COLORS.text2, marginTop: 22 } },
+					card.subtitle
+				)
+		),
+		stats(card.stats ?? [])
+	);
+}
+
+export function compareCard(columns: CompareColumn[], host: string): OgNode {
+	const size = columns.length > 2 ? 64 : 92;
+	return frame(
+		host,
+		h('div', { style: { display: 'flex', marginTop: 34 } }, kicker('Team comparison')),
+		h(
+			'div',
+			{ style: { display: 'flex', marginTop: 'auto' } },
+			...columns.map((column, index) =>
+				h(
+					'div',
+					{
+						style: {
+							display: 'flex',
+							flexDirection: 'column',
+							flex: 1,
+							minWidth: 0,
+							paddingLeft: index === 0 ? 0 : 28,
+							paddingRight: 20,
+							borderLeft: index === 0 ? 'none' : `2px solid ${COLORS.line}`
+						}
+					},
+					h(
+						'div',
+						{
+							style: {
+								display: 'flex',
+								fontSize: size,
+								fontWeight: 700,
+								lineHeight: 1,
+								letterSpacing: -2
+							}
+						},
+						String(column.number)
+					),
+					h(
+						'div',
+						{ style: oneLine({ fontSize: 30, fontWeight: 700, marginTop: 10 }) },
+						column.name
+					),
+					...column.stats.map((stat) =>
+						h(
+							'div',
+							{ style: { display: 'flex', alignItems: 'baseline', marginTop: 18 } },
+							h(
+								'div',
+								{ style: { display: 'flex', fontSize: 40, fontWeight: 700, marginRight: 12 } },
+								stat.value
+							),
+							h('div', { style: oneLine({ fontSize: 24, color: COLORS.text3 }) }, stat.label)
+						)
+					)
+				)
+			)
+		)
 	);
 }
 
@@ -191,7 +479,6 @@ export function siteCard(host: string): OgNode {
 		h(
 			'div',
 			{ style: { display: 'flex', flexDirection: 'column', marginTop: 'auto', marginBottom: 24 } },
-			mark(),
 			h(
 				'div',
 				{
@@ -201,7 +488,6 @@ export function siteCard(host: string): OgNode {
 						fontWeight: 700,
 						lineHeight: 1.1,
 						letterSpacing: -1.2,
-						marginTop: 28,
 						maxWidth: 900
 					}
 				},
