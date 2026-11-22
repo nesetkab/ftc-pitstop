@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { fixed, integer, MISSING, record, signed } from '#lib/format/index.ts';
+	import { regionName } from '#lib/format/places.ts';
 	import TrendSpark from './TrendSpark.svelte';
 	import type { ChartPoint, TeamPageData } from './team-view.ts';
 
@@ -13,6 +14,7 @@
 
 	const change = $derived(trend.length > 1 ? trend[trend.length - 1].value - trend[0].value : null);
 	const worldHref = $derived(team ? `/leaderboards?team=${team}` : undefined);
+	const region = $derived(stats.region ? regionName(stats.region.code) : null);
 	const regionHref = $derived(
 		team && stats.region ? `/leaderboards?region=${stats.region.code}&team=${team}` : undefined
 	);
@@ -40,9 +42,9 @@
 	</div>
 	{#if stats.region}
 		<div>
-			<dt>Rank in {stats.region.code}</dt>
+			<dt>Rank in {region}</dt>
 			<dd>
-				<a href={regionHref} title="Find {team} on the {stats.region.code} leaderboard"
+				<a href={regionHref} title="Find {team} on the {region} leaderboard"
 					>{integer(stats.region.rank)}</a
 				>
 				<small>of {integer(stats.region.of)}</small>

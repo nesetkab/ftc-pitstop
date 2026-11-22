@@ -108,8 +108,8 @@ describe('event list', () => {
 			{
 				label: 'United States',
 				options: [
-					{ value: 'USAZ', label: 'Arizona (USAZ)' },
-					{ value: 'USMT', label: 'Montana (USMT)' }
+					{ value: 'USAZ', label: 'Arizona' },
+					{ value: 'USMT', label: 'Montana' }
 				]
 			}
 		]);

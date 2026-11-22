@@ -1,5 +1,57 @@
 import { describe, expect, it } from 'vitest';
-import { areaName, isUnitedStates, placeName, stateName } from './places.ts';
+import {
+	areaName,
+	isUnitedStates,
+	knownRegion,
+	placeName,
+	regionName,
+	stateName
+} from './places.ts';
+
+describe('regionName', () => {
+	it('names single-state US regions and Canadian provinces', () => {
+		expect(regionName('USMI')).toBe('Michigan');
+		expect(regionName('USMT')).toBe('Montana');
+		expect(regionName('CAAB')).toBe('Alberta');
+		expect(regionName('CAON')).toBe('Ontario');
+	});
+
+	it('names split and special regions', () => {
+		expect(regionName('USCANO')).toBe('California NorCal');
+		expect(regionName('USTXHO')).toBe('Texas Houston');
+		expect(regionName('USNYLI')).toBe('New York Long Island');
+		expect(regionName('USCHS')).toBe('Chesapeake');
+		expect(regionName('ONADOD')).toBe('Military and Diplomatic');
+	});
+
+	it('names country regions', () => {
+		expect(regionName('KZ')).toBe('Kazakhstan');
+		expect(regionName('IN')).toBe('India');
+		expect(regionName('MA')).toBe('Morocco');
+		expect(regionName('TR')).toBe('Türkiye');
+		expect(regionName('NL')).toBe('Benelux');
+	});
+
+	it('ignores case and surrounding space', () => {
+		expect(regionName(' usmi ')).toBe('Michigan');
+	});
+
+	it('falls back to the raw code when the code is unknown', () => {
+		expect(regionName('USZZ')).toBe('USZZ');
+		expect(regionName('CAZZ')).toBe('CAZZ');
+		expect(regionName('XQZ9')).toBe('XQZ9');
+		expect(regionName('ZZ')).toBe('ZZ');
+		expect(regionName('QX')).toBe('QX');
+		expect(knownRegion('USZZ')).toBeNull();
+		expect(knownRegion('ZZ')).toBeNull();
+	});
+
+	it('returns null for a missing code', () => {
+		expect(regionName(null)).toBeNull();
+		expect(regionName('')).toBeNull();
+		expect(knownRegion(undefined)).toBeNull();
+	});
+});
 
 describe('placeName', () => {
 	it('writes US places with the full state name', () => {

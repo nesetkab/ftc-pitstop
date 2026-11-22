@@ -4,7 +4,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import AlliancesTable from './AlliancesTable.svelte';
 	import Bracket from './Bracket.svelte';
-	import { buildBracket, playoffRecords } from './bracket.ts';
+	import { allianceStatus, buildBracket, playoffRecords } from './bracket.ts';
 
 	interface Props {
 		bundle: Pick<EventBundle, 'event' | 'teams' | 'matches' | 'alliances'>;
@@ -21,6 +21,14 @@
 			: null
 	);
 	const records = $derived(playoffRecords(bundle.alliances, bundle.matches));
+	const status = $derived(
+		bracket
+			? allianceStatus(
+					bracket,
+					bundle.alliances.map((alliance) => alliance.seed)
+				)
+			: new Map<number, string>()
+	);
 	const showOdds = $derived(odds !== null && odds.length > 0 && bracket?.champion == null);
 </script>
 
@@ -36,6 +44,7 @@
 				alliances={bundle.alliances}
 				teams={bundle.teams}
 				{records}
+				{status}
 				odds={showOdds ? odds : null}
 				{followed}
 			/>

@@ -112,3 +112,63 @@ export function placeName(place: Place, style: 'full' | 'short' = 'full'): strin
 	const repeated = names(place.city, full) || names(place.city, area);
 	return [place.city, repeated ? null : area].filter(Boolean).join(', ');
 }
+
+const REGIONS: Record<string, string> = {
+	USARL: 'Adventist Robotics League',
+	USCALA: 'California SoCal',
+	USCALS: 'California LAUSD',
+	USCANO: 'California NorCal',
+	USCASD: 'California San Diego',
+	USCHS: 'Chesapeake',
+	USFCT: 'Four Corners',
+	USMOKS: 'Missouri and Kansas',
+	USNYEX: 'New York Excelsior',
+	USNYLI: 'New York Long Island',
+	USNYNY: 'New York City',
+	USTXCE: 'Texas Central',
+	USTXHO: 'Texas Houston',
+	USTXNO: 'Texas North',
+	USTXSO: 'Texas South',
+	USTXWP: 'Texas West and Panhandle',
+	ONADOD: 'Military and Diplomatic',
+	CMPZ2: 'FIRST Championship',
+	NL: 'Benelux',
+	HK: 'Hong Kong',
+	MO: 'Macau',
+	TR: 'Türkiye'
+};
+
+let countryNames: Intl.DisplayNames | null | undefined;
+
+function countryName(code: string): string | null {
+	if (countryNames === undefined) {
+		try {
+			countryNames = new Intl.DisplayNames('en', { type: 'region', fallback: 'none' });
+		} catch {
+			countryNames = null;
+		}
+	}
+	try {
+		const name = countryNames?.of(code);
+		return name && name !== 'Unknown Region' ? name : null;
+	} catch {
+		return null;
+	}
+}
+
+export function knownRegion(code: string | null | undefined): string | null {
+	const key = code?.trim().toUpperCase();
+	if (!key) return null;
+	if (REGIONS[key]) return REGIONS[key];
+	if (/^US[A-Z]{2}$/.test(key)) return US_STATES[key.slice(2)] ?? null;
+	if (/^CA[A-Z]{2}$/.test(key)) return CA_PROVINCES[key.slice(2)] ?? null;
+	if (/^[A-Z]{2}$/.test(key)) return countryName(key);
+	return null;
+}
+
+export function regionName(code: string): string;
+export function regionName(code: string | null | undefined): string | null;
+export function regionName(code: string | null | undefined): string | null {
+	if (!code) return null;
+	return knownRegion(code) ?? code;
+}

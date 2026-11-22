@@ -187,8 +187,8 @@ describe('team page', () => {
 			})
 		);
 		const stat = (name: string) => screen.getByText(name, { selector: 'dt' }).nextElementSibling;
-		expect(stat('Rank in USAZ')).toHaveTextContent('3 of 40');
-		expect(within(stat('Rank in USAZ') as HTMLElement).getByRole('link')).toHaveAttribute(
+		expect(stat('Rank in Arizona')).toHaveTextContent('3 of 40');
+		expect(within(stat('Rank in Arizona') as HTMLElement).getByRole('link')).toHaveAttribute(
 			'href',
 			'/leaderboards?region=USAZ&team=26670'
 		);

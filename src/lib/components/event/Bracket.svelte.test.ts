@@ -2,7 +2,13 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import Bracket from './Bracket.svelte';
-import { buildBracket, playoffRecords, type BracketView } from './bracket.ts';
+import {
+	allianceStatus,
+	buildBracket,
+	finalsStatus,
+	playoffRecords,
+	type BracketView
+} from './bracket.ts';
 import { fixtureBundle, unplay } from './test-fixtures.ts';
 
 afterEach(() => {
@@ -100,6 +106,60 @@ describe('bracket layout', () => {
 	});
 });
 
+describe('playoff status', () => {
+	const seeds = [1, 2, 3, 4, 5, 6];
+
+	it('names the winner, the finalist and where each other alliance went out', () => {
+		const { bracket } = bracketOf('USAZGIQ');
+		const status = allianceStatus(bracket, seeds);
+		expect(status.get(2)).toBe('Won the event');
+		expect(status.get(1)).toBe('Finalist');
+		expect([3, 4, 5, 6].map((seed) => status.get(seed))).toEqual(
+			[3, 4, 5, 6].map(() => expect.stringMatching(/^Out after M\d+$/))
+		);
+		expect(finalsStatus(bracket)).toBe('Alliance 2 won the event.');
+	});
+
+	it('keeps alliances that are still alive in their bracket', () => {
+		const { bracket } = bracketOf('USAZGIQ', (series) => series <= 4);
+		const status = allianceStatus(bracket, seeds);
+		expect(seeds.map((seed) => status.get(seed))).toEqual([
+			'Upper bracket',
+			'Upper bracket',
+			'Lower bracket',
+			'Lower bracket',
+			'Lower bracket',
+			'Lower bracket'
+		]);
+		expect(finalsStatus(bracket)).toBeNull();
+	});
+
+	it('says nothing before the first playoff match', () => {
+		const { bracket } = bracketOf('USAZGIQ', () => false);
+		expect(allianceStatus(bracket, seeds).size).toBe(0);
+	});
+
+	it('explains a second final after the lower bracket wins the first', () => {
+		const bundle = unplay(fixtureBundle('USMISOQ'), (match) => match.series === 11);
+		const bracket = buildBracket(bundle.alliances, bundle.matches) as BracketView;
+		expect(finalsStatus(bracket)).toBe('Alliance 3 won M10, so M11 decides the event.');
+		const status = allianceStatus(bracket, seeds);
+		expect(status.get(3)).toBe('In the finals');
+	});
+
+	it('gives the series score in a best of three final', () => {
+		const bundle = unplay(fixtureBundle('USALATQ'), (match) => match.key === 'p2');
+		const bracket = buildBracket(bundle.alliances, bundle.matches) as BracketView;
+		expect(finalsStatus(bracket)).toBe('Alliance 1 leads the finals 1–0.');
+		expect(allianceStatus(bracket, [1, 2])).toEqual(
+			new Map([
+				[1, 'In the finals'],
+				[2, 'In the finals']
+			])
+		);
+	});
+});
+
 describe('Bracket', () => {
 	it('draws upper and lower brackets with scores and the finals', () => {
 		const { bracket } = bracketOf('USAZGIQ');
@@ -140,6 +200,9 @@ describe('Bracket', () => {
 		expect(sides[0]).toMatch(/^Red, alliance 4 /);
 		expect(sides[1]).toMatch(/^Blue, alliance 5 /);
 		expect(sides.filter((side) => side?.endsWith(', won'))).toHaveLength(1);
+		expect(m1.querySelector('.slot.red .seed')).toHaveTextContent('A4');
+		expect(m1.querySelector('.slot.blue .seed')).toHaveTextContent('A5');
+		expect(screen.getByText(/is on top in every match/)).toBeInTheDocument();
 		const finals = screen.getByRole('region', { name: 'Finals' });
 		const headers = within(finals).getAllByRole('rowheader');
 		expect(headers[0]).toHaveTextContent(/^Alliance 2/);
@@ -176,5 +239,16 @@ describe('Bracket', () => {
 		expect(bracket.finals.games.map((game) => game.label)).toEqual(['F1', 'F2', 'F3']);
 		expect(screen.getByText('If needed')).toBeInTheDocument();
 		expect(screen.queryByText(/won the event/)).toBeNull();
+		expect(screen.getByText('Alliance 1 leads the finals 1–0.')).toBeInTheDocument();
+	});
+
+	it('shows when an unplayed final is scheduled', () => {
+		const bundle = unplay(fixtureBundle('USMISOQ'), (match) => match.series === 11);
+		const bracket = buildBracket(bundle.alliances, bundle.matches) as BracketView;
+		show('USMISOQ', bracket);
+		const finals = screen.getByRole('region', { name: 'Finals' });
+		const m11 = within(finals).getByRole('link', { name: 'M11' }).closest('th')!;
+		expect(m11).toHaveTextContent(/M11\s*\d{1,2}:\d{2}\s[AP]M/);
+		expect(screen.getByText('Alliance 3 won M10, so M11 decides the event.')).toBeInTheDocument();
 	});
 });

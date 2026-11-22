@@ -1,6 +1,6 @@
 import type { SeasonRatings } from '#lib/analysis/types.ts';
 import type { SearchTeam } from '#lib/types.ts';
-import { stateName } from '#lib/format/places.ts';
+import { regionName, stateName } from '#lib/format/places.ts';
 import { ratedTeams } from './team-view.ts';
 
 export const PAGE_SIZE = 50;
@@ -184,7 +184,7 @@ export function createDataset(rows: LeaderboardRow[]): LeaderboardDataset {
 	}
 	return {
 		rows: sorted,
-		regions: [...regions].map((value) => ({ value, label: value })).sort(byLabel),
+		regions: [...regions].map((value) => ({ value, label: regionName(value) })).sort(byLabel),
 		countries: [...countries].map((value) => ({ value, label: value })).sort(byLabel),
 		states: Object.fromEntries(
 			[...states].map(([country, values]) => [
