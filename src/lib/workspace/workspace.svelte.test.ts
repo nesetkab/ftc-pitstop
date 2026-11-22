@@ -229,7 +229,9 @@ describe('trouble saving', () => {
 		await vi.advanceTimersByTimeAsync(300);
 		expect(workspace.sync).toBe('retrying');
 		expect(workspace.offline).toBe(true);
-		expect(workspace.message).toBe('Offline. Not saved yet, will retry when the connection is back.');
+		expect(workspace.message).toBe(
+			'Offline. Not saved yet, will retry when the connection is back.'
+		);
 		await vi.advanceTimersByTimeAsync(1000);
 		expect(write).toHaveBeenCalledTimes(2);
 		expect(workspace.sync).toBe('saved');
@@ -251,6 +253,27 @@ describe('trouble saving', () => {
 		expect(write).toHaveBeenCalledTimes(2);
 		await vi.advanceTimersByTimeAsync(500);
 		expect(write).toHaveBeenCalledTimes(3);
+	});
+
+	it('saves right away when the connection comes back or on retry now', async () => {
+		const workspace = await open();
+		const stop = workspace.start();
+		const write = vi
+			.spyOn(device, 'write')
+			.mockRejectedValueOnce(new WorkspaceError('unavailable', 'down'))
+			.mockRejectedValueOnce(new WorkspaceError('unavailable', 'down'));
+		workspace.update('picklist', (list) => addEntry(list, 7));
+		await vi.advanceTimersByTimeAsync(300);
+		expect(workspace.unsaved).toBe(true);
+		window.dispatchEvent(new Event('online'));
+		await vi.advanceTimersByTimeAsync(0);
+		expect(write).toHaveBeenCalledTimes(2);
+		expect(workspace.sync).toBe('retrying');
+		await workspace.retry();
+		expect(write).toHaveBeenCalledTimes(3);
+		expect(workspace.sync).toBe('saved');
+		expect(workspace.unsaved).toBe(false);
+		stop();
 	});
 
 	it('stops retrying a change that is too large', async () => {

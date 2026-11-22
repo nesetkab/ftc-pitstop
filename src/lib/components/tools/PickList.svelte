@@ -297,14 +297,15 @@
 				</svg>
 			</button>
 		{/if}
+		{#if update && avoiding}<span class="handle" aria-hidden="true"></span>{/if}
 		<span class="rank">{avoiding ? '' : index + 1}</span>
-		<span class="team">
-			<span class="line"
-				><b>{entry.team}</b>{#if entry.name}<span class="name">{entry.name}</span>{/if}</span
-			>
-			{#if tags}<span class="tags">{tags}</span>{/if}
-		</span>
-		<span class="stat">{stat}</span>
+		<span class="team"
+			><b>{entry.team}</b>{#if entry.name}<span class="name">{entry.name}</span>{/if}</span
+		>
+		<span class="meta"
+			>{#if stat}<span class="stat">{stat}</span>{/if}{#if tags}<span class="tags">{tags}</span
+				>{/if}</span
+		>
 		{#if update}
 			<input
 				class="ctl-input ctl-quiet note-input"
@@ -568,6 +569,10 @@
 		font-variant-numeric: tabular-nums;
 	}
 
+	.row > * {
+		grid-row: 1;
+	}
+
 	.handle {
 		grid-column: 1;
 	}
@@ -580,8 +585,18 @@
 		grid-column: 3;
 	}
 
+	.meta {
+		display: contents;
+	}
+
 	.stat {
 		grid-column: 4;
+		grid-row: 1;
+	}
+
+	.tags {
+		grid-column: 3;
+		grid-row: 2;
 	}
 
 	.note-input,
@@ -597,8 +612,9 @@
 		grid-column: 7;
 	}
 
-	.more {
+	.row > .more {
 		grid-column: 2 / -1;
+		grid-row: 3;
 	}
 
 	.row.dragging {
@@ -631,6 +647,10 @@
 		touch-action: none;
 	}
 
+	span.handle {
+		cursor: auto;
+	}
+
 	.handle:hover {
 		color: var(--text);
 	}
@@ -645,11 +665,7 @@
 	}
 
 	.team {
-		display: grid;
 		min-width: 0;
-	}
-
-	.line {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -778,20 +794,39 @@
 
 		.row {
 			grid-column: auto;
-			grid-template-columns: 22px minmax(0, 1fr) auto auto;
+			grid-template-columns: 22px minmax(0, 1fr) auto;
 			grid-template-areas:
-				'rank team stat stat'
-				'. note note actions'
-				'. more more more';
+				'rank team team'
+				'. meta meta'
+				'. note actions'
+				'. more more';
+			row-gap: 2px;
 			padding: 8px 0;
+		}
+
+		.row > * {
+			grid-row: auto;
+			grid-column: auto;
 		}
 
 		.editable .row {
 			grid-template-columns: auto 22px minmax(0, 1fr) auto auto;
 			grid-template-areas:
-				'handle rank team stat move'
-				'. . note note actions'
+				'handle rank team team move'
+				'. . meta meta meta'
+				'. . note actions actions'
 				'. . more more more';
+		}
+
+		.meta {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0 10px;
+			grid-area: meta;
+		}
+
+		.meta:empty {
+			display: none;
 		}
 
 		.handle {
@@ -804,10 +839,6 @@
 
 		.team {
 			grid-area: team;
-		}
-
-		.stat {
-			grid-area: stat;
 		}
 
 		.move {
@@ -823,12 +854,11 @@
 			grid-area: note;
 		}
 
-		.more {
+		.row > .more {
 			grid-area: more;
 		}
 
-		.note-text:empty,
-		.stat:empty {
+		.note-text:empty {
 			display: none;
 		}
 	}

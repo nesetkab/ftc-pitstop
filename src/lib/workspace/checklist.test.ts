@@ -8,8 +8,10 @@ import {
 	removeItem,
 	renameItem,
 	resetForNextMatch,
+	restoreItem,
 	setMatch,
-	toggleItem
+	toggleItem,
+	undoReset
 } from '#lib/workspace/checklist.ts';
 import type { Checklist } from '#lib/workspace/schemas.ts';
 
@@ -116,5 +118,32 @@ describe('next match', () => {
 		}
 		expect(next.history).toHaveLength(30);
 		expect(next.history[0].match).toBe('Q65');
+	});
+});
+
+describe('undo', () => {
+	it('puts a removed item back in its place', () => {
+		const start = toggleItem(list('A', 'B', 'C'), 'i2', 'AL', NOW);
+		const item = start.items[1];
+		const restored = restoreItem(removeItem(start, 'i2'), item, 1);
+		expect(restored.items.map((entry) => entry.id)).toEqual(['i1', 'i2', 'i3']);
+		expect(restored.items[1]).toEqual(item);
+		expect(restoreItem(restored, item, 0)).toBe(restored);
+	});
+
+	it('brings back the checks, match and history after a reset', () => {
+		const before = toggleItem(toggleItem(list('A', 'B'), 'i1', 'AL', NOW), 'i2', 'BK', NOW + 1);
+		const reset = resetForNextMatch(before, NOW + 5);
+		const undone = undoReset(reset, before, NOW + 5);
+		expect(undone).toEqual(before);
+	});
+
+	it('keeps checks made after the reset and other history', () => {
+		const before = toggleItem(list('A', 'B'), 'i1', 'AL', NOW);
+		const reset = toggleItem(resetForNextMatch(before, NOW + 5), 'i2', 'BK', NOW + 6);
+		const undone = undoReset(reset, before, NOW + 9);
+		expect(undone.items.map((item) => item.by)).toEqual(['AL', 'BK']);
+		expect(undone.history).toHaveLength(1);
+		expect(undone.match).toBe('Q26');
 	});
 });

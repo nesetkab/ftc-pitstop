@@ -113,4 +113,30 @@ describe('selection feed', () => {
 		expect(playoffs).toHaveBeenCalledTimes(2);
 		second.stop();
 	});
+
+	it('shows each team its rank and OPR, asking for ratings only after new results', async () => {
+		const rankings = [{ team: 100, rank: 2 }];
+		const lite = (played: number) =>
+			respond({
+				alliances,
+				teams,
+				rankings,
+				matches: Array.from({ length: played }, () => ({ result: {} }))
+			});
+		const fetcher = vi.fn(async (url: string) =>
+			url.endsWith('/analysis')
+				? respond({ ratings: [{ team: 100, opr: 41.5 }] })
+				: lite(fetcher.mock.calls.length > 3 ? 4 : 3)
+		);
+		const { feed, stop } = start(() => 'USAZGIQ', fetcher as unknown as typeof fetch);
+		await vi.advanceTimersByTimeAsync(0);
+		expect(feed.stats.get(100)).toEqual({ opr: 41.5, rank: 2 });
+		await vi.advanceTimersByTimeAsync(15_000);
+		const analysis = () =>
+			fetcher.mock.calls.filter(([url]) => String(url).endsWith('/analysis')).length;
+		expect(analysis()).toBe(1);
+		await vi.advanceTimersByTimeAsync(15_000);
+		expect(analysis()).toBe(2);
+		stop();
+	});
 });

@@ -134,3 +134,28 @@ describe('checklist', () => {
 		expect(screen.queryByLabelText('Your initials')).toBeNull();
 	});
 });
+
+describe('undo', () => {
+	it('brings back the checks after an accidental reset', async () => {
+		const start = checklist('Battery in', 'Pollen loaded');
+		start.items[0] = { ...start.items[0], by: 'AL', at: 1_700_000_000_000 };
+		const { state, refresh } = setup(start);
+		await fireEvent.click(screen.getByRole('button', { name: 'Reset for next match' }));
+		expect(state.current.match).toBe('Q27');
+		await refresh();
+		await fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+		expect(state.current.match).toBe('Q26');
+		expect(state.current.items[0].by).toBe('AL');
+		expect(state.current.history).toEqual([]);
+	});
+
+	it('brings back a removed item', async () => {
+		const { state, refresh } = setup(checklist('Battery in', 'Pollen loaded'));
+		await fireEvent.click(screen.getByRole('button', { name: 'Edit items' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Remove item 1' }));
+		expect(state.current.items).toHaveLength(1);
+		await refresh();
+		await fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+		expect(state.current.items.map((item) => item.text)).toEqual(['Battery in', 'Pollen loaded']);
+	});
+});
