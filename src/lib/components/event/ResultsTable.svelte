@@ -68,6 +68,7 @@
 						</th>
 					{/if}
 					<td class="l">
+						<span class="visually-hidden">{color === 'red' ? 'Red' : 'Blue'}</span>
 						<span class="chips">
 							{#each match[color] as entry (entry.team)}
 								<TeamChip number={entry.team} alliance={color} me={followed.has(entry.team)} />
@@ -80,7 +81,11 @@
 						>
 					{/each}
 					<td class="opt">{split.fouls}</td>
-					<td class={['total', { won: match.result?.winner === color }]}>{score.total}</td>
+					<td class={['total', { won: match.result?.winner === color }]}>
+						{score.total}{#if match.result?.winner === color}<span class="visually-hidden"
+								>, won</span
+							>{/if}
+					</td>
 				</tr>
 			{/each}
 		</tbody>

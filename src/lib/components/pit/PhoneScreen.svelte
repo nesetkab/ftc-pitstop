@@ -18,6 +18,7 @@
 		awardName,
 		colorName,
 		heroText,
+		liveText,
 		matchItem,
 		phoneDetail,
 		playoffResult,
@@ -109,15 +110,17 @@
 			: null
 	);
 	const blocked = $derived(permission === 'denied' || permission === 'unsupported');
+	const announcement = $derived(liveText(view, call));
 </script>
 
 <div class="phone">
 	<header class="top">
-		<b>{view.team}</b>
+		<h1>{view.team}</h1>
 		<span>{event.name}</span>
 	</header>
 
 	<main class="body">
+		<p class="visually-hidden" role="status">{announcement}</p>
 		<p class={['status', { stale }]}>
 			{#if connection === 'offline'}Offline.{/if}
 			{#if updated !== null}
@@ -288,11 +291,13 @@
 								{/if}
 							</span>
 							<span class="side red">
+								<span class="visually-hidden">Red</span>
 								{#each match.red as slot (slot.team)}
 									<span class={{ me: slot.team === view.team }}>{slot.team}</span>
 								{/each}
 							</span>
 							<span class="side blue">
+								<span class="visually-hidden">Blue</span>
 								{#each match.blue as slot (slot.team)}
 									<span class={{ me: slot.team === view.team }}>{slot.team}</span>
 								{/each}
@@ -307,16 +312,10 @@
 	</main>
 
 	<nav class="tabs" aria-label="Sections">
-		<button
-			type="button"
-			aria-current={tab === 'team' ? 'page' : undefined}
-			onclick={() => (tab = 'team')}>Team</button
-		>
+		<button type="button" aria-pressed={tab === 'team'} onclick={() => (tab = 'team')}>Team</button>
 		<a href="/events/{event.code}">Event</a>
-		<button
-			type="button"
-			aria-current={tab === 'matches' ? 'page' : undefined}
-			onclick={() => (tab = 'matches')}>Matches</button
+		<button type="button" aria-pressed={tab === 'matches'} onclick={() => (tab = 'matches')}
+			>Matches</button
 		>
 		<a href="/w">Tools</a>
 	</nav>
@@ -346,9 +345,11 @@
 		background: var(--bg);
 	}
 
-	.top b {
+	.top h1 {
 		font-size: 16px;
 		font-weight: 600;
+		line-height: inherit;
+		letter-spacing: normal;
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -551,7 +552,7 @@
 		text-decoration: none;
 	}
 
-	.tabs [aria-current='page'] {
+	.tabs [aria-pressed='true'] {
 		color: var(--text);
 		font-weight: 600;
 	}

@@ -36,7 +36,7 @@
 	<Logo height="0.95em" />
 	<span class="event">{eventName}</span>
 	<span class="space"></span>
-	<span class="me">{team}{teamName ? ` ${teamName}` : ''}</span>
+	<h1 class="me">{team}{teamName ? ` ${teamName}` : ''}</h1>
 	<time datetime={new Date(now).toISOString()}>{time(now, timeZone)}</time>
 	{#if canFullscreen && !fullscreen}
 		<button type="button" onclick={enterFullscreen}>Full screen</button>
@@ -66,7 +66,11 @@
 	}
 
 	.me {
+		font-size: inherit;
 		font-weight: 600;
+		line-height: inherit;
+		letter-spacing: inherit;
+		white-space: nowrap;
 	}
 
 	time {

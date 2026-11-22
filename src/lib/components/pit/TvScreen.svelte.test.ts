@@ -52,6 +52,14 @@ describe('TvScreen', () => {
 		expect(text(container)).toContain('Matches start at 10:30 AM.');
 	});
 
+	it('names the team and each panel with headings', () => {
+		render(TvScreen, { props: props(at('Q22')) });
+		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(String(TEAM));
+		const headings = screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent);
+		expect(headings).toContain('Next match');
+		expect(headings).toContain('Our matches');
+	});
+
 	it('keeps the phone address short enough to fit under the QR code', () => {
 		const { container } = render(TvScreen, {
 			props: props(Date.parse('2026-11-14T17:00:00Z'), { phoneUrl: 'www.ftcpitstop.com/14624' })
@@ -217,6 +225,21 @@ describe('PhoneScreen', () => {
 		expect(facts).toEqual(['Rank', '8 of 27', 'Record', '3-0-0', 'Ranking score', '3.33']);
 		expect(screen.getByRole('link', { name: 'Event' })).toHaveAttribute('href', '/events/USAZGIQ');
 		expect(screen.getByRole('link', { name: 'Tools' })).toHaveAttribute('href', '/w');
+	});
+
+	it('gives screen readers a heading, a quiet status line and labelled views', async () => {
+		phone('default');
+		expect(screen.getByRole('heading', { level: 1, name: String(TEAM) })).toBeInTheDocument();
+		expect(screen.getByRole('status')).toHaveTextContent(/Next match Q26, Red alliance\.$/);
+		const team = screen.getByRole('button', { name: 'Team' });
+		const matches = screen.getByRole('button', { name: 'Matches' });
+		expect(team).toHaveAttribute('aria-pressed', 'true');
+		expect(matches).toHaveAttribute('aria-pressed', 'false');
+		await fireEvent.click(matches);
+		expect(matches).toHaveAttribute('aria-pressed', 'true');
+		const ours = screen.getByRole('link', { name: 'Q26' }).closest('li')!;
+		expect(ours.querySelector('.side.red')).toHaveTextContent(/^Red/);
+		expect(ours.querySelector('.side.blue')).toHaveTextContent(/^Blue/);
 	});
 
 	it('says our qualification matches are done while others still play', () => {

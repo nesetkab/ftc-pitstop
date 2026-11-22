@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
-import { delayText, heroText, matchItems, playoffResult, shortDelay } from './copy.ts';
+import { delayText, heroText, liveText, matchItems, playoffResult, shortDelay } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { bundleSignature, pitView, rankWindow } from './view.ts';
@@ -154,6 +154,19 @@ describe('pitView during quals', () => {
 		});
 		const call = queueCall(modeled.next, queueAt);
 		expect(heroText(modeled.next!, call, queueAt, ZONE, 120).headline).toBe('Queue now');
+		expect(liveText(modeled, call)).toMatch(/Next match Q26, Red alliance\. Queue now\.$/);
+	});
+
+	it('announces only results and the next match, not every clock tick', () => {
+		const early = view(at('Q23'));
+		const later = view(at('Q25'));
+		expect(heroText(early.next!, null, at('Q23'), ZONE, early.delaySeconds)).not.toEqual(
+			heroText(later.next!, null, at('Q25'), ZONE, later.delaySeconds)
+		);
+		expect(liveText(early, null)).toBe(liveText(later, null));
+		expect(liveText(early, null)).toMatch(
+			/^Q\d+ (won|lost|tied) \d+–\d+\. Next match Q26, Red alliance\.$/
+		);
 	});
 
 	it('does not ask us to queue across a break', () => {

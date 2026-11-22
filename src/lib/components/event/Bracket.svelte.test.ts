@@ -124,6 +124,28 @@ describe('Bracket', () => {
 		expect(screen.getByText('Alliance 2 won the event.')).toBeInTheDocument();
 	});
 
+	it('reads each match with its alliances and winner, not only by color', () => {
+		const { bracket } = bracketOf('USAZGIQ');
+		show('USAZGIQ', bracket);
+		const upper = screen.getByRole('region', { name: 'Upper bracket' });
+		expect(
+			within(upper)
+				.getAllByRole('heading', { level: 4 })
+				.map((node) => node.textContent)
+		).toEqual(['Round 1', 'Round 2', 'Round 4']);
+		const m1 = within(upper).getByRole('link', { name: 'M1' }).closest('li')!;
+		const sides = [...m1.querySelectorAll('.slot')].map((slot) =>
+			slot.textContent?.replace(/\s+/g, ' ').trim()
+		);
+		expect(sides[0]).toMatch(/^Red, alliance 4 /);
+		expect(sides[1]).toMatch(/^Blue, alliance 5 /);
+		expect(sides.filter((side) => side?.endsWith(', won'))).toHaveLength(1);
+		const finals = screen.getByRole('region', { name: 'Finals' });
+		const headers = within(finals).getAllByRole('rowheader');
+		expect(headers[0]).toHaveTextContent(/^Alliance 2/);
+		expect(within(finals).getAllByText(', won').length).toBeGreaterThan(0);
+	});
+
 	it('draws the 4 alliance bracket', () => {
 		const { bracket } = bracketOf('UZTAQ1');
 		show('UZTAQ1', bracket);

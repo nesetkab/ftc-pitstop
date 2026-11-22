@@ -24,7 +24,7 @@
 
 <div class="cols" style:--cols="31em 23em minmax(0, 1fr)">
 	<section>
-		<span class="tv-label">Alliance selection</span>
+		<h2 class="tv-label">Alliance selection</h2>
 		<p class={['status', { picked }]}>{roleText(view)}</p>
 		{#if standingText(view)}
 			<p class="sub">{standingText(view)}</p>
@@ -33,7 +33,7 @@
 			<p class="sub">Alliance {view.picking} is picking.</p>
 		{/if}
 		{#if view.alliance}
-			<span class="tv-label">Our alliance</span>
+			<h2 class="tv-label">Our alliance</h2>
 			<ul class="members">
 				{#each members(view.alliance.seed) as number (number)}
 					<li>
@@ -43,11 +43,11 @@
 				{/each}
 			</ul>
 		{/if}
-		<span class="tv-label">This event</span>
+		<h2 class="tv-label">This event</h2>
 		<Facts facts={eventFacts(view)} />
 	</section>
 	<section>
-		<span class="tv-label">Alliances</span>
+		<h2 class="tv-label">Alliances</h2>
 		{#if view.alliances.length > 0}
 			<ol class="alliances">
 				{#each view.alliances as alliance (alliance.seed)}
@@ -74,9 +74,9 @@
 		{/if}
 	</section>
 	<section>
-		<span class="tv-label">
+		<h2 class="tv-label">
 			{view.picksFor === null ? 'Available teams' : `Best picks for alliance ${view.picksFor}`}
-		</span>
+		</h2>
 		<table class="available">
 			<caption class="visually-hidden">Available teams</caption>
 			<thead>
