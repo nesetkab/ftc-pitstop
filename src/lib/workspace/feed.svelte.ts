@@ -1,8 +1,15 @@
 import { SvelteMap } from 'svelte/reactivity';
-import type { AllianceSelection, Team } from '#lib/types.ts';
+import type { AllianceSelection, EventPhase, Team } from '#lib/types.ts';
 import { deriveSelection, takenLabels } from '#lib/workspace/selection.ts';
 
-export type FeedBundle = { alliances: AllianceSelection[]; teams: Team[] };
+export type FeedBundle = { alliances: AllianceSelection[]; teams: Team[]; phase?: EventPhase };
+
+export const SETTLED_INTERVAL = 300_000;
+
+export function feedDelay(phase: EventPhase | undefined, interval: number): number | null {
+	if (phase === 'done') return null;
+	return phase === 'playoffs' ? Math.max(interval, SETTLED_INTERVAL) : interval;
+}
 
 export async function fetchTeamName(
 	team: number,
@@ -29,12 +36,16 @@ export class SelectionFeed {
 			let timer: ReturnType<typeof setTimeout> | undefined;
 
 			const poll = async () => {
+				let delay: number | null = interval;
 				if (!document.hidden) {
-					const response = await fetcher(`/api/events/${code}`).catch(() => null);
-					const body: unknown = response?.ok ? await response.json().catch(() => null) : null;
-					if (!stopped && body) this.apply(body as FeedBundle);
+					const response = await fetcher(`/api/events/${code}/lite`).catch(() => null);
+					const body = response?.ok ? await response.json().catch(() => null) : null;
+					if (!stopped && body) {
+						this.apply(body as FeedBundle);
+						delay = feedDelay((body as FeedBundle).phase, interval);
+					}
 				}
-				if (!stopped) timer = setTimeout(poll, interval);
+				if (!stopped && delay !== null) timer = setTimeout(poll, delay);
 			};
 
 			void poll();

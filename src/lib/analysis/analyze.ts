@@ -649,3 +649,7 @@ export function analyzeEvent(
 		averages: eventAverages(bundle.matches)
 	};
 }
+
+export function retime(analysis: EventAnalysis, bundle: EventBundle, now: number): EventAnalysis {
+	return { ...analysis, generatedAt: now, timing: eventTiming(bundle, now) };
+}

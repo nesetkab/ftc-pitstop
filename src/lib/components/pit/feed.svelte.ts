@@ -1,5 +1,5 @@
 import type { EventBundle, QueueStatusSnapshot } from '#lib/types.ts';
-import { BUNDLE_INTERVAL, QUEUE_INTERVAL, retryDelay } from './poll.ts';
+import { BUNDLE_INTERVAL, bundleDelay, QUEUE_INTERVAL, queueActive, retryDelay } from './poll.ts';
 
 export const OFFLINE_HEADER = 'x-pitstop-offline';
 
@@ -10,6 +10,7 @@ export interface FeedOptions {
 	nexus: boolean;
 	fetch?: typeof fetch;
 	now?: () => number;
+	pollHidden?: () => boolean;
 }
 
 type Channel = 'bundle' | 'queue';
@@ -25,7 +26,9 @@ export class PitFeed {
 	#nexus: boolean;
 	#fetch: typeof fetch;
 	#now: () => number;
+	#pollHidden: () => boolean;
 	#queueFailures = 0;
+	#queueParked = false;
 	#timers = new Map<Channel, ReturnType<typeof setTimeout>>();
 	#running = false;
 
@@ -34,6 +37,7 @@ export class PitFeed {
 		this.#nexus = options.nexus;
 		this.#fetch = options.fetch ?? ((input, init) => fetch(input, init));
 		this.#now = options.now ?? Date.now;
+		this.#pollHidden = options.pollHidden ?? (() => false);
 		this.bundle = options.bundle;
 		this.queue = options.queue;
 		this.updatedAt = options.bundle ? this.#now() : null;
@@ -60,7 +64,7 @@ export class PitFeed {
 		addEventListener('online', online);
 		addEventListener('offline', offline);
 		document.addEventListener('visibilitychange', visible);
-		this.#schedule('bundle', this.bundle ? BUNDLE_INTERVAL : 0);
+		this.#schedule('bundle', this.bundle ? bundleDelay(this.bundle, this.#now()) : 0);
 		if (this.#nexus) this.#schedule('queue', this.queue ? QUEUE_INTERVAL : 0);
 		return () => {
 			removeEventListener('online', online);
@@ -79,21 +83,39 @@ export class PitFeed {
 	refresh() {
 		if (!this.#running) return;
 		this.#schedule('bundle', 0);
-		if (this.#nexus) this.#schedule('queue', 0);
+		if (this.#nexus) this.#wakeQueue();
 	}
 
-	#schedule(channel: Channel, delay: number) {
+	#wakeQueue() {
+		this.#queueParked = false;
+		this.#schedule('queue', 0);
+	}
+
+	#schedule(channel: Channel, delay: number | null) {
 		clearTimeout(this.#timers.get(channel));
-		if (!this.#running) return;
+		this.#timers.delete(channel);
+		if (!this.#running || delay === null) return;
 		this.#timers.set(
 			channel,
-			setTimeout(() => void (channel === 'bundle' ? this.#pollBundle() : this.#pollQueue()), delay)
+			setTimeout(() => {
+				this.#timers.delete(channel);
+				void (channel === 'bundle' ? this.#pollBundle() : this.#pollQueue());
+			}, delay)
+		);
+	}
+
+	#asleep(): boolean {
+		return (
+			typeof document !== 'undefined' &&
+			document.visibilityState === 'hidden' &&
+			!this.#pollHidden()
 		);
 	}
 
 	async #pollBundle() {
+		if (this.#asleep()) return;
 		try {
-			const response = await this.#fetch(`/api/events/${this.#code}`);
+			const response = await this.#fetch(`/api/events/${this.#code}/lite`);
 			if (!response.ok) throw new Error(`Event data returned ${response.status}`);
 			const bundle = (await response.json()) as EventBundle;
 			if (response.headers.get(OFFLINE_HEADER)) {
@@ -109,10 +131,20 @@ export class PitFeed {
 		} catch {
 			this.failures++;
 		}
-		this.#schedule('bundle', retryDelay(BUNDLE_INTERVAL, this.failures));
+		this.#schedule(
+			'bundle',
+			this.failures > 0
+				? retryDelay(BUNDLE_INTERVAL, this.failures)
+				: bundleDelay(this.bundle, this.#now())
+		);
+		if (this.#nexus && this.#queueParked) this.#wakeQueue();
 	}
 
 	async #pollQueue() {
+		if (this.#asleep() || !queueActive(this.bundle, this.#now())) {
+			this.#queueParked = true;
+			return;
+		}
 		try {
 			const response = await this.#fetch(`/api/nexus/${this.#code}`);
 			if (response.status === 404) {

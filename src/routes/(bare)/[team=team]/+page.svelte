@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import { PitAlerts } from '#lib/components/pit/notify.svelte.ts';
 	import PhoneScreen from '#lib/components/pit/PhoneScreen.svelte';
-	import { PitSession } from '#lib/components/pit/session.svelte.ts';
+	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { pitAnalysis } from './pit.remote.ts';
 	import type { PageProps } from './$types';
@@ -19,7 +19,8 @@
 					queue: data.queue,
 					nexus: data.nexus,
 					replay: data.replay,
-					loadAnalysis: (request) => pitAnalysis(request)
+					loadAnalysis: analysisLoader((request) => pitAnalysis(request)),
+					pollHidden: () => alerts.enabled
 				})
 			: null
 	);

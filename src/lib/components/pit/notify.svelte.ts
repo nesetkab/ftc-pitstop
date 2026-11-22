@@ -29,6 +29,10 @@ export class PitAlerts {
 		}
 	}
 
+	get enabled(): boolean {
+		return this.permission === 'granted' && Object.values(this.settings).some(Boolean);
+	}
+
 	get blocked(): boolean {
 		return this.permission === 'denied' || this.permission === 'unsupported';
 	}
