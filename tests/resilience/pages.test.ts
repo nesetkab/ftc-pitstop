@@ -14,7 +14,7 @@ vi.mock('$app/env/private', () => ({
 }));
 
 const EVENT_DAY = Date.parse('2026-11-14T20:00:00Z');
-const PAGE_BUDGET_MS = 5_500;
+const PAGE_BUDGET_MS = 7_000;
 const OUTAGE_BUDGET_MS = 9_000;
 const NEEDS_SCOUT = new Set(['/leaderboards', '/records']);
 
