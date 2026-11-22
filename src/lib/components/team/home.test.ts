@@ -28,7 +28,10 @@ describe('buildHomeEvents', () => {
 				type: 'Qualifier',
 				place: 'Gilbert, AZ',
 				dates: 'Day 2 of 2',
-				status: 'Matches posted'
+				status: 'Matches posted',
+				state: 'posted',
+				leader: null,
+				leaderLabel: 'Top seed'
 			},
 			{
 				code: 'B',
@@ -36,7 +39,10 @@ describe('buildHomeEvents', () => {
 				type: 'Qualifier',
 				place: 'Gilbert, AZ',
 				dates: 'Today',
-				status: 'No matches posted'
+				status: 'Not started',
+				state: 'waiting',
+				leader: null,
+				leaderLabel: 'Top seed'
 			}
 		]);
 	});
@@ -54,6 +60,31 @@ describe('buildHomeEvents', () => {
 			NOW
 		);
 		expect(today?.map((event) => event.code)).toEqual(['A', 'Z', 'C']);
+	});
+
+	it('puts live events first with their progress and leader', () => {
+		const { today } = buildHomeEvents(
+			{
+				today: [
+					eventSummary({ code: 'A', name: 'Alpha Meet', hasMatches: true }),
+					eventSummary({ code: 'D', name: 'Delta Meet', hasMatches: true }),
+					eventSummary({ code: 'Z', name: 'Zeta Meet', hasMatches: false })
+				],
+				season: null,
+				progress: {
+					A: { phase: 'done', label: 'Done', leader: { team: 1, name: 'One' } },
+					Z: { phase: 'quals', label: 'Q23 of 40', leader: { team: 2, name: 'Two' } }
+				}
+			},
+			NOW
+		);
+		expect(today?.map((event) => [event.code, event.status, event.state])).toEqual([
+			['Z', 'Q23 of 40', 'live'],
+			['D', 'Matches posted', 'posted'],
+			['A', 'Done', 'done']
+		]);
+		expect(today?.[0]).toMatchObject({ leader: { team: 2, name: 'Two' }, leaderLabel: 'Leading' });
+		expect(today?.[2].leaderLabel).toBe('Top seed');
 	});
 
 	it('leaves out kickoffs, workshops and other non-competition events', () => {

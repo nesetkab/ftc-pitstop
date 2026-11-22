@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { eventSummary, teamSeason } from '#lib/components/team/fixtures.ts';
 import { createAnalysis } from '#lib/server/analysis.ts';
 import { createCache, redisStore } from '#lib/server/cache.ts';
 import { createLoaders, teamPolicy } from '#lib/server/event.ts';
+import { createHome } from '#lib/server/home.ts';
 import { createFtcClient } from '#lib/server/ftc/client.ts';
 import { createFtcScoutClient } from '#lib/server/ftcscout.ts';
 import { createNexusClient } from '#lib/server/nexus.ts';
@@ -57,9 +59,17 @@ function instance(redis: FakeRedis, clock: { now: number }) {
 		now,
 		background: () => {}
 	});
+	const home = createHome({
+		cache,
+		loadTeamSeason: loaders.loadTeamSeason,
+		loadSeasonRatingsWithin: analysis.loadSeasonRatingsWithin,
+		loadSeasonModelWithin: async () => null,
+		now
+	});
 	return {
 		loaders,
 		analysis,
+		home,
 		eventPage: async (code: string) => {
 			await Promise.all([loaders.loadEventBundle(code), analysis.loadEventAnalysisEntry(code)]);
 		}
@@ -126,6 +136,57 @@ describe('redis commands for a filtered leaderboard', () => {
 		expect(await commands(redis, () => both(first))).toEqual([]);
 		const fresh = instance(redis, clock);
 		expect(await commands(redis, () => both(fresh))).toEqual(['mget']);
+	});
+});
+
+describe('redis commands for the home page', () => {
+	const today = [
+		eventSummary({ code: 'USAZGIQ' }),
+		eventSummary({ code: 'USAZXXQ', name: 'Nobody looked at this one' })
+	];
+
+	it('reads progress for every event today in one batch without fetching', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		await instance(redis, clock).eventPage('USAZGIQ');
+		const fresh = instance(redis, clock);
+		let progress: Awaited<ReturnType<typeof fresh.home.loadTodayProgress>> = {};
+		const calls = await commands(redis, async () => {
+			progress = await fresh.home.loadTodayProgress(today);
+		});
+		expect(calls).toEqual(['mget']);
+		expect(Object.keys(progress)).toEqual(['USAZGIQ']);
+		expect(await commands(redis, () => fresh.home.loadTodayProgress(today))).toEqual([]);
+		clock.now += 90_000;
+		expect(await commands(redis, () => fresh.home.loadTodayProgress(today))).toEqual([]);
+		clock.now += 60_000;
+		expect(await commands(redis, () => fresh.home.loadTodayProgress(today))).toEqual(['mget']);
+	});
+
+	it('reads all followed teams and their ratings in one batch', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		await instance(redis, clock).analysis.loadSeasonRatings();
+		for (const [number, name] of [
+			[26670, 'SCA Iron Eagles'],
+			[3747, 'The Hive']
+		] as const) {
+			const entry = { body: teamSeason(number, name), lastModified: null, fetchedAt: LIVE };
+			await redis.set(`pitstop:cache:scout:2026:team:${number}`, JSON.stringify(entry), {
+				ex: 3600
+			});
+		}
+		const fresh = instance(redis, clock);
+		let teams: Awaited<ReturnType<typeof fresh.home.loadFollowed>> = [];
+		const calls = await commands(redis, async () => {
+			teams = await fresh.home.loadFollowed([26670, 3747]);
+		});
+		expect(calls).toEqual(['mget']);
+		expect(teams.map((team) => [team.number, team.name, team.found])).toEqual([
+			[26670, 'SCA Iron Eagles', true],
+			[3747, 'The Hive', true]
+		]);
+		expect(await commands(redis, () => fresh.home.loadFollowed([26670, 3747]))).toEqual([]);
 	});
 });
 

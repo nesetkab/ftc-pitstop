@@ -349,6 +349,52 @@ describe('cache stores', () => {
 	});
 });
 
+describe('cache lookup', () => {
+	function memoryStore(entries: Record<string, CacheEntry>) {
+		const get = vi.fn(async (key: string) => entries[key] ?? null);
+		const store: CacheStore = { get, set: async () => {} };
+		return { store, get };
+	}
+
+	it('reads only keys that are not fresh in memory and never fetches', async () => {
+		const time = clock();
+		const shared = { body: 'shared', lastModified: null, fetchedAt: time.now() };
+		const { store, get } = memoryStore({ b: shared });
+		const cache = createCache({ now: time.now, store, sharedMinTtl: 0 });
+		await cache.get('a', policy, counter(['local']));
+		get.mockClear();
+		const found = await cache.lookup(['a', 'b', 'c'], 60_000);
+		expect([...found].map(([key, entry]) => [key, entry.body])).toEqual([
+			['a', 'local'],
+			['b', 'shared']
+		]);
+		expect(get.mock.calls.map(([key]) => key)).toEqual(['b', 'c']);
+		expect(cache.peek('b')?.body).toBe('shared');
+	});
+
+	it('remembers missing keys for a while', async () => {
+		const time = clock();
+		const { store, get } = memoryStore({});
+		const cache = createCache({ now: time.now, store });
+		await cache.lookup(['gone'], 60_000);
+		await cache.lookup(['gone'], 60_000);
+		expect(get).toHaveBeenCalledTimes(1);
+		time.advance(61);
+		await cache.lookup(['gone'], 60_000);
+		expect(get).toHaveBeenCalledTimes(2);
+	});
+
+	it('keeps an older memory entry when the store has nothing newer', async () => {
+		const time = clock();
+		const { store } = memoryStore({});
+		const cache = createCache({ now: time.now, store, sharedMinTtl: 0 });
+		await cache.get('a', policy, counter(['old']));
+		time.advance(120);
+		const found = await cache.lookup(['a'], 60_000);
+		expect(found.get('a')?.body).toBe('old');
+	});
+});
+
 describe('LruMap', () => {
 	it('evicts the least recently used entry', () => {
 		const lru = new LruMap<number>(2);

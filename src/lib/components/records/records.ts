@@ -144,7 +144,7 @@ function keyLabel(key: string): string {
 	return parsed ? matchLabel(parsed) : key.toUpperCase();
 }
 
-function dayOf(match: SeasonMatch): string {
+export function matchDay(match: SeasonMatch): string {
 	if (match.time === null) return match.date;
 	const day = new Date(match.time).toISOString().slice(0, 10);
 	if (day < match.date) return match.date;
@@ -159,7 +159,7 @@ function side(
 ): RecordRow {
 	return {
 		event: match.eventCode,
-		day: dayOf(match),
+		day: matchDay(match),
 		type: match.eventType,
 		region: match.region,
 		key: match.key,

@@ -8,12 +8,21 @@ const server = vi.hoisted(() => ({
 	loadSeasonEvents: vi.fn()
 }));
 
+const home = vi.hoisted(() => ({
+	loadTodayProgress: vi.fn(),
+	loadHighlights: vi.fn()
+}));
+
 vi.mock('#lib/server/event.ts', () => server);
-vi.mock('#lib/server/records.ts', () => ({ loadRecentRecords: vi.fn(async () => null) }));
+vi.mock('#lib/server/home.ts', () => home);
+vi.mock('#lib/server/records.ts', () => ({
+	recordNames: vi.fn(async () => ({ teams: { 1: 'One' }, events: { NOW: 'Now Event' } }))
+}));
 
 type Home = {
-	today: { code: string }[] | null;
+	today: { code: string; status: string; state: string }[] | null;
 	week: { code: string }[] | null;
+	highlights: unknown;
 };
 
 function call() {
@@ -37,6 +46,8 @@ const season: EventSummary[] = [
 
 beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
+	home.loadTodayProgress.mockReset().mockResolvedValue({});
+	home.loadHighlights.mockReset().mockResolvedValue(null);
 });
 
 describe('home load', () => {
@@ -63,6 +74,53 @@ describe('home load', () => {
 	it('still renders when neither list can be loaded', async () => {
 		server.loadEventsToday.mockRejectedValue(new Error('down'));
 		server.loadSeasonEvents.mockRejectedValue(new Error('down'));
-		expect(await call().result).toEqual({ today: null, week: null, records: null });
+		expect(await call().result).toEqual({ today: null, week: null, highlights: null });
+		expect(home.loadTodayProgress).not.toHaveBeenCalled();
+	});
+
+	it('adds live progress for competitions running today', async () => {
+		server.loadEventsToday.mockResolvedValue(today);
+		server.loadSeasonEvents.mockResolvedValue({ events: season, fetchedAt: 1, stale: false });
+		home.loadTodayProgress.mockResolvedValue({
+			NOW: { phase: 'quals', label: 'Q23 of 40', leader: { team: 1, name: 'One' } }
+		});
+		const data = await call().result;
+		expect(home.loadTodayProgress).toHaveBeenCalledWith(today);
+		expect(data.today?.[0]).toMatchObject({ code: 'NOW', status: 'Q23 of 40', state: 'live' });
+	});
+
+	it('keeps the event list when progress cannot be read', async () => {
+		server.loadEventsToday.mockResolvedValue(today);
+		server.loadSeasonEvents.mockResolvedValue({ events: season, fetchedAt: 1, stale: false });
+		home.loadTodayProgress.mockRejectedValue(new Error('down'));
+		const data = await call().result;
+		expect(data.today?.[0].code).toBe('NOW');
+	});
+
+	it('names the teams and events in the highlights', async () => {
+		server.loadEventsToday.mockResolvedValue([]);
+		server.loadSeasonEvents.mockResolvedValue({ events: [], fetchedAt: 1, stale: false });
+		const item = {
+			event: 'NOW',
+			key: 'q1',
+			label: 'Q1',
+			red: [1, 2],
+			blue: [3, 4],
+			redScore: 100,
+			blueScore: 90,
+			winner: 'red',
+			chance: null
+		};
+		home.loadHighlights.mockResolvedValue({
+			range: 'week',
+			highest: [item],
+			closest: [],
+			upsets: []
+		});
+		const data = await call().result;
+		expect(data.highlights).toMatchObject({
+			range: 'week',
+			names: { teams: { 1: 'One' }, events: { NOW: 'Now Event' } }
+		});
 	});
 });
