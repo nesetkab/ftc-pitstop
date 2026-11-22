@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 import { browser } from '$app/env';
 import { CODE_PATTERN } from '#lib/workspace/code.ts';
 
@@ -30,62 +30,64 @@ export const LIMITS = {
 	penValues: 800
 } as const;
 
-const text = (max: number) => z.string().max(max);
-const id = z.string().min(1).max(40);
-const stamp = z.number().int().nonnegative();
-const coordinate = z.number().min(-100).max(600);
-const color = z.enum(SHAPE_COLORS).default('ink');
-const dash = z.boolean().default(false);
+const text = (max: number) => z.string().check(z.maxLength(max));
+const range = (min: number, max: number) => z.number().check(z.minimum(min), z.maximum(max));
+const whole = (min: number, max: number) => z.int().check(z.minimum(min), z.maximum(max));
+const list = <T extends z.ZodMiniType>(item: T, max: number) =>
+	z._default(z.array(item).check(z.maxLength(max)), []);
+const nothing = <T extends z.ZodMiniType>(schema: T) => z._default(z.nullable(schema), null);
+const id = z.string().check(z.minLength(1), z.maxLength(40));
+const stamp = z.int().check(z.nonnegative());
+const coordinate = range(-100, 600);
+const color = z._default(z.enum(SHAPE_COLORS), 'ink');
+const dash = z._default(z.boolean(), false);
+const teamNumber = whole(1, 999_999);
 
 export const pickEntrySchema = z.object({
-	team: z.number().int().min(1).max(999_999),
-	name: text(80).nullable().default(null),
-	note: text(300).default(''),
-	taken: z.boolean().default(false)
+	team: teamNumber,
+	name: nothing(text(80)),
+	note: z._default(text(300), ''),
+	taken: z._default(z.boolean(), false)
 });
 
 export const pickListSchema = z.object({
-	event: z
-		.string()
-		.regex(/^[A-Z0-9]{2,24}$/)
-		.nullable()
-		.default(null),
-	entries: z.array(pickEntrySchema).max(LIMITS.picks).default([])
+	event: nothing(z.string().check(z.regex(/^[A-Z0-9]{2,24}$/))),
+	entries: list(pickEntrySchema, LIMITS.picks)
 });
 
 export const batterySchema = z.object({
 	id,
 	name: text(24),
-	status: z.enum(BATTERY_STATUSES).default('charged'),
-	voltage: z.number().min(0).max(30).nullable().default(null),
-	used: z.array(text(12)).max(60).default([]),
-	note: text(200).default(''),
-	restedSince: stamp.nullable().default(null)
+	status: z._default(z.enum(BATTERY_STATUSES), 'charged'),
+	voltage: nothing(range(0, 30)),
+	used: list(text(12), 60),
+	note: z._default(text(200), ''),
+	restedSince: nothing(stamp)
 });
 
 export const batteriesSchema = z.object({
-	items: z.array(batterySchema).max(LIMITS.batteries).default([])
+	items: list(batterySchema, LIMITS.batteries)
 });
 
 export const checkItemSchema = z.object({
 	id,
 	text: text(160),
-	by: text(4).nullable().default(null),
-	at: stamp.nullable().default(null)
+	by: nothing(text(4)),
+	at: nothing(stamp)
 });
 
 export const checkHistorySchema = z.object({
-	match: text(16).default(''),
+	match: z._default(text(16), ''),
 	at: stamp,
-	done: z.number().int().min(0).max(100),
-	total: z.number().int().min(0).max(100),
-	by: z.array(text(4)).max(20).default([])
+	done: whole(0, 100),
+	total: whole(0, 100),
+	by: list(text(4), 20)
 });
 
 export const checklistSchema = z.object({
-	match: text(16).default(''),
-	items: z.array(checkItemSchema).max(LIMITS.checks).default([]),
-	history: z.array(checkHistorySchema).max(LIMITS.history).default([])
+	match: z._default(text(16), ''),
+	items: list(checkItemSchema, LIMITS.checks),
+	history: list(checkHistorySchema, LIMITS.history)
 });
 
 const penSchema = z.object({
@@ -93,11 +95,11 @@ const penSchema = z.object({
 	kind: z.literal('pen'),
 	color,
 	dash,
-	pts: z
-		.array(coordinate)
-		.min(2)
-		.max(LIMITS.penValues)
-		.refine((values) => values.length % 2 === 0)
+	pts: z.array(coordinate).check(
+		z.minLength(2),
+		z.maxLength(LIMITS.penValues),
+		z.refine((values) => values.length % 2 === 0)
+	)
 });
 
 const arrowSchema = z.object({
@@ -123,7 +125,7 @@ const labelSchema = z.object({
 	color,
 	x: coordinate,
 	y: coordinate,
-	text: z.string().min(1).max(60)
+	text: z.string().check(z.minLength(1), z.maxLength(60))
 });
 
 export const shapeSchema = z.discriminatedUnion('kind', [
@@ -135,14 +137,14 @@ export const shapeSchema = z.discriminatedUnion('kind', [
 
 export const planSchema = z.object({
 	id,
-	name: text(60).default('Plan'),
-	notes: text(2000).default(''),
-	shapes: z.array(shapeSchema).max(LIMITS.shapes).default([]),
-	updatedAt: stamp.default(0)
+	name: z._default(text(60), 'Plan'),
+	notes: z._default(text(2000), ''),
+	shapes: list(shapeSchema, LIMITS.shapes),
+	updatedAt: z._default(stamp, 0)
 });
 
 export const boardsSchema = z.object({
-	plans: z.array(planSchema).max(LIMITS.plans).default([])
+	plans: list(planSchema, LIMITS.plans)
 });
 
 export const DOC_SCHEMAS = {
@@ -153,8 +155,8 @@ export const DOC_SCHEMAS = {
 } as const;
 
 export const metaSchema = z.object({
-	code: z.string().regex(CODE_PATTERN),
-	teamNumber: z.number().int().min(1).max(999_999).nullable(),
+	code: z.string().check(z.regex(CODE_PATTERN)),
+	teamNumber: z.nullable(teamNumber),
 	createdAt: stamp
 });
 
@@ -187,7 +189,8 @@ export type Docs = { [K in DocName]?: Stamped<DocMap[K]> };
 
 export type Snapshot = { meta: WorkspaceMeta; docs: Docs };
 
-const stamped = <T extends z.ZodType>(schema: T) => z.object({ updatedAt: stamp, data: schema });
+const stamped = <T extends z.ZodMiniType>(schema: T) =>
+	z.object({ updatedAt: stamp, data: schema });
 
 export const stampedSchemas = {
 	picklist: stamped(pickListSchema),
@@ -198,20 +201,21 @@ export const stampedSchemas = {
 
 export const snapshotSchema = z.object({
 	meta: metaSchema,
-	docs: z
-		.object({
-			picklist: stampedSchemas.picklist.optional(),
-			batteries: stampedSchemas.batteries.optional(),
-			checklist: stampedSchemas.checklist.optional(),
-			boards: stampedSchemas.boards.optional()
-		})
-		.default({})
+	docs: z._default(
+		z.object({
+			picklist: z.optional(stampedSchemas.picklist),
+			batteries: z.optional(stampedSchemas.batteries),
+			checklist: z.optional(stampedSchemas.checklist),
+			boards: z.optional(stampedSchemas.boards)
+		}),
+		{}
+	)
 });
 
 const shareBase = {
 	v: z.literal(1),
-	from: z.string().regex(CODE_PATTERN).nullable().default(null),
-	team: z.number().int().min(1).max(999_999).nullable().default(null),
+	from: nothing(z.string().check(z.regex(CODE_PATTERN))),
+	team: nothing(teamNumber),
 	at: stamp
 };
 
