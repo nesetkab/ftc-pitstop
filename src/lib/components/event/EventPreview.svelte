@@ -1,10 +1,12 @@
 <script lang="ts">
-	import type { TeamRating } from '#lib/analysis/types.ts';
+	import type { Projection, TeamRating } from '#lib/analysis/types.ts';
 	import { SEASON } from '#lib/game/biobuzz.ts';
 	import { fixed, integer } from '#lib/format/number.ts';
+	import { allianceCountFor } from '#lib/model/bracket.ts';
 	import { time } from '#lib/format/time.ts';
 	import type { Match, Team } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import { weekday } from './dates.ts';
@@ -19,10 +21,19 @@
 		matches: Match[];
 		timezone: string;
 		ratings?: TeamRating[] | null;
+		projections?: Projection[] | null;
 		followed?: ReadonlySet<number>;
 	}
 
-	let { code, teams, matches, timezone, ratings = null, followed = new Set() }: Props = $props();
+	let {
+		code,
+		teams,
+		matches,
+		timezone,
+		ratings = null,
+		projections = null,
+		followed = new Set()
+	}: Props = $props();
 
 	const Z = 1.2816;
 
@@ -49,15 +60,31 @@
 	const withRange = $derived(
 		rated !== null && [...rated.values()].some((rating) => Number.isFinite(rating.sd))
 	);
+	const projected = $derived(
+		rated && projections && projections.length > 0
+			? new Map(projections.map((projection) => [projection.team, projection]))
+			: null
+	);
+	const spots = $derived(allianceCountFor(projected?.size ?? 0));
 	const rows = $derived.by(() => {
-		const list = teams.map((team) => ({ team, rating: rated?.get(team.number) ?? null }));
+		const list = teams.map((team) => ({
+			team,
+			rating: rated?.get(team.number) ?? null,
+			projection: projected?.get(team.number) ?? null
+		}));
 		if (!rated) return list.sort((a, b) => a.team.number - b.team.number);
 		return list.sort(
 			(a, b) =>
+				(a.projection?.expectedRank ?? Number.POSITIVE_INFINITY) -
+					(b.projection?.expectedRank ?? Number.POSITIVE_INFINITY) ||
 				(b.rating?.opr ?? Number.NEGATIVE_INFINITY) - (a.rating?.opr ?? Number.NEGATIVE_INFINITY) ||
 				a.team.number - b.team.number
 		);
 	});
+
+	function topChance(projection: Projection): number {
+		return projection.rankChances.slice(0, spots).reduce((total, p) => total + p, 0);
+	}
 	const scale = $derived(
 		Math.max(
 			1,
@@ -104,7 +131,13 @@
 					{#if withRange}
 						<th scope="col">Likely range</th>
 					{/if}
-					<th class="l" scope="col">Based on</th>
+					<th class="l opt" scope="col">Based on</th>
+					{#if projected}
+						<th class="sep" scope="col">Expected rank</th>
+						{#if spots > 0}
+							<th scope="col">Top {spots}</th>
+						{/if}
+					{/if}
 				{:else}
 					<th class="l" scope="col">Location</th>
 					<th scope="col">Rookie year</th>
@@ -138,13 +171,19 @@
 									{/if}
 								</td>
 							{/if}
-							<td class="l muted">{basis(row.team, row.rating)}</td>
+							<td class="l muted opt">{basis(row.team, row.rating)}</td>
 						{:else}
 							<td>—</td>
 							{#if withRange}
 								<td></td>
 							{/if}
-							<td class="l muted">No rating yet</td>
+							<td class="l muted opt">No rating yet</td>
+						{/if}
+						{#if projected}
+							<td class="sep">{fixed(row.projection?.expectedRank)}</td>
+							{#if spots > 0}
+								<ProbCell p={row.projection ? topChance(row.projection) : null} />
+							{/if}
 						{/if}
 					{:else}
 						<td class="l muted">{placeName(row.team)}</td>
@@ -158,6 +197,10 @@
 		<p class="note">
 			Starting OPR is the rating each team brings into this event. Teams with BIOBUZZ matches start
 			from their own results. Teams without start from last season's results.
+			{#if projected && spots > 0}
+				Expected rank and top {spots} chance play out the posted schedule thousands of times, so they
+				also reflect who each team is paired with and against. The top {spots} become alliance captains.
+			{/if}
 		</p>
 	{/if}
 {/if}

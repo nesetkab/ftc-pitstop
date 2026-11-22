@@ -17,6 +17,7 @@
 	<RankingsView
 		{bundle}
 		analysis={data.analysis}
+		rp={data.rp}
 		followed={view.followed}
 		csvHref="/events/{bundle.event.code}/rankings.csv"
 	/>
@@ -27,6 +28,7 @@
 		matches={bundle.matches}
 		timezone={bundle.event.timezone}
 		ratings={data.analysis?.ratings ?? null}
+		projections={data.analysis?.projections ?? null}
 		followed={view.followed}
 	/>
 {/if}
