@@ -131,7 +131,7 @@
 
 <div class="page">
 	<div class="head">
-		<h2>Alliance selection</h2>
+		<h2 class="visually-hidden">Alliance selection</h2>
 		<p class="status">
 			<StaleNotice
 				updated={bundle.fetchedAt}

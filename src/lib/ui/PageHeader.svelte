@@ -44,6 +44,7 @@
 		font-size: 26px;
 		line-height: 1.2;
 		letter-spacing: -0.015em;
+		text-wrap: pretty;
 	}
 
 	.meta {

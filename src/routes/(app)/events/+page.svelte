@@ -269,6 +269,7 @@
 	}
 
 	.seg button {
+		min-height: calc(var(--control-h) - 2px);
 		padding: 8px 12px;
 		border: 0;
 		background: transparent;
@@ -295,8 +296,9 @@
 
 	.count {
 		margin-bottom: -12px;
-		font-size: 13px;
-		color: var(--text-3);
+		font-size: 14px;
+		color: var(--text-2);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.table-wrap {

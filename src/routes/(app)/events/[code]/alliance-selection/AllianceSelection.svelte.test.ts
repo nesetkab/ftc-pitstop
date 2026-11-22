@@ -90,8 +90,8 @@ describe('alliance table', () => {
 			{ ...alliances[1], picks: [201, 202] }
 		]);
 		render(AllianceTable, { props: { selection: full } });
-		expect(screen.getByRole('columnheader', { name: 'Pick 1' })).toBeInTheDocument();
-		expect(screen.getByRole('columnheader', { name: 'Pick 2' })).toBeInTheDocument();
+		expect(screen.getByRole('columnheader', { name: 'First pick' })).toBeInTheDocument();
+		expect(screen.getByRole('columnheader', { name: 'Second pick' })).toBeInTheDocument();
 		expect(screen.getByRole('columnheader', { name: 'Backup' })).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: '103' })).toBeInTheDocument();
 	});

@@ -99,7 +99,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: end;
-		gap: 12px 16px;
+		gap: 12px;
 	}
 
 	label {
@@ -110,7 +110,7 @@
 	}
 
 	select {
-		min-width: 150px;
+		min-width: 128px;
 	}
 
 	input {

@@ -228,7 +228,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: end;
-		gap: 12px 16px;
+		gap: 12px;
 	}
 
 	label {
@@ -239,11 +239,16 @@
 	}
 
 	select {
-		min-width: 150px;
+		min-width: 128px;
+		max-width: 180px;
+	}
+
+	.find {
+		flex: 1 0 160px;
 	}
 
 	input {
-		width: 200px;
+		width: 100%;
 		padding: 7px 10px;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);
@@ -291,6 +296,7 @@
 		input,
 		.date {
 			min-width: 0;
+			max-width: none;
 			width: 100%;
 		}
 	}

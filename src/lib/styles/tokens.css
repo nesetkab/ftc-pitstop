@@ -85,6 +85,7 @@
 	--radius-chip: 4px;
 	--radius-control: 6px;
 	--radius-panel: 8px;
+	--control-h: 36px;
 	--page-max: 1180px;
 	--gutter: clamp(16px, 3vw, 24px);
 }
@@ -267,6 +268,7 @@ select {
 	background-size: 12px 12px;
 	border: 1px solid var(--line-2);
 	border-radius: var(--radius-control);
+	min-height: var(--control-h);
 	padding: 7px 32px 7px 10px;
 	cursor: pointer;
 }
