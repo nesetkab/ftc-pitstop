@@ -1,7 +1,9 @@
 import { getContext, setContext } from 'svelte';
 import type { DeviceStore } from '#lib/workspace/device-store.ts';
+import { replayEdit, type PendingStore } from '#lib/workspace/pending.ts';
 import {
 	DOC_NAMES,
+	emptyDoc,
 	emptyDocs,
 	type DocMap,
 	type DocName,
@@ -27,6 +29,7 @@ type AnyChange = (doc: DocMap[DocName]) => DocMap[DocName];
 export interface WorkspaceAccess {
 	stores: readonly WorkspaceStore[];
 	cache?: DeviceStore | null;
+	pending?: PendingStore | null;
 }
 
 export interface WorkspaceOptions {
@@ -58,6 +61,8 @@ export class Workspace {
 
 	#stores: readonly WorkspaceStore[] = [];
 	#cache: DeviceStore | null = null;
+	#saved: PendingStore | null = null;
+	#confirmed: Partial<DocMap> = {};
 	#store: WorkspaceStore | null = null;
 	#versions: Versions = {};
 	#rev: string | undefined;
@@ -81,9 +86,11 @@ export class Workspace {
 	async open(access: WorkspaceAccess): Promise<void> {
 		this.#stores = access.stores;
 		this.#cache = access.cache ?? null;
+		this.#saved = access.pending ?? null;
 		this.status = 'loading';
 		const cached = await this.#cache?.load(this.code, { docs: this.names });
 		if (cached) this.#apply(cached, false);
+		this.#restore();
 		let unreachable: WorkspaceStore | null = null;
 		for (const store of this.#stores) {
 			try {
@@ -104,6 +111,7 @@ export class Workspace {
 			this.kind = unreachable.kind;
 			this.offline = true;
 			this.status = 'ready';
+			this.#resume();
 			return;
 		}
 		this.status = unreachable ? 'error' : 'missing';
@@ -162,6 +170,7 @@ export class Workspace {
 		this.#pending[name] = queue;
 		this.sync = 'saving';
 		this.message = null;
+		this.#persist(name);
 		this.#schedule(name, this.#flushDelay);
 	}
 
@@ -214,15 +223,46 @@ export class Workspace {
 			if (!stamped) continue;
 			if (confirmed && stamped.updatedAt < (this.#versions[name] ?? 0)) continue;
 			if (confirmed) this.#versions[name] = stamped.updatedAt;
+			this.#confirmed = { ...this.#confirmed, [name]: stamped.data };
 			docs = withDoc(docs, name, this.#rebase(name, stamped.data));
 		}
 		this.docs = docs;
 		if (confirmed) this.#mirror(snapshot);
+		this.#resume();
+	}
+
+	#resume() {
 		for (const name of this.names) {
 			if (this.#queued(name) > 0 && !this.#running[name]) {
 				this.#schedule(name, this.#flushDelay);
 			}
 		}
+	}
+
+	#restore() {
+		if (!this.#saved) return;
+		let docs = this.docs;
+		for (const name of this.names) {
+			const edit = this.#saved.read(this.code, name);
+			if (!edit || this.#queued(name) > 0) continue;
+			const change = replayEdit(edit) as unknown as AnyChange;
+			this.#pending[name] = [change];
+			docs = withDoc(docs, name, change(docs[name]));
+			this.sync = 'saving';
+		}
+		this.docs = docs;
+	}
+
+	#persist(name: DocName) {
+		if (!this.#saved || this.#store?.kind !== 'shared') return;
+		if (this.#queued(name) === 0) {
+			this.#saved.clear(this.code, name);
+			return;
+		}
+		this.#saved.save(this.code, name, {
+			from: this.#confirmed[name] ?? emptyDoc(name),
+			data: this.docs[name]
+		});
 	}
 
 	#rebase<K extends DocName>(name: K, base: DocMap[K]): DocMap[K] {
@@ -258,6 +298,7 @@ export class Workspace {
 				);
 				if (result.ok) {
 					this.#versions[name] = result.stamped.updatedAt;
+					this.#confirmed = { ...this.#confirmed, [name]: result.stamped.data };
 					this.#pending[name] = (this.#pending[name] ?? []).slice(sent);
 					this.savedAt = this.#now();
 					this.offline = false;
@@ -266,12 +307,14 @@ export class Workspace {
 					break;
 				}
 				this.#versions[name] = result.current.updatedAt;
+				this.#confirmed = { ...this.#confirmed, [name]: result.current.data };
 				this.docs = withDoc(this.docs, name, this.#rebase(name, result.current.data));
 			}
 		} catch (error) {
 			retry = this.#fail(name, error);
 		} finally {
 			delete this.#running[name];
+			this.#persist(name);
 		}
 		if (this.#queued(name) > 0) {
 			this.sync = retry ? 'retrying' : 'saving';

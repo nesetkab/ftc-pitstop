@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { OFFLINE_HEADER } from '#lib/pwa/rules.ts';
 import type { EventBundle } from '#lib/types.ts';
 import { PitFeed } from './feed.svelte.ts';
 import { fixtureBundle } from './fixtures.ts';
@@ -161,5 +162,45 @@ describe('PitFeed', () => {
 		await vi.advanceTimersByTimeAsync(QUEUE_INTERVAL * 3);
 		stopLive();
 		expect(second.calls('/api/nexus/').length).toBeGreaterThanOrEqual(3);
+	});
+
+	it('shows newer cached data when offline but still reports the failure', async () => {
+		vi.useFakeTimers({ now: EVENT_DAY });
+		const newer = { ...live, fetchedAt: live.fetchedAt + 60_000 };
+		const cached = () =>
+			new Response(JSON.stringify(newer), { headers: { [OFFLINE_HEADER]: '1' } });
+		const fetch = vi.fn(async () => cached());
+		const feed = new PitFeed({ code: 'USAZGIQ', bundle: live, queue: null, nexus: false, fetch });
+		const updatedAt = feed.updatedAt;
+		const stop = feed.start();
+		await vi.advanceTimersByTimeAsync(BUNDLE_INTERVAL);
+		stop();
+		expect(feed.bundle?.fetchedAt).toBe(newer.fetchedAt);
+		expect(feed.failures).toBe(1);
+		expect(feed.updatedAt).toBe(updatedAt);
+	});
+
+	it('ignores cached data older than what the page already shows', async () => {
+		vi.useFakeTimers({ now: EVENT_DAY });
+		const older = { ...live, fetchedAt: live.fetchedAt - 60_000 };
+		const fetch = vi.fn(
+			async () => new Response(JSON.stringify(older), { headers: { [OFFLINE_HEADER]: '1' } })
+		);
+		const feed = new PitFeed({ code: 'USAZGIQ', bundle: live, queue: null, nexus: false, fetch });
+		const stop = feed.start();
+		await vi.advanceTimersByTimeAsync(BUNDLE_INTERVAL);
+		stop();
+		expect(feed.bundle?.fetchedAt).toBe(live.fetchedAt);
+	});
+
+	it('checks right away when the page opens offline', async () => {
+		vi.useFakeTimers({ now: WEEK_LATER });
+		vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+		const { feed, calls } = feedFor(done);
+		const stop = feed.start();
+		await vi.advanceTimersByTimeAsync(0);
+		stop();
+		expect(feed.online).toBe(false);
+		expect(calls('/lite')).toHaveLength(1);
 	});
 });

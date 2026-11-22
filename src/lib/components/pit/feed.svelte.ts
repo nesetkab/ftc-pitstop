@@ -1,7 +1,6 @@
+import { OFFLINE_HEADER } from '#lib/pwa/rules.ts';
 import type { EventBundle, QueueStatusSnapshot } from '#lib/types.ts';
 import { BUNDLE_INTERVAL, bundleDelay, QUEUE_INTERVAL, queueActive, retryDelay } from './poll.ts';
-
-export const OFFLINE_HEADER = 'x-pitstop-offline';
 
 export interface FeedOptions {
 	code: string;
@@ -64,7 +63,10 @@ export class PitFeed {
 		addEventListener('online', online);
 		addEventListener('offline', offline);
 		document.addEventListener('visibilitychange', visible);
-		this.#schedule('bundle', this.bundle ? bundleDelay(this.bundle, this.#now()) : 0);
+		this.#schedule(
+			'bundle',
+			this.bundle && this.online ? bundleDelay(this.bundle, this.#now()) : 0
+		);
 		if (this.#nexus) this.#schedule('queue', this.queue ? QUEUE_INTERVAL : 0);
 		return () => {
 			removeEventListener('online', online);
@@ -119,7 +121,7 @@ export class PitFeed {
 			if (!response.ok) throw new Error(`Event data returned ${response.status}`);
 			const bundle = (await response.json()) as EventBundle;
 			if (response.headers.get(OFFLINE_HEADER)) {
-				this.bundle ??= bundle;
+				if (!this.bundle || bundle.fetchedAt > this.bundle.fetchedAt) this.bundle = bundle;
 				throw new Error('Served from the offline cache');
 			}
 			if (this.bundle && this.bundle.matches.length > 0 && bundle.matches.length === 0) {
