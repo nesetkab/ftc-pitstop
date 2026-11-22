@@ -54,6 +54,21 @@ export function explain(term: string): string | null {
 	return Object.hasOwn(GLOSSARY, term) ? GLOSSARY[term] : null;
 }
 
+export const ABOUT_PATH = '/about';
+
+export function termId(term: string): string {
+	const slug = term
+		.toLowerCase()
+		.replace('#', 'rank')
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-|-$/g, '');
+	return `term-${slug}`;
+}
+
+export function termHref(term: string): string | null {
+	return explain(term) === null ? null : `${ABOUT_PATH}#${termId(term)}`;
+}
+
 export function oprTerm(part: string): string {
 	return part === PART_LABELS.total || part === 'OPR' ? 'OPR' : `${part} OPR`;
 }
