@@ -36,7 +36,7 @@ describe('seasonRange', () => {
 describe('splitNote', () => {
 	it('explains what each split was used for', () => {
 		expect(splitNote('train')).toBe('Used to set parameters');
-		expect(splitNote('validation')).toBe('Used to choose the model');
+		expect(splitNote('validation')).toBe('Used to set parameters and choose the model');
 		expect(splitNote('test')).toBe('Not used for tuning');
 		expect(splitNote('other')).toBe('');
 	});

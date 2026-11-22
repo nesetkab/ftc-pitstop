@@ -1,5 +1,11 @@
 import { SwarmBook } from './rp.ts';
-import type { AllianceDetail, ModelEvent, ModelMatch } from './types.ts';
+import {
+	plausibleMatch,
+	rated,
+	type AllianceDetail,
+	type ModelEvent,
+	type ModelMatch
+} from './types.ts';
 
 export const COMPONENTS = [
 	'auto',
@@ -55,23 +61,27 @@ export type OprParams = {
 	qWeek: number;
 	carry: number;
 	drift: number;
+	scoreCommon: number;
+	scoreQ: number;
 };
 
 export const OPR_PARAMS: OprParams = {
-	lamNew: 2.4,
+	lamNew: 2,
 	lamReturning: 2,
 	rhoNew: 0.2,
 	rhoReturning: 0.4,
-	rhoNewScore: 0.8,
-	rhoReturningScore: 0.9,
-	beta: 0.6,
-	q: 0.1,
-	qWeek: 0.02,
+	rhoNewScore: 0.5,
+	rhoReturningScore: 0.7,
+	beta: 0.5,
+	q: 0.15,
+	qWeek: 0.01,
 	carry: 1,
-	drift: 0.25
+	drift: 0.25,
+	scoreCommon: 0.1,
+	scoreQ: 0.05
 };
 
-export const SCORE_SIGMA = 0.55;
+export const SCORE_SIGMA = 0.49;
 
 export type SeasonStats = { mean: number; sd: number; parts: number[]; matches: number };
 
@@ -173,15 +183,52 @@ export function priorFor(
 	return { values, prec: 1 / (1 / state.prec + p.q + p.qWeek * weeks) };
 }
 
+function rowSums(M: Float64Array, out: Float64Array, n: number, idx: number[]): number {
+	out.fill(0);
+	for (const i of idx) {
+		const row = i * n;
+		for (let k = 0; k < n; k++) out[k] += M[row + k];
+	}
+	let total = 0;
+	for (const i of idx) total += out[i];
+	return total;
+}
+
+function support(ph: Float64Array, nz: Int32Array): number {
+	let count = 0;
+	for (let k = 0; k < ph.length; k++) if (ph[k] !== 0) nz[count++] = k;
+	return count;
+}
+
+function downdate(
+	M: Float64Array,
+	ph: Float64Array,
+	nz: Int32Array,
+	count: number,
+	n: number,
+	s: number
+): void {
+	for (let x = 0; x < count; x++) {
+		const a = nz[x];
+		const fa = ph[a] / s;
+		const row = a * n;
+		for (let y = 0; y < count; y++) M[row + nz[y]] -= fa * ph[nz[y]];
+	}
+}
+
 export class EventRater {
 	readonly code: string;
 	readonly teams: number[] = [];
 	private index = new Map<number, number>();
 	private n = 0;
 	private P = new Float64Array(0);
+	private S = new Float64Array(0);
 	private mu: Float64Array[] = [];
+	private base: Float64Array[] = [];
 	private played = new Int32Array(0);
 	private ph = new Float64Array(0);
+	private sh = new Float64Array(0);
+	private nz = new Int32Array(0);
 	private priors: Priors;
 	private stats: () => SeasonStats;
 	private day: number;
@@ -206,10 +253,20 @@ export class EventRater {
 		const old = this.n;
 		const n = old + fresh.length;
 		const P = new Float64Array(n * n);
-		for (let i = 0; i < old; i++) P.set(this.P.subarray(i * old, (i + 1) * old), i * n);
+		const S = new Float64Array(n * n);
+		for (let i = 0; i < old; i++) {
+			P.set(this.P.subarray(i * old, (i + 1) * old), i * n);
+			S.set(this.S.subarray(i * old, (i + 1) * old), i * n);
+		}
+		const common = this.priors.params.scoreCommon;
 		const mu = Array.from({ length: SIZE }, (_, c) => {
 			const next = new Float64Array(n);
 			if (this.mu[c]) next.set(this.mu[c]);
+			return next;
+		});
+		const base = Array.from({ length: SIZE }, (_, c) => {
+			const next = new Float64Array(n);
+			if (this.base[c]) next.set(this.base[c]);
 			return next;
 		});
 		const played = new Int32Array(n);
@@ -220,21 +277,30 @@ export class EventRater {
 			this.index.set(team, i);
 			this.teams.push(team);
 			const prior = priorFor(team, this.priors, stats, this.day);
-			for (let c = 0; c < SIZE; c++) mu[c][i] = prior.values[c];
+			for (let c = 0; c < SIZE; c++) mu[c][i] = base[c][i] = prior.values[c];
 			P[i * n + i] = 1 / prior.prec;
+			for (let j = old; j < n; j++) S[i * n + j] = common;
+			S[i * n + i] += 1 / prior.prec;
 		});
 		this.n = n;
 		this.P = P;
+		this.S = S;
 		this.mu = mu;
+		this.base = base;
 		this.played = played;
 		this.ph = new Float64Array(n);
+		this.sh = new Float64Array(n);
+		this.nz = new Int32Array(n);
 	}
 
 	private refresh(team: number): void {
 		const i = this.index.get(team)!;
 		if (this.played[i] > 0) return;
 		const prior = priorFor(team, this.priors, this.stats(), this.day);
-		for (let c = 0; c < SIZE; c++) this.mu[c][i] = prior.values[c];
+		for (let c = 0; c < SIZE; c++) {
+			this.mu[c][i] += prior.values[c] - this.base[c][i];
+			this.base[c][i] = prior.values[c];
+		}
 	}
 
 	private sum(teams: number[], c: number): number {
@@ -243,10 +309,10 @@ export class EventRater {
 		return s;
 	}
 
-	private quad(weights: Map<number, number>): number {
+	private quad(weights: Map<number, number>, M = this.P): number {
 		const n = this.n;
 		let v = 0;
-		for (const [a, wa] of weights) for (const [b, wb] of weights) v += wa * wb * this.P[a * n + b];
+		for (const [a, wa] of weights) for (const [b, wb] of weights) v += wa * wb * M[a * n + b];
 		return v;
 	}
 
@@ -263,7 +329,7 @@ export class EventRater {
 		const side = (teams: number[]): AllianceForecast => ({
 			strength: this.sum(teams, STRENGTH),
 			score: this.sum(teams, OPR),
-			variance: this.quad(this.weights(teams)) + 1,
+			variance: this.quad(this.weights(teams), this.S) + 1,
 			components: Object.fromEntries(
 				COMPONENTS.map((c, k) => [c, this.sum(teams, k + 2)])
 			) as Record<Component, number>
@@ -280,33 +346,33 @@ export class EventRater {
 	}
 
 	private observe(teams: number[], values: (number | undefined)[]): void {
-		const n = this.n;
-		const P = this.P;
-		const ph = this.ph;
 		const idx = teams.map((t) => this.index.get(t)!);
-		ph.fill(0);
-		for (const i of idx) {
-			const row = i * n;
-			for (let k = 0; k < n; k++) ph[k] += P[row + k];
-		}
-		let hph = 0;
-		for (const i of idx) hph += ph[i];
-		const s = hph + 1;
-		for (let c = 0; c < SIZE; c++) {
+		this.step(this.P, this.ph, idx, values, STRENGTH, STRENGTH + 1);
+		this.step(this.S, this.sh, idx, values, STRENGTH + 1, SIZE);
+	}
+
+	private step(
+		M: Float64Array,
+		ph: Float64Array,
+		idx: number[],
+		values: (number | undefined)[],
+		from: number,
+		to: number
+	): void {
+		const n = this.n;
+		const nz = this.nz;
+		const s = rowSums(M, ph, n, idx) + 1;
+		const count = support(ph, nz);
+		for (let c = from; c < to; c++) {
 			const y = values[c];
 			if (y === undefined) continue;
 			const mu = this.mu[c];
 			let pred = 0;
 			for (const i of idx) pred += mu[i];
 			const resid = y - pred;
-			for (let k = 0; k < n; k++) mu[k] += (ph[k] / s) * resid;
+			for (let x = 0; x < count; x++) mu[nz[x]] += (ph[nz[x]] / s) * resid;
 		}
-		for (let a = 0; a < n; a++) {
-			const fa = ph[a] / s;
-			if (fa === 0) continue;
-			const row = a * n;
-			for (let b = 0; b < n; b++) P[row + b] -= fa * ph[b];
-		}
+		downdate(M, ph, nz, count, n, s);
 	}
 
 	update(m: ModelMatch): void {
@@ -319,10 +385,14 @@ export class EventRater {
 			[m.red, m.redNp, m.redDetail],
 			[m.blue, m.blueNp, m.blueDetail]
 		];
-		const credited: number[] = [];
+		const credited = [...m.red, ...m.blue].filter((t) => !absent.has(t));
+		const q = this.priors.params.scoreQ;
+		for (const t of credited) {
+			const i = this.index.get(t)!;
+			this.S[i * this.n + i] += q;
+		}
 		for (const [teams, np, detail] of sides) {
 			const present = teams.filter((t) => !absent.has(t));
-			credited.push(...present);
 			const disqualified = m.level === 'playoff' && teams.some((t) => dq.has(t));
 			if (!present.length || disqualified) continue;
 			this.observe(present, [np, np, ...COMPONENTS.map((c) => detailValue(detail, c))]);
@@ -452,6 +522,7 @@ export type SeasonOptions = {
 };
 
 function credits(m: ModelMatch): [number, AllianceDetail | undefined][] {
+	if (!plausibleMatch(m)) return [];
 	const absent = new Set(m.noShows ?? []);
 	const dq = new Set(m.dqs ?? []);
 	const out: [number, AllianceDetail | undefined][] = [];
@@ -501,7 +572,7 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 			swarm.enterEvent(event.code, teams);
 			const steps: RatingStep[] = [];
 			for (const m of matches) {
-				if (m.redNp === null || m.blueNp === null) continue;
+				if (!rated(m)) continue;
 				const forecast = rater.forecast(m.red, m.blue);
 				options.onForecast?.(event, m, forecast);
 				const members = [...m.red, ...m.blue];

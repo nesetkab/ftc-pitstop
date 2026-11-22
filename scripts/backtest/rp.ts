@@ -3,13 +3,17 @@ import { join } from 'node:path';
 import { orderEvents, orderMatches, rateSeason, type Forecast } from '../../src/lib/model/opr.ts';
 import { marginScale, WIN_PARAMS } from '../../src/lib/model/predict.ts';
 import {
+	calibratedSwarm,
+	logit,
 	recalibrate,
 	RP_CALIBRATION,
 	RP_RULES,
+	SWARM_MODEL,
 	SwarmBook,
 	swarmFromMean,
 	tipChances,
-	type Platt
+	type Platt,
+	type SwarmCalibration
 } from '../../src/lib/model/rp.ts';
 import type { ModelEvent, ModelMatch } from '../../src/lib/model/types.ts';
 import { loadSeason } from './hist.ts';
@@ -62,38 +66,66 @@ function bins(samples: Sample[], count = 10) {
 		.map((b) => ({ ...b, predicted: round(b.predicted / b.n), observed: round(b.observed / b.n) }));
 }
 
-function fitPlatt(samples: Sample[]): Platt {
-	let a = 0;
-	let b = 1;
-	const xs = samples.map(({ p }) => {
-		const q = Math.min(Math.max(p, 1e-6), 1 - 1e-6);
-		return Math.log(q / (1 - q));
-	});
-	for (let iter = 0; iter < 50; iter++) {
-		let ga = 0;
-		let gb = 0;
-		let haa = 0;
-		let hab = 0;
-		let hbb = 0;
-		samples.forEach(({ y }, i) => {
-			const x = xs[i];
-			const p = 1 / (1 + Math.exp(-(a + b * x)));
-			const w = p * (1 - p);
-			ga += p - y;
-			gb += (p - y) * x;
-			haa += w;
-			hab += w * x;
-			hbb += w * x * x;
-		});
-		const det = haa * hbb - hab * hab;
-		if (Math.abs(det) < 1e-12) break;
-		const da = (hbb * ga - hab * gb) / det;
-		const db = (haa * gb - hab * ga) / det;
-		a -= da;
-		b -= db;
-		if (Math.abs(da) + Math.abs(db) < 1e-10) break;
+function solve(A: number[][], b: number[]): number[] {
+	const n = b.length;
+	const M = A.map((row, i) => [...row, b[i]]);
+	for (let c = 0; c < n; c++) {
+		let p = c;
+		for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+		[M[c], M[p]] = [M[p], M[c]];
+		for (let r = 0; r < n; r++) {
+			if (r === c) continue;
+			const f = M[r][c] / M[c][c];
+			for (let j = c; j <= n; j++) M[r][j] -= f * M[c][j];
+		}
 	}
+	return M.map((row, i) => row[n] / row[i]);
+}
+
+function fitLogistic(xs: number[][], ys: number[]): number[] {
+	const k = xs[0].length + 1;
+	const w = [0, ...Array.from({ length: k - 1 }, () => 1 / (k - 1))];
+	for (let iter = 0; iter < 50; iter++) {
+		const g = new Array(k).fill(0);
+		const H = Array.from({ length: k }, () => new Array(k).fill(0));
+		xs.forEach((x, i) => {
+			const z = [1, ...x];
+			const p = 1 / (1 + Math.exp(-z.reduce((sum, v, j) => sum + v * w[j], 0)));
+			for (let a = 0; a < k; a++) {
+				g[a] += (p - ys[i]) * z[a];
+				for (let b = 0; b < k; b++) H[a][b] += p * (1 - p) * z[a] * z[b];
+			}
+		});
+		const step = solve(H, g);
+		for (let a = 0; a < k; a++) w[a] -= step[a];
+		if (step.reduce((sum, v) => sum + Math.abs(v), 0) < 1e-10) break;
+	}
+	return w;
+}
+
+function fitPlatt(samples: Sample[]): Platt {
+	const [a, b] = fitLogistic(
+		samples.map(({ p }) => [logit(p)]),
+		samples.map(({ y }) => y)
+	);
 	return { a: round(a, 4), b: round(b, 4) };
+}
+
+type SwarmSample = { robots: number; points: number; y: number };
+
+function fitSwarm(samples: SwarmSample[], sd: number): SwarmCalibration {
+	const [a, robots, points] = fitLogistic(
+		samples.map((s) => [logit(s.robots), logit(swarmFromMean(s.points, sd))]),
+		samples.map((s) => s.y)
+	);
+	return { a: round(a, 4), robots: round(robots, 4), points: round(points, 4), sd };
+}
+
+function stacked(samples: SwarmSample[], c: SwarmCalibration): Sample[] {
+	return samples.map((s) => ({
+		p: calibratedSwarm(s.robots, s.points, { ...RP_CALIBRATION, swarm: c }),
+		y: s.y
+	}));
 }
 
 function calibrated(samples: Sample[], c: Platt): Sample[] {
@@ -167,14 +199,11 @@ async function main(): Promise<void> {
 		)
 	}));
 	normal.sort((a, b) => a.brier - b.brier);
-	const swarmChoice = bestRobot.brier <= normal[0].brier ? 'robots' : 'normal';
 	console.log(
 		'swarm robots best',
 		JSON.stringify(bestRobot),
 		'normal best',
-		JSON.stringify(normal[0]),
-		'->',
-		swarmChoice
+		JSON.stringify(normal[0])
 	);
 
 	const tipModels = [1, 2, 3, 5, 8, 16, Infinity].map((size) => {
@@ -216,14 +245,14 @@ async function main(): Promise<void> {
 	const scoreSigma = Math.sqrt(sq / count);
 	console.log('tie scale', tie.toFixed(4), 'score sigma', scoreSigma.toFixed(4));
 
-	const robotKey = bestRobot.key;
-	const swarmSamples =
-		swarmChoice === 'robots'
-			? sides.map((s) => ({ p: s.row.swarm[robotKey][s.own], y: swarmHit(s.detail) }))
-			: sides.map((s) => ({
-					p: swarmFromMean(s.f.components.leave + s.f.components.park, normal[0].sd),
-					y: swarmHit(s.detail)
-				}));
+	const robotKey = `${SWARM_MODEL.prior}/${SWARM_MODEL.carry}`;
+	const swarmSamples: SwarmSample[] = sides.map((s) => ({
+		robots: s.row.swarm[robotKey][s.own],
+		points: s.f.components.leave + s.f.components.park,
+		y: swarmHit(s.detail)
+	}));
+	const robotsOnly = swarmSamples.map(({ robots, y }) => ({ p: robots, y }));
+	const swarmSd = normal[0].sd;
 	const p1Samples = sides.map((s) => ({
 		p: tipChances(s.f.components.tips, RP_RULES, { size: tip.size }).pollinator1,
 		y: (s.detail.tips ?? 0) >= RP_RULES.pollinator1 ? 1 : 0
@@ -245,8 +274,24 @@ async function main(): Promise<void> {
 			calibrated: scores(calibrated(later, fit)).brier
 		};
 	};
+	const swarmHoldout = (() => {
+		const fit = fitSwarm(
+			swarmSamples.filter((_, i) => early[i]),
+			swarmSd
+		);
+		const platt = fitPlatt(robotsOnly.filter((_, i) => early[i]));
+		const later = swarmSamples.filter((_, i) => !early[i]);
+		const laterRobots = robotsOnly.filter((_, i) => !early[i]);
+		return {
+			fitOn: `events before ${split}`,
+			n: later.length,
+			raw: scores(laterRobots).brier,
+			robotsOnly: scores(calibrated(laterRobots, platt)).brier,
+			calibrated: scores(stacked(later, fit)).brier
+		};
+	})();
 	const fits = {
-		swarm: fitPlatt(swarmSamples),
+		swarm: fitSwarm(swarmSamples, swarmSd),
 		pollinator1: fitPlatt(p1Samples),
 		pollinator2: fitPlatt(p2Samples)
 	};
@@ -262,13 +307,14 @@ async function main(): Promise<void> {
 		season: 2026,
 		alliances: sides.length,
 		swarm: {
-			model: swarmChoice,
-			params: swarmChoice === 'robots' ? settings[robotKey] : { sd: normal[0].sd },
-			alternative:
-				swarmChoice === 'robots'
-					? { model: 'normal', sd: normal[0].sd, brier: normal[0].brier }
-					: { model: 'robots', ...settings[robotKey], brier: bestRobot.brier },
-			...pack(swarmSamples, RP_CALIBRATION.swarm)
+			model: 'robots and points',
+			params: settings[robotKey],
+			alternative: { model: 'normal', sd: normal[0].sd, brier: normal[0].brier },
+			raw: scores(robotsOnly),
+			...scores(stacked(swarmSamples, RP_CALIBRATION.swarm)),
+			stack: RP_CALIBRATION.swarm,
+			holdout: swarmHoldout,
+			calibration: bins(stacked(swarmSamples, RP_CALIBRATION.swarm))
 		},
 		tips: {
 			model: Number.isFinite(tip.size) ? 'negative binomial' : 'poisson',

@@ -18,10 +18,10 @@ import type { EpaParams, Model, OprParams } from './models.ts';
 import { prepSeason, type PEvent } from './prep.ts';
 import { productionRecords } from './production.ts';
 
-const TRAIN = [2021, 2022, 2023];
+const TRAIN = [2021, 2022, 2023, 2024, 2025];
 const VALID = [2024, 2025];
 const TEST = [2026];
-const ALL = [...TRAIN, ...VALID, ...TEST];
+const ALL = [...new Set([...TRAIN, ...VALID, ...TEST])].sort((a, b) => a - b);
 const GAMES: Record<number, string> = {
 	2021: 'Freight Frenzy',
 	2022: 'POWERPLAY',
@@ -195,7 +195,7 @@ async function main(): Promise<void> {
 	}
 	await writeFile(PARAMS_PATH, `${JSON.stringify(stored, null, '\t')}\n`);
 
-	const seasons = [...train, ...(await loadSeasons([...VALID, ...TEST]))];
+	const seasons = [...train, ...(await loadSeasons(ALL.filter((s) => !TRAIN.includes(s))))];
 	const models: Model[] = CANDIDATES.map((c) => build(c, stored.candidates[c.id]));
 	const b = stored.blend!;
 	const oprC = CANDIDATES.find((c) => c.id === b.opr)!;
@@ -282,7 +282,7 @@ async function main(): Promise<void> {
 		const breakdown = Object.fromEntries(
 			Object.entries(groups).map(([name, g]) => [name, perModel((r) => inSeason(r) && g(r))])
 		);
-		const split = TRAIN.includes(season) ? 'train' : VALID.includes(season) ? 'validation' : 'test';
+		const split = VALID.includes(season) ? 'validation' : TRAIN.includes(season) ? 'train' : 'test';
 		return { season, game: GAMES[season], split, n: all.n, models: all.models, breakdown };
 	});
 	for (const row of seasonRows) {

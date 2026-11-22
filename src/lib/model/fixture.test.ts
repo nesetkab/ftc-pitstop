@@ -56,18 +56,18 @@ describe('Gilbert qualifier 2026 (USAZGIQ)', () => {
 		const ev = rateSeason([event]).events.get('USAZGIQ')!;
 		expect(ev.steps).toHaveLength(44);
 		const top = [...ev.ratings].sort((a, b) => b.opr - a.opr).slice(0, 3);
-		expect(top.map((r) => r.team)).toEqual([18420, 25620, 18421]);
-		expect(top[0].opr).toBeCloseTo(64.77, 2);
-		expect(top[0].strength).toBeCloseTo(62.22, 2);
-		expect(top[0].components.tips).toBeCloseTo(2.582, 3);
+		expect(top.map((r) => r.team)).toEqual([18420, 25620, 26670]);
+		expect(top[0].opr).toBeCloseTo(74.18, 2);
+		expect(top[0].strength).toBeCloseTo(64.02, 2);
+		expect(top[0].components.tips).toBeCloseTo(2.987, 3);
 		const result = rateSeason([event]);
 		expect(result.swarm.chance([18420, 25620])).toBeCloseTo(0.8058, 4);
 		expect(result.swarm.chance([10246, 10984])).toBeCloseTo(0.3762, 4);
 		const step = ev.steps.find((s) => s.key === 'p10')!;
 		expect(step.swarm.red).toBeCloseTo(0.7729, 4);
 		const final = predictMatch(step.forecast, { swarm: step.swarm });
-		expect(final.redWin).toBeCloseTo(0.6588, 4);
-		expect(final.red.score).toBeCloseTo(105.16, 2);
+		expect(final.redWin).toBeCloseTo(0.6777, 4);
+		expect(final.red.score).toBeCloseTo(118.09, 2);
 	});
 
 	it('estimates the first match after lunch at its scheduled time', () => {

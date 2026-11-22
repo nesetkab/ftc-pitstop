@@ -1,5 +1,6 @@
 import type { HistEvent, HistMatch, HistSeason, HistTeam } from './hist.ts';
 import { OFFICIAL_TYPES } from './hist.ts';
+import { plausibleScore } from '../../src/lib/model/types.ts';
 
 export type PMatch = {
 	key: string;
@@ -52,8 +53,19 @@ function parseTime(value: string | null): number | null {
 	return Number.isFinite(t) ? t : null;
 }
 
+function plausible(s: Record<string, number>): boolean {
+	const detailed = s.tips !== undefined;
+	return plausibleScore(
+		s.totalPoints ?? s.totalPointsNp,
+		s.totalPointsNp,
+		detailed ? s.autoPoints : undefined,
+		detailed ? s.dcPoints : undefined
+	);
+}
+
 function prepMatch(event: HistEvent, m: HistMatch): PMatch | null {
 	if (!m.played || !m.rs || !m.bs) return null;
+	if (!plausible(m.rs) || !plausible(m.bs)) return null;
 	const red = playing(m.red);
 	const blue = playing(m.blue);
 	if (!red.length || !blue.length) return null;

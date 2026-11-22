@@ -3,9 +3,11 @@ import {
 	calibratedSwarm,
 	calibratedTips,
 	expectedRp,
+	logit,
 	recalibrate,
 	robotCategory,
 	ROBOT_POINTS,
+	RP_CALIBRATION,
 	RP_RULES,
 	SwarmBook,
 	swarmFromMean,
@@ -80,11 +82,20 @@ describe('recalibration', () => {
 	it('is the identity for a neutral map and keeps pollinator 2 below 1', () => {
 		expect(recalibrate(0.3, { a: 0, b: 1 })).toBeCloseTo(0.3, 12);
 		expect(recalibrate(0.5, { a: 1, b: 1 })).toBeCloseTo(1 / (1 + Math.exp(-1)), 12);
+		const neutral = { a: 0, robots: 1, points: 0, sd: 8 };
+		expect(calibratedSwarm(0.3, 40, { ...RP_CALIBRATION, swarm: neutral })).toBeCloseTo(0.3, 12);
+		const stacked = { a: 0.5, robots: 0.8, points: 0.4, sd: 8 };
+		const z = 0.5 + 0.8 * logit(0.3) + 0.4 * logit(swarmFromMean(12, 8));
+		expect(calibratedSwarm(0.3, 12, { ...RP_CALIBRATION, swarm: stacked })).toBeCloseTo(
+			1 / (1 + Math.exp(-z)),
+			12
+		);
 		for (const mean of [0, 0.5, 2, 5, 9]) {
 			const t = calibratedTips(mean);
 			expect(t.pollinator2).toBeLessThanOrEqual(t.pollinator1);
 		}
-		expect(calibratedSwarm(0.9)).toBeGreaterThan(calibratedSwarm(0.2));
+		expect(calibratedSwarm(0.9, 12)).toBeGreaterThan(calibratedSwarm(0.2, 12));
+		expect(calibratedSwarm(0.5, 20)).toBeGreaterThan(calibratedSwarm(0.5, 10));
 	});
 });
 

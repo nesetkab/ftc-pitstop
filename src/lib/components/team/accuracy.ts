@@ -95,7 +95,7 @@ export function seasonRange(years: number[]): string {
 
 export function splitNote(split: string): string {
 	if (split === 'train') return 'Used to set parameters';
-	if (split === 'validation') return 'Used to choose the model';
+	if (split === 'validation') return 'Used to set parameters and choose the model';
 	if (split === 'test') return 'Not used for tuning';
 	return '';
 }

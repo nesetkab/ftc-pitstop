@@ -22,10 +22,10 @@ export type WinParams = {
 
 export const WIN_PARAMS: WinParams = {
 	link: 'logit',
-	kappa: 0.42442,
+	kappa: 0.40445,
 	eta: 0.2,
 	gamma: 0.375,
-	tie: 0.0252
+	tie: 0.0243
 };
 
 export type AlliancePrediction = {
@@ -94,7 +94,9 @@ export function predictMatch(forecast: Forecast, options: PredictOptions = {}): 
 		const chances: RpChances = {
 			win: own === 'red' ? odds.red : odds.blue,
 			tie: odds.tie,
-			swarm: options.swarm ? calibratedSwarm(options.swarm[own]) : 0,
+			swarm: options.swarm
+				? calibratedSwarm(options.swarm[own], f.components.leave + f.components.park)
+				: 0,
 			pollinator1: t.pollinator1,
 			pollinator2: t.pollinator2
 		};

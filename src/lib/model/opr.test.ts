@@ -17,7 +17,9 @@ const FLAT: OprParams = {
 	carry: 1,
 	drift: 0,
 	q: 0,
-	qWeek: 0
+	qWeek: 0,
+	scoreCommon: 0,
+	scoreQ: 0
 };
 
 let n = 0;
@@ -71,7 +73,13 @@ describe('rateSeason', () => {
 	});
 
 	it('shrinks toward the prior with a strong prior', () => {
-		const strong: OprParams = { ...OPR_PARAMS, lamNew: 1e6, rhoNewScore: 1 };
+		const strong: OprParams = {
+			...OPR_PARAMS,
+			lamNew: 1e6,
+			rhoNewScore: 1,
+			scoreCommon: 0,
+			scoreQ: 0
+		};
 		const result = rateSeason(
 			[event('A', '2026-10-01', [match([1, 2], [3, 4], 10, 90), match([1, 3], [2, 4], 50, 50)])],
 			{
@@ -184,6 +192,47 @@ describe('rateSeason', () => {
 			expect(r.components.auto + r.components.teleop).toBeCloseTo(r.opr, 6);
 			expect(r.components.tips).toBeGreaterThan(0);
 		}
+	});
+
+	it('spreads an event-wide scoring shift to points but not to win strength', () => {
+		const params: OprParams = { ...OPR_PARAMS, scoreCommon: 0.2, scoreQ: 0 };
+		const games = [
+			match([1, 2], [3, 4], 120, 120),
+			match([1, 3], [2, 4], 120, 120),
+			match([5, 6], [1, 2], null, null)
+		];
+		const shifted = rateSeason([event('A', '2026-10-01', games)], { params }).events.get('A')!;
+		const flat = rateSeason([event('A', '2026-10-01', games)], {
+			params: { ...params, scoreCommon: 0 }
+		}).events.get('A')!;
+		expect(shifted.rater.value(5)).toBeGreaterThan(flat.rater.value(5));
+		expect(shifted.rater.value(5, 'strength')).toBeCloseTo(flat.rater.value(5, 'strength'), 10);
+		expect(shifted.rater.value(1, 'strength')).toBeCloseTo(flat.rater.value(1, 'strength'), 10);
+	});
+
+	it('weights recent matches more for points when scores drift', () => {
+		const games = [
+			match([1, 2], [3, 4], 20, 50),
+			match([1, 3], [2, 4], 20, 50),
+			match([1, 4], [2, 3], 80, 50),
+			match([1, 2], [3, 4], 80, 50)
+		];
+		const rate = (scoreQ: number) =>
+			rateSeason([event('A', '2026-10-01', games)], {
+				params: { ...OPR_PARAMS, scoreCommon: 0, scoreQ }
+			}).events.get('A')!.rater;
+		expect(rate(0.2).value(1)).toBeGreaterThan(rate(0).value(1));
+		expect(rate(0.2).value(1, 'strength')).toBeCloseTo(rate(0).value(1, 'strength'), 10);
+	});
+
+	it('ignores impossible scores', () => {
+		const clean = [match([1, 2], [3, 4], 30, 70), match([1, 3], [2, 4], 40, 60)];
+		const junk = match([1, 2], [3, 4], 7308, 8355);
+		const base = rateSeason([event('A', '2026-10-01', clean)]);
+		const dirty = rateSeason([event('A', '2026-10-01', [...clean, junk])]);
+		expect(dirty.events.get('A')!.steps).toHaveLength(2);
+		expect(dirty.stats.sd).toBeCloseTo(base.stats.sd, 10);
+		expect(dirty.latest.get(1)!.opr).toBeCloseTo(base.latest.get(1)!.opr, 10);
 	});
 
 	it('handles a season with no matches', () => {

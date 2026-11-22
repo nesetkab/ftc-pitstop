@@ -56,8 +56,8 @@ describe('accuracy page', () => {
 			.map((header) => header.textContent?.replace(/\s+/g, ' ').trim());
 		expect(groups).toEqual([
 			'2026, BIOBUZZ 6,463 matches. Not used for tuning',
-			'2025, DECODE 45,230 matches. Used to choose the model',
-			'2024, INTO THE DEEP 39,799 matches. Used to choose the model'
+			'2025, DECODE 45,230 matches. Used to set parameters and choose the model',
+			'2024, INTO THE DEEP 39,799 matches. Used to set parameters and choose the model'
 		]);
 		const modelRows = within(table)
 			.getAllByRole('row')
