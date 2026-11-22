@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { oprTerm } from '#lib/format/glossary.ts';
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed, integer, MISSING } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -69,10 +71,14 @@
 					>
 						{#if filters}
 							<a href={sortHref(column.key)} data-sveltekit-reset="false">
-								{column.label}{#if active}<span aria-hidden="true"> ↓</span>{/if}
+								<Term label={column.label} term={oprTerm(column.label)} />{#if active}<span
+										aria-hidden="true"
+									>
+										↓</span
+									>{/if}
 							</a>
 						{:else}
-							{column.label}
+							<Term label={column.label} term={oprTerm(column.label)} />
 						{/if}
 					</th>
 				{/each}

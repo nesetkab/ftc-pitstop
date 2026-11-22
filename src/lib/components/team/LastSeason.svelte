@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed, integer } from '#lib/format/index.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import type { PreviousSeason } from './team-view.ts';
@@ -14,8 +15,8 @@
 	<thead>
 		<tr>
 			<th class="l" scope="col"><span class="visually-hidden">Measure</span></th>
-			<th scope="col">OPR</th>
-			<th scope="col">World rank</th>
+			<th scope="col"><Term label="OPR" /></th>
+			<th scope="col"><Term label="World rank" /></th>
 		</tr>
 	</thead>
 	<tbody>

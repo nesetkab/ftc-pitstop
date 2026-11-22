@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import type { TeamRating } from '#lib/analysis/types.ts';
 	import { fixed, integer } from '#lib/format/number.ts';
 	import type { Ranking, Team } from '#lib/types.ts';
@@ -47,11 +48,11 @@
 				<th scope="col">Rank</th>
 			{/if}
 			{#if opr}
-				<th scope="col">OPR here</th>
+				<th scope="col"><Term label="OPR here" /></th>
 			{/if}
 			{#if season}
-				<th scope="col">Season OPR</th>
-				<th class="opt" scope="col">World rank</th>
+				<th scope="col"><Term label="Season OPR" /></th>
+				<th class="opt" scope="col"><Term label="World rank" /></th>
 			{/if}
 		</tr>
 	</thead>

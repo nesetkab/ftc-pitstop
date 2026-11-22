@@ -3,6 +3,8 @@ export type SearchResult = {
 	type: 'team' | 'event';
 	label: string;
 	sublabel?: string | null;
+	meta?: string | null;
+	live?: boolean;
 	href: string;
 };
 

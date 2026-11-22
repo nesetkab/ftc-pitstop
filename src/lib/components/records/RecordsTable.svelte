@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { follows, syncFollows } from '#lib/components/team/follow.svelte.ts';
 	import { integer, shortDate } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -61,10 +62,10 @@
 					>
 						{#if sortable}
 							<a href={sortHref(part.key)} data-sveltekit-reset="false">
-								{part.label}{#if active}<span aria-hidden="true"> ↓</span>{/if}
+								<Term label={part.label} />{#if active}<span aria-hidden="true"> ↓</span>{/if}
 							</a>
 						{:else}
-							{part.label}
+							<Term label={part.label} />
 						{/if}
 					</th>
 				{/each}

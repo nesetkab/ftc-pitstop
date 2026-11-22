@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed, MISSING, ordinal } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -18,7 +19,7 @@
 		<thead>
 			<tr>
 				<th class="l" scope="col"><span class="visually-hidden">Measure</span></th>
-				<th scope="col">OPR</th>
+				<th scope="col"><Term label="OPR" /></th>
 				<th scope="col">Percentile</th>
 			</tr>
 		</thead>

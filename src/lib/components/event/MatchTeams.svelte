@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { oprTerm } from '#lib/format/glossary.ts';
+	import Term from '#lib/ui/Term.svelte';
 	import type { TeamRating } from '#lib/analysis/types.ts';
 	import { fixed } from '#lib/format/number.ts';
 	import { record } from '#lib/format/record.ts';
@@ -35,17 +37,21 @@
 			<th class="l" scope="col">Team</th>
 			<th class="l" scope="col">Alliance</th>
 			{#if rated}
-				<th scope="col">OPR</th>
-				<th scope="col">{PART_LABELS.auto}</th>
-				<th class="opt" scope="col">{PART_LABELS.hive}</th>
-				<th class="opt" scope="col">{PART_LABELS.park}</th>
-				<th class="opt" scope="col">Avg tips</th>
+				<th scope="col"><Term label="OPR" /></th>
+				<th scope="col"><Term label={PART_LABELS.auto} term={oprTerm(PART_LABELS.auto)} /></th>
+				<th class="opt" scope="col"
+					><Term label={PART_LABELS.hive} term={oprTerm(PART_LABELS.hive)} /></th
+				>
+				<th class="opt" scope="col"
+					><Term label={PART_LABELS.park} term={oprTerm(PART_LABELS.park)} /></th
+				>
+				<th class="opt" scope="col"><Term label="Avg tips" /></th>
 				<th class="opt" scope="col">Matches</th>
 			{:else}
 				<th scope="col">Rank</th>
-				<th scope="col">RS</th>
-				<th scope="col">Record</th>
-				<th class="opt" scope="col">Avg tips</th>
+				<th scope="col"><Term label="RS" /></th>
+				<th scope="col"><Term label="Record" /></th>
+				<th class="opt" scope="col"><Term label="Avg tips" /></th>
 				<th class="opt" scope="col">Matches</th>
 			{/if}
 		</tr>

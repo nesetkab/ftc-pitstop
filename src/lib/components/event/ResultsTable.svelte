@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { breakdownParts, PART_LABELS } from '#lib/game/biobuzz.ts';
 	import type { AllianceColor, AllianceScore, Match } from '#lib/types.ts';
 	import Table from '#lib/ui/Table.svelte';
@@ -47,12 +48,12 @@
 				</button>
 			</th>
 			<th class="l" scope="col">Teams</th>
-			<th scope="col">{PART_LABELS.auto}</th>
-			<th class="opt" scope="col">{PART_LABELS.hive}</th>
-			<th class="opt" scope="col">{PART_LABELS.flower}</th>
-			<th class="opt" scope="col">{PART_LABELS.garden}</th>
-			<th class="opt" scope="col">{PART_LABELS.park}</th>
-			<th class="opt" scope="col">{PART_LABELS.fouls}</th>
+			<th scope="col"><Term label={PART_LABELS.auto} /></th>
+			<th class="opt" scope="col"><Term label={PART_LABELS.hive} /></th>
+			<th class="opt" scope="col"><Term label={PART_LABELS.flower} /></th>
+			<th class="opt" scope="col"><Term label={PART_LABELS.garden} /></th>
+			<th class="opt" scope="col"><Term label={PART_LABELS.park} /></th>
+			<th class="opt" scope="col"><Term label={PART_LABELS.fouls} /></th>
 			<th scope="col">{PART_LABELS.total}</th>
 		</tr>
 	</thead>

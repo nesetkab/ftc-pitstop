@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Term from '#lib/ui/Term.svelte';
 	import { fixed } from '#lib/format/number.ts';
 	import { record } from '#lib/format/record.ts';
 	import type { RankRow } from './view.ts';
@@ -17,11 +18,11 @@
 	<caption class="visually-hidden">{caption}</caption>
 	<thead>
 		<tr>
-			<th class="l" scope="col">#</th>
+			<th class="l" scope="col"><Term label="#" /></th>
 			<th class="l" scope="col">Team</th>
 			<th class="l" scope="col"><span class="visually-hidden">Name</span></th>
-			<th scope="col">RS</th>
-			<th scope="col">Record</th>
+			<th scope="col"><Term label="RS" /></th>
+			<th scope="col"><Term label="Record" /></th>
 		</tr>
 	</thead>
 	<tbody>
