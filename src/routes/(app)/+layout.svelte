@@ -1,12 +1,43 @@
 <script lang="ts">
+	import type { Component } from 'svelte';
 	import AppBar from '#lib/ui/AppBar.svelte';
-	import SearchDialog from '#lib/ui/SearchDialog.svelte';
 	import ThemeSwitch from '#lib/ui/ThemeSwitch.svelte';
-	import { searchDialog } from '#lib/ui/search.svelte.ts';
+	import { searchDialog, searchShortcut } from '#lib/ui/search.svelte.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+
+	let SearchDialog = $state<Component<{ open?: boolean }>>();
+	let loading: Promise<void> | undefined;
+
+	function loadSearch() {
+		loading ??= import('#lib/ui/SearchDialog.svelte').then((module) => {
+			SearchDialog = module.default;
+		});
+		return loading;
+	}
+
+	function onkeydown(event: KeyboardEvent) {
+		if (SearchDialog || !searchShortcut(event)) return;
+		event.preventDefault();
+		searchDialog.open = true;
+	}
+
+	$effect(() => {
+		if (searchDialog.open) loadSearch();
+	});
+
+	$effect(() => {
+		if ('requestIdleCallback' in window) {
+			const handle = requestIdleCallback(loadSearch, { timeout: 4000 });
+			return () => cancelIdleCallback(handle);
+		}
+		const timer = setTimeout(loadSearch, 2000);
+		return () => clearTimeout(timer);
+	});
 </script>
+
+<svelte:window {onkeydown} />
 
 <div class="shell">
 	<a class="skip" href="#main">Skip to content</a>
@@ -28,7 +59,9 @@
 	</footer>
 </div>
 
-<SearchDialog bind:open={searchDialog.open} />
+{#if SearchDialog}
+	<SearchDialog bind:open={searchDialog.open} />
+{/if}
 
 <style>
 	.shell {

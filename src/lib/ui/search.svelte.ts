@@ -1,4 +1,3 @@
-import { toSearchResults } from './search-results.ts';
 export type SearchResult = {
 	type: 'team' | 'event';
 	label: string;
@@ -12,8 +11,31 @@ export type SearchFn = (query: string, signal: AbortSignal) => Promise<SearchRes
 
 export const searchDialog = $state({ open: false });
 
-export async function searchApi(query: string, signal?: AbortSignal): Promise<SearchResult[]> {
-	const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal });
-	if (!response.ok) return [];
-	return toSearchResults(await response.json());
+export const TEXT_ENTRY =
+	'textarea, select, [contenteditable]:not([contenteditable="false"]), input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not([type="color"])';
+
+export function isTextEntry(target: EventTarget | null): boolean {
+	return target instanceof Element && target.closest(TEXT_ENTRY) !== null;
+}
+
+export function searchShortcut(event: KeyboardEvent): 'command' | 'slash' | null {
+	if (event.defaultPrevented || event.isComposing) return null;
+	if (
+		(event.metaKey || event.ctrlKey) &&
+		!event.altKey &&
+		!event.shiftKey &&
+		event.key.toLowerCase() === 'k'
+	) {
+		return 'command';
+	}
+	if (
+		event.key === '/' &&
+		!event.metaKey &&
+		!event.ctrlKey &&
+		!event.altKey &&
+		!isTextEntry(event.target)
+	) {
+		return 'slash';
+	}
+	return null;
 }

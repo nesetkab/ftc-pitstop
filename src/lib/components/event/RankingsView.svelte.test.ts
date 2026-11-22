@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { parseRankingChoice } from './ranking-columns.ts';
 import RankingsView from './RankingsView.svelte';
@@ -197,7 +197,7 @@ describe('RankingsView', () => {
 		const trigger = screen.getByRole('button', { name: /Columns/ });
 		expect(trigger).toHaveAttribute('aria-expanded', 'false');
 		await fireEvent.click(trigger);
-		expect(trigger).toHaveAttribute('aria-expanded', 'true');
+		await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
 		const panel = screen.getByRole('group', { name: 'Choose columns' });
 		expect(within(panel).getByRole('checkbox', { name: 'Ranking score (RS)' })).toBeChecked();
 		await fireEvent.click(within(panel).getByRole('checkbox', { name: 'Hive' }));
@@ -212,7 +212,7 @@ describe('RankingsView', () => {
 	it('greys out OPR columns before the model has run', async () => {
 		render(RankingsView, { props: { bundle: finished, onchoose: () => {} } });
 		await fireEvent.click(screen.getByRole('button', { name: /Columns/ }));
-		expect(screen.getByRole('checkbox', { name: 'Auto' })).toBeDisabled();
+		expect(await screen.findByRole('checkbox', { name: 'Auto' })).toBeDisabled();
 		expect(screen.getByRole('checkbox', { name: 'Average' })).toBeEnabled();
 	});
 });
