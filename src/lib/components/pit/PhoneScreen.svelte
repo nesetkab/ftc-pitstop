@@ -143,7 +143,7 @@
 						<AllianceChip alliance={next.alliance} />
 					</div>
 					<span class={['big', { urgent: text.urgent }]}>{text.headline}</span>
-					<span class="muted">{phoneDetail(next, timeZone, view.delaySeconds)}</span>
+					<span class="muted">{phoneDetail(next, timeZone, view.delaySeconds, now)}</span>
 					{#if next.level === 'playoff' && view.playoff?.position}
 						<span class="muted">{view.playoff.position}</span>
 					{/if}

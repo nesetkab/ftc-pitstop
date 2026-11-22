@@ -19,6 +19,8 @@ export type StartEstimate = {
 };
 
 const MINUTE = 60_000;
+const IDLE = 30 * MINUTE;
+const OVERNIGHT = 8 * 60 * MINUTE;
 
 export const SCHEDULE_DEFAULTS = {
 	window: 6,
@@ -71,6 +73,16 @@ export function observedCycle(matches: TimedMatch[], options: ScheduleOptions = 
 	return median(gaps);
 }
 
+function resumeAt(matches: TimedMatch[], lastPlayed: number, now: number): number | null {
+	const last = lastPlayed >= 0 ? matches[lastPlayed].actual : null;
+	if (last === null || now - last < IDLE) return null;
+	const later = matches
+		.slice(lastPlayed + 1)
+		.map((m) => m.scheduled)
+		.filter((time): time is number => time !== null && time - last >= OVERNIGHT);
+	return later.length > 0 ? Math.min(...later) : null;
+}
+
 export function estimateStarts(
 	matches: TimedMatch[],
 	options: ScheduleOptions = {}
@@ -103,7 +115,9 @@ export function estimateStarts(
 			const step = isBreak ? cycle : trust * cycle + (1 - trust) * Math.max(plannedGap, 0);
 			start = Math.max(prev + step, isBreak ? m.scheduled : m.scheduled - maxEarly);
 		}
-		if (i === lastPlayed + 1 && options.now !== undefined) start = Math.max(start, options.now);
+		if (i === lastPlayed + 1 && options.now !== undefined) {
+			start = Math.max(start, options.now, resumeAt(matches, lastPlayed, options.now) ?? 0);
+		}
 		starts.push(start);
 	}
 	const lead = queueMatches * Math.max(cycle, sched);

@@ -59,6 +59,16 @@ describe('estimateStarts', () => {
 		expect(overnight[4].queue).toBe(1064 * MIN);
 	});
 
+	it('moves matches left over at night to the next morning', () => {
+		const times = [0, 7, 14, 21, 28, 840, 847];
+		const night = estimateStarts(plan(times, [30, 37]), { now: 300 * MIN });
+		expect(minutes(night).slice(2)).toEqual([840, 847, 854, 861, 868]);
+		const evening = estimateStarts(plan(times, [30, 37]), { now: 50 * MIN });
+		expect(minutes(evening)[2]).toBe(50);
+		const morning = estimateStarts(plan(times, [30, 37]), { now: 860 * MIN });
+		expect(minutes(morning)[2]).toBe(860);
+	});
+
 	it('never starts before now', () => {
 		const est = estimateStarts(plan([0, 7, 14, 21], [0, 7]), { now: 20 * MIN });
 		expect(minutes(est).slice(2)).toEqual([20, 27]);

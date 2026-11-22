@@ -78,7 +78,7 @@ export function heroText(
 	const away = awayText(next.matchesAway);
 	const field =
 		next.expectedStart !== null
-			? `On the field around ${time(next.expectedStart, timeZone)}, ${away}.`
+			? `On the field around ${dayTime(next.expectedStart, now, timeZone)}, ${away}.`
 			: `${capitalize(away)}.`;
 	const delay = delayText(delaySeconds);
 	const status = next.nexus.tracked ? next.nexus.status : null;
@@ -89,7 +89,7 @@ export function heroText(
 	}
 	if (next.queueAt !== null) {
 		return {
-			headline: `Queue at ${time(next.queueAt, timeZone)}`,
+			headline: `Queue at ${dayTime(next.queueAt, now, timeZone)}`,
 			detail: present([`${capitalize(relative(next.queueAt, now))}.`, field, delay]),
 			urgent: false
 		};
@@ -110,12 +110,13 @@ export function heroText(
 export function phoneDetail(
 	next: NextMatch,
 	timeZone: string,
-	delaySeconds: number | null
+	delaySeconds: number | null,
+	now: number
 ): string {
 	if (next.started !== null) return `Started at ${time(next.started, timeZone)}.`;
 	const field =
 		next.expectedStart !== null
-			? `On the field around ${time(next.expectedStart, timeZone)}.`
+			? `On the field around ${dayTime(next.expectedStart, now, timeZone)}.`
 			: `${capitalize(awayText(next.matchesAway))}.`;
 	return present([field, shortDelay(delaySeconds)]).join(' ');
 }
