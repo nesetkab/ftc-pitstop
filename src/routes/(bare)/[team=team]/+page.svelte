@@ -47,7 +47,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.team}{data.teamName ? ` ${data.teamName}` : ''} | PitStop</title>
+	<title>{data.team}{data.teamName ? ` ${data.teamName}` : ''} - PitStop</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
