@@ -45,6 +45,7 @@ interface Data {
 	source: 'ratings' | 'scout';
 	updated: number;
 	filters: LeaderboardFilters;
+	found: boolean;
 	rows: LeaderboardRow[];
 	total: number;
 	page: number;
@@ -59,7 +60,8 @@ interface Data {
 const base: Data = {
 	source: 'ratings',
 	updated: Date.now() - 60_000,
-	filters: { region: '', country: '', state: '', min: 0, page: 1 },
+	filters: { region: '', country: '', state: '', min: 0, sort: 'opr', q: '', team: 0, page: 1 },
+	found: false,
 	rows: [row(26670, 58.24, { name: 'SCA Iron Eagles' }), row(3747, 40, { name: 'The Hive' })],
 	total: 120,
 	page: 1,
@@ -90,7 +92,7 @@ describe('leaderboard page', () => {
 		show();
 		const headers = within(screen.getByRole('table'))
 			.getAllByRole('columnheader')
-			.map((cell) => cell.textContent);
+			.map((cell) => cell.textContent?.replace('↓', '').trim());
 		expect(headers).toEqual([
 			'Rank',
 			'Team',
@@ -133,7 +135,16 @@ describe('leaderboard page', () => {
 		show({
 			start: 50,
 			page: 2,
-			filters: { region: 'USAZ', country: '', state: '', min: 10, page: 2 }
+			filters: {
+				region: 'USAZ',
+				country: '',
+				state: '',
+				min: 10,
+				sort: 'opr',
+				q: '',
+				team: 0,
+				page: 2
+			}
 		});
 		expect(screen.getByRole('link', { name: 'Previous' })).toHaveAttribute(
 			'href',
@@ -157,6 +168,40 @@ describe('leaderboard page', () => {
 	it('hides the pager when everything fits on one page', () => {
 		show({ pages: 1, total: 2 });
 		expect(screen.queryByRole('navigation', { name: 'Pages' })).not.toBeInTheDocument();
+	});
+
+	it('links each sortable column and marks the active one', () => {
+		const filters = { ...base.filters, region: 'USAZ', sort: 'auto' as const, page: 2 };
+		show({ filters });
+		const auto = screen.getByRole('columnheader', { name: /Auto/ });
+		expect(auto).toHaveAttribute('aria-sort', 'descending');
+		expect(within(auto).getByRole('link')).toHaveAttribute(
+			'href',
+			'/leaderboards?region=USAZ&sort=auto'
+		);
+		expect(
+			within(screen.getByRole('columnheader', { name: /OPR/ })).getByRole('link')
+		).toHaveAttribute('href', '/leaderboards?region=USAZ');
+		expect(screen.getByText(/Sorted by auto OPR/)).toBeInTheDocument();
+	});
+
+	it('marks the team that was asked for and keeps it out of the pager and CSV links', () => {
+		show({ filters: { ...base.filters, team: 3747 }, found: true });
+		const target = bodyRows().find((item) => item.getAttribute('aria-current') === 'true');
+		expect(target).toHaveTextContent('3747');
+		expect(screen.getByRole('link', { name: 'Next' })).toHaveAttribute(
+			'href',
+			'/leaderboards?page=2'
+		);
+		expect(screen.getByRole('link', { name: 'Download CSV' })).toHaveAttribute(
+			'href',
+			'/leaderboards.csv'
+		);
+	});
+
+	it('says when the team asked for is not in the list', () => {
+		show({ filters: { ...base.filters, team: 9999 } });
+		expect(screen.getByText('Team 9999 is not in this list.')).toBeInTheDocument();
 	});
 
 	it('highlights followed teams', async () => {
@@ -198,14 +243,34 @@ describe('leaderboard filters', () => {
 	});
 
 	it('combines the other filters that are set', async () => {
-		show({ filters: { region: 'USAZ', country: '', state: '', min: 0, page: 1 } });
+		show({
+			filters: {
+				region: 'USAZ',
+				country: '',
+				state: '',
+				min: 0,
+				sort: 'opr',
+				q: '',
+				team: 0,
+				page: 1
+			}
+		});
 		await fireEvent.change(screen.getByLabelText('Minimum matches'), { target: { value: '10' } });
 		expect(navigation.goto).toHaveBeenCalledWith('?region=USAZ&min=10', { reset: false });
 	});
 
 	it('clears the state when the country changes', async () => {
 		show({
-			filters: { region: '', country: 'USA', state: 'AZ', min: 0, page: 1 },
+			filters: {
+				region: '',
+				country: 'USA',
+				state: 'AZ',
+				min: 0,
+				sort: 'opr',
+				q: '',
+				team: 0,
+				page: 1
+			},
 			states: [{ value: 'AZ', label: 'Arizona' }]
 		});
 		await fireEvent.change(screen.getByLabelText('Country'), { target: { value: 'Canada' } });
@@ -217,7 +282,16 @@ describe('leaderboard filters', () => {
 		expect(screen.getByLabelText('State or province')).toBeDisabled();
 		cleanup();
 		show({
-			filters: { region: '', country: 'USA', state: '', min: 0, page: 1 },
+			filters: {
+				region: '',
+				country: 'USA',
+				state: '',
+				min: 0,
+				sort: 'opr',
+				q: '',
+				team: 0,
+				page: 1
+			},
 			states: [{ value: 'AZ', label: 'Arizona' }]
 		});
 		const state = screen.getByLabelText('State or province');
@@ -226,7 +300,18 @@ describe('leaderboard filters', () => {
 	});
 
 	it('reflects the current filters and offers a way to clear them', () => {
-		show({ filters: { region: 'USAZ', country: '', state: '', min: 7, page: 1 } });
+		show({
+			filters: {
+				region: 'USAZ',
+				country: '',
+				state: '',
+				min: 7,
+				sort: 'opr',
+				q: '',
+				team: 0,
+				page: 1
+			}
+		});
 		expect(screen.getByLabelText('Region')).toHaveValue('USAZ');
 		expect(screen.getByLabelText('Minimum matches')).toHaveValue('7');
 		expect(screen.getByRole('link', { name: 'Clear filters' })).toHaveAttribute(

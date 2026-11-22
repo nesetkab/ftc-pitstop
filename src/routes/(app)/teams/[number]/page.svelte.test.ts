@@ -277,7 +277,7 @@ describe('team page', () => {
 			view({
 				charts: [],
 				comparison: [],
-				stats: { opr: null, rank: null, of: null, record: null, events: 0 }
+				stats: { opr: null, rank: null, of: null, record: null, events: 0, region: null }
 			})
 		);
 		expect(screen.getAllByText('No matches played yet this season.')).toHaveLength(2);

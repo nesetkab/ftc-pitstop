@@ -2,12 +2,16 @@ import { beforeAll, describe, expect, it } from 'vitest';
 import type { EventAnalysis, SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import type { EventBundle, TeamSeason } from '#lib/types.ts';
 import { fixtureLoaders, scoutTeamSeason } from './fixtures.server.ts';
+import { teamEvent, teamSeason } from './fixtures.ts';
 import {
 	awardLabel,
 	buildTeamPage,
+	eventBreakdown,
 	percentileOf,
 	ratedTeams,
-	rankPercentile
+	rankPercentile,
+	regionStanding,
+	seasonTrend
 } from './team-view.ts';
 
 const NOW = Date.parse('2026-11-19T12:00:00Z');
@@ -168,7 +172,14 @@ describe('buildTeamPage without season ratings', () => {
 			bundles: {},
 			now: NOW
 		});
-		expect(view.stats).toEqual({ opr: null, rank: null, of: null, record: null, events: 0 });
+		expect(view.stats).toEqual({
+			opr: null,
+			rank: null,
+			of: null,
+			record: null,
+			events: 0,
+			region: null
+		});
 		expect(view.charts).toEqual([]);
 		expect(view.comparison).toEqual([]);
 		expect(view.previous).toBeNull();
@@ -300,6 +311,85 @@ describe('buildTeamPage with season ratings', () => {
 		expect(view.events[0].playoffs).toBe(
 			'First pick of alliance 5, eliminated in lower bracket round 3'
 		);
+	});
+});
+
+describe('regionStanding', () => {
+	const pool = [
+		rating(1, 90, { region: 'USMI' }),
+		rating(2, 70, { region: 'USAZ' }),
+		rating(3, 60, { region: 'USMI' }),
+		rating(4, 50, { region: 'USMI' })
+	];
+
+	it('ranks the team among teams from its region', () => {
+		expect(regionStanding(pool[2], pool)).toEqual({ code: 'USMI', rank: 2, of: 3 });
+		expect(regionStanding(pool[1], pool)).toEqual({ code: 'USAZ', rank: 1, of: 1 });
+	});
+
+	it('gives nothing when the team has no region', () => {
+		expect(regionStanding(rating(5, 10, { region: null }), pool)).toBeNull();
+	});
+});
+
+describe('eventBreakdown and seasonTrend', () => {
+	const stats = (total: number) => ({
+		rank: 1,
+		rs: 4,
+		tbp: 90,
+		avgTips: 3,
+		wins: 5,
+		losses: 0,
+		ties: 0,
+		dq: 0,
+		played: 5,
+		opr: { total, auto: total / 4, teleop: (total * 3) / 4 }
+	});
+	const played = teamSeason(77, 'Test', [
+		{ ...teamEvent({ code: 'AAA', name: 'First' }), stats: stats(40) },
+		teamEvent({ code: 'SKIP', name: 'Not played' }),
+		{ ...teamEvent({ code: 'BBB', name: 'Second' }), stats: stats(60) }
+	]);
+	const rated: EventAnalysis = {
+		...analysis(77, ['Q1']),
+		code: 'BBB',
+		ratings: [
+			{
+				team: 77,
+				opr: 64,
+				parts: { auto: 16, hive: 30, flower: 4, garden: 6, park: 6, tips: 2 },
+				matches: 5,
+				rank: 1,
+				prior: 50,
+				history: []
+			}
+		]
+	};
+
+	it('uses analysis parts when there are some and event OPR otherwise', () => {
+		const rows = eventBreakdown(played, { BBB: rated }, null);
+		expect(rows.map((row) => row.key)).toEqual(['AAA', 'BBB']);
+		expect(rows[0]).toMatchObject({ opr: 40, auto: 10, teleop: 30, hive: null, tips: null });
+		expect(rows[1]).toMatchObject({ opr: 64, auto: 16, teleop: 48, hive: 30, garden: 6 });
+	});
+
+	it('puts the season row first when the team has a season rating', () => {
+		const rows = eventBreakdown(played, {}, rating(77, 80));
+		expect(rows[0]).toMatchObject({ key: 'season', code: null, opr: 80, auto: 20, teleop: 60 });
+		expect(rows).toHaveLength(3);
+	});
+
+	it('draws a trend only from two or more events and skips the season row', () => {
+		const rows = eventBreakdown(played, { BBB: rated }, rating(77, 80));
+		expect(seasonTrend(rows)).toEqual([
+			{ label: 'First', value: 40 },
+			{ label: 'Second', value: 64 }
+		]);
+		expect(seasonTrend(rows.slice(0, 2))).toEqual([]);
+	});
+
+	it('gives nothing before the team has played', () => {
+		expect(eventBreakdown(teamSeason(77, 'Test', [teamEvent()]), {}, rating(77, 80))).toEqual([]);
 	});
 });
 

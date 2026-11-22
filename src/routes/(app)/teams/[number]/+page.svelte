@@ -5,6 +5,7 @@
 	import LastSeason from '#lib/components/team/LastSeason.svelte';
 	import OprCharts from '#lib/components/team/OprCharts.svelte';
 	import TeamAwards from '#lib/components/team/TeamAwards.svelte';
+	import TeamBreakdown from '#lib/components/team/TeamBreakdown.svelte';
 	import TeamEvents from '#lib/components/team/TeamEvents.svelte';
 	import TeamMatches from '#lib/components/team/TeamMatches.svelte';
 	import TeamStats from '#lib/components/team/TeamStats.svelte';
@@ -56,7 +57,11 @@
 	{/snippet}
 </PageHeader>
 
-<TeamStats stats={view.stats} />
+<TeamStats
+	stats={view.stats}
+	trend={view.trend}
+	team={view.source === 'ratings' ? view.team.number : undefined}
+/>
 
 <div class="grid2">
 	<section class="panel" aria-labelledby="opr-title">
@@ -78,6 +83,13 @@
 		</p>
 	{/if}
 </section>
+
+{#if view.breakdown.length > 0}
+	<section class="panel" aria-labelledby="breakdown-title">
+		<h2 class="sec-title" id="breakdown-title">Scoring by event</h2>
+		<TeamBreakdown rows={view.breakdown} />
+	</section>
+{/if}
 
 {#if view.matches.length > 0}
 	<section class="panel" aria-labelledby="matches-title">

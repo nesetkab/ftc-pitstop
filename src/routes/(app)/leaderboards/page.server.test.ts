@@ -26,6 +26,7 @@ type Result = Awaited<ReturnType<typeof load>> & {
 	states: { value: string; label: string }[];
 	regions: { value: string }[];
 	filters: { region: string; country: string; state: string; min: number; page: number };
+	found: boolean;
 };
 
 function call(query = '') {
@@ -102,6 +103,26 @@ describe('leaderboards load with season ratings', () => {
 		expect(data.filters).toMatchObject({ region: 'USAZ', min: 10 });
 		expect(data.rows.length).toBeGreaterThan(0);
 		expect(data.rows.every((row) => row.region === 'USAZ' && row.matches >= 10)).toBe(true);
+	});
+
+	it('sorts by another column and finds teams by name', async () => {
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 31));
+		const sorted = await call('?sort=matches').result;
+		const matches = sorted.rows.map((row) => row.matches);
+		expect(matches).toEqual([...matches].sort((a, b) => b - a));
+		const found = await call('?q=valley').result;
+		expect(found.rows.map((row) => row.team)).toEqual([1001]);
+	});
+
+	it('opens the page with the team asked for unless a page is given', async () => {
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(200, 32));
+		const data = await call('?team=1150').result;
+		expect(data.page).toBe(3);
+		expect(data.found).toBe(true);
+		expect(data.rows.some((row) => row.team === 1150)).toBe(true);
+		expect((await call('?team=1150&page=1').result).page).toBe(1);
+		const missing = await call('?team=1000').result;
+		expect(missing).toMatchObject({ page: 1, found: false });
 	});
 
 	it('offers the states of the chosen country', async () => {
