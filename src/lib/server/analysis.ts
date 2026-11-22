@@ -1,9 +1,16 @@
 import { createHash } from 'node:crypto';
 import { analyzeEvent, retime } from '#lib/analysis/analyze.ts';
-import { buildSeason, contextFor, teamHistory, type SeasonModel } from '#lib/analysis/season.ts';
+import {
+	buildSeason,
+	contextFor,
+	eventRatings,
+	teamHistory,
+	type SeasonModel
+} from '#lib/analysis/season.ts';
 import type {
 	AnalysisContext,
 	EventAnalysis,
+	SeasonEventRatings,
 	SeasonRatings,
 	TeamRatingHistory
 } from '#lib/analysis/types.ts';
@@ -232,6 +239,24 @@ export function createAnalysis(deps: AnalysisDeps) {
 		}
 	}
 
+	async function loadSeasonEventRatings(): Promise<SeasonEventRatings | null> {
+		try {
+			const value = await cache.get<SeasonEventRatings>(
+				`analysis:${SEASON}:event-ratings:v1`,
+				RATINGS_POLICY,
+				async () => {
+					const model = await loadSeasonModel();
+					if (!model.complete) throw new Incomplete(model);
+					return { status: 'ok', body: eventRatings(model) };
+				}
+			);
+			return value.body;
+		} catch (error) {
+			if (error instanceof Incomplete) return eventRatings(error.model);
+			return null;
+		}
+	}
+
 	async function loadTeamRatingHistory(number: number | string): Promise<TeamRatingHistory | null> {
 		const team = normalizeTeamNumber(number);
 		return teamHistory(await loadSeasonModel(), team);
@@ -256,6 +281,10 @@ export function createAnalysis(deps: AnalysisDeps) {
 		return settleWithin(loadSeasonRatings(), ms);
 	}
 
+	function loadSeasonEventRatingsWithin(ms: number = budget): Promise<SeasonEventRatings | null> {
+		return settleWithin(loadSeasonEventRatings(), ms);
+	}
+
 	function loadTeamRatingHistoryWithin(
 		number: number | string,
 		ms: number = budget
@@ -276,6 +305,8 @@ export function createAnalysis(deps: AnalysisDeps) {
 		loadEventAnalysisEntry,
 		loadSeasonRatings,
 		loadSeasonRatingsWithin,
+		loadSeasonEventRatings,
+		loadSeasonEventRatingsWithin,
 		loadTeamRatingHistory,
 		loadTeamRatingHistoryWithin,
 		priorsForTeams
@@ -292,6 +323,7 @@ export const {
 	loadEventAnalysisEntry,
 	loadSeasonRatings,
 	loadSeasonRatingsWithin,
+	loadSeasonEventRatingsWithin,
 	loadTeamRatingHistory,
 	loadTeamRatingHistoryWithin,
 	priorsForTeams

@@ -59,6 +59,7 @@ function instance(redis: FakeRedis, clock: { now: number }) {
 	});
 	return {
 		loaders,
+		analysis,
 		eventPage: async (code: string) => {
 			await Promise.all([loaders.loadEventBundle(code), analysis.loadEventAnalysisEntry(code)]);
 		}
@@ -111,6 +112,20 @@ describe('redis commands for season matches', () => {
 		await instance(redis, clock).loaders.loadSeasonMatches();
 		const fresh = instance(redis, clock);
 		expect(await commands(redis, () => fresh.loaders.loadSeasonMatches())).toEqual(['mget']);
+	});
+});
+
+describe('redis commands for a filtered leaderboard', () => {
+	it('reads season and event ratings in one batch and nothing once warm', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		const both = (page: ReturnType<typeof instance>) =>
+			Promise.all([page.analysis.loadSeasonRatings(), page.analysis.loadSeasonEventRatings()]);
+		const first = instance(redis, clock);
+		await both(first);
+		expect(await commands(redis, () => both(first))).toEqual([]);
+		const fresh = instance(redis, clock);
+		expect(await commands(redis, () => both(fresh))).toEqual(['mget']);
 	});
 });
 

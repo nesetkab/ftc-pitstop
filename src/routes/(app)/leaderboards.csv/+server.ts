@@ -1,4 +1,4 @@
-import { filterRows, parseFilters } from '#lib/components/team/leaderboard.ts';
+import { filterRows, leaderboardScope, parseFilters } from '#lib/components/team/leaderboard.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { csvResponse, round, toCsv } from '#lib/server/csv.ts';
 import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
@@ -23,7 +23,9 @@ const HEADER = [
 
 export const GET: RequestHandler = async ({ url }) => {
 	const filters = parseFilters(url.searchParams);
-	const source = await loadLeaderboardSource().catch(() => null);
+	const today = new Date().toISOString().slice(0, 10);
+	const scope = leaderboardScope(filters, today);
+	const source = await loadLeaderboardSource(scope, today).catch(() => null);
 	if (!source) {
 		return jsonResponse(
 			{ error: 'Season ratings are still loading. Try again in a minute.' },
@@ -50,8 +52,14 @@ export const GET: RequestHandler = async ({ url }) => {
 			row.events
 		])
 	);
-	const name = ['leaderboard', SEASON, filters.region.toLowerCase(), filters.sort].filter(
-		(part) => part && part !== 'opr'
-	);
+	const window = source.kind === 'ratings' ? scope.window : null;
+	const name = [
+		'leaderboard',
+		SEASON,
+		filters.region.toLowerCase(),
+		source.kind === 'ratings' ? filters.type.toLowerCase() : '',
+		filters.dates || (window ? `${filters.from || 'start'}-to-${filters.to || 'now'}` : ''),
+		filters.sort
+	].filter((part) => part && part !== 'opr');
 	return csvResponse(body, `${name.join('-')}.csv`, CACHE_CONTROL.short);
 };

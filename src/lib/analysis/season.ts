@@ -3,6 +3,8 @@ import defaults from '#lib/analysis/defaults.json';
 import type {
 	AnalysisContext,
 	RatingPoint,
+	SeasonEventRating,
+	SeasonEventRatings,
 	SeasonRating,
 	SeasonRatings,
 	TeamEventRating,
@@ -189,4 +191,23 @@ export function teamHistory(model: SeasonModel, team: number): TeamRatingHistory
 	}
 	if (events.length === 0) return null;
 	return { team, generatedAt: model.generatedAt, events, points: trail };
+}
+
+export function eventRatings(model: SeasonModel): SeasonEventRatings {
+	const types = new Map(model.matches.map((m) => [m.eventCode, m.eventType]));
+	const events: SeasonEventRating[] = model.events.map((event) => {
+		const { rater } = model.run.events.get(event.code)!;
+		const teams = rater.teams
+			.filter((team) => rater.matchesPlayed(team) > 0)
+			.sort((a, b) => a - b)
+			.flatMap((team) => [
+				team,
+				points(rater.value(team)),
+				points(rater.value(team, 'auto')),
+				points(rater.value(team, 'tips')),
+				rater.matchesPlayed(team)
+			]);
+		return { code: event.code, type: types.get(event.code) ?? 'Other', start: event.start, teams };
+	});
+	return { generatedAt: model.generatedAt, events };
 }

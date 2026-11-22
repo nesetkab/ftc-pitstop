@@ -55,12 +55,28 @@ interface Data {
 	regions: FilterOption[];
 	countries: FilterOption[];
 	states: FilterOption[];
+	window: { from: string; to: string } | null;
+	types: FilterOption[];
+	weeks: FilterOption[];
 }
 
 const base: Data = {
 	source: 'ratings',
 	updated: Date.now() - 60_000,
-	filters: { region: '', country: '', state: '', min: 0, sort: 'opr', q: '', team: 0, page: 1 },
+	filters: {
+		region: '',
+		country: '',
+		state: '',
+		min: 0,
+		sort: 'opr',
+		q: '',
+		team: 0,
+		page: 1,
+		type: '',
+		dates: '',
+		from: '',
+		to: ''
+	},
 	found: false,
 	rows: [row(26670, 58.24, { name: 'SCA Iron Eagles' }), row(3747, 40, { name: 'The Hive' })],
 	total: 120,
@@ -76,7 +92,17 @@ const base: Data = {
 		{ value: 'Canada', label: 'Canada' },
 		{ value: 'USA', label: 'USA' }
 	],
-	states: []
+	states: [],
+	window: null,
+	types: [
+		{ value: 'official', label: 'Official events' },
+		{ value: 'LeagueMeet', label: 'League Meet' },
+		{ value: 'Qualifier', label: 'Qualifier' }
+	],
+	weeks: [
+		{ value: '2026-11-16', label: 'Nov 16–22' },
+		{ value: '2026-11-09', label: 'Nov 9–15' }
+	]
 };
 
 function show(overrides: Partial<Data> = {}) {
@@ -143,7 +169,11 @@ describe('leaderboard page', () => {
 				sort: 'opr',
 				q: '',
 				team: 0,
-				page: 2
+				page: 2,
+				type: '',
+				dates: '',
+				from: '',
+				to: ''
 			}
 		});
 		expect(screen.getByRole('link', { name: 'Previous' })).toHaveAttribute(
@@ -252,7 +282,11 @@ describe('leaderboard filters', () => {
 				sort: 'opr',
 				q: '',
 				team: 0,
-				page: 1
+				page: 1,
+				type: '',
+				dates: '',
+				from: '',
+				to: ''
 			}
 		});
 		await fireEvent.change(screen.getByLabelText('Minimum matches'), { target: { value: '10' } });
@@ -269,7 +303,11 @@ describe('leaderboard filters', () => {
 				sort: 'opr',
 				q: '',
 				team: 0,
-				page: 1
+				page: 1,
+				type: '',
+				dates: '',
+				from: '',
+				to: ''
 			},
 			states: [{ value: 'AZ', label: 'Arizona' }]
 		});
@@ -290,7 +328,11 @@ describe('leaderboard filters', () => {
 				sort: 'opr',
 				q: '',
 				team: 0,
-				page: 1
+				page: 1,
+				type: '',
+				dates: '',
+				from: '',
+				to: ''
 			},
 			states: [{ value: 'AZ', label: 'Arizona' }]
 		});
@@ -309,7 +351,11 @@ describe('leaderboard filters', () => {
 				sort: 'opr',
 				q: '',
 				team: 0,
-				page: 1
+				page: 1,
+				type: '',
+				dates: '',
+				from: '',
+				to: ''
 			}
 		});
 		expect(screen.getByLabelText('Region')).toHaveValue('USAZ');
@@ -323,5 +369,79 @@ describe('leaderboard filters', () => {
 	it('does not show the clear link when no filter is set', () => {
 		show();
 		expect(screen.queryByRole('link', { name: 'Clear filters' })).not.toBeInTheDocument();
+	});
+});
+
+describe('leaderboard event filters', () => {
+	it('filters by event type', async () => {
+		show();
+		const type = screen.getByLabelText('Event type');
+		expect(
+			within(type)
+				.getAllByRole('option')
+				.map((option) => option.textContent)
+		).toEqual(['All events', 'Official events', 'League Meet', 'Qualifier']);
+		await fireEvent.change(type, { target: { value: 'Qualifier' } });
+		expect(navigation.goto).toHaveBeenCalledWith('?type=Qualifier', { reset: false });
+	});
+
+	it('turns a week or the last two weeks into date parameters', async () => {
+		show({ filters: { ...base.filters, region: 'USAZ' } });
+		const dates = screen.getByLabelText('Dates');
+		await fireEvent.change(dates, { target: { value: '2026-11-09' } });
+		expect(navigation.goto).toHaveBeenLastCalledWith('?region=USAZ&from=2026-11-09&to=2026-11-15', {
+			reset: false
+		});
+		await fireEvent.change(dates, { target: { value: 'recent' } });
+		expect(navigation.goto).toHaveBeenLastCalledWith('?region=USAZ&dates=recent', {
+			reset: false
+		});
+	});
+
+	it('opens date fields for a custom range without leaving the page', async () => {
+		show();
+		expect(screen.queryByLabelText('From')).not.toBeInTheDocument();
+		await fireEvent.change(screen.getByLabelText('Dates'), { target: { value: 'custom' } });
+		expect(navigation.goto).not.toHaveBeenCalled();
+		await fireEvent.change(screen.getByLabelText('From'), { target: { value: '2026-11-01' } });
+		expect(navigation.goto).toHaveBeenCalledWith('?from=2026-11-01', {
+			reset: false,
+			replace: true
+		});
+	});
+
+	it('shows the chosen type and dates and explains the numbers', () => {
+		show({
+			filters: { ...base.filters, type: 'Qualifier', from: '2026-11-16', to: '2026-11-22' },
+			window: { from: '2026-11-16', to: '2026-11-22' }
+		});
+		expect(screen.getByLabelText('Event type')).toHaveValue('Qualifier');
+		expect(screen.getByLabelText('Dates')).toHaveValue('2026-11-16');
+		expect(
+			screen.getByText('Qualifier events, Nov 16–22. Showing 1 to 2 of 120 teams')
+		).toBeInTheDocument();
+		expect(screen.getByText(/as of its last event in this filter/)).toBeInTheDocument();
+		expect(screen.getByRole('link', { name: 'Download CSV' })).toHaveAttribute(
+			'href',
+			'/leaderboards.csv?type=Qualifier&from=2026-11-16&to=2026-11-22'
+		);
+		expect(screen.getByRole('link', { name: 'Clear filters' })).toBeInTheDocument();
+	});
+
+	it('keeps event filters in the sort links', () => {
+		show({
+			filters: { ...base.filters, dates: 'recent' },
+			window: { from: '2026-11-09', to: '2026-11-22' }
+		});
+		expect(
+			within(screen.getByRole('columnheader', { name: /Auto/ })).getByRole('link')
+		).toHaveAttribute('href', '/leaderboards?dates=recent&sort=auto');
+		expect(screen.getByText(/^Last 2 weeks\. Showing/)).toBeInTheDocument();
+	});
+
+	it('hides event filters when there are no event types to offer', () => {
+		show({ source: 'scout', types: [], weeks: [] });
+		expect(screen.queryByLabelText('Event type')).not.toBeInTheDocument();
+		expect(screen.queryByLabelText('Dates')).not.toBeInTheDocument();
 	});
 });
