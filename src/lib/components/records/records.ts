@@ -185,9 +185,22 @@ function byLabel(a: RecordOption, b: RecordOption): number {
 	return a.label.localeCompare(b.label, 'en', { numeric: true });
 }
 
+const PLAUSIBLE_SCORE = 600;
+
+function plausible(alliance: SeasonMatchAlliance): boolean {
+	return (
+		alliance.total <= PLAUSIBLE_SCORE &&
+		Math.abs(alliance.auto + alliance.teleop - alliance.preFoulTotal) <= 1
+	);
+}
+
+export function plausibleMatch(match: SeasonMatch): boolean {
+	return plausible(match.red) && plausible(match.blue);
+}
+
 export function buildRecordDataset(matches: SeasonMatch[]): RecordDataset {
 	const rows = matches.flatMap((match) =>
-		match.red.teams.length > 0 && match.blue.teams.length > 0
+		match.red.teams.length > 0 && match.blue.teams.length > 0 && plausibleMatch(match)
 			? [side(match, 'red', match.red, match.blue), side(match, 'blue', match.blue, match.red)]
 			: []
 	);

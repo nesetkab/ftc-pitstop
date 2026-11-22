@@ -62,7 +62,7 @@ const filters = (overrides: Partial<RecordFilters> = {}): RecordFilters => ({
 
 const matches = [
 	seasonMatch('q1', alliance([1, 2], 150, { total: 160 }), alliance([3, 4], 120)),
-	seasonMatch('p2', alliance([1, 3], 200, { auto: 50 }), alliance([2, 4], 200), {
+	seasonMatch('p2', alliance([1, 3], 200, { auto: 50, teleop: 150 }), alliance([2, 4], 200), {
 		date: '2026-11-21',
 		end: '2026-11-21',
 		time: Date.parse('2026-11-21T20:00:00Z'),
@@ -126,6 +126,12 @@ describe('buildRecordDataset', () => {
 			time: Date.parse('2026-11-15T03:00:00Z')
 		});
 		expect(buildRecordDataset([late]).rows[0].day).toBe('2026-11-14');
+	});
+
+	it('skips matches with impossible scores', () => {
+		const junk = seasonMatch('q1', alliance([1], 7308), alliance([2], 80));
+		const broken = seasonMatch('q2', alliance([1], 90, { auto: 80 }), alliance([2], 80));
+		expect(buildRecordDataset([junk, broken]).rows).toHaveLength(0);
 	});
 });
 

@@ -1,7 +1,7 @@
 import { addDays } from '#lib/components/team/dates.ts';
-import { matchDay } from '#lib/components/records/records.ts';
+import { matchDay, plausibleMatch } from '#lib/components/records/records.ts';
 import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
-import type { AllianceColor, SeasonMatch, SeasonMatchAlliance } from '#lib/types.ts';
+import type { AllianceColor, SeasonMatch } from '#lib/types.ts';
 
 export type HighlightRange = 'today' | 'week';
 
@@ -32,16 +32,8 @@ export interface HighlightNames {
 export const HIGHLIGHT_COUNT = 3;
 export const TODAY_MINIMUM = 12;
 const UPSET_CHANCE = 0.4;
-const PLAUSIBLE_SCORE = 600;
 
 export type WinnerChance = (match: SeasonMatch, winner: AllianceColor) => number | null;
-
-function plausible(alliance: SeasonMatchAlliance): boolean {
-	return (
-		alliance.total <= PLAUSIBLE_SCORE &&
-		Math.abs(alliance.auto + alliance.teleop - alliance.preFoulTotal) <= 1
-	);
-}
 
 function winnerOf(match: SeasonMatch): AllianceColor | null {
 	if (match.red.total === match.blue.total) return null;
@@ -82,8 +74,7 @@ export function buildHighlights(
 			match.red.teams.length > 0 &&
 			match.blue.teams.length > 0 &&
 			combined(match) > 0 &&
-			plausible(match.red) &&
-			plausible(match.blue)
+			plausibleMatch(match)
 	);
 	const since = addDays(today, -6);
 	const days = new Map(played.map((match) => [match, matchDay(match)]));
