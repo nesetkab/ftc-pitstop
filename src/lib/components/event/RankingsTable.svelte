@@ -52,7 +52,7 @@
 			<th class="l" scope="col">Rank</th>
 			<th class="l" scope="col">Team</th>
 			<th scope="col">RS</th>
-			<th scope="col">Record</th>
+			<th class={{ opt: projected !== null }} scope="col">Record</th>
 			<th class="opt" scope="col">TBP</th>
 			<th class="opt" scope="col">Avg tips</th>
 			{#if opr}
@@ -60,7 +60,7 @@
 			{/if}
 			{#if projected}
 				<th class="sep opt" scope="col">Finish, 1st to {ordinal(rankings.length)}</th>
-				<th scope="col">Top 4</th>
+				<th class="opt" scope="col">Top 4</th>
 				<th scope="col">Top 8</th>
 			{/if}
 		</tr>
@@ -74,7 +74,7 @@
 					<TeamCell number={row.team} name={names.get(row.team)} href="/teams/{row.team}" />
 				</td>
 				<td>{fixed(row.rs, 2)}</td>
-				<td>{record(row.wins, row.losses, row.ties)}</td>
+				<td class={{ opt: projected !== null }}>{record(row.wins, row.losses, row.ties)}</td>
 				<td class="opt">{fixed(row.tbp)}</td>
 				<td class="opt">{fixed(row.avgTips)}</td>
 				{#if opr}
@@ -86,7 +86,7 @@
 							<FinishSpark dist={projection.rankChances} />
 						{/if}
 					</td>
-					<ProbCell p={projection?.top4} />
+					<ProbCell p={projection?.top4} class="opt" />
 					<ProbCell p={projection?.top8} />
 				{/if}
 			</tr>
