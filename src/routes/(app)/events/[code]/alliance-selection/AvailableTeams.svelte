@@ -5,14 +5,16 @@
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
+	import type { PickMark } from '#lib/workspace/picklist.ts';
 	import { takenLabel, type SelectionTable, type TeamRow } from '#lib/workspace/selection.ts';
 
 	interface Props {
 		table: SelectionTable;
 		me?: number | null;
+		marks?: ReadonlyMap<number, PickMark>;
 	}
 
-	let { table, me = null }: Props = $props();
+	let { table, me = null, marks }: Props = $props();
 
 	function note(row: TeamRow): string {
 		if (row.status.kind !== 'available') return takenLabel(row.status) ?? '';
@@ -52,9 +54,12 @@
 	<tbody>
 		{#each rows as row (row.team)}
 			{@const taken = row.status.kind !== 'available'}
+			{@const mark = marks?.get(row.team)}
 			<tr class:dim={taken} class:me={row.team === me}>
 				<td class="team wrap"
-					><TeamCell number={row.team} name={row.name} href="/teams/{row.team}" /></td
+					><TeamCell number={row.team} name={row.name} href="/teams/{row.team}" />{#if mark}<span
+							class="ours">{mark.text}</span
+						>{/if}</td
 				>
 				{#if table.rated}
 					<td>{fixed(row.opr)}</td>
@@ -92,5 +97,15 @@
 
 	td.note {
 		min-width: 150px;
+	}
+
+	.ours {
+		display: block;
+		max-width: 320px;
+		overflow: hidden;
+		color: var(--text-2);
+		font-size: 12px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 </style>

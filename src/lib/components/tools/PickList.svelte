@@ -1,60 +1,88 @@
 <script lang="ts">
 	import '#lib/components/tools/controls.css';
 	import { tick, type Snippet } from 'svelte';
+	import UndoBar from '#lib/components/tools/UndoBar.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { parseEventCode, parseTeamNumber } from '#lib/workspace/code.ts';
 	import {
 		addEntry,
+		avoided,
 		checkAdd,
 		indexAtOffset,
 		moveEntry,
+		pickListCsv,
+		pickListText,
+		ranked,
 		removeEntry,
+		restoreEntry,
+		setAvoid,
 		setEvent,
 		setName,
 		setNote,
-		setTaken
+		setTaken,
+		statText,
+		TAG_LABELS,
+		tagText,
+		toggleTag,
+		type PickStat
 	} from '#lib/workspace/picklist.ts';
-	import type { PickList } from '#lib/workspace/schemas.ts';
+	import { PICK_TAGS, type PickEntry, type PickList } from '#lib/workspace/schemas.ts';
+	import { UndoOffer } from '#lib/workspace/undo.svelte.ts';
 
 	interface Props {
 		list: PickList;
 		update?: (change: (list: PickList) => PickList) => void;
 		auto?: ReadonlyMap<number, string>;
+		stats?: ReadonlyMap<number, PickStat>;
 		lookupName?: (team: number) => Promise<string | null>;
 		share?: Snippet;
 		title?: string;
 		showEvent?: boolean;
+		exportable?: boolean;
 	}
 
 	let {
 		list,
 		update,
 		auto,
+		stats,
 		lookupName,
 		share,
 		title = 'Pick list',
-		showEvent = true
+		showEvent = true,
+		exportable
 	}: Props = $props();
 
 	interface Drag {
 		team: number;
 		from: number;
 		startY: number;
+		startScroll: number;
+		pointerY: number;
 		offset: number;
 		centers: number[];
 		target: number;
 	}
 
+	const EDGE = 72;
+
 	const id = $props.id();
+	const undo = new UndoOffer();
 	let draft = $state('');
 	let error = $state('');
 	let eventError = $state('');
 	let announcement = $state('');
+	let copied = $state(false);
+	let open = $state<number | null>(null);
 	let drag = $state.raw<Drag | null>(null);
 	let listElement = $state<HTMLOListElement>();
+	let frame = 0;
 
+	const picks = $derived(ranked(list));
+	const avoid = $derived(avoided(list));
 	const eventHref = $derived(list.event ? `/events/${list.event}/alliance-selection` : null);
+	const context = $derived({ labels: auto, stats });
 
 	function add(event: SubmitEvent) {
 		event.preventDefault();
@@ -98,6 +126,32 @@
 		update?.((current) => setEvent(current, code));
 	}
 
+	function moved(team: number, target: number, total: number) {
+		announcement = `${team} moved to position ${target + 1} of ${total}.`;
+	}
+
+	function at(current: Drag, pointerY: number): Drag {
+		const offset = pointerY - current.startY + window.scrollY - current.startScroll;
+		return {
+			...current,
+			pointerY,
+			offset,
+			target: indexAtOffset(current.centers, current.from, offset)
+		};
+	}
+
+	function edgeScroll() {
+		if (!drag) return;
+		const y = drag.pointerY;
+		const bottom = window.innerHeight - EDGE;
+		const speed = y < EDGE ? -(EDGE - y) / 4 : y > bottom ? (y - bottom) / 4 : 0;
+		if (speed !== 0) {
+			window.scrollBy(0, speed);
+			drag = at(drag, y);
+		}
+		frame = requestAnimationFrame(edgeScroll);
+	}
+
 	function startDrag(event: PointerEvent, team: number, index: number) {
 		if (!update || !listElement || (event.pointerType === 'mouse' && event.button !== 0)) return;
 		const handle = event.currentTarget as HTMLElement;
@@ -106,44 +160,252 @@
 			const box = row.getBoundingClientRect();
 			return box.top + box.height / 2;
 		});
-		drag = { team, from: index, startY: event.clientY, offset: 0, centers, target: index };
+		drag = {
+			team,
+			from: index,
+			startY: event.clientY,
+			startScroll: window.scrollY,
+			pointerY: event.clientY,
+			offset: 0,
+			centers,
+			target: index
+		};
+		frame = requestAnimationFrame(edgeScroll);
 	}
 
 	function moveDrag(event: PointerEvent) {
-		if (!drag) return;
-		const offset = event.clientY - drag.startY;
-		drag = { ...drag, offset, target: indexAtOffset(drag.centers, drag.from, offset) };
+		if (drag) drag = at(drag, event.clientY);
+	}
+
+	function stopDrag() {
+		cancelAnimationFrame(frame);
+		const current = drag;
+		drag = null;
+		return current;
 	}
 
 	function endDrag() {
-		if (!drag) return;
-		const { team, from, target } = drag;
-		drag = null;
-		if (target !== from) {
-			update?.((current) => moveEntry(current, team, target));
-			announcement = `${team} moved to position ${target + 1} of ${list.entries.length}.`;
-		}
+		const current = stopDrag();
+		if (!current || current.target === current.from) return;
+		update?.((list) => moveEntry(list, current.team, current.target));
+		moved(current.team, current.target, picks.length);
+	}
+
+	async function focusHandle(team: number) {
+		await tick();
+		listElement?.querySelector<HTMLElement>(`[data-handle="${team}"]`)?.focus();
+	}
+
+	function move(team: number, index: number, target: number) {
+		const last = picks.length - 1;
+		const to = Math.min(Math.max(target, 0), last);
+		if (!update || to === index) return;
+		update((current) => moveEntry(current, team, to));
+		moved(team, to, picks.length);
 	}
 
 	async function pressKey(event: KeyboardEvent, team: number, index: number) {
-		const last = list.entries.length - 1;
 		const targets: Record<string, number> = {
 			ArrowUp: index - 1,
 			ArrowDown: index + 1,
 			Home: 0,
-			End: last
+			End: picks.length - 1
 		};
 		const wanted = targets[event.key];
 		if (wanted === undefined || !update) return;
 		event.preventDefault();
-		const target = Math.min(Math.max(wanted, 0), last);
-		if (target === index) return;
-		update((current) => moveEntry(current, team, target));
-		announcement = `${team} moved to position ${target + 1} of ${list.entries.length}.`;
-		await tick();
-		listElement?.querySelector<HTMLElement>(`[data-handle="${team}"]`)?.focus();
+		move(team, index, wanted);
+		await focusHandle(team);
+	}
+
+	function remove(entry: PickEntry) {
+		const index = list.entries.findIndex((item) => item.team === entry.team);
+		open = null;
+		update?.((current) => removeEntry(current, entry.team));
+		undo.offer(`Removed ${entry.team}.`, () =>
+			update?.((current) => restoreEntry(current, entry, index))
+		);
+	}
+
+	function changeAvoid(entry: PickEntry) {
+		const next = !entry.avoid;
+		open = null;
+		update?.((current) => setAvoid(current, entry.team, next));
+		announcement = next
+			? `${entry.team} moved to do not pick.`
+			: `${entry.team} moved back to the pick list.`;
+	}
+
+	async function copyText() {
+		copied = await navigator.clipboard.writeText(pickListText(list, context)).then(
+			() => true,
+			() => false
+		);
+		announcement = copied ? 'Pick list copied.' : 'Could not copy the pick list.';
+		if (copied) setTimeout(() => (copied = false), 3000);
+	}
+
+	function downloadCsv() {
+		const blob = new Blob([pickListCsv(list, context)], { type: 'text/csv;charset=utf-8' });
+		const url = URL.createObjectURL(blob);
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `pick-list${list.event ? `-${list.event.toLowerCase()}` : ''}.csv`;
+		link.click();
+		setTimeout(() => URL.revokeObjectURL(url), 1000);
 	}
 </script>
+
+{#snippet row(entry: PickEntry, index: number, last: number)}
+	{@const label = auto?.get(entry.team) ?? null}
+	{@const gone = entry.taken || label !== null}
+	{@const stat = statText(stats?.get(entry.team))}
+	{@const tags = tagText(entry)}
+	{@const avoiding = Boolean(entry.avoid)}
+	<li
+		class={[
+			'row',
+			{
+				gone,
+				dragging: drag?.team === entry.team,
+				before: drag !== null && drag.target < drag.from && drag.target === index,
+				after: drag !== null && drag.target > drag.from && drag.target === index
+			}
+		]}
+		style:transform={drag?.team === entry.team ? `translateY(${drag.offset}px)` : undefined}
+	>
+		{#if update && !avoiding}
+			<button
+				type="button"
+				class="handle"
+				data-handle={entry.team}
+				aria-label="Move {entry.team}"
+				aria-describedby="{id}-help"
+				onpointerdown={(event) => startDrag(event, entry.team, index)}
+				onpointermove={moveDrag}
+				onpointerup={endDrag}
+				onpointercancel={stopDrag}
+				onkeydown={(event) => pressKey(event, entry.team, index)}
+			>
+				<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">
+					<circle cx="2.5" cy="3" r="1.4" />
+					<circle cx="7.5" cy="3" r="1.4" />
+					<circle cx="2.5" cy="8" r="1.4" />
+					<circle cx="7.5" cy="8" r="1.4" />
+					<circle cx="2.5" cy="13" r="1.4" />
+					<circle cx="7.5" cy="13" r="1.4" />
+				</svg>
+			</button>
+		{/if}
+		{#if update && avoiding}<span class="handle" aria-hidden="true"></span>{/if}
+		<span class="rank">{avoiding ? '' : index + 1}</span>
+		<span class="team"
+			><b>{entry.team}</b>{#if entry.name}<span class="name">{entry.name}</span>{/if}</span
+		>
+		<span class="meta"
+			>{#if stat}<span class="stat">{stat}</span>{/if}{#if tags}<span class="tags">{tags}</span
+				>{/if}</span
+		>
+		{#if update}
+			<input
+				class="ctl-input ctl-quiet note-input"
+				aria-label="Note for {entry.team}"
+				placeholder="Add a note"
+				maxlength="300"
+				value={entry.note}
+				oninput={(event) => {
+					const value = event.currentTarget.value;
+					update((current) => setNote(current, entry.team, value));
+				}}
+			/>
+		{:else}
+			<span class="note-text">{entry.note}</span>
+		{/if}
+		{#if update && !avoiding}
+			<span class="move">
+				<button
+					type="button"
+					class="ctl-btn plain icon"
+					aria-label="Move {entry.team} up"
+					disabled={index === 0}
+					onclick={() => move(entry.team, index, index - 1)}
+				>
+					<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+						<path d="M2.5 7.5 6 4l3.5 3.5" />
+					</svg>
+				</button>
+				<button
+					type="button"
+					class="ctl-btn plain icon"
+					aria-label="Move {entry.team} down"
+					disabled={index === last}
+					onclick={() => move(entry.team, index, index + 1)}
+				>
+					<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
+						<path d="M2.5 4.5 6 8l3.5-3.5" />
+					</svg>
+				</button>
+			</span>
+		{/if}
+		<span class="actions">
+			{#if label}
+				<span class="tag">{label}</span>
+			{:else if update && !avoiding}
+				<button
+					type="button"
+					class="ctl-btn"
+					aria-pressed={entry.taken}
+					onclick={() => update((current) => setTaken(current, entry.team, !entry.taken))}
+				>
+					{entry.taken ? 'Taken' : 'Mark taken'}
+				</button>
+			{:else if entry.taken}
+				<span class="tag">Taken</span>
+			{/if}
+			{#if update}
+				<button
+					type="button"
+					class="ctl-btn plain"
+					aria-expanded={open === entry.team}
+					aria-controls="{id}-more-{entry.team}"
+					aria-label="More for {entry.team}"
+					onclick={() => (open = open === entry.team ? null : entry.team)}
+				>
+					More
+				</button>
+			{/if}
+		</span>
+		{#if update && open === entry.team}
+			<div class="more" id="{id}-more-{entry.team}">
+				<div class="chips" role="group" aria-label="Tags for {entry.team}">
+					{#each PICK_TAGS as tag (tag)}
+						<button
+							type="button"
+							class="ctl-btn chip"
+							aria-pressed={entry.tags?.includes(tag) ?? false}
+							onclick={() => update((current) => toggleTag(current, entry.team, tag))}
+						>
+							{TAG_LABELS[tag]}
+						</button>
+					{/each}
+				</div>
+				<div class="ctl-row">
+					{#if !avoiding && index > 0}
+						<button type="button" class="ctl-btn" onclick={() => move(entry.team, index, 0)}>
+							Move to top
+						</button>
+					{/if}
+					<button type="button" class="ctl-btn" onclick={() => changeAvoid(entry)}>
+						{avoiding ? 'Back to pick list' : 'Do not pick'}
+					</button>
+					<button type="button" class="ctl-btn" onclick={() => remove(entry)}>
+						Remove {entry.team}
+					</button>
+				</div>
+			</div>
+		{/if}
+	</li>
+{/snippet}
 
 <section class="picklist" aria-label={title}>
 	<div class="head">
@@ -177,99 +439,34 @@
 			{update ? 'Add the teams you want to pick, best first.' : 'This list is empty.'}
 		</EmptyState>
 	{:else}
-		<ol class={['rows', { editable: Boolean(update) }]} bind:this={listElement}>
-			{#each list.entries as entry, index (entry.team)}
-				{@const label = auto?.get(entry.team) ?? null}
-				{@const gone = entry.taken || label !== null}
-				<li
-					class={[
-						'row',
-						{
-							gone,
-							editable: Boolean(update),
-							dragging: drag?.team === entry.team,
-							before: drag !== null && drag.target < drag.from && drag.target === index,
-							after: drag !== null && drag.target > drag.from && drag.target === index
-						}
-					]}
-					style:transform={drag?.team === entry.team ? `translateY(${drag.offset}px)` : undefined}
-				>
-					{#if update}
-						<button
-							type="button"
-							class="handle"
-							data-handle={entry.team}
-							aria-label="Move {entry.team}"
-							aria-describedby="{id}-help"
-							onpointerdown={(event) => startDrag(event, entry.team, index)}
-							onpointermove={moveDrag}
-							onpointerup={endDrag}
-							onpointercancel={() => (drag = null)}
-							onkeydown={(event) => pressKey(event, entry.team, index)}
-						>
-							<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">
-								<circle cx="2.5" cy="3" r="1.4" />
-								<circle cx="7.5" cy="3" r="1.4" />
-								<circle cx="2.5" cy="8" r="1.4" />
-								<circle cx="7.5" cy="8" r="1.4" />
-								<circle cx="2.5" cy="13" r="1.4" />
-								<circle cx="7.5" cy="13" r="1.4" />
-							</svg>
-						</button>
-					{/if}
-					<span class="rank">{index + 1}</span>
-					<span class="team">
-						<b>{entry.team}</b>
-						{#if entry.name}<span class="name">{entry.name}</span>{/if}
-					</span>
-					{#if update}
-						<input
-							class="ctl-input ctl-quiet note-input"
-							aria-label="Note for {entry.team}"
-							placeholder="Add a note"
-							maxlength="300"
-							value={entry.note}
-							oninput={(event) => {
-								const value = event.currentTarget.value;
-								update((current) => setNote(current, entry.team, value));
-							}}
-						/>
-					{:else}
-						<span class="note-text">{entry.note}</span>
-					{/if}
-					<span class="actions">
-						{#if label}
-							<span class="tag">{label}</span>
-						{:else if update}
-							<button
-								type="button"
-								class="ctl-btn"
-								aria-pressed={entry.taken}
-								onclick={() => update((current) => setTaken(current, entry.team, !entry.taken))}
-							>
-								{entry.taken ? 'Taken' : 'Mark taken'}
-							</button>
-						{:else if entry.taken}
-							<span class="tag">Taken</span>
-						{/if}
-						{#if update}
-							<button
-								type="button"
-								class="ctl-btn plain"
-								aria-label="Remove {entry.team}"
-								onclick={() => update((current) => removeEntry(current, entry.team))}
-							>
-								Remove
-							</button>
-						{/if}
-					</span>
-				</li>
-			{/each}
-		</ol>
+		{#if picks.length > 0}
+			<ol class={['rows', { editable: Boolean(update) }]} bind:this={listElement}>
+				{#each picks as entry, index (entry.team)}
+					{@render row(entry, index, picks.length - 1)}
+				{/each}
+			</ol>
+		{/if}
+		{#if avoid.length > 0}
+			<h4 class="sub">Do not pick</h4>
+			<ul class={['rows', 'avoid', { editable: Boolean(update) }]}>
+				{#each avoid as entry, index (entry.team)}
+					{@render row(entry, index, avoid.length - 1)}
+				{/each}
+			</ul>
+		{/if}
 		{#if update}
 			<p id="{id}-help" class="note">
-				Drag the handle to reorder. With the handle focused, press the up or down arrow.
+				Drag the handle or use the arrow buttons to reorder. With the handle focused, you can also
+				press the up or down arrow key. Tags, do not pick and remove are under More.
 			</p>
+		{/if}
+		{#if exportable ?? Boolean(update)}
+			<div class="export">
+				<button type="button" class="ctl-btn" onclick={copyText}>
+					{copied ? 'Copied' : 'Copy as text'}
+				</button>
+				<button type="button" class="ctl-btn" onclick={downloadCsv}>Download CSV</button>
+			</div>
 		{/if}
 	{/if}
 
@@ -297,11 +494,15 @@
 		{#if eventError}
 			<p class="ctl-error" role="alert">{eventError}</p>
 		{:else if update}
-			<p class="note">With an event code, teams are crossed out as alliances pick them.</p>
+			<p class="note">
+				With an event code, each team shows its OPR and rank, and teams are crossed out as alliances
+				pick them.
+			</p>
 		{/if}
 	{/if}
 
 	<p class="visually-hidden" role="status" aria-live="polite">{announcement}</p>
+	{#if update}<UndoBar offer={undo} />{/if}
 </section>
 
 <style>
@@ -331,16 +532,27 @@
 		flex: 1 1 auto;
 	}
 
+	.sub {
+		margin-top: 8px;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--text-2);
+	}
+
 	.rows {
 		display: grid;
-		grid-template-columns: 26px minmax(120px, 0.7fr) minmax(0, 1.3fr) auto;
+		grid-template-columns: 0 26px minmax(120px, 0.8fr) auto minmax(0, 1.2fr) auto auto;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
+	.rows:not(.editable) .row {
+		margin-left: -8px;
+	}
+
 	.rows.editable {
-		grid-template-columns: 22px 26px minmax(120px, 0.7fr) minmax(0, 1.3fr) auto;
+		grid-template-columns: auto 26px minmax(120px, 0.8fr) auto minmax(0, 1.2fr) auto auto;
 	}
 
 	.row {
@@ -357,8 +569,52 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	.gone .note-input:placeholder-shown {
-		text-decoration: none;
+	.row > * {
+		grid-row: 1;
+	}
+
+	.handle {
+		grid-column: 1;
+	}
+
+	.rank {
+		grid-column: 2;
+	}
+
+	.team {
+		grid-column: 3;
+	}
+
+	.meta {
+		display: contents;
+	}
+
+	.stat {
+		grid-column: 4;
+		grid-row: 1;
+	}
+
+	.tags {
+		grid-column: 3;
+		grid-row: 2;
+	}
+
+	.note-input,
+	.note-text {
+		grid-column: 5;
+	}
+
+	.move {
+		grid-column: 6;
+	}
+
+	.actions {
+		grid-column: 7;
+	}
+
+	.row > .more {
+		grid-column: 2 / -1;
+		grid-row: 3;
 	}
 
 	.row.dragging {
@@ -391,6 +647,10 @@
 		touch-action: none;
 	}
 
+	span.handle {
+		cursor: auto;
+	}
+
 	.handle:hover {
 		color: var(--text);
 	}
@@ -406,6 +666,9 @@
 
 	.team {
 		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 	}
 
 	.team b {
@@ -418,6 +681,17 @@
 		font-size: 13px;
 	}
 
+	.tags {
+		color: var(--text-2);
+		font-size: 12px;
+	}
+
+	.stat {
+		color: var(--text-2);
+		font-size: 13px;
+		white-space: nowrap;
+	}
+
 	.note-input {
 		font-size: 13px;
 		color: var(--text-2);
@@ -428,11 +702,25 @@
 		font-size: 13px;
 	}
 
+	.move,
 	.actions {
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
 		gap: 4px;
+	}
+
+	.icon {
+		width: 32px;
+		padding: 6px 0;
+	}
+
+	.icon path {
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.5;
+		stroke-linecap: round;
+		stroke-linejoin: round;
 	}
 
 	.tag {
@@ -442,13 +730,39 @@
 		white-space: nowrap;
 	}
 
+	.more {
+		display: grid;
+		gap: 10px;
+		padding: 8px 0 6px;
+	}
+
+	.chips {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px;
+	}
+
+	.chip {
+		border-radius: 999px;
+	}
+
 	.gone .team b,
 	.gone .name,
 	.gone .note-text,
-	.gone .note-input,
+	.gone .note-input:not(:placeholder-shown),
 	.gone .rank {
 		color: var(--text-3);
 		text-decoration: line-through;
+	}
+
+	.avoid .team b {
+		color: var(--text-2);
+	}
+
+	.export {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
 	}
 
 	.event {
@@ -468,10 +782,14 @@
 		font-size: 14px;
 	}
 
-	@container (max-width: 520px) {
+	@container (max-width: 560px) {
 		.rows,
 		.rows.editable {
 			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.rows:not(.editable) .row {
+			margin-left: 0;
 		}
 
 		.row {
@@ -479,15 +797,36 @@
 			grid-template-columns: 22px minmax(0, 1fr) auto;
 			grid-template-areas:
 				'rank team team'
-				'. note actions';
+				'. meta meta'
+				'. note actions'
+				'. more more';
+			row-gap: 2px;
 			padding: 8px 0;
 		}
 
-		.row.editable {
-			grid-template-columns: 22px 22px minmax(0, 1fr) auto;
+		.row > * {
+			grid-row: auto;
+			grid-column: auto;
+		}
+
+		.editable .row {
+			grid-template-columns: auto 22px minmax(0, 1fr) auto auto;
 			grid-template-areas:
-				'handle rank team team'
-				'. . note actions';
+				'handle rank team team move'
+				'. . meta meta meta'
+				'. . note actions actions'
+				'. . more more more';
+		}
+
+		.meta {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0 10px;
+			grid-area: meta;
+		}
+
+		.meta:empty {
+			display: none;
 		}
 
 		.handle {
@@ -502,6 +841,10 @@
 			grid-area: team;
 		}
 
+		.move {
+			grid-area: move;
+		}
+
 		.actions {
 			grid-area: actions;
 		}
@@ -511,6 +854,10 @@
 			grid-area: note;
 		}
 
+		.row > .more {
+			grid-area: more;
+		}
+
 		.note-text:empty {
 			display: none;
 		}
@@ -518,7 +865,12 @@
 
 	@media (pointer: coarse) {
 		.handle {
-			height: 40px;
+			width: 28px;
+			height: 44px;
+		}
+
+		.icon {
+			width: 40px;
 		}
 	}
 </style>

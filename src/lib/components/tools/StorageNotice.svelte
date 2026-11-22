@@ -7,11 +7,9 @@
 		kind: WorkspaceKind;
 		sync?: SyncState;
 		savedAt?: number | null;
-		offline?: boolean;
-		message?: string | null;
 	}
 
-	let { kind, sync = 'saved', savedAt = null, offline = false, message = null }: Props = $props();
+	let { kind, sync = 'saved', savedAt = null }: Props = $props();
 </script>
 
 {#if kind === 'shared'}
@@ -25,20 +23,6 @@
 {/if}
 {#if sync === 'saving'}
 	Saving.
-{:else if sync === 'retrying' || sync === 'failed'}
-	<span class="problem">{message ?? 'Not saved yet.'}</span>
-{:else if offline}
-	<span class="problem">Offline. Showing the last copy.</span>
-{:else if savedAt !== null && kind === 'shared'}
+{:else if sync === 'saved' && savedAt !== null && kind === 'shared'}
 	<StaleNotice updated={savedAt} prefix="Saved" staleAfter={Infinity} />.
 {/if}
-
-<style>
-	.problem {
-		margin-inline: -4px;
-		padding: 1px 4px;
-		border-radius: var(--radius-chip);
-		background: var(--surface);
-		color: var(--text);
-	}
-</style>

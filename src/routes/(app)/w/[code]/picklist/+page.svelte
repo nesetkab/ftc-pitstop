@@ -18,6 +18,7 @@
 	{list}
 	update={(change) => workspace.update('picklist', change)}
 	auto={feed.labels}
+	stats={feed.stats}
 	lookupName={(team) => feed.name(team)}
 >
 	{#snippet share()}

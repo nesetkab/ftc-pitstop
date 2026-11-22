@@ -25,7 +25,7 @@ export interface WorkspaceRedis extends LimiterRedis {
 }
 
 export const DOC_BYTE_LIMITS: Record<DocName, number> = {
-	picklist: 40_000,
+	picklist: 48_000,
 	batteries: 40_000,
 	checklist: 60_000,
 	boards: 300_000

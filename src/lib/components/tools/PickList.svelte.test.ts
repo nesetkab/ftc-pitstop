@@ -121,6 +121,7 @@ describe('pick list', () => {
 
 	it('removes a team', async () => {
 		const { state } = setup(list(1, 2, 3));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 2' }));
 		await fireEvent.click(screen.getByRole('button', { name: 'Remove 2' }));
 		expect(order(state.current)).toEqual([1, 3]);
 	});
@@ -197,7 +198,7 @@ describe('reordering with the keyboard', () => {
 		setup(list(1, 2));
 		const handle = screen.getByRole('button', { name: 'Move 1' });
 		const help = document.getElementById(handle.getAttribute('aria-describedby') ?? '');
-		expect(help).toHaveTextContent('press the up or down arrow');
+		expect(help).toHaveTextContent('press the up or down arrow key');
 	});
 });
 
@@ -298,5 +299,92 @@ describe('read only', () => {
 		expect(screen.getByText('Strong auto')).toBeInTheDocument();
 		expect(screen.getByText('Taken')).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'Open alliance selection' })).toBeInTheDocument();
+	});
+});
+
+describe('one handed controls', () => {
+	it('moves a team with the up and down buttons', async () => {
+		const { state, refresh } = setup(list(1, 2, 3));
+		expect(screen.getByRole('button', { name: 'Move 1 up' })).toBeDisabled();
+		expect(screen.getByRole('button', { name: 'Move 3 down' })).toBeDisabled();
+		await fireEvent.click(screen.getByRole('button', { name: 'Move 3 up' }));
+		expect(order(state.current)).toEqual([1, 3, 2]);
+		await refresh();
+		await fireEvent.click(screen.getByRole('button', { name: 'Move 1 down' }));
+		expect(order(state.current)).toEqual([3, 1, 2]);
+		expect(screen.getByText('1 moved to position 2 of 3.')).toBeInTheDocument();
+	});
+
+	it('moves a team to the top from its menu', async () => {
+		const { state } = setup(list(1, 2, 3));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 3' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Move to top' }));
+		expect(order(state.current)).toEqual([3, 1, 2]);
+	});
+
+	it('undoes a removal', async () => {
+		const { state, refresh } = setup(list(1, 2, 3));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 2' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Remove 2' }));
+		await refresh();
+		expect(screen.getByText('Removed 2.')).toBeInTheDocument();
+		await fireEvent.click(screen.getByRole('button', { name: 'Undo' }));
+		expect(order(state.current)).toEqual([1, 2, 3]);
+		expect(screen.queryByText('Removed 2.')).toBeNull();
+	});
+
+	it('tags a team and shows the tags next to it', async () => {
+		const { state, refresh } = setup(list(1));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 1' }));
+		const defense = screen.getByRole('button', { name: 'Defense' });
+		expect(defense).toHaveAttribute('aria-pressed', 'false');
+		await fireEvent.click(defense);
+		expect(state.current.entries[0].tags).toEqual(['defense']);
+		await refresh();
+		expect(screen.getByRole('button', { name: 'Defense' })).toHaveAttribute('aria-pressed', 'true');
+		expect(screen.getAllByRole('listitem')[0]).toHaveTextContent('Defense');
+	});
+
+	it('keeps do not pick teams in their own section', async () => {
+		const { state, refresh } = setup(list(1, 2));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 1' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Do not pick' }));
+		expect(state.current.entries.map((entry) => [entry.team, entry.avoid ?? false])).toEqual([
+			[2, false],
+			[1, true]
+		]);
+		await refresh();
+		const avoid = screen.getByRole('heading', { name: 'Do not pick' }).nextElementSibling;
+		expect(avoid).toHaveTextContent('1');
+		expect(within(avoid as HTMLElement).queryByRole('button', { name: 'Move 1' })).toBeNull();
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 1' }));
+		await fireEvent.click(screen.getByRole('button', { name: 'Back to pick list' }));
+		expect(state.current.entries[1].avoid).toBeUndefined();
+	});
+});
+
+describe('stats and export', () => {
+	it('shows OPR and rank next to each team', () => {
+		setup(list(1, 2), { stats: new Map([[1, { opr: 45.25, rank: 3 }]]) });
+		const rows = screen.getAllByRole('listitem');
+		expect(rows[0]).toHaveTextContent('OPR 45.3 · #3');
+		expect(rows[1]).not.toHaveTextContent('OPR');
+	});
+
+	it('copies the list as text', async () => {
+		const writeText = vi.fn(async () => undefined);
+		Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+		setup({ ...list(1, 2), event: 'USAZGIQ' });
+		await fireEvent.click(screen.getByRole('button', { name: 'Copy as text' }));
+		expect(writeText).toHaveBeenCalledWith('Pick list, USAZGIQ\n1. 1\n2. 2');
+		await vi.waitFor(() =>
+			expect(screen.getByRole('button', { name: 'Copied' })).toBeInTheDocument()
+		);
+	});
+
+	it('hides export and editing when read only', () => {
+		render(PickList, { props: { list: list(1) } });
+		expect(screen.queryByRole('button', { name: 'Copy as text' })).toBeNull();
+		expect(screen.queryByRole('button', { name: /More/ })).toBeNull();
 	});
 });

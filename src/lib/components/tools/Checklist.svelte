@@ -3,6 +3,7 @@
 	import type { Snippet } from 'svelte';
 	import { time } from '#lib/format/time.ts';
 	import Button from '#lib/ui/Button.svelte';
+	import UndoBar from '#lib/components/tools/UndoBar.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { newId } from '#lib/workspace/code.ts';
 	import {
@@ -14,10 +15,13 @@
 		removeItem,
 		renameItem,
 		resetForNextMatch,
-		toggleItem
+		restoreItem,
+		toggleItem,
+		undoReset
 	} from '#lib/workspace/checklist.ts';
 	import { normalizeInitials } from '#lib/workspace/recents.ts';
-	import type { Checklist } from '#lib/workspace/schemas.ts';
+	import type { CheckItem, Checklist } from '#lib/workspace/schemas.ts';
+	import { UndoOffer } from '#lib/workspace/undo.svelte.ts';
 
 	interface Props {
 		checklist: Checklist;
@@ -30,6 +34,7 @@
 	let { checklist, initials = '', oninitials, update, share }: Props = $props();
 
 	const id = $props.id();
+	const undo = new UndoOffer();
 	let editing = $state(false);
 	let draft = $state('');
 	let waiting = $state<string | null>(null);
@@ -77,7 +82,19 @@
 
 	function reset() {
 		const stamp = Date.now();
+		const before = checklist;
+		const checked = counts.done > 0;
 		update?.((current) => resetForNextMatch(current, stamp));
+		if (checked) {
+			undo.offer('Checks cleared for the next match.', () =>
+				update?.((current) => undoReset(current, before, stamp))
+			);
+		}
+	}
+
+	function remove(item: CheckItem, index: number) {
+		update?.((current) => removeItem(current, item.id));
+		undo.offer('Item removed.', () => update?.((current) => restoreItem(current, item, index)));
 	}
 
 	function who(by: string[]): string {
@@ -168,7 +185,7 @@
 								type="button"
 								class="ctl-btn plain"
 								aria-label="Remove item {index + 1}"
-								onclick={() => update((current) => removeItem(current, item.id))}
+								onclick={() => remove(item, index)}
 							>
 								Remove
 							</button>
@@ -231,6 +248,7 @@
 			</ul>
 		</details>
 	{/if}
+	{#if update}<UndoBar offer={undo} />{/if}
 </section>
 
 <style>

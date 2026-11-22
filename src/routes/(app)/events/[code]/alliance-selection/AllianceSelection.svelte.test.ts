@@ -3,6 +3,7 @@ import { cleanup, render, screen, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { AllianceOdds, EventAnalysis } from '#lib/analysis/types.ts';
 import type { AllianceSelection, Ranking, Team } from '#lib/types.ts';
+import { pickMarks, setAvoid, setNote } from '#lib/workspace/picklist.ts';
 import { deriveSelection, selectionTable } from '#lib/workspace/selection.ts';
 import AllianceTable from './AllianceTable.svelte';
 import AvailableTeams from './AvailableTeams.svelte';
@@ -98,6 +99,28 @@ describe('alliance table', () => {
 });
 
 describe('available teams', () => {
+	it('shows our pick list place and notes under each team', () => {
+		const table = selectionTable({ teams, rankings, matches: [] }, null, selection);
+		const list = setAvoid(
+			setNote(
+				{
+					event: null,
+					entries: [201, 301].map((team) => ({ team, name: null, note: '', taken: false }))
+				},
+				201,
+				'Fast intake'
+			),
+			301,
+			true
+		);
+		render(AvailableTeams, { props: { table, marks: pickMarks(list) } });
+		const row = (team: string) =>
+			screen.getAllByRole('row').find((item) => item.textContent?.includes(team));
+		expect(row('Valley X')).toHaveTextContent('Our #1 · Fast intake');
+		expect(row('The Titans')).toHaveTextContent('Do not pick');
+		expect(row('Grape Nerds')).not.toHaveTextContent('Our #');
+	});
+
 	it('shows ranking columns when there is no analysis', () => {
 		const table = selectionTable({ teams, rankings, matches: [] }, null, selection);
 		render(AvailableTeams, { props: { table } });
