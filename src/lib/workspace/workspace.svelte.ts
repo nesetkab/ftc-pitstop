@@ -130,11 +130,19 @@ export class Workspace {
 			if (document.visibilityState === 'hidden') void this.flush();
 		};
 		const leave = () => void this.flush();
+		const online = () => void this.retry();
+		const offline = () => {
+			if (this.kind === 'shared') this.offline = true;
+		};
 		document.addEventListener('visibilitychange', hidden);
 		window.addEventListener('pagehide', leave);
+		window.addEventListener('online', online);
+		window.addEventListener('offline', offline);
 		stops.push(() => {
 			document.removeEventListener('visibilitychange', hidden);
 			window.removeEventListener('pagehide', leave);
+			window.removeEventListener('online', online);
+			window.removeEventListener('offline', offline);
 		});
 		return () => {
 			for (const stop of stops) stop();
@@ -155,6 +163,16 @@ export class Workspace {
 		this.sync = 'saving';
 		this.message = null;
 		this.#schedule(name, this.#flushDelay);
+	}
+
+	get unsaved(): boolean {
+		return this.sync === 'retrying' || this.sync === 'failed';
+	}
+
+	async retry(): Promise<void> {
+		this.#failures = 0;
+		if (this.names.some((name) => this.#queued(name) > 0)) this.sync = 'saving';
+		await this.flush();
 	}
 
 	async flush(): Promise<void> {
@@ -297,7 +315,9 @@ export class Workspace {
 		this.message =
 			code === 'rate-limited'
 				? 'Too many changes at once. Saving again shortly.'
-				: 'Not saved yet. Trying again.';
+				: this.offline
+					? 'Offline. Not saved yet, will retry when the connection is back.'
+					: 'Not saved yet. Trying again.';
 		return true;
 	}
 }

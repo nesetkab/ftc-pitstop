@@ -229,7 +229,7 @@ describe('trouble saving', () => {
 		await vi.advanceTimersByTimeAsync(300);
 		expect(workspace.sync).toBe('retrying');
 		expect(workspace.offline).toBe(true);
-		expect(workspace.message).toBe('Not saved yet. Trying again.');
+		expect(workspace.message).toBe('Offline. Not saved yet, will retry when the connection is back.');
 		await vi.advanceTimersByTimeAsync(1000);
 		expect(write).toHaveBeenCalledTimes(2);
 		expect(workspace.sync).toBe('saved');

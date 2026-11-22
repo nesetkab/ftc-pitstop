@@ -87,3 +87,24 @@ export function resetForNextMatch(list: Checklist, now: number): Checklist {
 		history
 	};
 }
+
+export function restoreItem(list: Checklist, item: CheckItem, index: number): Checklist {
+	if (list.items.length >= LIMITS.checks || list.items.some((known) => known.id === item.id)) {
+		return list;
+	}
+	const items = [...list.items];
+	items.splice(Math.min(Math.max(index, 0), items.length), 0, item);
+	return { ...list, items };
+}
+
+export function undoReset(list: Checklist, before: Checklist, now: number): Checklist {
+	const checks = new Map(before.items.map((item) => [item.id, item]));
+	return {
+		match: before.match,
+		items: list.items.map((item) => {
+			const old = checks.get(item.id);
+			return old && item.at === null ? { ...item, by: old.by, at: old.at } : item;
+		}),
+		history: list.history[0]?.at === now ? list.history.slice(1) : list.history
+	};
+}

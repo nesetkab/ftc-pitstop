@@ -121,6 +121,7 @@ describe('pick list', () => {
 
 	it('removes a team', async () => {
 		const { state } = setup(list(1, 2, 3));
+		await fireEvent.click(screen.getByRole('button', { name: 'More for 2' }));
 		await fireEvent.click(screen.getByRole('button', { name: 'Remove 2' }));
 		expect(order(state.current)).toEqual([1, 3]);
 	});
@@ -197,7 +198,7 @@ describe('reordering with the keyboard', () => {
 		setup(list(1, 2));
 		const handle = screen.getByRole('button', { name: 'Move 1' });
 		const help = document.getElementById(handle.getAttribute('aria-describedby') ?? '');
-		expect(help).toHaveTextContent('press the up or down arrow');
+		expect(help).toHaveTextContent('press the up or down arrow key');
 	});
 });
 

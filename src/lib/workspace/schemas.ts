@@ -16,6 +16,10 @@ export const SHAPE_COLORS = ['ink', 'red', 'blue', 'accent'] as const;
 
 export type ShapeColor = (typeof SHAPE_COLORS)[number];
 
+export const PICK_TAGS = ['auto', 'cycles', 'endgame', 'defense', 'steady', 'risky'] as const;
+
+export type PickTag = (typeof PICK_TAGS)[number];
+
 export const SHARE_TOOLS = ['picklist', 'batteries', 'checklist', 'board'] as const;
 
 export type ShareTool = (typeof SHARE_TOOLS)[number];
@@ -47,7 +51,9 @@ export const pickEntrySchema = z.object({
 	team: teamNumber,
 	name: nothing(text(80)),
 	note: z._default(text(300), ''),
-	taken: z._default(z.boolean(), false)
+	taken: z._default(z.boolean(), false),
+	tags: z.optional(z.array(z.enum(PICK_TAGS)).check(z.maxLength(PICK_TAGS.length))),
+	avoid: z.optional(z.boolean())
 });
 
 export const pickListSchema = z.object({

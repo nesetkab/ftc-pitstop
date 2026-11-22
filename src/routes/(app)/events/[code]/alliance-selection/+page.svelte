@@ -8,6 +8,7 @@
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
 	import { formatCode } from '#lib/workspace/code.ts';
+	import { pickMarks } from '#lib/workspace/picklist.ts';
 	import { readRecents, type Recent } from '#lib/workspace/recents.ts';
 	import {
 		bundleSignature,
@@ -39,6 +40,15 @@
 	const selection = $derived(deriveSelection(bundle.alliances));
 	const table = $derived(selectionTable(bundle, analysis, selection));
 	const labels = $derived(takenLabels(selection));
+	const stats = $derived(
+		new Map(
+			[...table.available, ...table.taken].map((row) => [
+				row.team,
+				{ opr: row.opr, rank: row.rank }
+			])
+		)
+	);
+	const marks = $derived(ours ? pickMarks(ours.docs.picklist) : undefined);
 	const ongoing = $derived(
 		bundle.phase === 'selection' && (!selection.started || selection.picking !== null)
 	);
@@ -176,7 +186,13 @@
 			{/if}
 			{#if ours}
 				<div class="panel">
-					<PickList list={ours.docs.picklist} auto={labels} title="Our pick list" showEvent={false}>
+					<PickList
+						list={ours.docs.picklist}
+						auto={labels}
+						{stats}
+						title="Our pick list"
+						showEvent={false}
+					>
 						{#snippet share()}
 							<a href="/w/{ours?.code}/picklist">Edit pick list</a>
 						{/snippet}
@@ -216,7 +232,7 @@
 		{#if selection.started}
 			<div class="panel main">
 				<h3 class="sec-title">{selection.complete ? 'Teams' : 'Available teams'}</h3>
-				<AvailableTeams {table} {me} />
+				<AvailableTeams {table} {me} {marks} />
 				{#each notes as note (note)}
 					<p class="note">{note}</p>
 				{/each}

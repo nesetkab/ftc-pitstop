@@ -104,8 +104,6 @@
 				kind={workspace.kind}
 				sync={workspace.sync}
 				savedAt={workspace.savedAt}
-				offline={workspace.offline}
-				message={workspace.message}
 			/>
 		{/snippet}
 		{#snippet actions()}
@@ -132,10 +130,59 @@
 		{/snippet}
 	</PageHeader>
 	<Tabs {tabs} label="Team tools" />
+	<div class="sync" role="status">
+		{#if workspace.unsaved || workspace.offline}
+			<p class="trouble">
+				<span class="dot" aria-hidden="true"></span>
+				<span class="text">
+					{workspace.unsaved
+						? (workspace.message ?? 'Not saved yet.')
+						: 'Offline. Showing the last copy.'}
+				</span>
+				{#if workspace.sync === 'retrying'}
+					<button type="button" class="ctl-btn" onclick={() => workspace.retry()}>Retry now</button>
+				{/if}
+			</p>
+		{/if}
+	</div>
 	{@render children()}
 {/if}
 
 <style>
+	.sync {
+		position: sticky;
+		top: 0;
+		z-index: 10;
+		margin-block: -8px;
+	}
+
+	.sync:empty {
+		display: none;
+	}
+
+	.trouble {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 8px 8px 8px 12px;
+		border: 1px solid var(--line-2);
+		border-radius: var(--radius-control);
+		background: var(--bg);
+		font-size: 14px;
+	}
+
+	.dot {
+		flex: none;
+		width: 8px;
+		height: 8px;
+		border-radius: 50%;
+		background: var(--red);
+	}
+
+	.text {
+		flex: 1 1 auto;
+	}
+
 	.match {
 		display: flex;
 		align-items: center;
