@@ -384,3 +384,55 @@ export function playoffRecords(
 	}
 	return records;
 }
+
+function sideName(side: FinalsAlliance): string {
+	return side.seed === null ? side.source : `Alliance ${side.seed}`;
+}
+
+export function finalsStatus(bracket: BracketView): string | null {
+	if (bracket.champion !== null) return `Alliance ${bracket.champion} won the event.`;
+	const { alliances, games } = bracket.finals;
+	if (!games.some((game) => game.played)) return null;
+	const [top, bottom] = alliances;
+	if (bracket.size === 2) {
+		if (top.wins === bottom.wins) return `Finals tied ${top.wins}–${bottom.wins}.`;
+		const [ahead, behind] = top.wins > bottom.wins ? [top, bottom] : [bottom, top];
+		return `${sideName(ahead)} leads the finals ${ahead.wins}–${behind.wins}.`;
+	}
+	const [first, second] = games;
+	if (first.winner === 1 && second && !second.played) {
+		return `${sideName(bottom)} won ${first.label}, so ${second.label} decides the event.`;
+	}
+	return null;
+}
+
+export function allianceStatus(bracket: BracketView, seeds: number[]): Map<number, string> {
+	const status = new Map<number, string>();
+	const matches = [...bracket.upper.flat(), ...bracket.lower.flat()].sort(
+		(a, b) => a.series - b.series
+	);
+	const started =
+		matches.some((match) => match.played) || bracket.finals.games.some((game) => game.played);
+	if (!started) return status;
+	const losses = new Map<number, number>();
+	for (const match of matches) {
+		if (!match.winner) continue;
+		const loser = match.winner === 'red' ? match.blue.seed : match.red.seed;
+		if (loser === null) continue;
+		const count = (losses.get(loser) ?? 0) + 1;
+		losses.set(loser, count);
+		if (count === 2) status.set(loser, `Out after ${match.label}`);
+	}
+	for (const side of bracket.finals.alliances) {
+		if (side.seed === null) continue;
+		const text =
+			bracket.champion === null ? 'In the finals' : side.champion ? 'Won the event' : 'Finalist';
+		status.set(side.seed, text);
+	}
+	if (bracket.size === 2) return status;
+	for (const seed of seeds) {
+		if (status.has(seed)) continue;
+		status.set(seed, (losses.get(seed) ?? 0) === 0 ? 'Upper bracket' : 'Lower bracket');
+	}
+	return status;
+}

@@ -11,6 +11,7 @@
 		teams: Team[];
 		records?: Map<number, { wins: number; losses: number; ties: number }>;
 		odds?: AllianceOdds[] | null;
+		status?: Map<number, string>;
 		followed?: ReadonlySet<number>;
 	}
 
@@ -19,6 +20,7 @@
 		teams,
 		records = new Map(),
 		odds = null,
+		status = new Map(),
 		followed = new Set()
 	}: Props = $props();
 
@@ -29,6 +31,7 @@
 		odds ? new Map(odds.map((entry) => [entry.seed, entry.winEvent])) : null
 	);
 	const showRecord = $derived(records.size > 0);
+	const showStatus = $derived(status.size > 0);
 
 	function pickLabel(index: number) {
 		return ['First pick', 'Second pick', 'Third pick'][index] ?? `Pick ${index + 1}`;
@@ -55,6 +58,9 @@
 			{/if}
 			{#if showRecord}
 				<th scope="col">Record</th>
+			{/if}
+			{#if showStatus}
+				<th class="l" scope="col">Playoffs</th>
 			{/if}
 			{#if chances}
 				<th scope="col">Win the event</th>
@@ -95,6 +101,16 @@
 					{@const entry = records.get(alliance.seed)}
 					<td>{entry ? record(entry.wins, entry.losses, entry.ties) : '—'}</td>
 				{/if}
+				{#if showStatus}
+					{@const text = status.get(alliance.seed) ?? '—'}
+					<td
+						class={[
+							'l',
+							'status',
+							{ out: text.startsWith('Out'), champion: text === 'Won the event' }
+						]}>{text}</td
+					>
+				{/if}
 				{#if chances}
 					<ProbCell p={chances.get(alliance.seed)} />
 				{/if}
@@ -104,6 +120,18 @@
 </Table>
 
 <style>
+	.status {
+		white-space: nowrap;
+	}
+
+	.status.out {
+		color: var(--text-3);
+	}
+
+	.status.champion {
+		font-weight: 600;
+	}
+
 	@media (max-width: 600px) {
 		:global(.table-wrap.alliances .team-cell .name) {
 			display: none;

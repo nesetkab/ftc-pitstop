@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { time } from '#lib/format/time.ts';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
-	import type { BracketMatchView, BracketView, SlotView } from './bracket.ts';
+	import {
+		finalsStatus,
+		type BracketMatchView,
+		type BracketView,
+		type SlotView
+	} from './bracket.ts';
 
 	interface Props {
 		code: string;
@@ -19,17 +24,19 @@
 		].filter((section) => section.rounds.length > 0)
 	);
 
+	const status = $derived(finalsStatus(bracket));
+
 	function href(key: string | null) {
 		return key ? `/events/${code}/matches/${key}` : undefined;
 	}
 </script>
 
 {#snippet slot(side: SlotView, color: 'red' | 'blue', match: BracketMatchView)}
-	<div class={['slot', { won: side.won, lost: match.played && !side.won }]}>
+	<div class={['slot', color, { won: side.won, lost: match.played && !side.won }]}>
 		<span class="visually-hidden"
 			>{color === 'red' ? 'Red' : 'Blue'}{side.seed === null ? '' : `, alliance ${side.seed}`}</span
 		>
-		<span class="seed" aria-hidden="true">{side.seed ?? ''}</span>
+		<span class="seed" aria-hidden="true">{side.seed === null ? '' : `A${side.seed}`}</span>
 		<span class="teams">
 			{#if side.teams.length > 0}
 				{#each side.teams as team (team)}
@@ -61,6 +68,12 @@
 {/snippet}
 
 <div class={['bracket', `size-${bracket.size}`]} aria-label="Playoff bracket" role="group">
+	{#if sections.length > 0}
+		<p class="key" aria-hidden="true">
+			<span class="side-name red">Red</span> is on top in every match and
+			<span class="side-name blue">Blue</span> below. A1 is the first seed.
+		</p>
+	{/if}
 	{#each sections as section (section.id)}
 		<section class={['part', section.id]} aria-label={section.title}>
 			<h3 class="part-title">{section.title}</h3>
@@ -91,7 +104,9 @@
 								{game.label}
 							</svelte:element>
 							{#if game.ifNeeded}
-								<span class="if-needed">If needed</span>
+								<span class="note">If needed</span>
+							{:else if !game.played && game.time !== null}
+								<span class="note">{time(game.time, timezone)}</span>
 							{/if}
 						</th>
 					{/each}
@@ -99,13 +114,18 @@
 			</thead>
 			<tbody>
 				{#each bracket.finals.alliances as side, index (index)}
-					<tr class={{ champion: side.champion }}>
+					<tr
+						class={{
+							champion: side.champion,
+							finalist: bracket.champion !== null && !side.champion
+						}}
+					>
 						<th scope="row" class="side">
 							<span class="side-inner">
 								<span class="seed">
 									{#if side.seed !== null}
-										<span class="visually-hidden">Alliance</span>
-										{side.seed}
+										<span class="visually-hidden">Alliance {side.seed}</span>
+										<span aria-hidden="true">A{side.seed}</span>
 									{/if}
 								</span>
 								<span class="teams">
@@ -138,8 +158,8 @@
 				{/each}
 			</tbody>
 		</table>
-		{#if bracket.champion !== null}
-			<p class="result">Alliance {bracket.champion} won the event.</p>
+		{#if status}
+			<p class="result">{status}</p>
 		{/if}
 	</section>
 </div>
@@ -149,6 +169,7 @@
 		display: grid;
 		grid-template-columns: max-content max-content;
 		grid-template-areas:
+			'key key'
 			'upper finals'
 			'lower finals';
 		gap: 28px 40px;
@@ -160,6 +181,26 @@
 	.size-2 {
 		grid-template-columns: minmax(0, max-content);
 		grid-template-areas: 'finals';
+	}
+
+	.key {
+		grid-area: key;
+		margin: 0 0 -12px;
+		font-size: 13px;
+		color: var(--text-3);
+	}
+
+	.side-name {
+		font-size: 12.5px;
+		font-weight: 500;
+	}
+
+	.side-name.red {
+		color: var(--red);
+	}
+
+	.side-name.blue {
+		color: var(--blue);
 	}
 
 	.part {
@@ -260,17 +301,29 @@
 
 	.slot {
 		display: grid;
-		grid-template-columns: 14px minmax(0, 1fr) auto;
+		grid-template-columns: 20px minmax(0, 1fr) auto;
 		gap: 8px;
 		align-items: center;
 		padding: 5px 10px;
 		border-top: 1px solid var(--line);
 	}
 
+	.slot.red {
+		box-shadow: inset 3px 0 0 var(--red);
+	}
+
+	.slot.blue {
+		box-shadow: inset 3px 0 0 var(--blue);
+	}
+
+	.slot:last-child {
+		border-bottom-left-radius: calc(var(--radius-panel) - 1px);
+	}
+
 	.seed {
 		font-size: 12.5px;
 		color: var(--text-3);
-		text-align: right;
+		white-space: nowrap;
 	}
 
 	.teams {
@@ -337,7 +390,7 @@
 		text-decoration: underline;
 	}
 
-	.if-needed {
+	.note {
 		display: block;
 		font-weight: 400;
 	}
@@ -369,6 +422,10 @@
 		font-weight: 600;
 	}
 
+	.finalist .teams {
+		opacity: 0.6;
+	}
+
 	.result {
 		font-size: 14px;
 		color: var(--text-2);
@@ -378,6 +435,7 @@
 		.bracket {
 			grid-template-columns: minmax(0, 1fr);
 			grid-template-areas:
+				'key'
 				'upper'
 				'lower'
 				'finals';
