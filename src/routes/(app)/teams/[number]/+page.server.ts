@@ -21,6 +21,7 @@ function fail(cause: unknown): never {
 }
 
 export const load: PageServerLoad = async ({ params, setHeaders }) => {
+	const ratingsTask = settled(loadSeasonRatingsWithin());
 	const season = await loadTeamSeason(params.number).catch(fail);
 	if (!season) error(404, 'Team not found');
 
@@ -30,7 +31,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	);
 
 	const [ratings, analysisList, bundleList] = await Promise.all([
-		settled(loadSeasonRatingsWithin()),
+		ratingsTask,
 		Promise.all(started.map((entry) => settled(loadEventAnalysis(entry.event.code)))),
 		Promise.all(started.map((entry) => settled(loadEventBundle(entry.event.code))))
 	]);

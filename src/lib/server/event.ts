@@ -3,6 +3,7 @@ import { detectPhase, lastPosted, WINNER_AWARD_ID } from '#lib/game/phase.ts';
 import {
 	cache as defaultCache,
 	LruMap,
+	settleWithin,
 	type Cache,
 	type CachedValue,
 	type CachePolicy,
@@ -31,13 +32,13 @@ import {
 } from '#lib/server/ftc/index.ts';
 import {
 	compareEvents,
-	createFtcScoutClient,
 	fetchEventByCode,
 	fetchEventsOnDate,
 	fetchQuickStats,
 	fetchSeasonEvents,
 	fetchSeasonMatches,
 	fetchTeamSeason,
+	scoutClient,
 	type FtcScoutClient
 } from '#lib/server/ftcscout.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
@@ -62,6 +63,13 @@ const HOUR = 3_600_000;
 const DAY_SECONDS = 86_400;
 const MISS_MS = 5 * 60_000;
 const LIST_RETRY_MS = 30_000;
+const LIST_WAIT_MS = 1_000;
+const LIST_HEDGE_MS = 2_000;
+const LIST_PEEK_MS = 250;
+const LIST_TIMEOUT_MS = 6_000;
+const BUNDLE_BUDGET_MS = 5_000;
+const FALLBACK_MIN_MS = 1_500;
+const TEAM_WAIT_MS = 3_000;
 const SEASON_WEEKS_AT_ONCE = 3;
 const AWARDS_WAIT_MS = 2 * HOUR;
 const EVENT_LIST_POLICY: CachePolicy = { ttl: 3600, maxStale: 7 * DAY_SECONDS };
@@ -202,6 +210,18 @@ async function settle<T>(task: Promise<CachedValue<T>> | null): Promise<Settled<
 	}
 }
 
+type Outcome<T> = { value: T } | { error: unknown };
+
+function outcomeWithin<T>(task: Promise<T>, ms: number): Promise<Outcome<T> | null> {
+	return settleWithin(
+		task.then(
+			(value): Outcome<T> => ({ value }),
+			(error: unknown): Outcome<T> => ({ error })
+		),
+		ms
+	);
+}
+
 function played(match: FtcScheduleMatch): boolean {
 	return match.scoreRedFinal != null && match.scoreBlueFinal != null;
 }
@@ -242,10 +262,11 @@ export function createLoaders(deps: LoaderDeps) {
 	function ftcPart<E extends FtcEndpoint>(
 		endpoint: E,
 		path: string,
-		policy: PolicyChoice<FtcBody<E>>
+		policy: PolicyChoice<FtcBody<E>>,
+		timeoutMs?: number
 	): Promise<CachedValue<FtcBody<E>>> {
 		return cache.get<FtcBody<E>>(`ftc:${SEASON}:${path}`, policy, (previous) =>
-			ftcEndpoint(ftc, endpoint, path, { ifModifiedSince: previous?.lastModified })
+			ftcEndpoint(ftc, endpoint, path, { ifModifiedSince: previous?.lastModified, timeoutMs })
 		);
 	}
 
@@ -262,20 +283,36 @@ export function createLoaders(deps: LoaderDeps) {
 		if (now() < listRetryAt[source]) return null;
 		try {
 			if (source === 'scout') return codesOf((await scoutEventList()).body);
-			const value = await ftcPart('event', ftcPaths.seasonEvents(), EVENT_LIST_POLICY);
-			return codesOf(value.body.events);
+			return codesOf((await ftcSeasonList()).body.events);
 		} catch {
 			listRetryAt[source] = now() + LIST_RETRY_MS;
 			return null;
 		}
 	}
 
+	async function listedSoon(source: 'scout' | 'ftc'): Promise<Set<string> | null> {
+		const task = listedCodes(source);
+		const codes = await settleWithin(task, LIST_WAIT_MS);
+		if (codes === null && now() >= listRetryAt[source]) {
+			listRetryAt[source] = now() + LIST_RETRY_MS;
+		}
+		return codes;
+	}
+
+	function budgetFrom(begun: number): number {
+		return Math.max(FALLBACK_MIN_MS, BUNDLE_BUDGET_MS - (performance.now() - begun));
+	}
+
 	async function isKnownEvent(code: string): Promise<boolean> {
-		const scoutCodes = await listedCodes('scout');
+		const scoutCodes = await listedSoon('scout');
 		if (scoutCodes?.has(code)) return true;
-		const ftcCodes = await listedCodes('ftc');
+		const ftcCodes = await listedSoon('ftc');
 		if (ftcCodes?.has(code)) return true;
 		return scoutCodes === null && ftcCodes === null;
+	}
+
+	function ftcSeasonList() {
+		return ftcPart('event', ftcPaths.seasonEvents(), EVENT_LIST_POLICY, LIST_TIMEOUT_MS);
 	}
 
 	function scoutEventList() {
@@ -319,20 +356,20 @@ export function createLoaders(deps: LoaderDeps) {
 		cache.prefetch([...paths.map((path) => `ftc:${SEASON}:${path}`), analysisKey(code)]);
 	}
 
-	async function scoutBundle(code: string, time: number, required = true): Promise<LoadedBundle> {
-		let value: CachedValue<Awaited<ReturnType<typeof fetchEventByCode>>>;
-		try {
-			value = await cache.get(
-				`scout:${SEASON}:event:${code}`,
-				{ ttl: 30, maxStale: 3600 },
-				async () => ({
-					status: 'ok',
-					body: await fetchEventByCode(code, SEASON, scout)
-				})
-			);
-		} catch {
-			throw unavailable('Event data is unavailable right now');
-		}
+	async function scoutBundle(
+		code: string,
+		time: number,
+		required = true,
+		waitMs = BUNDLE_BUDGET_MS
+	): Promise<LoadedBundle> {
+		const value = await settleWithin(
+			cache.get(`scout:${SEASON}:event:${code}`, { ttl: 30, maxStale: 3600 }, async () => ({
+				status: 'ok',
+				body: await fetchEventByCode(code, SEASON, scout)
+			})),
+			waitMs
+		);
+		if (!value) throw unavailable('Event data is unavailable right now');
 		const data = value.body;
 		if (!data && !required) throw unavailable('Event data is unavailable right now');
 		if (!data) {
@@ -367,6 +404,7 @@ export function createLoaders(deps: LoaderDeps) {
 	async function loadEventBundle(input: string): Promise<LoadedBundle> {
 		const code = normalizeEventCode(input);
 		const time = now();
+		const begun = performance.now();
 		if (recentlyMissed(`event:${code}`) || !(await isKnownEvent(code))) {
 			throw notFound('Event not found');
 		}
@@ -380,7 +418,7 @@ export function createLoaders(deps: LoaderDeps) {
 				rememberMiss(`event:${code}`);
 				throw notFound('Event not found');
 			}
-			return scoutBundle(code, time);
+			return scoutBundle(code, time, true, budgetFrom(begun));
 		}
 		const rawEvent = eventValue.body.events[0];
 		if (!rawEvent) {
@@ -399,7 +437,7 @@ export function createLoaders(deps: LoaderDeps) {
 		]);
 
 		if (qualSchedule.body === null) {
-			const fallback = await scoutBundle(code, time, false).catch(() => null);
+			const fallback = await scoutBundle(code, time, false, budgetFrom(begun)).catch(() => null);
 			if (fallback) return fallback;
 		}
 
@@ -474,7 +512,7 @@ export function createLoaders(deps: LoaderDeps) {
 		const advancementList = advancement?.body ? mapAdvancement(advancement.body) : null;
 		if (advancementList?.advancesTo) {
 			const target = advancementList.advancesTo;
-			const season = await loadSeasonEvents().catch(() => null);
+			const season = await settleWithin(loadSeasonEvents(), LIST_HEDGE_MS);
 			advancementList.advancesToName =
 				season?.events.find((entry) => entry.code === target)?.name ?? null;
 		}
@@ -521,7 +559,7 @@ export function createLoaders(deps: LoaderDeps) {
 	}
 
 	async function ftcSeasonEvents(): Promise<EventSummary[]> {
-		const value = await ftcPart('event', ftcPaths.seasonEvents(), EVENT_LIST_POLICY);
+		const value = await ftcSeasonList();
 		if (value.body.events.length === 0) throw unavailable('Event list is empty');
 		return value.body.events.map((raw) => summarizeEvent(mapEvent(raw))).sort(compareEvents);
 	}
@@ -531,15 +569,21 @@ export function createLoaders(deps: LoaderDeps) {
 		fetchedAt: number;
 		stale: boolean;
 	}> {
+		const fromScout = scoutEventList().then((value) => ({
+			events: value.body,
+			fetchedAt: value.fetchedAt,
+			stale: value.stale
+		}));
+		const hedge = cache.peek(`ftc:${SEASON}:${ftcPaths.seasonEvents()}`)
+			? LIST_PEEK_MS
+			: LIST_HEDGE_MS;
+		const early = await settleWithin(fromScout, hedge);
+		if (early) return early;
+		const fromFtc = ftcSeasonEvents().then((events) => ({ events, fetchedAt: now(), stale: true }));
 		try {
-			const value = await scoutEventList();
-			return { events: value.body, fetchedAt: value.fetchedAt, stale: value.stale };
+			return await Promise.any([fromScout, fromFtc]);
 		} catch {
-			try {
-				return { events: await ftcSeasonEvents(), fetchedAt: now(), stale: true };
-			} catch {
-				throw unavailable('Event list is unavailable right now');
-			}
+			throw unavailable('Event list is unavailable right now');
 		}
 	}
 
@@ -589,8 +633,9 @@ export function createLoaders(deps: LoaderDeps) {
 	async function loadTeamSeason(input: string | number): Promise<TeamSeason | null> {
 		const number = normalizeTeamNumber(input);
 		if (recentlyMissed(`team:${number}`)) return null;
-		try {
-			const value = await cache.get(
+		const begun = performance.now();
+		const primary = await outcomeWithin(
+			cache.get(
 				`scout:${SEASON}:team:${number}`,
 				(body) => teamPolicy(body, now()),
 				async () => {
@@ -598,21 +643,22 @@ export function createLoaders(deps: LoaderDeps) {
 					if (!body) throw new TeamMissing();
 					return { status: 'ok', body };
 				}
-			);
+			),
+			TEAM_WAIT_MS
+		);
+		if (primary && 'value' in primary) {
+			const { value } = primary;
 			if (!value.body) return null;
 			return { ...value.body, fetchedAt: value.fetchedAt, stale: value.stale };
-		} catch (error) {
-			if (error instanceof TeamMissing) {
-				rememberMiss(`team:${number}`);
-				return null;
-			}
-			try {
-				return await ftcTeamSeason(number);
-			} catch (fallback) {
-				if (isNotFound(fallback)) return null;
-				throw unavailable('Team data is unavailable right now');
-			}
 		}
+		if (primary?.error instanceof TeamMissing) {
+			rememberMiss(`team:${number}`);
+			return null;
+		}
+		const fallback = await outcomeWithin(ftcTeamSeason(number), budgetFrom(begun));
+		if (fallback && 'value' in fallback) return fallback.value;
+		if (fallback && isNotFound(fallback.error)) return null;
+		throw unavailable('Team data is unavailable right now');
 	}
 
 	async function loadSeasonTeams(): Promise<CachedValue<SearchTeam[]>> {
@@ -620,7 +666,9 @@ export function createLoaders(deps: LoaderDeps) {
 			`ftc:${SEASON}:teams:all`,
 			{ ttl: DAY_SECONDS, maxStale: 7 * DAY_SECONDS },
 			async () => {
-				const pages = await ftcAllPages(ftc, (page) => ftcPaths.seasonTeams(page));
+				const pages = await ftcAllPages(ftc, (page) => ftcPaths.seasonTeams(page), 4, {
+					timeoutMs: LIST_TIMEOUT_MS
+				});
 				const teams = mapTeams(pages)
 					.map((team) => ({
 						number: team.number,
@@ -785,7 +833,7 @@ export type Loaders = ReturnType<typeof createLoaders>;
 
 export const loaders = createLoaders({
 	ftc: defaultFtc,
-	scout: createFtcScoutClient(),
+	scout: scoutClient,
 	nexus: defaultNexus,
 	cache: defaultCache
 });

@@ -1,3 +1,4 @@
+import { createBreaker, type Breaker } from '#lib/server/breaker.ts';
 import { describeError } from '#lib/server/errors.ts';
 import { getRedis, type RedisLike } from '#lib/server/redis.ts';
 
@@ -70,6 +71,40 @@ export class LruMap<V> {
 
 export const SHARED_MIN_TTL = 120;
 const WARM_MS = 5_000;
+export const STORE_TIMEOUT_MS = 2_000;
+export const STALE_WAIT_MS = 2_500;
+export const FAILURE_MEMO_MS = 10_000;
+const LATE = Symbol('late');
+
+class StoreTimeout extends Error {
+	constructor() {
+		super('Cache store timed out');
+		this.name = 'StoreTimeout';
+	}
+}
+
+function waitFor<T>(task: Promise<T>, ms: number): Promise<T | typeof LATE> {
+	let timer: ReturnType<typeof setTimeout> | undefined;
+	const late = new Promise<typeof LATE>((resolve) => {
+		timer = setTimeout(() => resolve(LATE), ms);
+	});
+	return Promise.race([task, late]).finally(() => clearTimeout(timer));
+}
+
+export async function settleWithin<T>(task: Promise<T>, ms: number): Promise<T | null> {
+	const guarded = task.catch(() => null);
+	const result = await waitFor(guarded, ms);
+	if (result !== LATE) return result;
+	keepAlive(guarded);
+	return null;
+}
+
+async function bounded<T>(task: Promise<T>, ms: number): Promise<T> {
+	task.catch(() => undefined);
+	const result = await waitFor(task, ms);
+	if (result === LATE) throw new StoreTimeout();
+	return result;
+}
 
 export interface CacheOptions {
 	maxEntries?: number;
@@ -78,6 +113,9 @@ export interface CacheOptions {
 	now?: () => number;
 	onError?: (key: string, error: unknown) => void;
 	background?: (task: Promise<unknown>) => void;
+	storeTimeoutMs?: number;
+	staleWaitMs?: number;
+	storeBreaker?: Breaker;
 }
 
 type RequestStore = { get?: () => { waitUntil?: (task: Promise<unknown>) => void } | undefined };
@@ -101,33 +139,41 @@ export function createCache(options: CacheOptions = {}) {
 	const absent = new LruMap<number>(500);
 	const inflight = new Map<string, Promise<CacheEntry>>();
 	const failures = new Map<string, number>();
+	const errors = new LruMap<{ at: number; error: unknown }>(500);
 	const store = options.store ?? null;
 	const now = options.now ?? Date.now;
 	const onError = options.onError ?? logError;
 	const background = options.background ?? keepAlive;
 	const sharedMinTtl = options.sharedMinTtl ?? SHARED_MIN_TTL;
+	const storeTimeoutMs = options.storeTimeoutMs ?? STORE_TIMEOUT_MS;
+	const staleWaitMs = options.staleWaitMs ?? STALE_WAIT_MS;
+	const storeBreaker =
+		options.storeBreaker ?? createBreaker({ threshold: 3, cooldownMs: 15_000, now });
 
 	function shared(policy: CachePolicy): boolean {
 		return store !== null && policy.ttl >= sharedMinTtl;
 	}
 
-	async function readStore(key: string): Promise<CacheEntry | null> {
-		if (!store) return null;
+	async function useStore<T>(key: string, run: (store: CacheStore) => Promise<T>) {
+		if (!store || !storeBreaker.allow()) return null;
 		try {
-			return await store.get(key);
+			const result = await bounded(run(store), storeTimeoutMs);
+			storeBreaker.success();
+			return result;
 		} catch (error) {
+			storeBreaker.failure();
 			onError(key, error);
 			return null;
 		}
 	}
 
+	function readStore(key: string): Promise<CacheEntry | null> {
+		return useStore(key, (store) => store.get(key));
+	}
+
 	async function writeStore(key: string, entry: CacheEntry, policy: CachePolicy) {
-		if (!store || !shared(policy)) return;
-		try {
-			await store.set(key, entry, Math.ceil(policy.ttl + policy.maxStale));
-		} catch (error) {
-			onError(key, error);
-		}
+		if (!shared(policy)) return;
+		await useStore(key, (store) => store.set(key, entry, Math.ceil(policy.ttl + policy.maxStale)));
 	}
 
 	function prefetch(keys: string[]) {
@@ -183,12 +229,14 @@ export function createCache(options: CacheOptions = {}) {
 						};
 			memory.set(key, entry);
 			failures.delete(key);
+			errors.delete(key);
 			await writeStore(key, entry, choose(entry.body));
 			return entry;
 		})();
 		const tracked = task
 			.catch((error: unknown) => {
 				failures.set(key, now());
+				errors.set(key, { at: now(), error });
 				throw error;
 			})
 			.finally(() => inflight.delete(key));
@@ -226,13 +274,20 @@ export function createCache(options: CacheOptions = {}) {
 				return { ...(entry as CacheEntry<T>), stale: failed };
 			}
 		}
-		try {
-			const fresh = await refresh(key, choose, run, checkStore);
-			return { ...(fresh as CacheEntry<T>), stale: false };
-		} catch (error) {
-			if (entry) return { ...(entry as CacheEntry<T>), stale: true };
-			throw error;
+		const recent = entry ? undefined : errors.get(key);
+		if (recent && now() - recent.at < Math.min(FAILURE_MEMO_MS, policy.ttl * 1000)) {
+			throw recent.error;
 		}
+		const running = refresh(key, choose, run, checkStore);
+		if (!entry) return { ...((await running) as CacheEntry<T>), stale: false };
+		try {
+			const fresh = await waitFor(running, staleWaitMs);
+			if (fresh !== LATE) return { ...(fresh as CacheEntry<T>), stale: false };
+			background(running.catch((error: unknown) => onError(key, error)));
+		} catch {
+			return { ...(entry as CacheEntry<T>), stale: true };
+		}
+		return { ...(entry as CacheEntry<T>), stale: true };
 	}
 
 	async function lookup(keys: string[], maxAgeMs: number): Promise<Map<string, CacheEntry>> {
@@ -272,6 +327,7 @@ export function createCache(options: CacheOptions = {}) {
 			warming.clear();
 			absent.clear();
 			failures.clear();
+			errors.clear();
 		},
 		pending: () => inflight.size
 	};

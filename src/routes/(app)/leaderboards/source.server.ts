@@ -10,7 +10,7 @@ import {
 } from '#lib/components/team/leaderboard.ts';
 import { ratedTeams } from '#lib/components/team/team-view.ts';
 import { loadSeasonEventRatingsWithin, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
-import { LruMap } from '#lib/server/cache.ts';
+import { LruMap, settleWithin } from '#lib/server/cache.ts';
 import { unavailable } from '#lib/server/errors.ts';
 import { searchIndex } from '#lib/server/event.ts';
 import { scoutLeaderboard } from './scout.server.ts';
@@ -23,6 +23,9 @@ export interface LeaderboardSource {
 	options: EventFilterOptions;
 }
 
+const RATINGS_WAIT_MS = 4_000;
+const SCOUT_WAIT_MS = 2_500;
+const NAMES_WAIT_MS = 2_000;
 const NO_OPTIONS: EventFilterOptions = { types: [], weeks: [] };
 const EVERYTHING: LeaderboardScope = { type: '', window: null };
 
@@ -45,9 +48,9 @@ export async function loadLeaderboardSource(
 ): Promise<LeaderboardSource> {
 	const filtered = isScoped(scope);
 	const [ratings, directory, table] = await Promise.all([
-		loadSeasonRatingsWithin(20_000).catch(() => null),
-		searchIndex().catch(() => null),
-		filtered ? loadSeasonEventRatingsWithin(20_000).catch(() => null) : null
+		loadSeasonRatingsWithin(RATINGS_WAIT_MS).catch(() => null),
+		settleWithin(searchIndex(), NAMES_WAIT_MS),
+		filtered ? loadSeasonEventRatingsWithin(RATINGS_WAIT_MS).catch(() => null) : null
 	]);
 	if (ratings && ratedTeams(ratings).length > 0) {
 		const options = eventFilterOptions(directory?.events ?? [], today);
@@ -72,7 +75,9 @@ export async function loadLeaderboardSource(
 		scoped.set(key, source);
 		return source;
 	}
-	const { rows, fetchedAt } = await scoutLeaderboard.load();
+	const fallback = await settleWithin(scoutLeaderboard.load(), SCOUT_WAIT_MS);
+	if (!fallback) throw unavailable('Season ratings are still loading');
+	const { rows, fetchedAt } = fallback;
 	return remember(`scout:${fetchedAt}`, () => ({
 		kind: 'scout',
 		dataset: createDataset(rows),

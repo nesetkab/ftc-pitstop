@@ -2,7 +2,7 @@ import * as z from 'zod';
 import type { LeaderboardRow } from '#lib/components/team/leaderboard.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { cache as defaultCache, type Cache } from '#lib/server/cache.ts';
-import { createFtcScoutClient, type FtcScoutClient } from '#lib/server/ftcscout.ts';
+import { scoutClient, type FtcScoutClient } from '#lib/server/ftcscout.ts';
 
 const PAGE = 50;
 const DEFAULT_LIMIT = 500;
@@ -69,7 +69,7 @@ export interface ScoutLeaderboard {
 }
 
 export function createScoutLeaderboard(deps: ScoutLeaderboardDeps = {}) {
-	const scout = deps.scout ?? createFtcScoutClient();
+	const scout = deps.scout ?? scoutClient;
 	const cache = deps.cache ?? defaultCache;
 	const limit = deps.limit ?? DEFAULT_LIMIT;
 

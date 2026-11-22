@@ -35,3 +35,21 @@ export function errorResponse(error: unknown, fallback: string): Response {
 	console.error(`${fallback}: ${describeError(error)}`);
 	return jsonResponse({ error: fallback }, CACHE_CONTROL.none, 503);
 }
+
+export function uncachedErrors(response: Response): Response {
+	if (response.status < 500 || response.headers.get('cache-control') === CACHE_CONTROL.none) {
+		return response;
+	}
+	try {
+		response.headers.set('cache-control', CACHE_CONTROL.none);
+		return response;
+	} catch {
+		const headers = new Headers(response.headers);
+		headers.set('cache-control', CACHE_CONTROL.none);
+		return new Response(response.body, {
+			status: response.status,
+			statusText: response.statusText,
+			headers
+		});
+	}
+}
