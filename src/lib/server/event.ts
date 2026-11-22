@@ -5,7 +5,8 @@ import {
 	LruMap,
 	type Cache,
 	type CachedValue,
-	type CachePolicy
+	type CachePolicy,
+	type PolicyChoice
 } from '#lib/server/cache.ts';
 import { DataError, notFound, unavailable } from '#lib/server/errors.ts';
 import {
@@ -64,6 +65,10 @@ const LIST_RETRY_MS = 30_000;
 const SEASON_WEEKS_AT_ONCE = 3;
 const AWARDS_WAIT_MS = 2 * HOUR;
 const EVENT_LIST_POLICY: CachePolicy = { ttl: 3600, maxStale: 7 * DAY_SECONDS };
+const ARCHIVE_AFTER_MS = 7 * 24 * HOUR;
+export const ARCHIVE_POLICY: CachePolicy = { ttl: 7 * DAY_SECONDS, maxStale: 7 * DAY_SECONDS };
+const ACTIVE_TEAM_POLICY: CachePolicy = { ttl: 300, maxStale: DAY_SECONDS };
+const QUIET_TEAM_POLICY: CachePolicy = { ttl: 6 * 3600, maxStale: 2 * DAY_SECONDS };
 const EVENT_CODE_PATTERN = /^[A-Z0-9]{2,24}$/;
 const TEAM_NUMBER_PATTERN = /^[1-9]\d{0,4}$/;
 
@@ -118,6 +123,24 @@ export function eventTier(
 	if (startsAt !== null && now < startsAt - 12 * HOUR) return 'upcoming';
 	if (endsAt !== null && now >= endsAt + 6 * HOUR) return 'finished';
 	return 'live';
+}
+
+export function analysisKey(code: string): string {
+	return `analysis:${SEASON}:event:v1:${code}`;
+}
+
+export function isArchived(event: Pick<Event, 'start' | 'end' | 'timezone'>, now: number): boolean {
+	const { endsAt } = eventWindow(event);
+	return endsAt !== null && now >= endsAt + ARCHIVE_AFTER_MS;
+}
+
+export function teamPolicy(season: Pick<TeamSeason, 'events'> | null, now: number): CachePolicy {
+	if (!season) return ACTIVE_TEAM_POLICY;
+	const today = localDate(now, 'UTC');
+	const active = season.events.some(
+		({ event }) => addDays(event.start, -2) <= today && today <= addDays(event.end, 3)
+	);
+	return active ? ACTIVE_TEAM_POLICY : QUIET_TEAM_POLICY;
 }
 
 export function policyFor(
@@ -219,7 +242,7 @@ export function createLoaders(deps: LoaderDeps) {
 	function ftcPart<E extends FtcEndpoint>(
 		endpoint: E,
 		path: string,
-		policy: CachePolicy
+		policy: PolicyChoice<FtcBody<E>>
 	): Promise<CachedValue<FtcBody<E>>> {
 		return cache.get<FtcBody<E>>(`ftc:${SEASON}:${path}`, policy, (previous) =>
 			ftcEndpoint(ftc, endpoint, path, { ifModifiedSince: previous?.lastModified })
@@ -270,10 +293,30 @@ export function createLoaders(deps: LoaderDeps) {
 		}));
 	}
 
-	function cachedEventTier(code: string, time: number): EventTier {
-		const entry = cache.peek(`ftc:${SEASON}:${ftcPaths.event(code)}`);
-		const raw = (entry?.body as FtcBody<'event'> | undefined)?.events?.[0];
-		return raw ? eventTier(mapEvent(raw), time) : 'live';
+	function eventPartPolicy(time: number, hint: EventPhase | null) {
+		return (body: FtcBody<'event'> | null): CachePolicy => {
+			const raw = body?.events?.[0];
+			if (!raw) return policyFor('event', 'live', hint);
+			const event = mapEvent(raw);
+			if (isArchived(event, time)) return ARCHIVE_POLICY;
+			return policyFor('event', eventTier(event, time), hint);
+		};
+	}
+
+	function prefetchEvent(code: string) {
+		const paths = [
+			ftcPaths.event(code),
+			`${ftcPaths.teams(code)}:all`,
+			ftcPaths.schedule(code, 'qual'),
+			ftcPaths.schedule(code, 'playoff'),
+			ftcPaths.scores(code, 'qual'),
+			ftcPaths.scores(code, 'playoff'),
+			ftcPaths.rankings(code),
+			ftcPaths.alliances(code),
+			ftcPaths.awards(code),
+			ftcPaths.advancement(code)
+		];
+		cache.prefetch([...paths.map((path) => `ftc:${SEASON}:${path}`), analysisKey(code)]);
 	}
 
 	async function scoutBundle(code: string, time: number, required = true): Promise<LoadedBundle> {
@@ -327,14 +370,11 @@ export function createLoaders(deps: LoaderDeps) {
 		if (recentlyMissed(`event:${code}`) || !(await isKnownEvent(code))) {
 			throw notFound('Event not found');
 		}
+		prefetchEvent(code);
 		const hint = phases.get(code) ?? null;
 		let eventValue: CachedValue<FtcBody<'event'>>;
 		try {
-			eventValue = await ftcPart(
-				'event',
-				ftcPaths.event(code),
-				policyFor('event', cachedEventTier(code, time), hint)
-			);
+			eventValue = await ftcPart('event', ftcPaths.event(code), eventPartPolicy(time, hint));
 		} catch (error) {
 			if (isNotFound(error)) {
 				rememberMiss(`event:${code}`);
@@ -349,7 +389,8 @@ export function createLoaders(deps: LoaderDeps) {
 		}
 		const event = mapEvent(rawEvent);
 		const tier = eventTier(event, time);
-		const policy = (part: BundlePart) => policyFor(part, tier, hint);
+		const archived = isArchived(event, time);
+		const policy = (part: BundlePart) => (archived ? ARCHIVE_POLICY : policyFor(part, tier, hint));
 
 		const [teams, qualSchedule, playoffSchedule] = await Promise.all([
 			settle(teamsPart(code, policy('teams'))),
@@ -425,7 +466,7 @@ export function createLoaders(deps: LoaderDeps) {
 						ftcPart(
 							'advancement',
 							ftcPaths.advancement(code),
-							policyFor('advancement', tier, phase)
+							archived ? ARCHIVE_POLICY : policyFor('advancement', tier, phase)
 						)
 					)
 				: null;
@@ -551,7 +592,7 @@ export function createLoaders(deps: LoaderDeps) {
 		try {
 			const value = await cache.get(
 				`scout:${SEASON}:team:${number}`,
-				{ ttl: 300, maxStale: DAY_SECONDS },
+				(body) => teamPolicy(body, now()),
 				async () => {
 					const body = await fetchTeamSeason(number, SEASON, scout);
 					if (!body) throw new TeamMissing();
@@ -660,13 +701,17 @@ export function createLoaders(deps: LoaderDeps) {
 		return result;
 	}
 
+	function weekKey(start: string): string {
+		return `scout:${SEASON}:matches:v2:${start}`;
+	}
+
 	async function loadSeasonWeek(start: string, today: string) {
 		const end = addDays(start, 10);
 		const policy =
 			end < addDays(today, -7)
 				? { ttl: DAY_SECONDS, maxStale: 30 * DAY_SECONDS }
 				: { ttl: 600, maxStale: DAY_SECONDS };
-		return cache.get(`scout:${SEASON}:matches:v2:${start}`, policy, async () => ({
+		return cache.get(weekKey(start), policy, async () => ({
 			status: 'ok',
 			body: await fetchSeasonMatches({ season: SEASON, start, end }, scout)
 		}));
@@ -683,6 +728,7 @@ export function createLoaders(deps: LoaderDeps) {
 		const to = options.to ?? today;
 		const weeks: string[] = [];
 		for (let start = from; start <= to; start = addDays(start, 7)) weeks.push(start);
+		cache.prefetch(weeks.map(weekKey));
 		const loaded: (Awaited<ReturnType<typeof loadSeasonWeek>> | null)[] = [];
 		let next = 0;
 		const worker = async () => {

@@ -35,7 +35,7 @@ beforeEach(() => {
 	setHeaders.mockReset();
 	server.loadEventBundle.mockReset().mockResolvedValue(bundleWith(CACHE_CONTROL.finished));
 	server.loadEventAnalysisEntry.mockReset().mockImplementation(async () => ({
-		analysis: { code: 'USAZGIQ' },
+		analysis: { code: 'USAZGIQ', ratings: [] },
 		cacheControl: (await server.loadEventBundle()).cacheControl
 	}));
 });
@@ -60,7 +60,7 @@ describe('event layout', () => {
 		expect(data.analysis).toBeNull();
 		expect(setHeaders).toHaveBeenLastCalledWith({ 'cache-control': CACHE_CONTROL.live });
 		server.loadEventAnalysisEntry.mockResolvedValue({
-			analysis: {},
+			analysis: { ratings: [] },
 			cacheControl: CACHE_CONTROL.live
 		});
 		await run('USAZGIQ');
@@ -89,6 +89,16 @@ describe('event layout', () => {
 				result: { red: { total: 1, breakdown: null }, blue: { total: 0, breakdown: null } }
 			}
 		]);
+	});
+
+	it('leaves out rating histories the event pages never show', async () => {
+		const history = [{ key: 'q1', time: 1, opr: 40 }];
+		server.loadEventAnalysisEntry.mockResolvedValue({
+			analysis: { ratings: [{ team: 1, opr: 40, history }] },
+			cacheControl: CACHE_CONTROL.live
+		});
+		const data = await run('USAZGIQ');
+		expect(data.analysis).toEqual({ ratings: [{ team: 1, opr: 40, history: [] }] });
 	});
 
 	it('loads the event for a clean code', async () => {

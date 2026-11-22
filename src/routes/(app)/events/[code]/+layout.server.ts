@@ -1,4 +1,5 @@
 import { error, redirect } from '@sveltejs/kit';
+import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { withoutBreakdowns } from '#lib/game/breakdowns.ts';
 import { loadEventAnalysisEntry } from '#lib/server/analysis.ts';
 import { DataError, loadEventBundle, normalizeEventCode } from '#lib/server/event.ts';
@@ -9,6 +10,10 @@ function failure(cause: unknown): never {
 	if (cause instanceof DataError && cause.status === 404) error(404, 'Event not found');
 	if (cause instanceof DataError) error(cause.status, cause.message);
 	error(503, 'Event data is unavailable right now');
+}
+
+function withoutHistory(analysis: EventAnalysis): EventAnalysis {
+	return { ...analysis, ratings: analysis.ratings.map((rating) => ({ ...rating, history: [] })) };
 }
 
 const OWN_HEADERS = /\/(teams|alliance-selection|results|matches\/\[key\])$/;
@@ -42,5 +47,9 @@ export const load: LayoutServerLoad = async ({
 	if (!OWN_HEADERS.test(untrack(() => route.id) ?? '')) {
 		setHeaders({ 'cache-control': cacheControl });
 	}
-	return { bundle: withoutBreakdowns(bundle), analysis: entry?.analysis ?? null, cacheControl };
+	return {
+		bundle: withoutBreakdowns(bundle),
+		analysis: entry ? withoutHistory(entry.analysis) : null,
+		cacheControl
+	};
 };
