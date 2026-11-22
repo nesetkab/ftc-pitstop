@@ -318,6 +318,31 @@ describe('pitView after quals', () => {
 		);
 	});
 
+	it('does not call an ineligible team advancing', () => {
+		const slots = full.advancement!.teams;
+		const team = slots[0].team!;
+		const ineligible = {
+			...full,
+			advancement: {
+				...full.advancement!,
+				teams: slots.map((slot, index) =>
+					index === 0 ? { ...slot, status: 'ineligible' as const } : slot
+				)
+			}
+		};
+		expect(pitView({ bundle: full, analysis: null, queue: null, team }).advancing).toBe(true);
+		expect(pitView({ bundle: ineligible, analysis: null, queue: null, team }).advancing).toBe(
+			false
+		);
+	});
+
+	it('names league teams that did not play at this meet', () => {
+		const meet = fixtureBundle('USMIWMM8');
+		const done = pitView({ bundle: meet, analysis: null, queue: null, team: 10104 });
+		expect(done.names.get(24371)).toBe('Proto Pioneers');
+		expect(done.names.get(10104)).toBe('That OTHER Team');
+	});
+
 	it('knows when a team is not at the event', () => {
 		expect(pitView({ bundle: full, analysis: null, queue: null, team: 99999 }).registered).toBe(
 			false

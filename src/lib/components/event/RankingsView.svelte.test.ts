@@ -69,6 +69,20 @@ describe('RankingsView', () => {
 		expect(marked[0]).toHaveTextContent('14624');
 	});
 
+	it('names league teams that did not play at this meet', () => {
+		render(RankingsView, { props: { bundle: fixtureBundle('USMIWMM8') } });
+		const rows = bodyRows(screen.getByRole('table', { name: 'Rankings' }));
+		expect(rows).toHaveLength(33);
+		expect(rows[4]).toHaveTextContent('24371');
+		expect(rows[4]).toHaveTextContent('Proto Pioneers');
+		expect(screen.getByText(/These are league rankings/)).toBeInTheDocument();
+	});
+
+	it('leaves out the league note when every ranked team played here', () => {
+		render(RankingsView, { props: { bundle: finished } });
+		expect(screen.queryByText(/league rankings/)).toBeNull();
+	});
+
 	it('says when there are no rankings yet', () => {
 		render(RankingsView, { props: { bundle: fixtureBundle('USMTBUQ') } });
 		expect(screen.getByText('No rankings yet.')).toBeInTheDocument();

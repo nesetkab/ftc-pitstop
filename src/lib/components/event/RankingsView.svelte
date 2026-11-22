@@ -20,8 +20,15 @@
 	const ratings = $derived(analysis && analysis.ratings.length > 0 ? analysis.ratings : null);
 	const strength = $derived(analysis?.strength ?? []);
 	const strengthTitle = $derived(remaining > 0 ? 'Schedule so far' : 'Schedule strength');
+	const elsewhere = $derived.by(() => {
+		const here = new Set(bundle.teams.map((team) => team.number));
+		return here.size > 0 && bundle.rankings.some((row) => !here.has(row.team));
+	});
 	const note = $derived(
 		[
+			elsewhere
+				? "These are league rankings, so they include teams that didn't play at this meet."
+				: null,
 			'RS is the average ranking points per match.',
 			'TBP is the average match score without penalties.',
 			ratings ? "OPR is each team's estimated share of its alliance's score." : null,
