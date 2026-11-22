@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
+	import { clearRecent, readRecent, rememberRecent } from './recent-searches.ts';
 	import { searchApi, type SearchFn, type SearchResult } from './search.svelte.ts';
 
 	interface Props {
@@ -30,27 +32,47 @@
 	let results = $state<SearchResult[]>([]);
 	let status = $state<'idle' | 'loading' | 'done' | 'error'>('idle');
 	let active = $state(-1);
+	let recent = $state<SearchResult[]>([]);
 	let opener: HTMLElement | null = null;
 	let restoreFocus = true;
 
-	const ordered = $derived([
-		...results.filter((result) => result.type === 'team'),
-		...results.filter((result) => result.type === 'event')
-	]);
+	function typeOrder(list: SearchResult[]): SearchResult['type'][] {
+		const first = list[0]?.type ?? 'team';
+		return first === 'team' ? ['team', 'event'] : ['event', 'team'];
+	}
+
+	const showingRecent = $derived(!query.trim() && recent.length > 0);
+
+	const ordered = $derived(
+		showingRecent
+			? recent
+			: typeOrder(results).flatMap((type) => results.filter((result) => result.type === type))
+	);
 
 	const groups = $derived(
-		(['team', 'event'] as const)
-			.map((type) => ({
-				type,
-				label: type === 'team' ? 'Teams' : 'Events',
-				items: ordered.flatMap((result, index) => (result.type === type ? [{ result, index }] : []))
-			}))
-			.filter((group) => group.items.length > 0)
+		showingRecent
+			? [
+					{
+						type: 'recent',
+						label: 'Recent',
+						items: ordered.map((result, index) => ({ result, index }))
+					}
+				]
+			: typeOrder(results)
+					.map((type) => ({
+						type,
+						label: type === 'team' ? 'Teams' : 'Events',
+						items: ordered.flatMap((result, index) =>
+							result.type === type ? [{ result, index }] : []
+						)
+					}))
+					.filter((group) => group.items.length > 0)
 	);
 
 	const message = $derived.by(() => {
 		const trimmed = query.trim();
-		if (!trimmed) return 'Type a team number or name, or an event name or code.';
+		if (!trimmed && showingRecent) return '';
+		if (!trimmed) return 'Type a team number or name, a city or state, or an event name or code.';
 		if (status === 'error') return "Search isn't working right now. Try again in a moment.";
 		if (status === 'loading' && ordered.length === 0) return 'Searching…';
 		if (status === 'done' && ordered.length === 0) return `No teams or events match "${trimmed}".`;
@@ -65,7 +87,7 @@
 		if (!trimmed) {
 			results = [];
 			status = 'idle';
-			active = -1;
+			active = recent.length > 0 ? 0 : -1;
 			return;
 		}
 		const controller = new AbortController();
@@ -95,6 +117,8 @@
 		if (!dialog || !input) return;
 		if (open && !dialog.open) {
 			opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+			recent = readRecent();
+			if (!query.trim()) active = recent.length > 0 ? 0 : -1;
 			dialog.showModal();
 			input.focus();
 			input.select();
@@ -162,6 +186,14 @@
 			event.preventDefault();
 			move(-1);
 		} else if (event.key === 'Enter') {
+			const number = query.trim();
+			if (active < 0 && /^\d{1,6}$/.test(number)) {
+				event.preventDefault();
+				restoreFocus = false;
+				open = false;
+				goto(`/teams/${number}`);
+				return;
+			}
 			if (active < 0) return;
 			event.preventDefault();
 			document.getElementById(optionId(active))?.click();
@@ -172,6 +204,7 @@
 	}
 
 	function pick(event: MouseEvent, result: SearchResult) {
+		recent = rememberRecent(result);
 		if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
 			return;
 		}
@@ -181,6 +214,12 @@
 			event.preventDefault();
 			onselect(result);
 		}
+	}
+
+	function forget() {
+		recent = clearRecent();
+		active = -1;
+		input?.focus();
 	}
 
 	function onClose() {
@@ -220,7 +259,12 @@
 
 		<div class="list" id={listId} role="listbox" aria-label="Results" hidden={ordered.length === 0}>
 			{#each groups as group (group.type)}
-				<div class="group-label" aria-hidden="true">{group.label}</div>
+				<div class="group-label">
+					<span aria-hidden="true">{group.label}</span>
+					{#if group.type === 'recent'}
+						<button type="button" class="clear" onclick={forget}>Clear</button>
+					{/if}
+				</div>
 				<div role="group" aria-label={group.label}>
 					{#each group.items as { result, index } (index)}
 						<a
@@ -234,6 +278,11 @@
 							onpointermove={() => (active = index)}
 						>
 							<span class="label">{result.label}</span>
+							{#if result.meta}
+								<span class={['meta', { live: result.live }]}>
+									{#if result.live}<span class="dot" aria-hidden="true"></span>{/if}{result.meta}
+								</span>
+							{/if}
 							{#if result.sublabel}
 								<span class="sublabel">{result.sublabel}</span>
 							{/if}
@@ -313,18 +362,64 @@
 	}
 
 	.group-label {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
 		padding: 10px 10px 4px;
 		font-size: 12.5px;
 		font-weight: 500;
 		color: var(--text-3);
 	}
 
+	.clear {
+		padding: 0;
+		border: 0;
+		background: none;
+		font: inherit;
+		color: var(--text-2);
+		cursor: pointer;
+	}
+
+	.clear:hover {
+		color: var(--text);
+		text-decoration: underline;
+	}
+
 	.option {
 		display: grid;
-		gap: 1px;
+		grid-template-columns: minmax(0, 1fr) auto;
+		column-gap: 16px;
+		row-gap: 1px;
+		align-items: baseline;
 		padding: 8px 10px;
 		border-radius: var(--radius-control);
 		text-decoration: none;
+	}
+
+	.option .sublabel {
+		grid-column: 1 / -1;
+	}
+
+	.meta {
+		font-size: 13px;
+		color: var(--text-2);
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+	}
+
+	.meta.live {
+		font-weight: 600;
+		color: var(--text);
+	}
+
+	.dot {
+		display: inline-block;
+		width: 6px;
+		height: 6px;
+		margin-right: 6px;
+		border-radius: 50%;
+		background: var(--red);
+		vertical-align: 2px;
 	}
 
 	.option[aria-selected='true'] {
@@ -332,6 +427,10 @@
 	}
 
 	.label {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
 		font-size: 15px;
 		font-weight: 500;
 		font-variant-numeric: tabular-nums;

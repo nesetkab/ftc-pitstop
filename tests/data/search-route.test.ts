@@ -2,11 +2,26 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const server = vi.hoisted(() => ({
 	searchIndex: vi.fn(async () => ({ teams: [], events: [], fetchedAt: 1 })),
-	search: vi.fn((_index: unknown, _query: string, _limit: number) => ({ teams: [], events: [] }))
+	loadSeasonRatingsWithin: vi.fn(async (_ms?: number) => ({
+		generatedAt: 1,
+		teams: [{ team: 3747, opr: 80, rank: 3, matches: 9 }]
+	})),
+	search: vi.fn(
+		(_index: unknown, _query: string, _limit: number, _options?: { standings?: Map<number, unknown> }) => ({
+			teams: [],
+			events: []
+		})
+	)
 }));
 
 vi.mock('#lib/server/event.ts', () => ({ searchIndex: server.searchIndex }));
-vi.mock('#lib/server/search.ts', () => ({ search: server.search }));
+vi.mock('#lib/server/analysis.ts', () => ({
+	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin
+}));
+vi.mock('#lib/server/search.ts', async (importOriginal) => ({
+	...(await importOriginal<typeof import('#lib/server/search.ts')>()),
+	search: server.search
+}));
 
 const { GET } = await import('../../src/routes/api/search/+server.ts');
 
@@ -51,6 +66,19 @@ describe('search route', () => {
 		}
 		expect(server.searchIndex).not.toHaveBeenCalled();
 		expect(server.search).not.toHaveBeenCalled();
+	});
+
+	it('passes season standings without waiting long for them', async () => {
+		await get('?q=hive');
+		expect(server.loadSeasonRatingsWithin.mock.calls[0][0]).toBeLessThanOrEqual(500);
+		expect(server.search.mock.calls[0][3]?.standings?.get(3747)).toEqual({ opr: 80, rank: 3 });
+	});
+
+	it('still searches when standings are unavailable', async () => {
+		server.loadSeasonRatingsWithin.mockRejectedValueOnce(new Error('down'));
+		const answer = await get('?q=hive');
+		expect(answer.status).toBe(200);
+		expect(server.search.mock.calls[0][3]?.standings).toBeUndefined();
 	});
 
 	it('shares answers for an hour', async () => {

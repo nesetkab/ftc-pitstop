@@ -1,21 +1,26 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+
+const navigation = vi.hoisted(() => ({ goto: vi.fn() }));
+
+vi.mock('$app/navigation', () => navigation);
+import { RECENT_KEY } from './recent-searches.ts';
 import SearchDialog from './SearchDialog.svelte';
 import type { SearchFn, SearchResult } from './search.svelte.ts';
 
 const results: SearchResult[] = [
 	{
-		type: 'event',
-		label: 'Roadrunner - Gilbert Qualifier',
-		sublabel: 'USAZGIQ',
-		href: '/events/USAZGIQ'
-	},
-	{
 		type: 'team',
 		label: '14624 Cat-Astrophic Byte',
 		sublabel: 'Waddell, Arizona',
 		href: '/teams/14624'
+	},
+	{
+		type: 'event',
+		label: 'Roadrunner - Gilbert Qualifier',
+		sublabel: 'USAZGIQ',
+		href: '/events/USAZGIQ'
 	},
 	{ type: 'team', label: '26128 Wrightly Reconfigured Robots', href: '/teams/26128' }
 ];
@@ -33,6 +38,8 @@ beforeAll(() => {
 afterEach(() => {
 	cleanup();
 	document.body.innerHTML = '';
+	localStorage.clear();
+	navigation.goto.mockClear();
 });
 
 function setup(search: SearchFn = async () => results) {
@@ -78,7 +85,7 @@ describe('SearchDialog', () => {
 		expect(dialog).not.toHaveAttribute('open');
 	});
 
-	it('groups teams before events and makes the first result active', async () => {
+	it('groups results by type, best group first, and makes the first result active', async () => {
 		const search = vi.fn<SearchFn>(async () => results);
 		setup(search);
 		const input = await openAndType('ca');
@@ -141,5 +148,61 @@ describe('SearchDialog', () => {
 		expect(
 			await screen.findByText("Search isn't working right now. Try again in a moment.")
 		).toBeInTheDocument();
+	});
+
+	it('puts events first when the best match is an event', async () => {
+		setup(async () => [results[1], results[0]]);
+		await openAndType('gilbert');
+		expect(screen.getAllByRole('option').map((option) => option.getAttribute('href'))).toEqual([
+			'/events/USAZGIQ',
+			'/teams/14624'
+		]);
+	});
+
+	it('remembers picked results and shows them when the field is empty', async () => {
+		const { dialog } = setup();
+		const input = await openAndType('ca');
+		await fireEvent.keyDown(input, { key: 'Enter' });
+		expect(dialog).not.toHaveAttribute('open');
+		expect(JSON.parse(localStorage.getItem(RECENT_KEY) ?? '[]')[0].href).toBe('/teams/14624');
+		await fireEvent.keyDown(document.body, { key: '/' });
+		await fireEvent.input(screen.getByRole('combobox'), { target: { value: '' } });
+		const [option] = await screen.findAllByRole('option');
+		expect(option).toHaveAttribute('href', '/teams/14624');
+		expect(option).toHaveAttribute('aria-selected', 'true');
+		expect(screen.getByText('Recent')).toBeInTheDocument();
+	});
+
+	it('clears recent results', async () => {
+		localStorage.setItem(
+			RECENT_KEY,
+			JSON.stringify([{ type: 'team', label: '1 One', href: '/teams/1' }])
+		);
+		setup();
+		await fireEvent.keyDown(document.body, { key: '/' });
+		expect(await screen.findByRole('option')).toHaveAttribute('href', '/teams/1');
+		await fireEvent.click(screen.getByRole('button', { name: 'Clear' }));
+		expect(screen.queryByRole('option')).not.toBeInTheDocument();
+		expect(localStorage.getItem(RECENT_KEY)).toBeNull();
+	});
+
+	it('jumps straight to a team number on Enter before results arrive', async () => {
+		const { dialog } = setup(() => new Promise(() => {}));
+		await fireEvent.keyDown(document.body, { key: '/' });
+		const input = screen.getByRole('combobox');
+		await fireEvent.input(input, { target: { value: '3747' } });
+		await fireEvent.keyDown(input, { key: 'Enter' });
+		expect(navigation.goto).toHaveBeenCalledWith('/teams/3747');
+		expect(dialog).not.toHaveAttribute('open');
+	});
+
+	it('shows result details next to the name', async () => {
+		setup(async () => [
+			{ type: 'team', label: '3747 The Hive', meta: '80.0 OPR · #3', href: '/teams/3747' },
+			{ type: 'event', label: 'Butte', meta: 'Live', live: true, href: '/events/USMTBUQ' }
+		]);
+		await openAndType('hive');
+		expect(screen.getByText('80.0 OPR · #3')).toBeInTheDocument();
+		expect(screen.getByText('Live')).toHaveClass('live');
 	});
 });
