@@ -6,6 +6,7 @@ import {
 	filterEvents,
 	groupByWeek,
 	listed,
+	listStatus,
 	packEvents,
 	regionGroups,
 	unpackEvents
@@ -63,17 +64,34 @@ describe('event list', () => {
 	});
 
 	it('marks a live event done once it is known to be finished', () => {
-		const shown = filterEvents(
-			events,
-			{ query: '', region: '', type: '', when: 'upcoming' },
-			NOW,
-			new Set(['LIVE', 'SOON'])
+		const shown = (when: 'upcoming' | 'past') =>
+			filterEvents(
+				events,
+				{ query: '', region: '', type: '', when },
+				NOW,
+				new Set(['LIVE', 'SOON'])
+			).map((event) => `${event.code} ${event.status}`);
+		expect(shown('upcoming')).toEqual(['SOON upcoming', 'LATER upcoming']);
+		expect(shown('past')).toEqual(['LIVE done', 'PAST done']);
+	});
+
+	it('never calls an event live after its last day ends where it is held', () => {
+		const tokyo = listed(
+			summary('TOKYO', '2026-11-18', '2026-11-19', { timezone: 'Asia/Tokyo' }),
+			20
 		);
-		expect(shown.map((event) => `${event.code} ${event.status}`)).toEqual([
-			'LIVE done',
-			'SOON upcoming',
-			'LATER upcoming'
-		]);
+		const hawaii = listed(
+			summary('HAWAII', '2026-11-18', '2026-11-19', { timezone: 'Pacific/Honolulu' }),
+			20
+		);
+		const at = (iso: string) => Date.parse(iso);
+		expect(listStatus(tokyo, at('2026-11-19T14:59:00Z'))).toBe('live');
+		expect(listStatus(tokyo, at('2026-11-19T15:01:00Z'))).toBe('done');
+		expect(listStatus(hawaii, at('2026-11-20T09:59:00Z'))).toBe('live');
+		expect(listStatus(hawaii, at('2026-11-20T10:01:00Z'))).toBe('done');
+		expect(listStatus(hawaii, at('2026-11-20T10:01:00Z'), new Set())).toBe('done');
+		expect(listStatus(hawaii, at('2026-11-18T10:01:00Z'))).toBe('live');
+		expect(listStatus(hawaii, at('2026-11-18T09:59:00Z'))).toBe('upcoming');
 	});
 
 	it('groups by week and labels regions with real place names', () => {
