@@ -1,6 +1,9 @@
 import { flushSync } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
-import { replayStart } from '#lib/game/replay.ts';
+import { retime } from '#lib/analysis/analyze.ts';
+import { nowView } from '#lib/components/event/now.ts';
+import { fakeAnalysis } from '#lib/components/event/test-fixtures.ts';
+import { replayBundle, replayStart } from '#lib/game/replay.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { analysisLoader, PitSession, type SessionOptions } from './session.svelte.ts';
 
@@ -58,6 +61,26 @@ describe('PitSession', () => {
 		expect(session.takeover).toBeNull();
 		expect(session.call?.key).toBe('q26');
 		stop();
+	});
+
+	it('keeps match times current between analysis updates, like the Now tab', () => {
+		const start = replayStart('Q20', full)!;
+		const snapshot = replayBundle(full, start);
+		const loaded = retime(fakeAnalysis(snapshot), snapshot, start);
+		const session = new PitSession({ ...options(start), analysis: loaded });
+		session.now += 25 * 60_000;
+		const next = session.view!.next!;
+		const now = nowView({
+			bundle: session.bundle!,
+			analysis: loaded,
+			queue: null,
+			baseline: null,
+			now: session.clock
+		});
+		const listed = [now.onField, ...now.upcoming].find((match) => match?.key === next.key);
+		expect(next.expectedStart).not.toBe(loaded.timing.matches[next.key].expectedStart);
+		expect(next.expectedStart).toBe(listed?.expected);
+		expect(session.view!.delaySeconds).toBe(now.delaySeconds);
 	});
 });
 
