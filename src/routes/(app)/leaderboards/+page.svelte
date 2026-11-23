@@ -2,7 +2,7 @@
 	import { tick } from 'svelte';
 	import LeaderboardFilters from '#lib/components/team/LeaderboardFilters.svelte';
 	import LeaderboardTable from '#lib/components/team/LeaderboardTable.svelte';
-	import Pagination from '#lib/components/team/Pagination.svelte';
+	import Pagination from '#lib/ui/Pagination.svelte';
 	import {
 		LEADERBOARD_SORTS,
 		queryString,
