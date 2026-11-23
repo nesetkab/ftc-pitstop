@@ -222,8 +222,9 @@
 			{:else if access}
 				<div class="panel">
 					<h3 class="sec-title">Our pick list</h3>
-					<EmptyState title="No team workspace on this device.">
-						<a href="/w">Create a team workspace</a> to keep a pick list next to the picks.
+					<EmptyState title="Make a shared pick list with your team.">
+						<a href="/w">Start a team workspace</a> and your list shows here next to the live picks. No
+						account needed.
 					</EmptyState>
 				</div>
 			{/if}

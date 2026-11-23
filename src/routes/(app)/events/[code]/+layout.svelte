@@ -11,6 +11,8 @@
 	import { breadcrumbs, eventDescription, eventJsonLd, siteTitle } from '#lib/seo.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import CalendarMenu from '#lib/ui/CalendarMenu.svelte';
+	import Hint from '#lib/ui/Hint.svelte';
+	import { PIT_HINT } from '#lib/ui/hints.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
@@ -157,6 +159,9 @@
 	});
 
 	let followed = $state<ReadonlySet<number>>(new Set());
+	const ourTeam = $derived(
+		live ? (bundle.teams.find((team) => followed.has(team.number))?.number ?? null) : null
+	);
 
 	setEventView({
 		get followed() {
@@ -218,6 +223,13 @@
 	/>
 	{#if scheduled || started}
 		<Tabs {tabs} {current} label="Event" />
+	{/if}
+	{#if ourTeam}
+		<Hint id={PIT_HINT}>
+			Your team {ourTeam} is here. Put its <a href="/{ourTeam}/tv">pit display</a> on your pit TV
+			and the
+			<a href="/{ourTeam}">phone view</a> on your phone.
+		</Hint>
 	{/if}
 {/if}
 

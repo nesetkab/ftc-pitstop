@@ -12,6 +12,13 @@
 			try {
 				var theme = localStorage.getItem('ps-theme');
 				if (theme === 'light' || theme === 'dark') document.documentElement.dataset.theme = theme;
+				var follows = localStorage.getItem('ps-follow');
+				var hints = localStorage.getItem('ps-hints');
+				var following = !!follows && follows !== '[]';
+				if (following) document.documentElement.dataset.following = '';
+				if (following || (hints && hints.indexOf('"intro"') !== -1)) {
+					document.documentElement.dataset.returning = '';
+				}
 			} catch (error) {}
 		</script>
 		<link rel="manifest" href="/manifest.webmanifest" />

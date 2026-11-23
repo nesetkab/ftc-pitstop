@@ -13,7 +13,9 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="No matches played yet this season." />
+	<EmptyState title="No matches played yet this season.">
+		Percentiles show here after the team's first event.
+	</EmptyState>
 {:else}
 	<Table>
 		<thead>

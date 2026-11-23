@@ -12,8 +12,12 @@
 	}
 </script>
 
-<form onsubmit={open} aria-labelledby="pit-label">
+<form id="pit" onsubmit={open} aria-labelledby="pit-label">
 	<h2 class="sec-title" id="pit-label">Open the pit display for your team</h2>
+	<p class="about">
+		A full-screen page for the TV in your pit with your next match, queue time, alliances and rank,
+		updated live. Leave off /tv for the phone version.
+	</p>
 	<div class="row">
 		<label class="address">
 			<span class="host">ftcpitstop.com/</span>
@@ -37,6 +41,16 @@
 	form {
 		display: grid;
 		gap: 10px;
+	}
+
+	#pit {
+		scroll-margin-top: 24px;
+	}
+
+	.about {
+		max-width: 620px;
+		font-size: 14px;
+		color: var(--text-2);
 	}
 
 	.row {

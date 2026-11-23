@@ -137,12 +137,44 @@ describe('home page', () => {
 		expect(screen.getByText('ftcpitstop.com/')).toBeInTheDocument();
 	});
 
-	it('suggests following a team when none are followed', async () => {
+	it('offers a team search to follow when none are followed', async () => {
 		show({ today, week });
 		expect(await screen.findByRole('heading', { name: 'Your teams' })).toBeInTheDocument();
-		expect(
-			screen.getByText('Follow a team from its page and it will show up here.')
-		).toBeInTheDocument();
+		expect(screen.getByRole('searchbox', { name: 'Team number or name' })).toBeInTheDocument();
+	});
+
+	it('introduces the site and its standout tools to a first-time visitor', async () => {
+		show({ today, week });
+		const intro = await screen.findByRole('region', { name: 'What PitStop does' });
+		const links = within(intro).getAllByRole('link');
+		expect(links.map((link) => link.getAttribute('href'))).toEqual([
+			'#pit',
+			'/w',
+			'/advancement',
+			'/events/strength'
+		]);
+		expect(document.getElementById('pit')).not.toBeNull();
+	});
+
+	it('keeps the intro hidden once dismissed', async () => {
+		show({ today, week });
+		const intro = await screen.findByRole('region', { name: 'What PitStop does' });
+		await fireEvent.click(within(intro).getByRole('button', { name: 'Hide' }));
+		expect(screen.queryByRole('region', { name: 'What PitStop does' })).not.toBeInTheDocument();
+		cleanup();
+		show({ today, week });
+		await screen.findByRole('heading', { name: 'Your teams' });
+		expect(screen.queryByRole('region', { name: 'What PitStop does' })).not.toBeInTheDocument();
+	});
+
+	it('hides the intro for visitors who follow a team', async () => {
+		localStorage.setItem('ps-follow', '[26670]');
+		show({ today, week });
+		await screen.findByRole('heading', { name: 'Your teams' });
+		await vi.waitFor(() =>
+			expect(screen.queryByRole('region', { name: 'What PitStop does' })).not.toBeInTheDocument()
+		);
+		expect(localStorage.getItem('ps-hints')).toBe('["intro"]');
 	});
 
 	it('shows the best matches with links to each match', () => {

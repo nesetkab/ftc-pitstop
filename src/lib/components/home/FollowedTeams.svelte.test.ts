@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup, render, screen, within } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { match, ranking } from '#lib/components/team/fixtures.ts';
 import { FOLLOW_KEY, follows } from '#lib/components/follow/follow.svelte.ts';
@@ -87,12 +87,40 @@ function cardFor(team: number): HTMLElement {
 }
 
 describe('followed teams', () => {
-	it('suggests following a team when there are none', async () => {
+	it('offers a team search right there when there are none', async () => {
 		render(FollowedTeams);
 		expect(
-			await screen.findByText('Follow a team from its page and it will show up here.')
+			await screen.findByRole('searchbox', { name: 'Team number or name' })
 		).toBeInTheDocument();
 		expect(requested).toEqual([]);
+	});
+
+	it('follows a team from the search and shows it in the list', async () => {
+		responses.set('/api/search?q=26670', {
+			teams: [{ number: 26670, name: 'SCA Iron Eagles', city: 'Gilbert', state: 'AZ' }],
+			events: [],
+			lead: 'teams'
+		});
+		render(FollowedTeams);
+		await fireEvent.input(await screen.findByRole('searchbox', { name: 'Team number or name' }), {
+			target: { value: '26670' }
+		});
+		await fireEvent.click(await screen.findByRole('button', { name: 'Follow 26670' }));
+		expect(JSON.parse(localStorage.getItem(FOLLOW_KEY) ?? '[]')).toEqual([26670]);
+		expect(await screen.findByRole('link', { name: 'Pit screen' })).toHaveAttribute(
+			'href',
+			'/26670'
+		);
+		expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+	});
+
+	it('says when no team matches the search', async () => {
+		responses.set('/api/search?q=zzzz', { teams: [], events: [], lead: 'teams' });
+		render(FollowedTeams);
+		await fireEvent.input(await screen.findByRole('searchbox', { name: 'Team number or name' }), {
+			target: { value: 'zzzz' }
+		});
+		expect(await screen.findByText('No teams match "zzzz".')).toBeInTheDocument();
 	});
 
 	it('loads every team in one request and the live event once', async () => {

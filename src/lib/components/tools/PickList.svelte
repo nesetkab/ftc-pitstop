@@ -468,7 +468,9 @@
 
 	{#if list.entries.length === 0}
 		<EmptyState title="No teams yet.">
-			{update ? 'Add the teams you want to pick, best first.' : 'This list is empty.'}
+			{update
+				? 'Add the teams you want to pick, best first. During alliance selection the list shows next to the live picks on the event page.'
+				: 'This list is empty.'}
 		</EmptyState>
 	{:else}
 		{#if picks.length > 0}

@@ -15,6 +15,8 @@
 	import { breadcrumbs, teamDescription, teamJsonLd, teamTitle } from '#lib/seo.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import CalendarMenu from '#lib/ui/CalendarMenu.svelte';
+	import Hint from '#lib/ui/Hint.svelte';
+	import { eventThisWeek, PIT_HINT } from '#lib/ui/hints.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
@@ -28,6 +30,7 @@
 			.filter(Boolean)
 			.join('. ')
 	);
+	const pitEvent = $derived(eventThisWeek(view.upcoming, Date.now()));
 	const previousTitle = $derived(
 		view.previous ? `Last season, ${view.previous.game ?? view.previous.season}` : ''
 	);
@@ -65,6 +68,14 @@
 		/>
 	{/snippet}
 </PageHeader>
+
+{#if pitEvent}
+	<Hint id={PIT_HINT}>
+		At {pitEvent.name}{pitEvent.live ? ' today' : ' this week'}? Put the
+		<a href="/{view.team.number}/tv">pit display</a> on your pit TV and the
+		<a href="/{view.team.number}">phone view</a> on your phone.
+	</Hint>
+{/if}
 
 <TeamStats
 	stats={view.stats}
