@@ -1,17 +1,17 @@
 import { redirect } from '@sveltejs/kit';
-import {
-	buildComparison,
-	compareHref,
-	parseTeamList,
-	sharedEventCodes,
-	suggestNeighbors
-} from '#lib/components/compare/compare.ts';
-import { loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
-import { loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
-import { CACHE_CONTROL } from '#lib/server/http.ts';
+import { compareHref, parseTeamList } from '#lib/components/compare/compare.ts';
+import { loadSeasonModelWithin, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
+import { createCompare } from '#lib/server/compare.ts';
+import { loadTeamSeason } from '#lib/server/event.ts';
 import { recordNames } from '#lib/server/records.ts';
-import type { TeamSeason } from '#lib/types.ts';
 import type { PageServerLoad } from './$types';
+
+const loadComparison = createCompare({
+	loadTeamSeason: (number) => loadTeamSeason(number),
+	loadSeasonRatingsWithin: () => loadSeasonRatingsWithin(),
+	loadSeasonModelWithin: () => loadSeasonModelWithin(),
+	recordNames: (teams, events) => recordNames(teams, events)
+});
 
 export const load: PageServerLoad = async ({ url, setHeaders }) => {
 	const requested = url.searchParams.get('teams');
@@ -20,27 +20,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 		redirect(303, compareHref(numbers));
 	}
 
-	const [found, ratings] = await Promise.all([
-		Promise.all(numbers.map((number) => loadTeamSeason(number).catch(() => null))),
-		loadSeasonRatingsWithin().catch(() => null)
-	]);
-	const seasons = found.filter((season): season is TeamSeason => season !== null);
-	const missing = numbers.filter((_, index) => found[index] === null);
-
-	const codes = sharedEventCodes(seasons);
-	const loaded = await Promise.all(codes.map((code) => loadEventBundle(code).catch(() => null)));
-	const bundles = Object.fromEntries(codes.map((code, index) => [code, loaded[index]]));
-
-	const view = buildComparison({ seasons, ratings, bundles });
-	const present = seasons.map((season) => season.team.number);
-	const suggestions = present.length < 2 ? suggestNeighbors(ratings, present) : [];
-	const names = await recordNames(suggestions, []);
-
-	setHeaders({ 'cache-control': CACHE_CONTROL.short });
-	return {
-		view,
-		numbers: present,
-		missing,
-		suggestions: suggestions.map((number) => ({ number, name: names.teams[number] ?? null }))
-	};
+	const { cacheControl, ...data } = await loadComparison(numbers);
+	setHeaders({ 'cache-control': cacheControl });
+	return data;
 };

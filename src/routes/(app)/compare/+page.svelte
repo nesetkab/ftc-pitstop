@@ -1,9 +1,11 @@
 <script lang="ts">
+	import AllianceFit from '#lib/components/compare/AllianceFit.svelte';
 	import CompareTable from '#lib/components/compare/CompareTable.svelte';
 	import HeadToHead from '#lib/components/compare/HeadToHead.svelte';
 	import SharedEvents from '#lib/components/compare/SharedEvents.svelte';
 	import TeamPicker from '#lib/components/compare/TeamPicker.svelte';
 	import { compareHref } from '#lib/components/compare/compare.ts';
+	import { MAX_FIT } from '#lib/components/compare/fit.ts';
 	import { siteTitle } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -22,8 +24,8 @@
 	);
 	const description = $derived(
 		paired
-			? `Compare FTC teams ${names.slice(0, -1).join(', ')} and ${names.at(-1)} side by side: OPR by part, records, shared events and results against each other.`
-			: 'Compare up to four FTC teams side by side: OPR by part, records, shared events and results against each other.'
+			? `Compare FTC teams ${names.slice(0, -1).join(', ')} and ${names.at(-1)} side by side: OPR by part, records, head to head, alliance fit and shared events.`
+			: 'Compare up to four FTC teams side by side: OPR by part, records, head to head, alliance fit and shared events.'
 	);
 	const canonical = $derived(
 		compareHref(view.teams.map((team) => team.number).toSorted((a, b) => a - b))
@@ -34,7 +36,7 @@
 
 <PageHeader
 	title="Compare teams"
-	meta="Up to four teams side by side: season OPR by part, records, shared events and how they did against each other."
+	meta="Up to four teams side by side: season OPR by part, records, how they did against each other and as partners, and how two or three of them would fit as an alliance."
 />
 
 <TeamPicker teams={view.teams} suggestions={data.suggestions} />
@@ -66,9 +68,25 @@
 	</section>
 
 	{#if view.teams.length >= 2}
+		{#if view.fit}
+			<section class="panel" aria-labelledby="fit-title">
+				<h2 class="sec-title" id="fit-title">Alliance fit</h2>
+				<AllianceFit fit={view.fit} />
+			</section>
+		{:else if view.teams.length > MAX_FIT}
+			<p class="note">Remove a team to see how two or three of them would fit as an alliance.</p>
+		{/if}
+
 		<section class="panel" aria-labelledby="h2h-title">
 			<h2 class="sec-title" id="h2h-title">Head to head</h2>
-			<HeadToHead pairs={view.pairs} meetings={view.meetings} numbers={data.numbers} />
+			{#if view.history}
+				<HeadToHead pairs={view.pairs} meetings={view.meetings} numbers={data.numbers} />
+			{:else}
+				<EmptyState title="Match history is still loading.">
+					Reload in a minute to see the matches these teams played together and against each other,
+					and how they would fit as an alliance.
+				</EmptyState>
+			{/if}
 		</section>
 
 		<section class="panel" aria-labelledby="shared-title">
