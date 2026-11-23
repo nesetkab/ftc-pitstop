@@ -45,6 +45,7 @@ export interface NowMatch {
 	pending: { red: string | null; blue: string | null };
 	scheduled: number | null;
 	expected: number | null;
+	started: number | null;
 	status: NowStatus | null;
 	forecast: MatchForecast | null;
 }
@@ -244,8 +245,12 @@ export function nowView(input: NowInput): NowView {
 		},
 		scheduled: match.scheduledTime,
 		expected: isUnplayed(match) ? expectedStart(match.key, timed, queue) : null,
+		started: match.actualTime,
 		status: queueStatus(match, queue),
-		forecast: analysis?.forecasts[match.key] ?? null
+		forecast:
+			match.red.length > 0 && match.blue.length > 0
+				? (analysis?.forecasts[match.key] ?? null)
+				: null
 	});
 
 	const matches = bundle.matches;

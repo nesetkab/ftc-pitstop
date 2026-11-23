@@ -84,6 +84,8 @@
 	});
 
 	function when(match: NowMatch): string | null {
+		if (match.started !== null) return `Started ${time(match.started, zone)}`;
+		if (match.key === view.onField?.key) return null;
 		if (match.expected !== null) return `~${time(match.expected, zone)}`;
 		if (match.scheduled !== null) return time(match.scheduled, zone);
 		return null;
@@ -183,7 +185,7 @@
 					<p class="match">
 						<a class="label" href={matchHref(code, featured)}>{featured.label}</a>
 						<span class="muted">{featured.title}</span>
-						{#if featured.status && !(view.onField && featured.status === 'on-field')}
+						{#if featured.status && featured.key !== view.onField?.key}
 							<span class="state">{STATUS[featured.status]}</span>
 						{/if}
 					</p>

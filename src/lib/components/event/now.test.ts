@@ -159,7 +159,12 @@ describe('nowView during quals', () => {
 			)
 		};
 		const live = nowView({ bundle: started, analysis, queue: null, baseline: null, now: time });
-		expect(live.onField).toMatchObject({ label: 'Q23', status: 'playing', expected: null });
+		expect(live.onField).toMatchObject({
+			label: 'Q23',
+			status: 'playing',
+			expected: null,
+			started: time
+		});
 		expect(live.upcoming[0].label).toBe('Q24');
 	});
 });
@@ -265,7 +270,8 @@ describe('nowView during playoffs', () => {
 		expect(view.upcoming[2]).toMatchObject({
 			red: [18420, 25620],
 			blue: [],
-			pending: { red: null, blue: 'Winner of M2' }
+			pending: { red: null, blue: 'Winner of M2' },
+			forecast: null
 		});
 		expect(view.results[0].label).toBe('M1');
 	});
