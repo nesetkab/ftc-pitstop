@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SeasonEventRatings, SeasonRatings } from '#lib/analysis/types.ts';
-import type { LeaderboardRow } from '#lib/components/team/leaderboard.ts';
+import type { LeaderboardRow } from '#lib/components/leaderboard/leaderboard.ts';
 import { load } from './+page.server.ts';
 
 const server = vi.hoisted(() => ({

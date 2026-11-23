@@ -6,7 +6,7 @@ import type {
 	FilterOption,
 	LeaderboardFilters,
 	LeaderboardRow
-} from '#lib/components/team/leaderboard.ts';
+} from '#lib/components/leaderboard/leaderboard.ts';
 import Page from './+page.svelte';
 
 const navigation = vi.hoisted(() => ({ goto: vi.fn() }));

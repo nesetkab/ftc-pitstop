@@ -1,5 +1,5 @@
 import * as z from 'zod';
-import type { LeaderboardRow } from '#lib/components/team/leaderboard.ts';
+import type { LeaderboardRow } from '#lib/components/leaderboard/leaderboard.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { cache as defaultCache, type Cache } from '#lib/server/cache.ts';
 import { scoutClient, type FtcScoutClient } from '#lib/server/ftcscout.ts';

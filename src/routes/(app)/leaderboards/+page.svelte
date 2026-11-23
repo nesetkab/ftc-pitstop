@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { tick } from 'svelte';
-	import LeaderboardFilters from '#lib/components/team/LeaderboardFilters.svelte';
-	import LeaderboardTable from '#lib/components/team/LeaderboardTable.svelte';
+	import LeaderboardFilters from '#lib/components/leaderboard/LeaderboardFilters.svelte';
+	import LeaderboardTable from '#lib/components/leaderboard/LeaderboardTable.svelte';
 	import Pagination from '#lib/ui/Pagination.svelte';
 	import {
 		LEADERBOARD_SORTS,
 		queryString,
 		typeLabel,
 		windowLabel
-	} from '#lib/components/team/leaderboard.ts';
+	} from '#lib/components/leaderboard/leaderboard.ts';
 	import { integer } from '#lib/format/index.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
