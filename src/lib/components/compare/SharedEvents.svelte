@@ -66,6 +66,13 @@
 		vertical-align: top;
 	}
 
+	@media (min-width: 601px) {
+		th:not(.pin),
+		td:not(.pin) {
+			width: 190px;
+		}
+	}
+
 	.pin {
 		position: sticky;
 		left: 0;

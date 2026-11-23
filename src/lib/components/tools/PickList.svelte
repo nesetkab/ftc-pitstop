@@ -38,6 +38,7 @@
 		lookupName?: (team: number) => Promise<string | null>;
 		share?: Snippet;
 		title?: string;
+		showTitle?: boolean;
 		showEvent?: boolean;
 		exportable?: boolean;
 	}
@@ -50,6 +51,7 @@
 		lookupName,
 		share,
 		title = 'Pick list',
+		showTitle = true,
 		showEvent = true,
 		exportable
 	}: Props = $props();
@@ -82,6 +84,7 @@
 
 	const picks = $derived(ranked(list));
 	const avoid = $derived(avoided(list));
+	const eventShown = $derived(showEvent && (Boolean(update) || Boolean(list.event)));
 	const eventHref = $derived(list.event ? `/events/${list.event}/alliance-selection` : null);
 	const context = $derived({ labels: auto, stats });
 
@@ -439,11 +442,49 @@
 	</li>
 {/snippet}
 
-<section class="picklist" aria-label={title} bind:this={root}>
-	<div class="head">
-		<h3 class="sec-title">{title}</h3>
-		{#if share}{@render share()}{/if}
+{#snippet eventField()}
+	<div class="event">
+		<label class="ctl-label" for="{id}-event">Event code</label>
+		{#if update}
+			<input
+				id="{id}-event"
+				class="ctl-input event-input"
+				placeholder="USAZGIQ"
+				autocomplete="off"
+				maxlength="24"
+				value={list.event ?? ''}
+				onchange={changeEvent}
+				aria-invalid={eventError ? 'true' : undefined}
+				aria-describedby={eventError ? `${id}-event-error` : undefined}
+			/>
+		{:else}
+			<span>{list.event}</span>
+		{/if}
+		{#if eventHref}
+			<a href={eventHref}>Open alliance selection</a>
+		{:else if update}
+			<span class="faint">Shows OPR, rank and live picks</span>
+		{/if}
 	</div>
+{/snippet}
+
+<section class="picklist" aria-label={title} bind:this={root}>
+	{#if showTitle || share || eventShown}
+		<div class="head">
+			{#if showTitle}
+				<h3 class="sec-title">{title}</h3>
+			{:else if eventShown}
+				{@render eventField()}
+			{/if}
+			{#if share}{@render share()}{/if}
+		</div>
+	{/if}
+	{#if showTitle && eventShown}
+		{@render eventField()}
+	{/if}
+	{#if eventShown && eventError}
+		<p id="{id}-event-error" class="ctl-error" role="alert">{eventError}</p>
+	{/if}
 
 	{#if update}
 		<form class="add" onsubmit={add} novalidate>
@@ -469,7 +510,7 @@
 	{#if list.entries.length === 0}
 		<EmptyState title="No teams yet.">
 			{update
-				? 'Add the teams you want to pick, best first. During alliance selection the list shows next to the live picks on the event page.'
+				? 'Add teams best first. During alliance selection this list shows beside the live picks.'
 				: 'This list is empty.'}
 		</EmptyState>
 	{:else}
@@ -489,7 +530,7 @@
 			</ul>
 		{/if}
 		{#if update}
-			<p id="{id}-help" class="note">
+			<p id="{id}-help" class="visually-hidden">
 				Drag the handle or use the arrow buttons to reorder. With the handle focused, you can also
 				press the up or down arrow key. Tags, do not pick and remove are under More.
 			</p>
@@ -501,37 +542,6 @@
 				</button>
 				<button type="button" class="ctl-btn" onclick={downloadCsv}>Download CSV</button>
 			</div>
-		{/if}
-	{/if}
-
-	{#if showEvent && (update || list.event)}
-		<div class="event">
-			<label class="ctl-label" for="{id}-event">Event code</label>
-			{#if update}
-				<input
-					id="{id}-event"
-					class="ctl-input event-input"
-					placeholder="USAZGIQ"
-					autocomplete="off"
-					maxlength="24"
-					value={list.event ?? ''}
-					onchange={changeEvent}
-					aria-invalid={eventError ? 'true' : undefined}
-				/>
-			{:else}
-				<span>{list.event}</span>
-			{/if}
-			{#if eventHref}
-				<a href={eventHref}>Open alliance selection</a>
-			{/if}
-		</div>
-		{#if eventError}
-			<p class="ctl-error" role="alert">{eventError}</p>
-		{:else if update}
-			<p class="note">
-				With an event code, each team shows its OPR and rank, and teams are crossed out as alliances
-				pick them.
-			</p>
 		{/if}
 	{/if}
 
@@ -804,7 +814,10 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 8px 12px;
-		margin-top: 4px;
+	}
+
+	.event .faint {
+		font-size: 13px;
 	}
 
 	.event-input {

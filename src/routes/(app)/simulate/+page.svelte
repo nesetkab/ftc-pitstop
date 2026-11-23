@@ -100,8 +100,8 @@
 				<h2 class="sec-title" id="parts-title">Part by part</h2>
 				<PartTable red={simulation.red} blue={simulation.blue} />
 				<p class="note">
-					Expected points per match from each part. A team's share shows when it brings most of its
-					alliance's points in that part. Tips are counts, not points.
+					Expected points per match. A team's share shows when it brings most of its alliance's
+					points in a part. Tips are counts, not points.
 				</p>
 			</section>
 		</div>
@@ -126,8 +126,7 @@
 	</div>
 
 	<p class="note">
-		Each team's numbers are its current season rating, the same one match predictions use before an
-		event starts. Chances are for one qualification match.
+		Numbers are each team's current season rating. Chances are for one qualification match.
 		{#if fresh.length > 0}
 			No matches yet this season for {fresh.map((team) => team.number).join(', ')}, so
 			{fresh.length === 1 ? 'its numbers start' : 'their numbers start'} from last season or a typical

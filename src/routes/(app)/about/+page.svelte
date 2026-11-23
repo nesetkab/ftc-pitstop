@@ -30,9 +30,6 @@
 	const titles = new Map<AboutSectionId, string>(
 		ABOUT_SECTIONS.map((section) => [section.id, section.title])
 	);
-	const order = new Map<AboutSectionId, string>(
-		ABOUT_SECTIONS.map((section, index) => [section.id, String(index + 1).padStart(2, '0')])
-	);
 
 	let current = $state<AboutSectionId>(ABOUT_SECTIONS[0].id);
 
@@ -72,10 +69,7 @@
 />
 
 {#snippet heading(id: AboutSectionId)}
-	<h2 id="{id}-title">
-		<span class="index n" aria-hidden="true">{order.get(id)}</span>
-		<a href="#{id}">{titles.get(id)}</a>
-	</h2>
+	<h2 id="{id}-title"><a href="#{id}">{titles.get(id)}</a></h2>
 {/snippet}
 
 <PageHeader
@@ -395,8 +389,8 @@
 <style>
 	.about {
 		display: grid;
-		grid-template-columns: 200px minmax(0, 70ch);
-		gap: 64px;
+		grid-template-columns: 200px minmax(0, 72ch);
+		gap: 72px;
 		align-items: start;
 		margin-top: 8px;
 	}
@@ -410,10 +404,8 @@
 	}
 
 	.toc-title {
-		font-size: 12px;
-		font-weight: 600;
-		letter-spacing: 0.06em;
-		text-transform: uppercase;
+		font-size: 13px;
+		font-weight: 500;
 		color: var(--text-3);
 	}
 
@@ -446,7 +438,7 @@
 
 	article {
 		display: grid;
-		gap: 56px;
+		gap: 40px;
 		font-size: 17px;
 		line-height: 1.65;
 	}
@@ -458,13 +450,11 @@
 	}
 
 	section + section {
-		padding-top: 40px;
+		padding-top: 36px;
 		border-top: 1px solid var(--line);
 	}
 
 	h2 {
-		display: grid;
-		gap: 6px;
 		font-size: 22px;
 		line-height: 1.25;
 	}
@@ -475,13 +465,6 @@
 
 	h2 a:hover {
 		text-decoration: underline;
-	}
-
-	.index {
-		font-size: 13px;
-		font-weight: 500;
-		letter-spacing: 0.04em;
-		color: var(--text-3);
 	}
 
 	h3 {

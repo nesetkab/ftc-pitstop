@@ -14,7 +14,7 @@
 	const OPR_PARTS = new Set(['auto', 'teleop', 'hive', 'flower', 'garden', 'park', 'tips']);
 </script>
 
-<div class="wrap" style:max-width="{240 + 190 * teams.length}px">
+<div class="wrap">
 	<Table>
 		<caption class="visually-hidden">Season stats side by side</caption>
 		<thead>
@@ -69,6 +69,7 @@
 		margin-left: auto;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		white-space: nowrap;
 		font-weight: 400;
 	}
 

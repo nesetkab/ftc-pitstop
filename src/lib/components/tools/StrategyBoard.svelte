@@ -461,7 +461,6 @@
 					/>
 				{/if}
 			</div>
-			<p class="note">Simplified field</p>
 			{#if full && editable}
 				<p class="ctl-error" role="alert">This plan is full. Erase some marks to add more.</p>
 			{/if}
@@ -501,7 +500,7 @@
 					{/if}
 				</div>
 				<div class="panel">
-					<label class="sec-title" for="{id}-robot">Robot marker</label>
+					<label class="sec-title" for="{id}-robot">Robot number</label>
 					<input
 						id="{id}-robot"
 						class="ctl-input"
@@ -514,7 +513,7 @@
 							event.currentTarget.value = robotNumber;
 						}}
 					/>
-					<p class="note">The Robot tool places this number. Drag a marker to move it.</p>
+					<p class="note">Placed by the Robot tool. Drag a marker to move it.</p>
 				</div>
 				<div class="panel">
 					<label class="sec-title" for="{id}-notes">Notes</label>
@@ -562,12 +561,12 @@
 			{#if editable}
 				<div class="ctl-row">
 					<Button variant="secondary" onclick={newPlan}>New plan</Button>
-					<button type="button" class="ctl-btn" disabled={!plan} onclick={copyPlan}
-						>Duplicate</button
-					>
-					<button type="button" class="ctl-btn plain" disabled={!plan} onclick={deletePlan}>
-						{confirmDelete ? 'Confirm delete' : 'Delete'}
-					</button>
+					{#if plan}
+						<button type="button" class="ctl-btn" onclick={copyPlan}>Duplicate</button>
+						<button type="button" class="ctl-btn plain" onclick={deletePlan}>
+							{confirmDelete ? 'Confirm delete' : 'Delete'}
+						</button>
+					{/if}
 				</div>
 			{/if}
 		</div>
@@ -726,7 +725,6 @@
 		font-size: 13px;
 	}
 
-	.canvas > .note,
 	.canvas > .ctl-error {
 		justify-self: start;
 		width: 100%;

@@ -56,7 +56,7 @@ const shapesOf = (boards: Boards) => boards.plans[0]?.shapes ?? [];
 describe('strategy board', () => {
 	it('draws a plain field and says it is simplified', () => {
 		setup();
-		expect(screen.getByText('Simplified field')).toBeInTheDocument();
+		expect(screen.getByRole('img', { name: /Simplified BIOBUZZ field/ })).toBeInTheDocument();
 		expect(field().querySelectorAll('.tile')).toHaveLength(10);
 		expect(field().querySelectorAll('.flower')).toHaveLength(4);
 		expect(field().querySelectorAll('.zone')).toHaveLength(2);
@@ -150,8 +150,8 @@ describe('strategy board', () => {
 
 	it('labels a marker with the number typed in the side panel', async () => {
 		const { state } = setup({ plans: [] }, { team: 14624 });
-		await fireEvent.input(screen.getByLabelText('Robot marker'), { target: { value: '25a620' } });
-		expect(screen.getByLabelText('Robot marker')).toHaveValue('25620');
+		await fireEvent.input(screen.getByLabelText('Robot number'), { target: { value: '25a620' } });
+		expect(screen.getByLabelText('Robot number')).toHaveValue('25620');
 		await fireEvent.click(screen.getByRole('button', { name: 'Robot' }));
 		await stroke([[100, 400]]);
 		expect(shapesOf(state.current)[0]).toMatchObject({ label: '25620' });

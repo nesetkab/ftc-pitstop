@@ -18,6 +18,7 @@
 
 <PickList
 	{list}
+	showTitle={false}
 	update={(change) => workspace.update('picklist', change)}
 	auto={feed.labels}
 	stats={feed.stats}

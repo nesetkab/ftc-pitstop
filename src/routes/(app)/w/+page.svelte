@@ -103,6 +103,22 @@
 		}
 	}
 
+	const TOOLS = [
+		{
+			name: 'Pick list',
+			text: 'Rank the teams you want for alliance selection. Picked teams cross out live.'
+		},
+		{
+			name: 'Batteries',
+			text: 'Track charge and voltage so the freshest battery goes in the robot.'
+		},
+		{
+			name: 'Checklist',
+			text: 'The steps your team runs before every match, ticked off with initials.'
+		},
+		{ name: 'Strategy board', text: 'Draw paths on the field and save a plan for each match.' }
+	];
+
 	function where(kind: Recent['kind']): string {
 		return kind === 'shared' ? 'Shared with the team' : 'On this device';
 	}
@@ -115,72 +131,55 @@
 
 <PageHeader
 	title="Team workspace"
-	meta="A pick list, battery log, checklist and strategy board for your team. No account needed."
->
-	{#snippet status()}
-		{#if data.shared}
-			<b>Shared with your team.</b> Anyone with the join code can see and edit it.
-		{:else}
-			<b>Saved on this device.</b> Workspaces stay in this browser. Use Copy share link in any tool to
-			send it to a teammate.
-		{/if}
-	{/snippet}
-</PageHeader>
+	meta={data.shared
+		? 'Shared tools for your team, opened with a join code. No account needed.'
+		: 'Tools for your team, saved in this browser. No account needed.'}
+/>
 
-<div class="forms">
-	<form class="panel" onsubmit={create} novalidate>
-		<h2 class="sec-title">Create a team workspace</h2>
+<div class="start">
+	<form class="part" onsubmit={create} novalidate>
+		<h2 class="sec-title">Create a workspace</h2>
 		<label class="ctl-label" for="{id}-team">Team number</label>
-		<input
-			id="{id}-team"
-			class="ctl-input"
-			inputmode="numeric"
-			autocomplete="off"
-			maxlength="6"
-			placeholder="14624"
-			bind:value={team}
-			aria-invalid={createError ? 'true' : undefined}
-			aria-describedby={createError ? `${id}-create-error` : undefined}
-		/>
+		<div class="row">
+			<input
+				id="{id}-team"
+				class="ctl-input"
+				inputmode="numeric"
+				autocomplete="off"
+				maxlength="6"
+				placeholder="14624"
+				bind:value={team}
+				aria-invalid={createError ? 'true' : undefined}
+				aria-describedby={createError ? `${id}-create-error` : undefined}
+			/>
+			<Button type="submit" disabled={busy || !access}>Create</Button>
+		</div>
 		{#if createError}
 			<p id="{id}-create-error" class="ctl-error" role="alert">{createError}</p>
 		{/if}
-		<div>
-			<Button type="submit" disabled={busy || !access}>Create workspace</Button>
-		</div>
-		<p class="note">
-			{data.shared
-				? 'You get a join code to share with your team.'
-				: 'The workspace is saved in this browser, and the join code names it here.'}
-		</p>
 	</form>
 
-	<form class="panel" onsubmit={join} novalidate>
-		<h2 class="sec-title">Join a workspace</h2>
+	<form class="part" onsubmit={join} novalidate>
+		<h2 class="sec-title">Join your team</h2>
 		<label class="ctl-label" for="{id}-code">Join code</label>
-		<input
-			id="{id}-code"
-			class="ctl-input code"
-			autocomplete="off"
-			autocapitalize="characters"
-			spellcheck="false"
-			maxlength="8"
-			placeholder="ABC-DEF"
-			bind:value={code}
-			aria-invalid={joinError ? 'true' : undefined}
-			aria-describedby={joinError ? `${id}-join-error` : undefined}
-		/>
+		<div class="row">
+			<input
+				id="{id}-code"
+				class="ctl-input code"
+				autocomplete="off"
+				autocapitalize="characters"
+				spellcheck="false"
+				maxlength="8"
+				placeholder="ABC-DEF"
+				bind:value={code}
+				aria-invalid={joinError ? 'true' : undefined}
+				aria-describedby={joinError ? `${id}-join-error` : undefined}
+			/>
+			<Button variant="secondary" type="submit" disabled={busy || !access}>Join</Button>
+		</div>
 		{#if joinError}
 			<p id="{id}-join-error" class="ctl-error" role="alert">{joinError}</p>
 		{/if}
-		<div>
-			<Button variant="secondary" type="submit" disabled={busy || !access}>Join workspace</Button>
-		</div>
-		<p class="note">
-			{data.shared
-				? 'Ask a teammate for the code. It has 6 letters and numbers.'
-				: 'Only workspaces saved on this device can be joined by code.'}
-		</p>
 	</form>
 </div>
 
@@ -201,21 +200,49 @@
 	</section>
 {/if}
 
+<section class="tools" aria-labelledby="{id}-tools">
+	<h2 class="visually-hidden" id="{id}-tools">In every workspace</h2>
+	<dl>
+		{#each TOOLS as tool (tool.name)}
+			<div>
+				<dt>{tool.name}</dt>
+				<dd>{tool.text}</dd>
+			</div>
+		{/each}
+	</dl>
+</section>
+
 <style>
-	.forms {
+	.start {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 28px;
-		align-items: start;
-	}
-
-	.panel {
-		display: grid;
-		gap: 10px;
-		align-content: start;
-		padding: 18px;
 		border: 1px solid var(--line);
 		border-radius: var(--radius-panel);
+	}
+
+	.part {
+		display: grid;
+		gap: 8px;
+		align-content: start;
+		padding: 20px 22px 22px;
+	}
+
+	.part + .part {
+		border-left: 1px solid var(--line);
+	}
+
+	.part h2 {
+		margin-bottom: 4px;
+	}
+
+	.row {
+		display: flex;
+		gap: 8px;
+		max-width: 360px;
+	}
+
+	.row input {
+		flex: 1;
 	}
 
 	.code {
@@ -262,9 +289,50 @@
 		font-size: 13px;
 	}
 
+	.tools dl {
+		display: grid;
+		grid-template-columns: repeat(4, minmax(0, 1fr));
+		gap: 20px 28px;
+		margin: 8px 0 0;
+	}
+
+	.tools div {
+		display: grid;
+		gap: 4px;
+		align-content: start;
+		padding-top: 12px;
+		border-top: 1px solid var(--line-2);
+	}
+
+	.tools dt {
+		font-size: 14px;
+		font-weight: 600;
+	}
+
+	.tools dd {
+		font-size: 14px;
+		color: var(--text-2);
+		text-wrap: pretty;
+	}
+
+	@media (max-width: 900px) {
+		.tools dl {
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+		}
+	}
+
 	@media (max-width: 760px) {
-		.forms {
+		.start {
 			grid-template-columns: minmax(0, 1fr);
+		}
+
+		.part + .part {
+			border-top: 1px solid var(--line);
+			border-left: 0;
+		}
+
+		.row {
+			max-width: none;
 		}
 
 		.recents a {
@@ -273,6 +341,12 @@
 
 		.recents .where {
 			grid-column: 1 / -1;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.tools dl {
+			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 </style>

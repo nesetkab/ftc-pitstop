@@ -35,13 +35,8 @@
 		{ href: `/w/${code}/board`, label: 'Strategy board' }
 	]);
 
-	const meta = $derived(
-		[
-			workspace.meta?.teamNumber ? `Team ${workspace.meta.teamNumber}.` : '',
-			`Join code ${formatCode(code)}.`
-		]
-			.filter(Boolean)
-			.join(' ')
+	const title = $derived(
+		workspace.meta?.teamNumber ? `Team ${workspace.meta.teamNumber}` : 'Team workspace'
 	);
 
 	async function open() {
@@ -98,9 +93,17 @@
 		<Button onclick={open}>Try again</Button>
 	</div>
 {:else}
-	<PageHeader title="Team tools" {meta}>
+	<PageHeader
+		{title}
+		meta={workspace.kind === 'shared' ? undefined : `Join code ${formatCode(code)}`}
+	>
 		{#snippet status()}
-			<StorageNotice kind={workspace.kind} sync={workspace.sync} savedAt={workspace.savedAt} />
+			<StorageNotice
+				kind={workspace.kind}
+				sync={workspace.sync}
+				savedAt={workspace.savedAt}
+				code={formatCode(code)}
+			/>
 		{/snippet}
 		{#snippet actions()}
 			<div class="match">

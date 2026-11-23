@@ -7,13 +7,15 @@
 		kind: WorkspaceKind;
 		sync?: SyncState;
 		savedAt?: number | null;
+		code?: string;
 	}
 
-	let { kind, sync = 'saved', savedAt = null }: Props = $props();
+	let { kind, sync = 'saved', savedAt = null, code }: Props = $props();
 </script>
 
 {#if kind === 'shared'}
-	<b>Shared with your team.</b> Anyone with the join code can see and edit it.
+	<b>Shared with your team.</b> Anyone with {code ? `join code ${code}` : 'the join code'} can see and
+	edit it.
 {:else if kind === 'memory'}
 	<b>Not saved.</b> This browser is blocking storage, so changes are lost when you close the page. Copy
 	a share link to keep a copy.

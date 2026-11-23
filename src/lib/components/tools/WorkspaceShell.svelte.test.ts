@@ -22,10 +22,8 @@ describe('workspace shell', () => {
 		render(WorkspaceShell, { props: { code, shared: false, children } });
 		expect(screen.getByRole('status')).toHaveTextContent('Loading the workspace.');
 		expect(await screen.findByText('Tool content')).toBeInTheDocument();
-		expect(screen.getByRole('heading', { name: 'Team tools' })).toBeInTheDocument();
-		expect(
-			screen.getByText(`Team 14624. Join code ${code.slice(0, 3)}-${code.slice(3)}.`)
-		).toBeInTheDocument();
+		expect(screen.getByRole('heading', { level: 1, name: 'Team 14624' })).toBeInTheDocument();
+		expect(screen.getByText(`Join code ${code.slice(0, 3)}-${code.slice(3)}`)).toBeInTheDocument();
 		expect(screen.getByText('Saved on this device.')).toBeInTheDocument();
 	});
 

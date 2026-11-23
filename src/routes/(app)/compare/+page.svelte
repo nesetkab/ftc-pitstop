@@ -28,6 +28,7 @@
 			? `Compare FTC teams ${names.slice(0, -1).join(', ')} and ${names.at(-1)} side by side: OPR by part, records, head to head, alliance fit and shared events.`
 			: 'Compare up to four FTC teams side by side: OPR by part, records, head to head, alliance fit and shared events.'
 	);
+	const width = $derived(300 + 190 * Math.max(2, view.teams.length));
 	const canonical = $derived(
 		compareHref(view.teams.map((team) => team.number).toSorted((a, b) => a - b))
 	);
@@ -52,7 +53,7 @@
 		Type team numbers above, or use the Compare button on any team page.
 	</EmptyState>
 {:else}
-	<section class="panel" aria-labelledby="season-title">
+	<section class="panel" style:max-width="{width}px" aria-labelledby="season-title">
 		<h2 class="sec-title" id="season-title">This season</h2>
 		<CompareTable teams={view.teams} rows={view.rows} />
 		<p class="note">
@@ -65,7 +66,7 @@
 
 	{#if view.teams.length >= 2}
 		{#if view.fit}
-			<section class="panel" aria-labelledby="fit-title">
+			<section class="panel" style:max-width="{width}px" aria-labelledby="fit-title">
 				<h2 class="sec-title" id="fit-title">Alliance fit</h2>
 				<AllianceFit fit={view.fit} />
 			</section>
@@ -73,7 +74,7 @@
 			<p class="note">Remove a team to see how two or three of them would fit as an alliance.</p>
 		{/if}
 
-		<section class="panel" aria-labelledby="h2h-title">
+		<section class="panel" style:max-width="{width}px" aria-labelledby="h2h-title">
 			<h2 class="sec-title" id="h2h-title">Head to head</h2>
 			{#if view.history}
 				<HeadToHead pairs={view.pairs} meetings={view.meetings} numbers={data.numbers} />
@@ -85,7 +86,7 @@
 			{/if}
 		</section>
 
-		<section class="panel" aria-labelledby="shared-title">
+		<section class="panel" style:max-width="{width}px" aria-labelledby="shared-title">
 			<h2 class="sec-title" id="shared-title">Shared events</h2>
 			{#if view.shared.length === 0}
 				<EmptyState title="These teams have not been entered in the same event this season." />
