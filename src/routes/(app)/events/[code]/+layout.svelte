@@ -72,6 +72,7 @@
 	});
 
 	const tabs = $derived([
+		...(live && scheduled ? [{ href: `${base}/now`, label: 'Now' }] : []),
 		{ href: `${base}/rankings`, label: 'Rankings' },
 		{ href: `${base}/schedule`, label: 'Schedule' },
 		{ href: `${base}/results`, label: 'Results' },
@@ -90,6 +91,10 @@
 	});
 
 	const TOPICS: Record<string, { label: string; topic: string }> = {
+		now: {
+			label: 'Now',
+			topic: 'The match on the field, what is next, the latest results and the top 8, live.'
+		},
 		rankings: { label: 'Rankings', topic: 'Rankings, OPR and schedule strength.' },
 		schedule: { label: 'Schedule', topic: 'Match schedule with predicted scores and win chances.' },
 		results: { label: 'Results', topic: 'Match results with score breakdowns.' },
@@ -140,6 +145,7 @@
 				: siteTitle(`${event.name}, ${when.includes(year) ? when : `${when}, ${year}`}`),
 			description: eventDescription(event, status, tab ? tab.topic : rootTopic),
 			path: showsRankings ? base : `${base}/${tabPath}`,
+			noindex: section === 'now',
 			data: [
 				eventJsonLd(origin, event),
 				breadcrumbs(
@@ -161,7 +167,7 @@
 	$effect(() => watchFollowed((teams) => (followed = new Set(teams))));
 
 	$effect(() => {
-		if (!live) return;
+		if (!live || section === 'now') return;
 		let last = Date.now();
 		const refresh = () => {
 			if (document.visibilityState !== 'visible' || Date.now() - last < every) return;
