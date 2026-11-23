@@ -5,6 +5,7 @@
 	import SharedEvents from '#lib/components/compare/SharedEvents.svelte';
 	import TeamPicker from '#lib/components/compare/TeamPicker.svelte';
 	import { compareHref } from '#lib/components/compare/compare.ts';
+	import { MAX_FIT } from '#lib/components/compare/fit.ts';
 	import { siteTitle } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -72,6 +73,8 @@
 				<h2 class="sec-title" id="fit-title">Alliance fit</h2>
 				<AllianceFit fit={view.fit} />
 			</section>
+		{:else if view.teams.length > MAX_FIT}
+			<p class="note">Remove a team to see how two or three of them would fit as an alliance.</p>
 		{/if}
 
 		<section class="panel" aria-labelledby="h2h-title">

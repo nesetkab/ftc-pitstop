@@ -42,6 +42,7 @@
 	const pairName = (alliance: Alliance) => alliance.teams.join(' + ');
 	const averagePair = (part: FitPart) => fit.average[part] * 2;
 	const averageScore = $derived(averagePair('auto') + averagePair('teleop'));
+	const width = $derived(Math.max(640, 240 + 150 * (fit.alliances.length + 1)));
 
 	function leader(alliance: Alliance, part: FitPart): string | null {
 		const total = alliance.parts[part];
@@ -65,7 +66,7 @@
 		{/if}
 	</p>
 
-	<div class="wrap">
+	<div class="wrap" style:max-width="{width}px">
 		<Table>
 			<caption class="visually-hidden"
 				>Predicted score and ranking point chances for each pair</caption
@@ -93,7 +94,7 @@
 		</Table>
 	</div>
 
-	<div class="wrap" style:max-width="{240 + 150 * (fit.alliances.length + 1)}px">
+	<div class="wrap" style:max-width="{width}px">
 		<Table>
 			<caption class="visually-hidden"
 				>Points by part for each pair, against an average pair</caption
@@ -167,7 +168,6 @@
 	}
 
 	.wrap {
-		max-width: 640px;
 		min-width: 0;
 	}
 
