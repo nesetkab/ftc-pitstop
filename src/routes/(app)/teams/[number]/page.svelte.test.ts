@@ -262,9 +262,16 @@ describe('team page', () => {
 			'5-0-0',
 			'58.2',
 			'Captain of alliance 1, lost the final 81–178',
-			'Finalist alliance'
+			'Finalist alliance',
+			'Report'
 		]);
-		expect(within(rows[0]).getByRole('link')).toHaveAttribute('href', '/events/USAZGIQ');
+		expect(
+			within(rows[0]).getByRole('link', { name: 'Roadrunner - Gilbert Qualifier' })
+		).toHaveAttribute('href', '/events/USAZGIQ');
+		expect(within(rows[0]).getByRole('link', { name: 'Report' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/teams/26670'
+		);
 		const second = [...rows[1].querySelectorAll('td')].map((cell) => cell.textContent);
 		expect(second).toEqual([
 			'Phoenix Qualifier',
@@ -273,7 +280,8 @@ describe('team page', () => {
 			MISSING,
 			MISSING,
 			'Upcoming',
-			MISSING
+			MISSING,
+			'Report'
 		]);
 	});
 
@@ -325,6 +333,64 @@ describe('team page', () => {
 			})
 		);
 		expect(screen.getAllByText('No matches played yet this season.')).toHaveLength(2);
+	});
+
+	it('opens with season takeaways', () => {
+		show();
+		const list = screen.getByRole('list', { name: 'Season takeaways' });
+		const lines = within(list)
+			.getAllByRole('listitem')
+			.map((item) => item.textContent);
+		expect(lines[0]).toBe('Awards: Finalist alliance at Roadrunner - Gilbert Qualifier');
+		expect(lines.length).toBeGreaterThanOrEqual(2);
+		expect(lines.length).toBeLessThanOrEqual(4);
+	});
+
+	it('lists upcoming events with an outlook and a report link', () => {
+		show();
+		const table = screen.getByRole('heading', { name: 'Coming up' })
+			.nextElementSibling as HTMLElement;
+		const row = within(table).getAllByRole('row')[1];
+		expect(row).toHaveTextContent('Phoenix Qualifier');
+		expect(row).toHaveTextContent('Team list not out yet');
+		expect(within(row).getByRole('link', { name: 'Report' })).toHaveAttribute(
+			'href',
+			'/events/USAZNEXT/teams/26670'
+		);
+	});
+
+	it('lists partners and opponents from played matches', () => {
+		const played = { ...finalMatch(), result: null } as Match;
+		const score = (total: number) => ({
+			total,
+			preFoulTotal: total,
+			auto: 0,
+			teleop: total,
+			foulPoints: 0,
+			breakdown: null
+		});
+		played.result = { red: score(80), blue: score(120), winner: 'blue' };
+		show(
+			view({
+				allies: buildTeamPage({
+					season: season(),
+					ratings: null,
+					analyses: {},
+					bundles: { USAZGIQ: { alliances, matches: [played], phase: 'done' } },
+					now: NOW
+				}).allies
+			})
+		);
+		const partners = screen.getByRole('heading', { name: 'Partners' })
+			.nextElementSibling as HTMLElement;
+		const row = within(partners).getAllByRole('row')[1];
+		expect(row).toHaveTextContent('18421');
+		expect(row).toHaveTextContent('1-0-0');
+		expect(within(row).getByRole('link', { name: '120' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/matches/p10'
+		);
+		expect(screen.getByRole('heading', { name: 'Toughest opponents' })).toBeInTheDocument();
 	});
 
 	it('says when the data is saved and may be old', () => {

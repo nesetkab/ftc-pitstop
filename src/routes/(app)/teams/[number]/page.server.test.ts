@@ -135,14 +135,16 @@ describe('team page load', () => {
 		expect(view.charts[0]).toMatchObject({ id: 'AAA' });
 	});
 
-	it('only loads analysis and bundles for events that have started', async () => {
+	it('loads analysis for started events and only the team list for unscheduled ones', async () => {
 		server.loadTeamSeason.mockResolvedValue(
 			season([
 				played('MEET', '2026-11-07', 'LeagueMeet'),
 				played('QUAL', '2026-11-14'),
-				{ ...played('NEXT', '2099-01-01'), stats: null }
+				{ ...played('NEXT', '2099-01-01'), stats: null },
+				{ ...played('PAST', '2026-01-01'), stats: null }
 			])
 		);
+		server.loadEventBundle.mockResolvedValue({ teams: [], matches: [], alliances: [] });
 		await call().result;
 		expect(server.loadEventAnalysis.mock.calls.map(([code]) => code).sort()).toEqual([
 			'MEET',
@@ -150,7 +152,52 @@ describe('team page load', () => {
 		]);
 		expect(server.loadEventBundle.mock.calls.map(([code]) => code).sort()).toEqual([
 			'MEET',
+			'NEXT',
 			'QUAL'
+		]);
+	});
+
+	it('projects upcoming events once their schedule is out', async () => {
+		server.loadTeamSeason.mockResolvedValue(
+			season([played('QUAL', '2026-11-14'), { ...played('NEXT', '2099-01-01'), stats: null }])
+		);
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings);
+		const scheduledBundle = {
+			teams: [{ number: 26670 }, { number: 10 }],
+			alliances: [],
+			matches: [
+				{
+					key: 'q1',
+					level: 'qual',
+					red: [{ team: 26670 }],
+					blue: [{ team: 10 }],
+					result: null
+				}
+			]
+		};
+		server.loadEventBundle.mockImplementation(async (code: string) =>
+			code === 'NEXT' ? scheduledBundle : { teams: [], matches: [], alliances: [] }
+		);
+		server.loadEventAnalysis.mockImplementation(async (code: string) =>
+			code === 'NEXT'
+				? {
+						ratings: [],
+						projections: [
+							{ team: 26670, expectedRank: 1.4, top8: 1, top4: 1, rankChances: [], expectedRs: 2 },
+							{ team: 10, expectedRank: 1.6, top8: 1, top4: 1, rankChances: [], expectedRs: 2 }
+						]
+					}
+				: null
+		);
+		const { view } = (await call().result) as unknown as {
+			view: { upcoming: { code: string; kind: string; outlook: string }[] };
+		};
+		expect(server.loadEventAnalysis.mock.calls.map(([code]) => code).sort()).toEqual([
+			'NEXT',
+			'QUAL'
+		]);
+		expect(view.upcoming).toEqual([
+			expect.objectContaining({ code: 'NEXT', kind: 'projection', outlook: 'Expected rank 1 of 2' })
 		]);
 	});
 

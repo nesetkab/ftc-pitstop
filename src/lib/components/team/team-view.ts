@@ -13,6 +13,18 @@ import { localDay } from './dates.ts';
 import { placeName } from '#lib/format/places.ts';
 import { teamMatches, type TeamMatchEvent } from './matches.ts';
 import { playoffSummary } from './playoffs.ts';
+import {
+	advancementRows,
+	allianceScores,
+	allySummary,
+	playedMatches,
+	rpHabits,
+	seasonTakeaways,
+	upcomingEvents,
+	type AdvancementRow,
+	type AllySummary,
+	type UpcomingEventRow
+} from './season-report.ts';
 
 export const SEASON_GAMES: Record<number, string> = {
 	2021: 'Freight Frenzy',
@@ -110,6 +122,7 @@ export interface PreviousSeason {
 export interface TeamPageData {
 	team: { number: number; name: string; place: string; rookieYear: number | null };
 	source: 'ratings' | 'scout';
+	takeaways: string[];
 	stats: {
 		opr: number | null;
 		rank: number | null;
@@ -126,6 +139,9 @@ export interface TeamPageData {
 	events: TeamEventRow[];
 	matches: TeamMatchEvent[];
 	awards: TeamAwardRow[];
+	advancement: AdvancementRow[];
+	upcoming: UpcomingEventRow[];
+	allies: AllySummary;
 	previous: PreviousSeason | null;
 	updated: number;
 	stale: boolean;
@@ -135,7 +151,12 @@ export interface TeamViewInput {
 	season: TeamSeason;
 	ratings: SeasonRatings | null;
 	analyses: Record<string, EventAnalysis | null>;
-	bundles: Record<string, Pick<EventBundle, 'alliances' | 'matches' | 'phase'> | null>;
+	bundles: Record<
+		string,
+		| (Pick<EventBundle, 'alliances' | 'matches' | 'phase'> &
+				Partial<Pick<EventBundle, 'teams' | 'advancement'>>)
+		| null
+	>;
 	now: number;
 }
 
@@ -456,6 +477,31 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		};
 	});
 
+	const awards = season.events.flatMap((entry) =>
+		entry.awards.map((award) => ({
+			code: entry.event.code,
+			event: entry.event.name,
+			name: awardLabel(award)
+		}))
+	);
+	const advancement = advancementRows(season, bundles);
+	const upcoming = upcomingEvents(season, bundles, analyses, pool, now);
+	const seasonMatches = playedMatches(season, bundles);
+	const trend = seasonTrend(breakdown);
+	const previous = previousSeason(season.previousQuickStats);
+	const takeaways = seasonTakeaways({
+		stats,
+		comparison,
+		trend,
+		awards,
+		advancement,
+		upcoming,
+		previous: previous ? { ...previous.rows[0], count: previous.count } : null,
+		rookie: season.team.rookieYear === SEASON,
+		scores: allianceScores(seasonMatches),
+		rp: rpHabits(seasonMatches, bundles)
+	});
+
 	return {
 		team: {
 			number,
@@ -464,22 +510,20 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 			rookieYear: season.team.rookieYear
 		},
 		source: mine ? 'ratings' : 'scout',
+		takeaways,
 		stats,
-		trend: seasonTrend(breakdown),
+		trend,
 		breakdown,
 		chartTitle: histories.length > 0 ? 'OPR after each match' : 'OPR at each event',
 		charts,
 		comparison,
 		events,
 		matches: teamMatches(season, bundles, number),
-		awards: season.events.flatMap((entry) =>
-			entry.awards.map((award) => ({
-				code: entry.event.code,
-				event: entry.event.name,
-				name: awardLabel(award)
-			}))
-		),
-		previous: previousSeason(season.previousQuickStats),
+		awards,
+		advancement,
+		upcoming,
+		allies: allySummary(season, bundles, pool, seasonMatches),
+		previous,
 		updated: season.fetchedAt,
 		stale: season.stale
 	};
