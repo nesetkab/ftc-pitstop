@@ -1,10 +1,11 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen } from '@testing-library/svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import Tabs from './Tabs.svelte';
 
 afterEach(() => {
 	cleanup();
+	vi.restoreAllMocks();
 });
 
 const tabs = [
@@ -40,5 +41,18 @@ describe('Tabs', () => {
 			'href',
 			'/events/USAZGIQ'
 		);
+	});
+
+	it('offers a way to the hidden tabs when the row overflows', async () => {
+		vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(600);
+		vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(300);
+		render(Tabs, { props: { tabs, current: '/events/USAZGIQ', label: 'Event' } });
+		expect(await screen.findByRole('button', { name: 'Scroll event forward' })).toBeInTheDocument();
+		expect(screen.queryByRole('button', { name: 'Scroll event back' })).toBeNull();
+	});
+
+	it('shows no scroll buttons when every tab fits', () => {
+		render(Tabs, { props: { tabs, current: '/events/USAZGIQ', label: 'Event' } });
+		expect(screen.queryByRole('button')).toBeNull();
 	});
 });

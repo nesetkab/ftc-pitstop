@@ -27,6 +27,10 @@
 		more = { start: nav.scrollLeft > 1, end: nav.scrollLeft < max - 1 };
 	}
 
+	function nudge(direction: 1 | -1) {
+		nav?.scrollBy({ left: direction * nav.clientWidth * 0.6, behavior: 'smooth' });
+	}
+
 	const active = $derived(pathOf(current ?? page.url.pathname));
 
 	$effect(() => {
@@ -41,27 +45,52 @@
 
 <svelte:window onresize={measure} />
 
-<nav
-	class={['tabs', { 'more-start': more.start, 'more-end': more.end }]}
-	aria-label={label}
-	bind:this={nav}
-	onscroll={measure}
->
-	{#each tabs as tab (tab.href)}
-		<a href={tab.href} aria-current={pathOf(tab.href) === active ? 'page' : undefined}>
-			{tab.label}
-		</a>
-	{/each}
-</nav>
+{#snippet chevron(direction: 1 | -1)}
+	<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+		<path d={direction === 1 ? 'M5.5 3.5 9 7l-3.5 3.5' : 'M8.5 3.5 5 7l3.5 3.5'} />
+	</svg>
+{/snippet}
+
+<div class={['tab-row', { 'more-start': more.start, 'more-end': more.end }]}>
+	<nav class="tabs" aria-label={label} bind:this={nav} onscroll={measure}>
+		{#each tabs as tab (tab.href)}
+			<a href={tab.href} aria-current={pathOf(tab.href) === active ? 'page' : undefined}>
+				{tab.label}
+			</a>
+		{/each}
+	</nav>
+	{#if more.start}
+		<button
+			type="button"
+			class="nudge start"
+			tabindex="-1"
+			aria-label="Scroll {label.toLowerCase()} back"
+			onclick={() => nudge(-1)}>{@render chevron(-1)}</button
+		>
+	{/if}
+	{#if more.end}
+		<button
+			type="button"
+			class="nudge end"
+			tabindex="-1"
+			aria-label="Scroll {label.toLowerCase()} forward"
+			onclick={() => nudge(1)}>{@render chevron(1)}</button
+		>
+	{/if}
+</div>
 
 <style>
-	.tabs {
+	.tab-row {
+		--fade: 64px;
 		position: relative;
+		border-bottom: 1px solid var(--line);
+	}
+
+	.tabs {
 		display: flex;
 		gap: 24px;
 		margin: -2px -2px 0;
 		padding: 2px 2px 0;
-		border-bottom: 1px solid var(--line);
 		font-size: 14px;
 		color: var(--text-2);
 		overflow-x: auto;
@@ -72,20 +101,20 @@
 		display: none;
 	}
 
-	.more-end {
-		mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+	.more-end .tabs {
+		mask-image: linear-gradient(to right, #000 calc(100% - var(--fade)), transparent);
 	}
 
-	.more-start {
-		mask-image: linear-gradient(to left, #000 calc(100% - 40px), transparent);
+	.more-start .tabs {
+		mask-image: linear-gradient(to left, #000 calc(100% - var(--fade)), transparent);
 	}
 
-	.more-start.more-end {
+	.more-start.more-end .tabs {
 		mask-image: linear-gradient(
 			to right,
 			transparent,
-			#000 40px,
-			#000 calc(100% - 40px),
+			#000 var(--fade),
+			#000 calc(100% - var(--fade)),
 			transparent
 		);
 	}
@@ -109,6 +138,42 @@
 	a:focus-visible {
 		outline-offset: -2px;
 		border-radius: 2px;
+	}
+
+	.nudge {
+		position: absolute;
+		top: 0;
+		bottom: 1px;
+		display: grid;
+		place-items: center;
+		width: 32px;
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: var(--text-2);
+		cursor: pointer;
+	}
+
+	.nudge:hover {
+		color: var(--text);
+	}
+
+	.nudge.start {
+		left: -6px;
+		justify-items: start;
+	}
+
+	.nudge.end {
+		right: -6px;
+		justify-items: end;
+	}
+
+	svg {
+		fill: none;
+		stroke: currentColor;
+		stroke-width: 1.6;
+		stroke-linecap: round;
+		stroke-linejoin: round;
 	}
 
 	@media (max-width: 600px) {

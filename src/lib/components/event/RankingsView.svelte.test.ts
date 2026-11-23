@@ -68,7 +68,7 @@ describe('RankingsView', () => {
 		expect(first).toHaveTextContent('90%');
 		expect(first).toHaveTextContent('95%');
 		expect(screen.getByText(/12 remaining qualification matches/)).toBeInTheDocument();
-		expect(screen.getByRole('table', { name: 'Schedule so far' })).toBeInTheDocument();
+		expect(screen.getByRole('link', { name: 'Schedule' })).toHaveAttribute('href', '?view=schedule');
 	});
 
 	it('hides the projection once every qualification match is played', () => {
@@ -76,8 +76,6 @@ describe('RankingsView', () => {
 		expect(screen.queryByText(/Projected after/)).toBeNull();
 		expect(headers()).toContain('OPR');
 		expect(screen.getByRole('columnheader', { name: 'Record' })).not.toHaveClass('opt');
-		expect(screen.getByRole('table', { name: 'Schedule strength' })).toBeInTheDocument();
-		expect(screen.queryByText('Schedule so far')).toBeNull();
 	});
 
 	it('drops low-value columns on phones', () => {
@@ -149,7 +147,7 @@ describe('RankingsView', () => {
 	});
 
 	it('shows where each team got its ranking points', () => {
-		render(RankingsView, { props: { bundle: finished, rp: rpCounts(finished.matches) } });
+		render(RankingsView, { props: { bundle: finished, rp: rpCounts(finished.matches), view: 'rp' } });
 		const table = screen.getByRole('table', { name: 'Where ranking points came from' });
 		const first = bodyRows(table)[0];
 		const cells = Array.from(first.querySelectorAll('td')).map((cell) => cell.textContent?.trim());
@@ -159,9 +157,84 @@ describe('RankingsView', () => {
 		expect(screen.getByText(/Swarm takes 16 leave and park points/)).toBeInTheDocument();
 	});
 
-	it('leaves the ranking point table out without match detail', () => {
-		render(RankingsView, { props: { bundle: finished } });
+	it('leaves the ranking point view out without match detail', () => {
+		render(RankingsView, { props: { bundle: finished, view: 'rp' } });
 		expect(screen.queryByRole('table', { name: 'Where ranking points came from' })).toBeNull();
+		expect(screen.getByRole('table', { name: 'Rankings' })).toBeInTheDocument();
+		expect(screen.queryByRole('navigation', { name: 'Rankings view' })).toBeNull();
+	});
+
+	it('shows one table at a time and switches between them by link', () => {
+		const props = {
+			bundle: finished,
+			analysis: fakeAnalysis(finished),
+			rp: rpCounts(finished.matches),
+			choice: parseRankingChoice(new URLSearchParams('sort=opr')),
+			path: '/events/USAZGIQ/rankings',
+			eventCode: 'USAZGIQ'
+		};
+		const { rerender } = render(RankingsView, { props });
+		expect(screen.getAllByRole('table')).toHaveLength(1);
+		const views = screen.getByRole('navigation', { name: 'Rankings view' });
+		expect(within(views).getByRole('link', { name: 'Standings' })).toHaveAttribute(
+			'aria-current',
+			'page'
+		);
+		expect(within(views).getByRole('link', { name: 'Standings' })).toHaveAttribute(
+			'href',
+			'?sort=opr'
+		);
+		expect(within(views).getByRole('link', { name: 'Ranking points' })).toHaveAttribute(
+			'href',
+			'?sort=opr&view=rp'
+		);
+		expect(within(views).getByRole('link', { name: 'Schedule' })).toHaveAttribute(
+			'href',
+			'?sort=opr&view=schedule'
+		);
+
+		rerender({ ...props, view: 'rp' });
+		expect(screen.getAllByRole('table')).toHaveLength(1);
+		expect(screen.getByRole('table', { name: 'Where ranking points came from' })).toBeInTheDocument();
+		expect(within(views).getByRole('link', { name: 'Ranking points' })).toHaveAttribute(
+			'aria-current',
+			'page'
+		);
+		expect(screen.queryByRole('link', { name: 'Download CSV' })).toBeNull();
+
+		rerender({ ...props, view: 'schedule' });
+		const table = screen.getByRole('table', { name: 'Schedule strength' });
+		expect(screen.getAllByRole('table')).toHaveLength(1);
+		const ranks = bodyRows(table).map((row) => Number(row.querySelector('td')?.textContent));
+		expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
+		expect(within(bodyRows(table)[0]).getByRole('link')).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/teams/26670'
+		);
+	});
+
+	it('links the default view to the page itself', () => {
+		render(RankingsView, {
+			props: {
+				bundle: finished,
+				analysis: fakeAnalysis(finished),
+				view: 'schedule',
+				path: '/events/USAZGIQ/rankings'
+			}
+		});
+		expect(screen.getByRole('link', { name: 'Standings' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/rankings'
+		);
+		expect(screen.getByRole('table', { name: 'Schedule strength' })).toBeInTheDocument();
+	});
+
+	it('says the schedule view is so far while matches remain', () => {
+		render(RankingsView, {
+			props: { bundle: midway, analysis: fakeAnalysis(midway), view: 'schedule' }
+		});
+		expect(screen.getByRole('table', { name: 'Schedule so far' })).toBeInTheDocument();
+		expect(screen.getByText(/each team has played so far/)).toBeInTheDocument();
 	});
 
 	it('shows the chosen columns sorted by the chosen one', () => {

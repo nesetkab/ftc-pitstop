@@ -216,6 +216,21 @@ export function rankingQuery(choice: RankingChoice): string {
 	return parts.length > 0 ? `?${parts.join('&')}` : '';
 }
 
+export const RANKING_VIEWS = ['standings', 'rp', 'schedule'] as const;
+
+export type RankingView = (typeof RANKING_VIEWS)[number];
+
+export function parseRankingView(params: Pick<URLSearchParams, 'get'>): RankingView {
+	const raw = params.get('view');
+	return RANKING_VIEWS.find((view) => view === raw) ?? 'standings';
+}
+
+export function rankingPageQuery(choice: RankingChoice, view: RankingView): string {
+	const query = rankingQuery(choice);
+	if (view === 'standings') return query;
+	return `${query ? `${query}&` : '?'}view=${view}`;
+}
+
 export function toggleColumn(choice: RankingChoice, key: ColumnKey, on: boolean): RankingChoice {
 	const columns = on ? [...choice.columns, key] : choice.columns.filter((column) => column !== key);
 	return normalize({ ...choice, columns });

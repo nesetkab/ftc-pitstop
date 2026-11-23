@@ -84,7 +84,17 @@
 	}
 
 	.team {
+		display: flex;
+		gap: 0.35em;
+		max-width: 100%;
+		white-space: nowrap;
 		text-decoration: none;
+	}
+
+	.name {
+		min-width: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.team:hover {
@@ -102,8 +112,12 @@
 	}
 
 	@media (max-width: 760px) {
+		col.alliance {
+			width: 56px;
+		}
+
 		col.num {
-			width: 64px;
+			width: 60px;
 		}
 
 		th {
@@ -112,17 +126,10 @@
 		}
 
 		.teams {
-			align-items: stretch;
 			gap: 2px;
 		}
 
 		.team {
-			display: -webkit-box;
-			-webkit-box-orient: vertical;
-			-webkit-line-clamp: 2;
-			line-clamp: 2;
-			overflow: hidden;
-			overflow-wrap: anywhere;
 			line-height: 1.3;
 		}
 	}

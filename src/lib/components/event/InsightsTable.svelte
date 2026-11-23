@@ -42,7 +42,7 @@
 						class={{ opt: part.key !== 'total' && !active, active }}
 						aria-sort={active ? 'descending' : undefined}
 					>
-						<a href={sortHref(part.key)} data-sveltekit-noscroll>
+						<a class="sort-link" href={sortHref(part.key)} data-sveltekit-noscroll>
 							<Term label={part.label} nested />{#if active}<span aria-hidden="true"> ↓</span>{/if}
 						</a>
 					</th>
@@ -84,10 +84,6 @@
 {/if}
 
 <style>
-	th a {
-		color: inherit;
-	}
-
 	th.active {
 		color: var(--text);
 	}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getEventView } from '#lib/components/event/context.ts';
 	import InsightAverages from '#lib/components/event/InsightAverages.svelte';
-	import { INSIGHT_PARTS, insightQuery } from '#lib/components/event/insights.ts';
+	import { insightQuery } from '#lib/components/event/insights.ts';
 	import InsightsTable from '#lib/components/event/InsightsTable.svelte';
 	import { integer } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -26,9 +26,6 @@
 			...level,
 			href: `${base}${insightQuery({ ...data.filters, level: level.value, all: false })}`
 		}))
-	);
-	const sortLabel = $derived(
-		INSIGHT_PARTS.find((part) => part.key === data.filters.sort)?.label.toLowerCase() ?? 'total'
 	);
 	const hidden = $derived(data.total - data.rows.length);
 	const csvHref = $derived(
@@ -60,10 +57,7 @@
 			<Segmented label="Match type" options={levels} value={data.filters.level} />
 		</div>
 		<InsightsTable {code} rows={data.rows} filters={data.filters} followed={view.followed} />
-		<p class="note">
-			Sorted by {sortLabel}. Each match counts twice, once for each alliance. Click a column to sort
-			by it.
-		</p>
+		<p class="note">Each match counts twice, once for each alliance.</p>
 		<p class="links">
 			{#if hidden > 0}
 				<a href="{base}{insightQuery({ ...data.filters, all: true })}" data-sveltekit-noscroll

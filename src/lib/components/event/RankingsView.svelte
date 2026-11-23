@@ -4,17 +4,20 @@
 	import { LEAGUE_MATCHES } from '#lib/game/rankings.ts';
 	import type { EventBundle } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Segmented from '#lib/ui/Segmented.svelte';
 	import ColumnMenu from './ColumnMenu.svelte';
 	import { quals } from './matches.ts';
 	import {
 		availableSources,
 		DEFAULT_CHOICE,
+		rankingPageQuery,
 		rankingQuery,
 		rankingRows,
 		scoreStats,
 		sortRankingRows,
 		visibleColumns,
-		type RankingChoice
+		type RankingChoice,
+		type RankingView
 	} from './ranking-columns.ts';
 	import RankingsTable from './RankingsTable.svelte';
 	import RpSources from './RpSources.svelte';
@@ -31,6 +34,8 @@
 		followed?: ReadonlySet<number>;
 		csvHref?: string;
 		choice?: RankingChoice;
+		view?: RankingView;
+		path?: string;
 		onchoose?: (choice: RankingChoice) => void;
 		eventCode?: string;
 	}
@@ -42,6 +47,8 @@
 		followed = new Set(),
 		csvHref,
 		choice = DEFAULT_CHOICE,
+		view = 'standings',
+		path = '',
 		onchoose,
 		eventCode
 	}: Props = $props();
@@ -60,6 +67,18 @@
 	const query = $derived(rankingQuery(choice));
 	const strength = $derived(analysis?.strength ?? []);
 	const strengthTitle = $derived(remaining > 0 ? 'Schedule so far' : 'Schedule strength');
+	const views = $derived(
+		(
+			[
+				{ value: 'standings', label: 'Standings', shown: true },
+				{ value: 'rp', label: 'Ranking points', shown: rp !== null },
+				{ value: 'schedule', label: 'Schedule', shown: strength.length > 0 }
+			] as const
+		)
+			.filter((option) => option.shown)
+			.map(({ value, label }) => ({ value, label, href: link(rankingPageQuery(choice, value)) }))
+	);
+	const active = $derived(views.some((option) => option.value === view) ? view : 'standings');
 	const elsewhere = $derived.by(() => {
 		const here = new Set(bundle.teams.map((team) => team.number));
 		return here.size > 0 && bundle.rankings.some((row) => !here.has(row.team));
@@ -74,6 +93,10 @@
 			!league &&
 			(bundle.event?.type === 'LeagueMeet' || bundle.event?.type === 'LeagueTournament')
 	);
+	function link(query: string) {
+		return query || path || '?';
+	}
+
 	const note = $derived(
 		[
 			elsewhere
@@ -107,55 +130,55 @@
 		Rankings show here after the first qualification match is played.
 	</EmptyState>
 {:else}
-	<div class="bar">
-		<p class="note">Click a column to sort by it.</p>
-		{#if onchoose}
-			<ColumnMenu {choice} {sources} {onchoose} />
+	{#if views.length > 1 || (onchoose && active === 'standings')}
+		<div class="bar">
+			{#if views.length > 1}
+				<Segmented label="Rankings view" options={views} value={active} />
+			{/if}
+			{#if onchoose && active === 'standings'}
+				<span class="menu"><ColumnMenu {choice} {sources} {onchoose} /></span>
+			{/if}
+		</div>
+	{/if}
+	{#if active === 'rp' && rp}
+		<RpSources {rp} rankings={bundle.rankings} teams={bundle.teams} {followed} {eventCode} />
+		<p class="note">
+			Share of each team's qualification matches where its alliance won or earned each bonus ranking
+			point. Swarm takes {RP_THRESHOLDS.swarm} leave and park points, Pollinator 1 takes {RP_THRESHOLDS.pollinator1}
+			tips and Pollinator 2 takes {RP_THRESHOLDS.pollinator2}. Bonus RS is bonus ranking points per
+			match, the part of RS that doesn't depend on winning.
+		</p>
+	{:else if active === 'schedule'}
+		<StrengthTable
+			title={strengthTitle}
+			{strength}
+			rankings={bundle.rankings}
+			teams={bundle.teams}
+			{followed}
+			{eventCode}
+		/>
+		<p class="note">
+			Partners' and opponents' OPR are averages over the matches each team has played{remaining > 0
+				? ' so far'
+				: ''}. Difference is partners minus opponents, so a team above zero had the easier schedule.
+		</p>
+	{:else}
+		<RankingsTable
+			{rows}
+			teams={bundle.teams}
+			{columns}
+			{choice}
+			projected={projections !== null && projections.length > 0}
+			qualCount={qualMatches.length}
+			hrefFor={(next) => link(rankingQuery(next))}
+			{onchoose}
+			{followed}
+			{eventCode}
+		/>
+		<p class="note">{note}</p>
+		{#if csvHref}
+			<p class="csv"><a href="{csvHref}{query}" download>Download CSV</a></p>
 		{/if}
-	</div>
-	<RankingsTable
-		{rows}
-		teams={bundle.teams}
-		{columns}
-		{choice}
-		projected={projections !== null && projections.length > 0}
-		qualCount={qualMatches.length}
-		hrefFor={(next) => rankingQuery(next) || '?'}
-		{onchoose}
-		{followed}
-		{eventCode}
-	/>
-	<p class="note">{note}</p>
-	{#if csvHref}
-		<p class="csv"><a href="{csvHref}{query}" download>Download CSV</a></p>
-	{/if}
-	{#if rp}
-		<section class="panel" aria-labelledby="rp-title">
-			<h2 class="sec-title" id="rp-title">Where ranking points came from</h2>
-			<RpSources {rp} rankings={bundle.rankings} teams={bundle.teams} {followed} />
-			<p class="note">
-				Share of each team's qualification matches where its alliance won or earned each bonus
-				ranking point. Swarm takes {RP_THRESHOLDS.swarm} leave and park points, Pollinator 1 takes {RP_THRESHOLDS.pollinator1}
-				tips and Pollinator 2 takes {RP_THRESHOLDS.pollinator2}. Bonus RS is bonus ranking points
-				per match, the part of RS that doesn't depend on winning.
-			</p>
-		</section>
-	{/if}
-	{#if strength.length > 0}
-		<section class="panel" aria-labelledby="strength-title">
-			<h2 class="sec-title" id="strength-title">{strengthTitle}</h2>
-			<StrengthTable
-				title={strengthTitle}
-				{strength}
-				rankings={bundle.rankings}
-				teams={bundle.teams}
-				{followed}
-			/>
-			<p class="note">
-				Partners' and opponents' OPR are averages over the matches each team has played. Sorted by
-				the gap between rank and rank by OPR.
-			</p>
-		</section>
 	{/if}
 {/if}
 
@@ -165,11 +188,25 @@
 		flex-wrap: wrap;
 		gap: 8px 16px;
 		align-items: center;
-		justify-content: space-between;
 	}
 
-	.bar .note {
-		margin: 0;
+	.menu {
+		margin-left: auto;
+	}
+
+	:global(.table-wrap.ranked .rank) {
+		box-sizing: border-box;
+		width: 64px;
+	}
+
+	@media (max-width: 600px) {
+		:global(.table-wrap.ranked .rank) {
+			width: 54px;
+		}
+
+		:global(.table-wrap.rp .team-cell .name) {
+			max-width: min(6em, 19vw);
+		}
 	}
 
 	.csv {
@@ -182,13 +219,5 @@
 			margin-block: -10px;
 			padding-block: 10px;
 		}
-	}
-
-	.panel {
-		display: grid;
-		grid-template-columns: minmax(0, 1fr);
-		gap: 10px;
-		align-content: start;
-		min-width: 0;
 	}
 </style>

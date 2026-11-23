@@ -3,7 +3,12 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { badgePath } from '#lib/badge/links.ts';
 import { insightQuery, parseInsightFilters } from '#lib/components/event/insights.ts';
-import { parseRankingChoice, rankingQuery } from '#lib/components/event/ranking-columns.ts';
+import {
+	parseRankingChoice,
+	parseRankingView,
+	rankingPageQuery,
+	rankingQuery
+} from '#lib/components/event/ranking-columns.ts';
 import { teamListQuery } from '#lib/components/home/followed.ts';
 import { parseFilters, queryString } from '#lib/components/leaderboard/leaderboard.ts';
 import { parseRecordFilters, recordQuery } from '#lib/components/records/records.ts';
@@ -182,6 +187,11 @@ describe('canonical query strings', () => {
 		expect(insightQuery(parseInsightFilters(new URLSearchParams(insights.slice(1))))).toBe(insights);
 		const rankings = rankingQuery(parseRankingChoice(new URLSearchParams('sort=opr&dir=asc')));
 		expect(rankingQuery(parseRankingChoice(new URLSearchParams(rankings.slice(1))))).toBe(rankings);
+		const view = new URLSearchParams('view=rp&sort=opr&dir=asc');
+		const page = rankingPageQuery(parseRankingChoice(view), parseRankingView(view));
+		const again = new URLSearchParams(page.slice(1));
+		expect(rankingPageQuery(parseRankingChoice(again), parseRankingView(again))).toBe(page);
+		expect(rankingQuery(parseRankingChoice(again))).toBe(rankings);
 	});
 
 	it('send compare and simulator pages with extra keys to their clean address', async () => {

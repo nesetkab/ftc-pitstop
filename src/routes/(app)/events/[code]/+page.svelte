@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { getEventView } from '#lib/components/event/context.ts';
 	import EventPreview from '#lib/components/event/EventPreview.svelte';
-	import RankingsView from '#lib/components/event/RankingsView.svelte';
+	import RankingsPage from '#lib/components/event/RankingsPage.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -14,14 +14,7 @@
 </script>
 
 {#if started}
-	<RankingsView
-		{bundle}
-		analysis={data.analysis}
-		rp={data.rp}
-		followed={view.followed}
-		csvHref="/events/{bundle.event.code}/rankings.csv"
-		eventCode={bundle.event.code}
-	/>
+	<RankingsPage {bundle} analysis={data.analysis} rp={data.rp} />
 {:else}
 	<EventPreview
 		code={bundle.event.code}
