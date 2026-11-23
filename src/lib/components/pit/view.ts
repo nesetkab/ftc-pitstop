@@ -1,4 +1,5 @@
 import type { EventAnalysis, MatchForecast, MatchTiming, TeamRating } from '#lib/analysis/types.ts';
+import { sideOf } from '#lib/components/event/matches.ts';
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';
@@ -137,12 +138,6 @@ export interface PitView {
 	eventAwards: Award[];
 	advancing: boolean;
 	advancesTo: string | null;
-}
-
-export function sideOf(match: Match, team: number): AllianceColor | null {
-	if (match.red.some((slot) => slot.team === team)) return 'red';
-	if (match.blue.some((slot) => slot.team === team)) return 'blue';
-	return null;
 }
 
 function opposite(color: AllianceColor): AllianceColor {

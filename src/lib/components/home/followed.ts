@@ -1,4 +1,5 @@
 import type { SeasonRating } from '#lib/analysis/types.ts';
+import { scheduleTimes, sideOf } from '#lib/components/event/matches.ts';
 import { pickEvent, type EventPickReason } from '#lib/components/pit/resolve.ts';
 import { dayTime } from '#lib/format/time.ts';
 import { estimateStarts, PLAYOFF_SCHEDULE } from '#lib/model/schedule.ts';
@@ -131,25 +132,12 @@ export function followedTeam(
 	};
 }
 
-function sideOf(match: Match, team: number): AllianceColor | null {
-	if (match.red.some((entry) => entry.team === team)) return 'red';
-	if (match.blue.some((entry) => entry.team === team)) return 'blue';
-	return null;
-}
-
-function timed(matches: Match[]) {
-	return matches.map((match) => ({
-		key: match.key,
-		scheduled: match.scheduledTime,
-		actual: match.actualTime ?? (match.result ? (match.postedTime ?? match.scheduledTime) : null)
-	}));
-}
-
 function estimateFor(matches: Match[], next: Match, now: number): number | null {
 	const level = matches.filter((match) => match.level === next.level);
 	const options = next.level === 'playoff' ? { ...PLAYOFF_SCHEDULE, now } : { now };
 	return (
-		estimateStarts(timed(level), options).find((entry) => entry.key === next.key)?.start ?? null
+		estimateStarts(scheduleTimes(level), options).find((entry) => entry.key === next.key)?.start ??
+		null
 	);
 }
 

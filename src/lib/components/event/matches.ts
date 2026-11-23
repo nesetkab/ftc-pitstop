@@ -42,10 +42,18 @@ export function hasTeam(match: Match, team: number): boolean {
 	);
 }
 
-export function colorOf(match: Match, team: number): AllianceColor | null {
+export function sideOf(match: Match, team: number): AllianceColor | null {
 	if (match.red.some((entry) => entry.team === team)) return 'red';
 	if (match.blue.some((entry) => entry.team === team)) return 'blue';
 	return null;
+}
+
+export function scheduleTimes(matches: Match[]) {
+	return matches.map((match) => ({
+		key: match.key,
+		scheduled: match.scheduledTime,
+		actual: match.actualTime ?? (match.result ? (match.postedTime ?? match.scheduledTime) : null)
+	}));
 }
 
 export function neighbors(matches: Match[], key: string) {

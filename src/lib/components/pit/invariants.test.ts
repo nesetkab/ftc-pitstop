@@ -17,7 +17,8 @@ import {
 } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
-import { isGap, pitView, rankWindow, ROW_FIT, rowCapacity, sideOf } from './view.ts';
+import { sideOf } from '#lib/components/event/matches.ts';
+import { isGap, pitView, rankWindow, ROW_FIT, rowCapacity } from './view.ts';
 
 const MINUTE = 60_000;
 const EVENTS = readdirSync(join(process.cwd(), 'tests/fixtures/ftc/2026/'));

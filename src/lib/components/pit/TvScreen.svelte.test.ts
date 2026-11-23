@@ -6,7 +6,8 @@ import PhoneScreen from './PhoneScreen.svelte';
 import { DEFAULT_ALERTS } from './alerts.ts';
 import { queueCall } from './queue.ts';
 import TvScreen from './TvScreen.svelte';
-import { pitView, ROW_FIT, sideOf } from './view.ts';
+import { sideOf } from '#lib/components/event/matches.ts';
+import { pitView, ROW_FIT } from './view.ts';
 
 const TEAM = 14624;
 const full = fixtureBundle('USAZGIQ');
