@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import EventSections from '#lib/components/event/EventSections.svelte';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import { typeOptions, unpackEvents } from '#lib/components/event/event-list.ts';
 	import {
@@ -112,6 +113,8 @@
 	description="Every FTC event in the {SEASON_NAME} season ranked by strength: the average season OPR of its {TOP} best teams. Filter by region, event type and date."
 	path="/events/strength"
 />
+
+<EventSections />
 
 <PageHeader title="Event strength" {meta}>
 	{#snippet status()}

@@ -2,6 +2,7 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import EventSections from '#lib/components/event/EventSections.svelte';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import {
 		filterEvents,
@@ -133,6 +134,8 @@
 	path="/events"
 />
 
+<EventSections />
+
 <PageHeader
 	title="Events"
 	meta="{integer(data.total)} events in the BIOBUZZ season."
@@ -204,7 +207,6 @@
 {:else}
 	<p class="count">
 		<span>{integer(count)} {count === 1 ? 'event' : 'events'}</span>
-		<a href="/events/strength">Strongest events</a>
 	</p>
 	<div class="table-wrap">
 		<table class="t events">

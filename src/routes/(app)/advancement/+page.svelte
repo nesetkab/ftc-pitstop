@@ -3,6 +3,7 @@
 	import { isAhead } from '#lib/components/advancement/advancement.ts';
 	import ChampionshipTable from '#lib/components/advancement/ChampionshipTable.svelte';
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
+	import EventSections from '#lib/components/event/EventSections.svelte';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import { integer } from '#lib/format/number.ts';
 	import { regionName } from '#lib/format/places.ts';
@@ -45,6 +46,8 @@
 	description="Which FTC teams have advanced to each regional championship and the FIRST Championship so far this season, how they earned it, and which qualifiers are still to play."
 	path={data.region ? `/advancement?region=${data.region}` : '/advancement'}
 />
+
+<EventSections />
 
 <PageHeader
 	title={where ? `Advancement in ${where}` : 'Advancement'}
