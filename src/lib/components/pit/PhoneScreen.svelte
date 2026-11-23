@@ -2,7 +2,7 @@
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { relative } from '#lib/format/relative.ts';
-	import { dayTime, relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
+	import { dayTime, relativeDay, time } from '#lib/format/time.ts';
 	import type { DataSource, Event, Match } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import Button from '#lib/ui/Button.svelte';
@@ -29,7 +29,8 @@
 		queueCountdown,
 		resultLine,
 		roleText,
-		teamsLine
+		teamsLine,
+		updatedClock
 	} from './copy.ts';
 	import Facts from './Facts.svelte';
 	import type { Permission } from './notify.svelte.ts';
@@ -184,7 +185,7 @@
 		<p class={['status', { stale }]}>
 			{#if connection === 'offline'}Offline.{/if}
 			{#if updated !== null}
-				Updated {timeWithSeconds(updated, timeZone)} from {from}{stale
+				Updated {updatedClock(updated, now, timeZone)} from {from}{stale
 					? `, ${relative(updated, now)}`
 					: ''}.
 			{/if}

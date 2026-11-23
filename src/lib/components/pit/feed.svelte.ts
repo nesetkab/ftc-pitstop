@@ -1,3 +1,4 @@
+import { untrack } from 'svelte';
 import { OFFLINE_HEADER } from '#lib/pwa/rules.ts';
 import type { EventBundle, QueueStatusSnapshot } from '#lib/types.ts';
 import { BUNDLE_INTERVAL, bundleDelay, QUEUE_INTERVAL, queueActive, retryDelay } from './poll.ts';
@@ -47,6 +48,10 @@ export class PitFeed {
 	}
 
 	start(): () => void {
+		return untrack(() => this.#begin());
+	}
+
+	#begin(): () => void {
 		if (this.#running) return () => this.stop();
 		this.#running = true;
 		this.online = typeof navigator === 'undefined' ? true : navigator.onLine;

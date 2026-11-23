@@ -1,4 +1,5 @@
 import { untrack } from 'svelte';
+import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayClock, type ReplaySettings } from '#lib/game/replay.ts';
 import type { EventBundle, QueueStatusSnapshot } from '#lib/types.ts';
@@ -70,11 +71,15 @@ export class PitSession {
 
 	signature = $derived.by(() => (this.bundle ? bundleSignature(this.bundle) : null));
 
+	timed = $derived.by(() =>
+		this.analysis && this.bundle ? retime(this.analysis, this.bundle, this.clock) : null
+	);
+
 	view = $derived.by(() =>
 		this.bundle
 			? pitView({
 					bundle: this.bundle,
-					analysis: this.analysis,
+					analysis: this.timed,
 					queue: this.replay ? null : this.feed.queue,
 					team: this.team
 				})

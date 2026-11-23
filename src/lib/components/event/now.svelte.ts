@@ -2,6 +2,7 @@ import { untrack } from 'svelte';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { PitFeed } from '#lib/components/pit/feed.svelte.ts';
 import { connection } from '#lib/components/pit/poll.ts';
+import type { AnalysisLoader } from '#lib/components/pit/session.svelte.ts';
 import { bundleSignature } from '#lib/components/pit/view.ts';
 import { replayBundle, replayClock, type ReplaySettings } from '#lib/game/replay.ts';
 import type { EventBundle } from '#lib/types.ts';
@@ -15,6 +16,7 @@ export interface NowSessionOptions {
 	analysis: EventAnalysis | null;
 	replay: ReplaySettings | null;
 	reload: () => unknown;
+	loadAnalysis?: AnalysisLoader;
 	fetch?: typeof fetch;
 	now?: () => number;
 }
@@ -37,12 +39,16 @@ export class NowSession {
 	#lastReload: number;
 	#seen: RankSnapshot | null = null;
 	#baseline: RankSnapshot | null = null;
+	#loadAnalysis: AnalysisLoader | null;
+	#fetch: typeof fetch;
+	#version: string | null = null;
+	#request = 0;
 
 	clock = $derived.by(() =>
 		this.replay ? replayClock(this.replay, this.#origin, this.now) : this.now
 	);
 
-	source = $derived.by(() => newest(this.feed.bundle, this.layout));
+	source = $derived.by(() => (this.replay ? this.layout : newest(this.feed.bundle, this.layout)));
 
 	bundle = $derived.by(() => (this.replay ? replayBundle(this.source, this.clock) : this.source));
 
@@ -75,7 +81,9 @@ export class NowSession {
 		this.#reload = options.reload;
 		this.replay = options.replay;
 		this.layout = $state.raw(options.bundle);
-		this.analysis = $state.raw(options.analysis);
+		this.analysis = $state.raw(options.replay ? null : options.analysis);
+		this.#loadAnalysis = options.loadAnalysis ?? null;
+		this.#fetch = options.fetch ?? ((input, init) => fetch(input, init));
 		this.feed = new PitFeed({
 			code: options.bundle.event.code,
 			bundle: options.bundle,
@@ -87,8 +95,37 @@ export class NowSession {
 	}
 
 	update(bundle: EventBundle, analysis: EventAnalysis | null) {
+		if (this.replay) return;
 		this.layout = bundle;
 		this.analysis = analysis;
+	}
+
+	async loadScores() {
+		try {
+			const response = await this.#fetch(`/api/events/${this.layout.event.code}`);
+			if (!response.ok) return;
+			const bundle = (await response.json()) as EventBundle;
+			if (bundle.event.code === this.layout.event.code) this.layout = bundle;
+		} catch {
+			return;
+		}
+	}
+
+	async refreshAnalysis() {
+		const version = this.signature;
+		if (!this.replay || !this.#loadAnalysis || version === this.#version) return;
+		this.#version = version;
+		const request = ++this.#request;
+		try {
+			const analysis = await this.#loadAnalysis({
+				code: this.layout.event.code,
+				at: Math.round(this.clock),
+				version
+			});
+			if (request === this.#request) this.analysis = analysis;
+		} catch {
+			if (request === this.#request) this.#version = null;
+		}
 	}
 
 	check() {
@@ -109,6 +146,7 @@ export class NowSession {
 
 	start(): () => void {
 		const stop = this.feed.start();
+		if (this.replay) untrack(() => void this.loadScores());
 		const timer = setInterval(() => this.check(), this.replay ? REPLAY_TICK : LIVE_TICK);
 		return () => {
 			clearInterval(timer);

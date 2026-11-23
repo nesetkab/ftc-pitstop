@@ -48,6 +48,26 @@ export function sideOf(match: Match, team: number): AllianceColor | null {
 	return null;
 }
 
+export function frontierIndex(matches: Match[]): number {
+	return matches.findLastIndex((match) => match.actualTime !== null || match.result !== null);
+}
+
+export function nextMatchIndex(matches: Match[], team: number): number {
+	const active = frontierIndex(matches);
+	const ours = (match: Match) => match.result === null && sideOf(match, team) !== null;
+	const ahead = matches.findIndex((match, index) => index >= active && ours(match));
+	if (ahead !== -1) return ahead;
+	return matches.findIndex(
+		(match, index) =>
+			index < active &&
+			ours(match) &&
+			(match.actualTime !== null ||
+				matches.some(
+					(later, after) => after >= active && later.result === null && later.level === match.level
+				))
+	);
+}
+
 export function opposite(color: AllianceColor): AllianceColor {
 	return color === 'red' ? 'blue' : 'red';
 }

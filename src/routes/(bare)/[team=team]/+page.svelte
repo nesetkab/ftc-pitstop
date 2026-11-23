@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { updated } from '$app/state';
+	import { pitAnalysis } from '#lib/components/pit/analysis.remote.ts';
+	import { reloadDue, watchDeploys } from '#lib/components/pit/deploy.ts';
 	import { PitAlerts } from '#lib/components/pit/notify.svelte.ts';
 	import PhoneScreen from '#lib/components/pit/PhoneScreen.svelte';
 	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
@@ -11,7 +14,6 @@
 		type RankMemory
 	} from '#lib/components/pit/standing.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import { pitAnalysis } from './pit.remote.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -80,6 +82,15 @@
 	});
 
 	$effect(() => session?.start());
+
+	$effect(() => watchDeploys(() => updated.check()));
+
+	$effect(() => {
+		if (!session) return;
+		if (reloadDue({ updated: updated.current, replay: session.replay, call: session.call })) {
+			location.reload();
+		}
+	});
 
 	$effect(() => {
 		if (!session || !session.signature) return;

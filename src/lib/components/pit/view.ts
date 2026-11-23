@@ -1,5 +1,5 @@
 import type { EventAnalysis, MatchForecast, MatchTiming, TeamRating } from '#lib/analysis/types.ts';
-import { opposite, sideOf } from '#lib/components/event/matches.ts';
+import { frontierIndex, nextMatchIndex, opposite, sideOf } from '#lib/components/event/matches.ts';
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { bracketDecided, WINNER_AWARD_ID } from '#lib/game/phase.ts';
@@ -418,12 +418,8 @@ export function pitView(input: PitInput): PitView {
 	const ours = bundle.matches
 		.map((match) => pitMatch(match, team, analysis, queue))
 		.filter((match): match is PitMatch => match !== null);
-	const active = bundle.matches.findLastIndex(
-		(match) => match.actualTime !== null || match.result !== null
-	);
-	const nextIndex = bundle.matches.findIndex(
-		(match, index) => index >= active && match.result === null && sideOf(match, team) !== null
-	);
+	const active = frontierIndex(bundle.matches);
+	const nextIndex = nextMatchIndex(bundle.matches, team);
 	let next: NextMatch | null = null;
 	if (nextIndex !== -1) {
 		const match = bundle.matches[nextIndex];
@@ -471,7 +467,7 @@ export function pitView(input: PitInput): PitView {
 		names,
 		rankings: bundle.rankings,
 		ranking: registered && standing && standing.played > 0 ? standing : null,
-		teamCount: Math.max(bundle.teams.length, bundle.rankings.length),
+		teamCount: bundle.rankings.length || bundle.teams.length,
 		rankedAfter: postedQuals.at(-1)?.label ?? null,
 		qualsPlayed: postedQuals.length,
 		qualsTotal: quals.length,
