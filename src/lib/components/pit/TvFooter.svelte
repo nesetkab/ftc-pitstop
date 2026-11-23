@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { relative } from '#lib/format/relative.ts';
-	import { timeWithSeconds } from '#lib/format/time.ts';
 	import type { DataSource } from '#lib/types.ts';
+	import { updatedClock } from './copy.ts';
 	import type { Connection } from './poll.ts';
 
 	interface Props {
@@ -41,7 +41,7 @@
 	<span class="state"><span class={['dot', connection]}></span>{STATE[connection]}</span>
 	{#if updated !== null}
 		<span class="updated">
-			Updated {timeWithSeconds(updated, timeZone)} from {from}{stale
+			Updated {updatedClock(updated, now, timeZone)} from {from}{stale
 				? `, ${relative(updated, now)}`
 				: ''}
 		</span>

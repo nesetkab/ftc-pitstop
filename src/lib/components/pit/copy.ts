@@ -4,7 +4,7 @@ import { ordinal } from '#lib/format/ordinal.ts';
 import { pct } from '#lib/format/pct.ts';
 import { record } from '#lib/format/record.ts';
 import { relative } from '#lib/format/relative.ts';
-import { dayTime, time } from '#lib/format/time.ts';
+import { dayTime, sameDay, time, timeWithSeconds } from '#lib/format/time.ts';
 import type { MatchListItem } from '#lib/ui/MatchList.svelte';
 import type { AllianceColor } from '#lib/types.ts';
 import type { QueueCall } from './queue.ts';
@@ -14,6 +14,12 @@ export const OUTCOME: Record<Outcome, string> = { win: 'Won', loss: 'Lost', tie:
 
 export function colorName(color: AllianceColor): string {
 	return color === 'red' ? 'Red' : 'Blue';
+}
+
+export function updatedClock(updated: number, now: number, timeZone: string): string {
+	return sameDay(updated, now, timeZone)
+		? timeWithSeconds(updated, timeZone)
+		: dayTime(updated, now, timeZone);
 }
 
 export function capitalize(text: string): string {

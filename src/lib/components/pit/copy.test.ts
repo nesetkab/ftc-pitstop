@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { replayBundle } from '#lib/game/replay.ts';
-import { fieldLine, queueCountdown, resultLine, teamsLine } from './copy.ts';
+import { fieldLine, queueCountdown, resultLine, teamsLine, updatedClock } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import type { QueueCall } from './queue.ts';
 import { pitView } from './view.ts';
@@ -55,5 +55,16 @@ describe('result copy', () => {
 		expect(teamsLine([25620], [32043, 22258])).toBe('With 25620 against 32043, 22258.');
 		expect(teamsLine([], [32043])).toBe('Against 32043.');
 		expect(teamsLine([], [])).toBe('');
+	});
+});
+
+describe('updatedClock', () => {
+	it('names the day when the data is from an earlier day', () => {
+		const zone = 'America/Denver';
+		const posted = Date.parse('2026-11-21T18:36:39Z');
+		expect(updatedClock(posted, posted + 60_000, zone)).toMatch(/^11:36:39\sAM$/);
+		expect(updatedClock(posted, Date.parse('2026-11-22T11:21:00Z'), zone)).toMatch(
+			/^Sat 11:36\sAM$/
+		);
 	});
 });
