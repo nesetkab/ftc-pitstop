@@ -5,6 +5,7 @@ import {
 	type EventProgress,
 	type TodayState
 } from './today.ts';
+import { eventDay } from '#lib/components/event/dates.ts';
 import { placeName } from '#lib/format/places.ts';
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';
@@ -49,11 +50,9 @@ function byName(a: EventSummary, b: EventSummary): number {
 }
 
 function todayRow(event: EventSummary, progress: EventProgress | null, now: number): TodayEvent {
-	const length = daysBetween(event.start, event.end) + 1;
-	const day = daysBetween(event.start, localDate(now, event.timezone)) + 1;
 	const status = progress?.label ?? (event.hasMatches ? 'Matches posted' : 'Not started');
 	return {
-		...row(event, length > 1 ? `Day ${day} of ${length}` : 'Today', status),
+		...row(event, eventDay(event, now), status),
 		state: todayState(progress, event.hasMatches),
 		leader: progress?.leader ?? null,
 		leaderLabel: progress?.phase === 'quals' ? 'Leading' : 'Top seed'

@@ -60,9 +60,8 @@
 >
 	{#snippet status()}
 		{#if data.updated}
-			<StaleNotice updated={data.updated} staleAfter={86400} prefix="Ratings updated" />.
+			<StaleNotice updated={data.updated} staleAfter={86400} prefix="Ratings updated" />
 		{/if}
-		Each region's top team plays most of its matches there.
 	{/snippet}
 </PageHeader>
 
@@ -102,7 +101,7 @@
 									<span class="sub">
 										{integer(region.teams)}
 										{region.teams === 1 ? 'team' : 'teams'}{region.live > 0
-											? ` · ${integer(region.live)} live`
+											? ` · ${integer(region.live)} today`
 											: ''}
 									</span>
 								</td>
@@ -113,7 +112,7 @@
 								<td class="opt">
 									{integer(region.live + region.upcoming)}
 									{#if region.live > 0}
-										<span class="live">{integer(region.live)} live</span>
+										<span class="live">{integer(region.live)} today</span>
 									{/if}
 								</td>
 								<td class="team">

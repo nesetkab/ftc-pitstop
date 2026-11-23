@@ -119,7 +119,7 @@
 		<dt>Still to play</dt>
 		<dd>
 			{integer(left)}
-			{#if region.live > 0}<small>{integer(region.live)} live now</small>{/if}
+			{#if region.live > 0}<small>{integer(region.live)} today</small>{/if}
 		</dd>
 	</div>
 	<div>
@@ -187,8 +187,8 @@
 		<a href="/events?region={code}">Open in the event list</a>
 	</div>
 	{#if data.events.live.length > 0}
-		<h3 class="group">Live now</h3>
-		{@render eventTable(data.events.live, `Events live now in ${region.name}`)}
+		<h3 class="group">Today</h3>
+		{@render eventTable(data.events.live, `Events today in ${region.name}`)}
 	{/if}
 	{#if data.events.upcoming.length + data.events.done.length > 0}
 		<div class="pick">

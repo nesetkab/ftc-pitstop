@@ -41,7 +41,7 @@ describe('toSearchResults', () => {
 	it('marks events that are running now', () => {
 		const event = eventSummary({ start: '2026-11-20', end: '2026-11-21' });
 		const live = toSearchResults({ events: [event] }, Date.parse('2026-11-21T18:00:00Z'));
-		expect(live[0]).toMatchObject({ meta: 'Live', live: true });
+		expect(live[0]).toMatchObject({ meta: 'Day 2 of 2', live: true });
 		expect(live[0].sublabel).toBe('USAZGIQ · Gilbert, Arizona · Nov 20–21');
 		const soon = toSearchResults({ events: [event] }, Date.parse('2026-11-10T18:00:00Z'));
 		expect(soon[0]).toMatchObject({ meta: 'Upcoming', live: false });

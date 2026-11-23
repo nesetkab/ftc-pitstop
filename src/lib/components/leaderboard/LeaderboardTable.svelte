@@ -53,7 +53,9 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="No teams match these filters.">Try other filters.</EmptyState>
+	<EmptyState title="No teams match these filters.">
+		<a href="/leaderboards">Clear filters</a>
+	</EmptyState>
 {:else}
 	<Table>
 		<caption class="visually-hidden">{caption}</caption>
