@@ -26,7 +26,9 @@ export async function recoverWorker(version: string, deps: RecoverDeps): Promise
 	const pending = Boolean(registration.installing || registration.waiting);
 	if (!isStaleWorker(keys, version, pending)) return false;
 	deps.mark(version);
-	await Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => deps.remove(key)));
+	await Promise.all(
+		keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => deps.remove(key))
+	);
 	void registration.unregister().catch(() => false);
 	return true;
 }
