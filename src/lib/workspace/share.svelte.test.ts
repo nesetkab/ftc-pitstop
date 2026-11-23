@@ -14,7 +14,7 @@ const plan: Plan = {
 	notes: '14624 takes the left side.',
 	updatedAt: 1_700_000_000_000,
 	shapes: [
-		{ id: 's1', kind: 'pen', color: 'accent', dash: false, pts: [74, 404, 110, 340, 150, 300] },
+		{ id: 's1', kind: 'pen', color: 'green', dash: false, pts: [74, 404, 110, 340, 150, 300] },
 		{ id: 's2', kind: 'arrow', color: 'ink', dash: true, pts: [124, 146, 196, 212] },
 		{ id: 's3', kind: 'robot', color: 'blue', x: 60, y: 420, label: '14624' },
 		{ id: 's4', kind: 'text', color: 'red', x: 200, y: 288, text: 'Hive frame' }

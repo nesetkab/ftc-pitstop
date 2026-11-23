@@ -12,7 +12,7 @@ export const BATTERY_STATUSES = ['charged', 'in-robot', 'charging', 'not-in-use'
 
 export type BatteryStatus = (typeof BATTERY_STATUSES)[number];
 
-export const SHAPE_COLORS = ['ink', 'red', 'blue', 'accent'] as const;
+export const SHAPE_COLORS = ['ink', 'red', 'blue', 'green'] as const;
 
 export type ShapeColor = (typeof SHAPE_COLORS)[number];
 
@@ -43,7 +43,13 @@ const nothing = <T extends z.ZodMiniType>(schema: T) => z._default(z.nullable(sc
 const id = z.string().check(z.minLength(1), z.maxLength(40));
 const stamp = z.int().check(z.nonnegative());
 const coordinate = range(-100, 600);
-const color = z._default(z.enum(SHAPE_COLORS), 'ink');
+const color = z._default(
+	z.pipe(
+		z.enum([...SHAPE_COLORS, 'accent']),
+		z.transform((value): ShapeColor => (value === 'accent' ? 'green' : value))
+	),
+	'ink'
+);
 const dash = z._default(z.boolean(), false);
 const teamNumber = whole(1, 999_999);
 

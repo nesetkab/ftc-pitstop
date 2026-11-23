@@ -60,8 +60,8 @@
 		color: var(--blue);
 	}
 
-	.accent {
-		color: var(--accent);
+	.green {
+		color: var(--ok);
 	}
 
 	.mark path {

@@ -25,7 +25,7 @@ import {
 	upsertPlan,
 	type BoardOp
 } from '#lib/workspace/board.ts';
-import type { Boards, Shape } from '#lib/workspace/schemas.ts';
+import { parseDoc, type Boards, type Shape } from '#lib/workspace/schemas.ts';
 
 const NOW = 1_700_000_000_000;
 
@@ -324,5 +324,13 @@ describe('plans', () => {
 		let next: Boards = { plans: [] };
 		for (let i = 0; i < 35; i++) next = addPlan(next, blankPlan(`p${i}`, `P${i}`, 0));
 		expect(next.plans).toHaveLength(30);
+	});
+});
+
+describe('saved board colors', () => {
+	it('reads the retired yellow pen as green', () => {
+		const shape = { id: 'a', kind: 'pen', color: 'accent', dash: false, pts: [0, 0, 10, 10] };
+		const parsed = parseDoc('boards', { plans: [{ id: 'p', name: 'Plan', shapes: [shape] }] });
+		expect(parsed?.plans[0].shapes[0].color).toBe('green');
 	});
 });
