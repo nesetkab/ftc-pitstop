@@ -5,6 +5,7 @@ export const CACHE_CONTROL = {
 	finished: 'public, s-maxage=86400, stale-while-revalidate=604800',
 	list: 'public, s-maxage=3600, stale-while-revalidate=86400',
 	ratings: 'public, s-maxage=900, stale-while-revalidate=86400',
+	badge: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
 	short: 'public, s-maxage=300, stale-while-revalidate=3600',
 	queue: 'public, s-maxage=10, stale-while-revalidate=30',
 	missing: 'public, s-maxage=60',

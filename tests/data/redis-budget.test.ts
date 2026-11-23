@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { eventSummary, teamSeason } from '#lib/components/team/fixtures.ts';
 import { createAnalysis } from '#lib/server/analysis.ts';
+import { loadBadgeFacts } from '#lib/server/badge/load.ts';
 import { teamFeed } from '#lib/server/calendar/load.ts';
 import { createCache, redisStore } from '#lib/server/cache.ts';
 import { createLoaders, teamPolicy } from '#lib/server/event.ts';
@@ -223,6 +224,28 @@ describe('redis commands for a team calendar', () => {
 		const calls = await commands(redis, feed);
 		expect(reads(calls)).toEqual(['mget', 'mget', 'mget']);
 		expect(await commands(redis, feed)).toEqual([]);
+	});
+});
+
+describe('redis commands for a team badge', () => {
+	it('reads the team and the season ratings in one batch, then nothing', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		await instance(redis, clock).analysis.loadSeasonRatings();
+		const entry = { body: teamSeason(26670, 'SCA Iron Eagles'), lastModified: null, fetchedAt: LIVE };
+		await redis.set('pitstop:cache:scout:2026:team:26670', JSON.stringify(entry), { ex: 3600 });
+		const fresh = instance(redis, clock);
+		const deps = {
+			loadTeamSeason: fresh.loaders.loadTeamSeason,
+			loadSeasonRatings: () => fresh.analysis.loadSeasonRatingsWithin()
+		};
+		let facts: Awaited<ReturnType<typeof loadBadgeFacts>> = null;
+		const calls = await commands(redis, async () => {
+			facts = await loadBadgeFacts(deps, 26670, clock.now);
+		});
+		expect(calls).toEqual(['mget']);
+		expect(facts).toMatchObject({ number: 26670, complete: true });
+		expect(await commands(redis, () => loadBadgeFacts(deps, 26670, clock.now))).toEqual([]);
 	});
 });
 
