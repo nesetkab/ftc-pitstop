@@ -506,7 +506,7 @@
 	}
 
 	.compact .grid {
-		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 		gap: 14px 28px;
 	}
 
@@ -516,6 +516,10 @@
 
 	.compact section {
 		gap: 6px;
+	}
+
+	.compact .stats {
+		gap: 6px 20px;
 	}
 
 	.compact .stats dd {
@@ -615,7 +619,8 @@
 			font-size: 12px;
 		}
 
-		.stats dd {
+		.stats dd,
+		.compact .stats dd {
 			font-size: 14px;
 		}
 

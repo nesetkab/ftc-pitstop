@@ -18,7 +18,7 @@
 	followed={view.followed}
 />
 
-<p class="note more">
+<p class="more">
 	<a href="/events/{event.code}/scouting">Print reports for every team</a>
 </p>
 
@@ -29,15 +29,25 @@
 		color: var(--text-2);
 	}
 
-	.back a,
-	.more a {
+	.back a {
 		text-decoration: none;
 	}
 
-	.back a:hover,
-	.more a:hover {
+	.back a:hover {
 		color: var(--text);
 		text-decoration: underline;
+	}
+
+	.more {
+		font-size: 14px;
+	}
+
+	@media (pointer: coarse) {
+		.more a {
+			display: inline-block;
+			margin-block: -10px;
+			padding-block: 10px;
+		}
 	}
 
 	@media print {

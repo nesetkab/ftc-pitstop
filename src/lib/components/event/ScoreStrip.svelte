@@ -85,6 +85,18 @@
 		fill-opacity: 0.7;
 	}
 
+	@media screen and (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) .loss {
+			fill-opacity: 0.6;
+		}
+	}
+
+	@media screen {
+		:global(:root[data-theme='dark']) .loss {
+			fill-opacity: 0.6;
+		}
+	}
+
 	.base {
 		stroke: var(--line-2);
 		stroke-width: 1;

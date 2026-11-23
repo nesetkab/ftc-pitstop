@@ -508,7 +508,7 @@ function spreadTakeaways(spread: Spread | null): Candidate[] {
 		return [
 			{
 				weight: 50,
-				text: `Consistent scores: ${spread.rank === 1 ? '' : `${ordinal(spread.rank)} `}smallest spread of ${spread.of} teams`
+				text: `Consistent scores: ${spread.rank === 1 ? '' : `${ordinal(spread.rank)}-`}smallest spread of ${spread.of} teams`
 			}
 		];
 	}
@@ -517,7 +517,7 @@ function spreadTakeaways(spread: Spread | null): Candidate[] {
 		return [
 			{
 				weight: 52,
-				text: `Uneven scores: ${widest === 1 ? '' : `${ordinal(widest)} `}widest spread of ${spread.of} teams`
+				text: `Uneven scores: ${widest === 1 ? '' : `${ordinal(widest)}-`}widest spread of ${spread.of} teams`
 			}
 		];
 	}
