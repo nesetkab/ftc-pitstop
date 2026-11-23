@@ -1,5 +1,6 @@
 <script lang="ts">
 	import AllianceFit from '#lib/components/compare/AllianceFit.svelte';
+	import CompareSections from '#lib/components/compare/CompareSections.svelte';
 	import CompareTable from '#lib/components/compare/CompareTable.svelte';
 	import HeadToHead from '#lib/components/compare/HeadToHead.svelte';
 	import SharedEvents from '#lib/components/compare/SharedEvents.svelte';
@@ -38,6 +39,8 @@
 </script>
 
 <Seo {title} {description} path={canonical} noindex={!paired} />
+
+<CompareSections teams={data.numbers} />
 
 <PageHeader
 	title="Compare teams"

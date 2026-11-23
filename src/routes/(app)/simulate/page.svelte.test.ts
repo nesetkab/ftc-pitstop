@@ -129,6 +129,19 @@ describe('simulate page', () => {
 		expect(screen.getByText(/No matches yet this season for 4133/)).toBeInTheDocument();
 	});
 
+	it('links to compare with the same teams from the tab row', () => {
+		show();
+		const tabs = screen.getByRole('navigation', { name: 'Team tools' });
+		expect(within(tabs).getByRole('link', { name: 'Compare' })).toHaveAttribute(
+			'href',
+			'/compare?teams=724,10662,5026,4133'
+		);
+		expect(within(tabs).getByRole('link', { name: 'Simulate' })).toHaveAttribute(
+			'href',
+			'/simulate?red=724,10662&blue=5026,4133'
+		);
+	});
+
 	it('asks for teams and offers the top four when nothing is picked', () => {
 		show({
 			sides: { red: [], blue: [] },

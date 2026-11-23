@@ -1,4 +1,5 @@
 <script lang="ts">
+	import CompareSections from '#lib/components/compare/CompareSections.svelte';
 	import { compareHref } from '#lib/components/compare/compare.ts';
 	import RpChances from '#lib/components/event/RpChances.svelte';
 	import PartTable from '#lib/components/simulate/PartTable.svelte';
@@ -66,6 +67,8 @@
 	path={simulateHref(sides)}
 	noindex={COLORS.some((c) => sides[c].length > 0)}
 />
+
+<CompareSections teams={[...sides.red, ...sides.blue]} />
 
 <PageHeader
 	title="Match simulator"

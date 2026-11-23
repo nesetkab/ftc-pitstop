@@ -83,6 +83,19 @@ function show(overrides: Partial<{ view: Comparison; missing: number[] }> = {}) 
 }
 
 describe('compare page', () => {
+	it('links to the simulator with the same teams from the tab row', () => {
+		show();
+		const tabs = screen.getByRole('navigation', { name: 'Team tools' });
+		expect(within(tabs).getByRole('link', { name: 'Compare' })).toHaveAttribute(
+			'href',
+			'/compare?teams=100,200'
+		);
+		expect(within(tabs).getByRole('link', { name: 'Simulate' })).toHaveAttribute(
+			'href',
+			'/simulate?red=100,200'
+		);
+	});
+
 	it('shows the teams side by side and marks the best value', () => {
 		show();
 		const table = screen.getByRole('table', { name: 'Season stats side by side' });
