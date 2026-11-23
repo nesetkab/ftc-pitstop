@@ -196,6 +196,7 @@
 											inputmode="decimal"
 											class="ctl-input ctl-quiet number"
 											aria-label="Voltage of {battery.name}"
+											placeholder="—"
 											value={battery.voltage ?? ''}
 											onchange={(event) => changeVoltage(battery.id, event.currentTarget)}
 										/>
@@ -210,7 +211,7 @@
 									<input
 										class="ctl-input ctl-quiet"
 										aria-label="Matches {battery.name} was used in"
-										placeholder="Q5, Q14"
+										placeholder="Add matches"
 										value={battery.used.join(', ')}
 										onchange={(event) => {
 											const used = parseUsed(event.currentTarget.value);
@@ -279,11 +280,7 @@
 
 	{#if update}
 		<div class="foot">
-			<Button variant="secondary" onclick={add}>Add battery</Button>
-			<p class="note">
-				Use next is the charged battery with the highest voltage. A tie goes to the one that has
-				rested longest.
-			</p>
+			<Button onclick={add}>Add battery</Button>
 		</div>
 	{/if}
 </section>

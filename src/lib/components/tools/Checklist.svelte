@@ -102,6 +102,20 @@
 	}
 </script>
 
+{#snippet addForm(variant: 'primary' | 'secondary')}
+	<form class="add" onsubmit={addOne}>
+		<label class="visually-hidden" for="{id}-new">New item</label>
+		<input
+			id="{id}-new"
+			class="ctl-input"
+			placeholder="New item"
+			maxlength="160"
+			bind:value={draft}
+		/>
+		<Button {variant} type="submit">Add item</Button>
+	</form>
+{/snippet}
+
 <section class="checklist" aria-label="Checklist">
 	<div class="head">
 		<div class="title">
@@ -122,7 +136,6 @@
 				class="ctl-input short"
 				maxlength="3"
 				autocomplete="off"
-				placeholder="AL"
 				value={initials}
 				onchange={changeInitials}
 				aria-invalid={waiting ? 'true' : undefined}
@@ -143,6 +156,7 @@
 			{update ? 'Add the steps your team does before each match.' : 'This checklist is empty.'}
 		</EmptyState>
 		{#if update}
+			{@render addForm('primary')}
 			<div class="ctl-row">
 				<Button variant="secondary" onclick={addExamples}>Add example items</Button>
 			</div>
@@ -219,17 +233,7 @@
 				</Button>
 			</div>
 			{#if editing}
-				<form class="add" onsubmit={addOne}>
-					<label class="visually-hidden" for="{id}-new">New item</label>
-					<input
-						id="{id}-new"
-						class="ctl-input"
-						placeholder="New item"
-						maxlength="160"
-						bind:value={draft}
-					/>
-					<Button variant="secondary" type="submit">Add item</Button>
-				</form>
+				{@render addForm('secondary')}
 			{/if}
 		{/if}
 	{/if}

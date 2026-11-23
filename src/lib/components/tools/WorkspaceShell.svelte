@@ -112,7 +112,6 @@
 					id="{id}-match"
 					class="ctl-input"
 					maxlength="16"
-					placeholder="Q26"
 					autocomplete="off"
 					value={workspace.docs.checklist.match}
 					onchange={(event) => {
