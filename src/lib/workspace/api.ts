@@ -151,6 +151,8 @@ export function createWorkspaceApi(store: WorkspaceStore, limiter: Limiter): Wor
 			try {
 				if (!isCode(code)) throw missing();
 				const options = parseLoadOptions(new URL(request.url).searchParams);
+				const unproven = !options.rev && !options.key && !options.known;
+				if (unproven && limiter.blocked(`miss:${ip}`, RATE.miss.window)) return rateLimited();
 				const snapshot = await store.load(code, options);
 				if (!snapshot) {
 					if (!(await takeGuess(ip))) return rateLimited();
@@ -172,6 +174,7 @@ export function createWorkspaceApi(store: WorkspaceStore, limiter: Limiter): Wor
 				if (!body.success) throw new WorkspaceError('invalid', 'The request is not valid');
 				const data = parseDoc(doc, body.data.data);
 				if (!data) throw new WorkspaceError('invalid', 'The data is not valid');
+				if (limiter.blocked(`write:${code}`, RATE.write.window)) return rateLimited();
 				if (await guessedTooMuch(ip)) return rateLimited();
 				if (!(await limiter.allow(`write:${code}`, RATE.write.limit, RATE.write.window))) {
 					return rateLimited();

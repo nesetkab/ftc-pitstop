@@ -212,10 +212,31 @@ describe('rate limiter', () => {
 		const results: boolean[] = [];
 		for (let i = 0; i < 5; i++) results.push(await limiter.allow('key', 3, 60));
 		expect(results).toEqual([true, true, true, false, false]);
-		expect(await limiter.used('key', 60)).toBe(5);
+		expect(await limiter.used('key', 60)).toBe(4);
+		expect(limiter.blocked('key', 60)).toBe(true);
 		time += 61_000;
+		expect(limiter.blocked('key', 60)).toBe(false);
 		expect(await limiter.allow('key', 3, 60)).toBe(true);
 		expect(await limiter.used('key', 60)).toBe(1);
+	});
+
+	it('stops asking Redis once a window is used up', async () => {
+		const limiter = createLimiter(redis, { now: () => time });
+		for (let i = 0; i < 4; i++) await limiter.allow('key', 3, 60);
+		const before = redis.calls.length;
+		for (let i = 0; i < 50; i++) expect(await limiter.allow('key', 3, 60)).toBe(false);
+		expect(await limiter.used('key', 60)).toBe(4);
+		expect(redis.calls.slice(before)).toEqual([]);
+	});
+
+	it('forgets the oldest refusals past its memory size', async () => {
+		const limiter = createLimiter(redis, { now: () => time, remembered: 2 });
+		for (const name of ['a', 'b', 'c']) {
+			await limiter.allow(name, 0, 60);
+		}
+		expect(limiter.blocked('a', 60)).toBe(false);
+		expect(limiter.blocked('b', 60)).toBe(true);
+		expect(limiter.blocked('c', 60)).toBe(true);
 	});
 
 	it('counts names separately and expires old windows', async () => {
