@@ -45,9 +45,8 @@
 <style>
 	.intro {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto;
+		justify-items: start;
 		align-content: start;
-		gap: 0 24px;
 		max-width: 680px;
 	}
 
@@ -56,7 +55,6 @@
 	}
 
 	.lead {
-		grid-column: 1;
 		font-size: 26px;
 		font-weight: 600;
 		line-height: 1.22;
@@ -69,7 +67,6 @@
 	}
 
 	.sub {
-		grid-column: 1;
 		margin-top: 10px;
 		font-size: 16px;
 		line-height: 1.5;
@@ -83,10 +80,7 @@
 	}
 
 	.hide {
-		grid-column: 2;
-		grid-row: 1;
-		align-self: start;
-		margin-top: 6px;
+		margin-top: 8px;
 		padding: 0;
 		border: 0;
 		background: none;
