@@ -1,5 +1,5 @@
 import type { RankedRecord, RecordRow } from '#lib/components/records/records.ts';
-import { localDay } from '#lib/components/team/dates.ts';
+import { localDate } from '#lib/format/calendar.ts';
 import { breakdownParts, PART_LABELS, tips } from '#lib/game/biobuzz.ts';
 import type { AllianceColor, Event, Match, TournamentLevel } from '#lib/types.ts';
 
@@ -58,7 +58,7 @@ export function insightQuery(filters: Partial<InsightFilters>): string {
 function dayOf(event: InsightEvent, match: Match): string {
 	const time = match.actualTime ?? match.scheduledTime;
 	if (time === null) return event.start;
-	const day = localDay(time, event.timezone);
+	const day = localDate(time, event.timezone);
 	if (day < event.start) return event.start;
 	return day > event.end ? event.end : day;
 }

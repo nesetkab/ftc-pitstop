@@ -1,4 +1,4 @@
-const DAY = 86_400_000;
+const DAY_MS = 86_400_000;
 
 const LOCAL_TIME = /^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2})(?::(\d{2})(?:\.(\d+))?)?)?$/;
 
@@ -57,8 +57,8 @@ export function zonedTimeToUtc(local: string, timeZone: string): number | null {
 	const naive = Date.UTC(+year, +month - 1, +day, +hour, +minute, +second, millis);
 	if (!isValidTimeZone(timeZone)) return naive;
 
-	const before = timeZoneOffset(naive - DAY, timeZone);
-	const after = timeZoneOffset(naive + DAY, timeZone);
+	const before = timeZoneOffset(naive - DAY_MS, timeZone);
+	const after = timeZoneOffset(naive + DAY_MS, timeZone);
 	const candidates = [naive - before, naive - after].filter(
 		(instant) => timeZoneOffset(instant, timeZone) === naive - instant
 	);
@@ -66,9 +66,8 @@ export function zonedTimeToUtc(local: string, timeZone: string): number | null {
 	return naive - before;
 }
 
-export function localDate(instant: number, timeZone: string): string {
-	const zone = isValidTimeZone(timeZone) ? timeZone : 'UTC';
-	const { year, month, day } = wallClock(instant, zone);
+export function localDate(instant: number, timeZone: string | null | undefined): string {
+	const { year, month, day } = wallClock(instant, isValidTimeZone(timeZone) ? timeZone : 'UTC');
 	return `${String(year).padStart(4, '0')}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 }
 
@@ -76,7 +75,20 @@ export function startOfLocalDay(date: string, timeZone: string): number | null {
 	return zonedTimeToUtc(`${date.slice(0, 10)}T00:00:00`, timeZone);
 }
 
-export function addDays(date: string, days: number): string {
+function serial(date: string): number {
 	const [year, month, day] = date.slice(0, 10).split('-').map(Number);
-	return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+	return Date.UTC(year, month - 1, day) / DAY_MS;
+}
+
+export function addDays(date: string, days: number): string {
+	return new Date((serial(date) + days) * DAY_MS).toISOString().slice(0, 10);
+}
+
+export function daysBetween(from: string, to: string): number {
+	return serial(to) - serial(from);
+}
+
+export function weekStart(date: string): string {
+	const weekday = new Date(serial(date) * DAY_MS).getUTCDay();
+	return addDays(date, -((weekday + 6) % 7));
 }

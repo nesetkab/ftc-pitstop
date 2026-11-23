@@ -6,7 +6,7 @@
 	import type { Match } from '#lib/types.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
-	import { localDate } from './dates.ts';
+	import { localDate } from '#lib/format/calendar.ts';
 	import { matchHref } from './matches.ts';
 
 	interface Props {

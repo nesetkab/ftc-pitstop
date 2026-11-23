@@ -3,7 +3,7 @@ import type { SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import { followedTeam, type FollowedTeam } from '#lib/components/home/followed.ts';
 import { buildHighlights, type Highlights } from '#lib/components/home/highlights.ts';
 import { eventProgress, seasonProgress, type EventProgress } from '#lib/components/home/today.ts';
-import { localDay } from '#lib/components/team/dates.ts';
+import { localDate } from '#lib/format/calendar.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { redChance } from '#lib/model/predict.ts';
 import type { Forecast } from '#lib/model/opr.ts';
@@ -107,7 +107,7 @@ export function createHome(deps: HomeDeps) {
 	async function loadHighlights(ms: number): Promise<Highlights | null> {
 		const model = await deps.loadSeasonModelWithin(ms);
 		if (!model) return null;
-		const today = localDay(now(), 'UTC');
+		const today = localDate(now(), 'UTC');
 		const memoKey = `${model.generatedAt}:${today}`;
 		if (highlightMemo?.key === memoKey) return highlightMemo.value;
 		const chance = chanceFrom(model);

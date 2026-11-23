@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { EventSummary, EventType } from '#lib/types.ts';
-import { localDay, pickEvent } from './resolve.ts';
+import { pickEvent } from './resolve.ts';
 
 function event(
 	code: string,
@@ -63,10 +63,5 @@ describe('pickEvent', () => {
 	it('ignores events without matches and handles an empty season', () => {
 		expect(pickEvent([season[0]], at('2026-09-12T18:00:00Z'))).toBeNull();
 		expect(pickEvent([], Date.now())).toBeNull();
-	});
-
-	it('formats the local day', () => {
-		expect(localDay(at('2026-11-15T05:30:00Z'), 'America/Phoenix')).toBe('2026-11-14');
-		expect(localDay(at('2026-11-15T05:30:00Z'), 'Not/AZone')).toBe('2026-11-15');
 	});
 });

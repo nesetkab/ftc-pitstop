@@ -6,7 +6,7 @@ import {
 	startOfLocalDay,
 	timeZoneOffset,
 	zonedTimeToUtc
-} from '#lib/server/time.ts';
+} from '#lib/format/calendar.ts';
 
 const iso = (ms: number | null) => (ms === null ? null : new Date(ms).toISOString());
 

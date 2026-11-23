@@ -1,3 +1,4 @@
+import { timeZoneOffset } from '#lib/format/calendar.ts';
 import { tips } from '#lib/game/biobuzz.ts';
 import { detectPhase } from '#lib/game/phase.ts';
 import type {
@@ -290,30 +291,6 @@ export function replayBundle(bundle: EventBundle, at: number): EventBundle {
 const OFFSET = /(?:z|[+-]\d{2}:?\d{2})$/i;
 const LOCAL = /^\d{4}-\d{2}-\d{2}(?:[t ]\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?)?$/i;
 
-function zoneOffset(instant: number, timeZone: string): number {
-	const parts = new Intl.DateTimeFormat('en-US', {
-		timeZone,
-		hourCycle: 'h23',
-		year: 'numeric',
-		month: '2-digit',
-		day: '2-digit',
-		hour: '2-digit',
-		minute: '2-digit',
-		second: '2-digit'
-	}).formatToParts(new Date(instant));
-	const part = (type: Intl.DateTimeFormatPartTypes) =>
-		Number(parts.find((item) => item.type === type)?.value ?? 0);
-	const wall = Date.UTC(
-		part('year'),
-		part('month') - 1,
-		part('day'),
-		part('hour'),
-		part('minute'),
-		part('second')
-	);
-	return wall - Math.floor(instant / 1000) * 1000;
-}
-
 export function parseReplayTime(value: string, timeZone: string): number | null {
 	const text = value.trim();
 	if (OFFSET.test(text)) {
@@ -324,8 +301,8 @@ export function parseReplayTime(value: string, timeZone: string): number | null 
 	const naive = Date.parse(`${text.replace(' ', 'T')}Z`);
 	if (Number.isNaN(naive)) return null;
 	try {
-		const guess = naive - zoneOffset(naive, timeZone);
-		return naive - zoneOffset(guess, timeZone);
+		const guess = naive - timeZoneOffset(naive, timeZone);
+		return naive - timeZoneOffset(guess, timeZone);
 	} catch {
 		return naive;
 	}

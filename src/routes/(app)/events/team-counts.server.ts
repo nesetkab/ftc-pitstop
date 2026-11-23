@@ -2,7 +2,7 @@ import * as z from 'zod';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { cache, keepAlive } from '#lib/server/cache.ts';
 import { scoutClient as scout } from '#lib/server/ftcscout.ts';
-import { localDate } from '#lib/server/time.ts';
+import { localDate } from '#lib/format/calendar.ts';
 import type { EventSummary } from '#lib/types.ts';
 
 const DAY = 86_400;

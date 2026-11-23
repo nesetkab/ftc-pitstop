@@ -1,7 +1,7 @@
 import { eventStatus } from '#lib/components/event/dates.ts';
 import { typeNoun } from '#lib/components/event/event-meta.ts';
 import { titleOf } from '#lib/components/event/matches.ts';
-import { addDays, localDay } from '#lib/components/team/dates.ts';
+import { addDays, localDate } from '#lib/format/calendar.ts';
 import { ordinal } from '#lib/format/ordinal.ts';
 import { dateRange, time } from '#lib/format/time.ts';
 import { placeName } from '#lib/format/places.ts';
@@ -146,8 +146,8 @@ function eventSpan(
 	if (event.start === event.end && times.length > 0) {
 		const first = Math.min(...times.map((at) => at.start));
 		const last = Math.max(...times.map(matchEnd));
-		const sameDay = localDay(first, event.timezone) === event.start;
-		if (sameDay && localDay(last, event.timezone) === event.start) {
+		const sameDay = localDate(first, event.timezone) === event.start;
+		if (sameDay && localDate(last, event.timezone) === event.start) {
 			return zonedRange(first, last, event.timezone);
 		}
 	}
@@ -284,7 +284,7 @@ function teamMatch(
 }
 
 export function scheduleLikely(event: Pick<EventSummary, 'start' | 'timezone'>, now: number) {
-	return addDays(event.start, -SCHEDULE_LEAD_DAYS) <= localDay(now, event.timezone);
+	return addDays(event.start, -SCHEDULE_LEAD_DAYS) <= localDate(now, event.timezone);
 }
 
 function standing(entry: TeamSeason['events'][number]): string[] {

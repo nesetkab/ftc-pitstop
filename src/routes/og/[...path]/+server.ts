@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { filterRecords, pageRecords, parseRecordFilters } from '#lib/components/records/records.ts';
-import { localDay } from '#lib/components/team/dates.ts';
+import { localDate } from '#lib/format/calendar.ts';
 import { loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import { loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
 import { cardFor, type OgDeps } from '#lib/server/og/load.ts';
@@ -16,7 +16,7 @@ const deps: OgDeps = {
 		const source = await loadRecordDataset(3500);
 		if (!source) return null;
 		const filters = parseRecordFilters(new URLSearchParams());
-		const sorted = filterRecords(source.dataset.rows, filters, localDay(Date.now(), 'UTC'));
+		const sorted = filterRecords(source.dataset.rows, filters, localDate(Date.now(), 'UTC'));
 		return pageRecords(sorted, 'total', 1, count).rows;
 	},
 	loadNames: recordNames

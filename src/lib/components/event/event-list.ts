@@ -1,6 +1,7 @@
 import { dateRange } from '#lib/format/time.ts';
 import type { EventSummary, EventType } from '#lib/types.ts';
-import { addDays, eventStatus, localDate, weekStart, type EventStatus } from './dates.ts';
+import { addDays, localDate, weekStart } from '#lib/format/calendar.ts';
+import { eventStatus, type EventStatus } from './dates.ts';
 import { TYPE_ORDER } from './event-meta.ts';
 import { areaName, isUnitedStates, knownRegion, placeName } from '#lib/format/places.ts';
 

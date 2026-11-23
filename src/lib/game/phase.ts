@@ -1,3 +1,4 @@
+import { localDate } from '#lib/format/calendar.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import type { AllianceSelection, Award, Event, EventPhase, Match } from '#lib/types.ts';
 
@@ -57,27 +58,6 @@ export function bracketDecided(playoffs: Match[], alliances: AllianceSelection[]
 	return alive === 1;
 }
 
-const dayFormats = new Map<string, Intl.DateTimeFormat>();
-
-function localDay(instant: number, timeZone: string): string {
-	let format = dayFormats.get(timeZone);
-	if (!format) {
-		try {
-			format = new Intl.DateTimeFormat('en-US', {
-				timeZone,
-				year: 'numeric',
-				month: '2-digit',
-				day: '2-digit'
-			});
-		} catch {
-			return localDay(instant, 'UTC');
-		}
-		dayFormats.set(timeZone, format);
-	}
-	const parts = new Map(format.formatToParts(instant).map((part) => [part.type, part.value]));
-	return `${parts.get('year')}-${parts.get('month')}-${parts.get('day')}`;
-}
-
 export function lastPosted(matches: Match[]): number | null {
 	let latest: number | null = null;
 	for (const match of matches) {
@@ -108,7 +88,7 @@ export function detectPhase(input: PhaseInput): EventPhase {
 	if (played < quals.length) return over ? 'done' : 'quals';
 	if (over || winnerAnnounced || !hasPlayoffs(event.type)) return 'done';
 	const last = lastPosted(quals);
-	const lastDay = last !== null && localDay(last, event.timezone) >= event.end;
+	const lastDay = last !== null && localDate(last, event.timezone) >= event.end;
 	if (last !== null && lastDay && now - last > 2 * HOUR) return 'done';
 	return 'selection';
 }

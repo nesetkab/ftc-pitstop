@@ -1,4 +1,4 @@
-import { addDays } from '#lib/components/team/dates.ts';
+import { addDays } from '#lib/format/calendar.ts';
 import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
 import { regionName } from '#lib/format/places.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
