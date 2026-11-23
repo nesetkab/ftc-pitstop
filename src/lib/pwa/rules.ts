@@ -10,7 +10,6 @@ export interface RouteInput {
 
 export const OFFLINE_HEADER = 'x-pitstop-offline';
 export const CACHE_PREFIX = 'pitstop-';
-export const PAGES_CACHE = `${CACHE_PREFIX}pages`;
 export const MAX_DATA_ENTRIES = 40;
 export const MAX_PAGE_ENTRIES = 20;
 export const PAGE_TIMEOUT = 4_000;
@@ -22,7 +21,8 @@ const PIT_DATA = new RegExp(`^${TEAM}(?:/tv)?/__data\\.json$`);
 const EVENT_DATA = /^api\/events\/[A-Za-z0-9]{2,24}\/(?:lite|analysis)$/;
 const WORKSPACE_PAGE =
 	/^w(?:\/[A-Za-z0-9-]{1,40}(?:\/(?:picklist|batteries|checklist|board))?)?\/?$/;
-const IMMUTABLE_REF = /["'(]([^"'()\s]*_app\/immutable\/[^"'()\s?#]+)/g;
+const NETWORK_ONLY = /^(?:_app\/version\.json$|_app\/remote\/|service-worker\.js$)/;
+const PAGE_VERSION = /__sveltekit_\w+\s*=\s*\{[^}]*?\bversion:\s*"([^"]*)"/;
 
 export function shellCache(version: string): string {
 	return `${CACHE_PREFIX}shell-${version}`;
@@ -30,6 +30,10 @@ export function shellCache(version: string): string {
 
 export function dataCache(version: string): string {
 	return `${CACHE_PREFIX}data-${version}`;
+}
+
+export function pageCache(version: string): string {
+	return `${CACHE_PREFIX}pages-${version}`;
 }
 
 function relative(pathname: string, scope: string): string {
@@ -46,8 +50,9 @@ export function isWorkspacePage(path: string): boolean {
 
 export function strategyFor(input: RouteInput): Strategy | null {
 	if (input.method !== 'GET') return null;
-	if (input.shell.has(input.pathname)) return 'shell';
 	const path = relative(input.pathname, input.scope);
+	if (NETWORK_ONLY.test(path)) return null;
+	if (input.shell.has(input.pathname)) return 'shell';
 	if (input.mode === 'navigate') {
 		return isPitPage(path) || isWorkspacePage(path) ? 'page' : null;
 	}
@@ -73,23 +78,60 @@ export function isImmutable(path: string): boolean {
 	return path.includes('/_app/immutable/');
 }
 
-export function pageAssets(html: string, page: string): string[] {
-	const origin = new URL(page).origin;
-	const found = new Set<string>();
-	for (const match of html.matchAll(IMMUTABLE_REF)) {
-		try {
-			const url = new URL(match[1], page);
-			if (url.origin === origin) found.add(url.pathname);
-		} catch {
-			continue;
-		}
-	}
-	return [...found];
+export function pageVersion(html: string): string | null {
+	return PAGE_VERSION.exec(html)?.[1] ?? null;
 }
 
-export function pageFits(html: string, page: string, shell: ReadonlySet<string>): boolean {
-	const assets = pageAssets(html, page);
-	return assets.length > 0 && assets.every((path) => shell.has(path));
+export function isPageFrom(html: string, version: string): boolean {
+	return pageVersion(html) === version;
+}
+
+export async function acceptPage(response: Response, version: string): Promise<Response | null> {
+	const html = await response.text();
+	if (!isPageFrom(html, version)) return null;
+	return new Response(html, {
+		status: response.status,
+		statusText: response.statusText,
+		headers: response.headers
+	});
+}
+
+export function fallbackDelay(online: boolean, timeout: number): number {
+	return online ? timeout : 0;
+}
+
+export function firstAnswer<T>(
+	network: Promise<T>,
+	fallback: () => Promise<T | null>,
+	delay: number
+): Promise<T> {
+	return new Promise<T>((resolve, reject) => {
+		let settled = false;
+		const tryCache = async (error: unknown) => {
+			const cached = await fallback().catch(() => null);
+			if (settled) return;
+			if (cached !== null) {
+				settled = true;
+				resolve(cached);
+			} else if (error !== null) {
+				settled = true;
+				reject(error);
+			}
+		};
+		const timer = setTimeout(() => void tryCache(null), delay);
+		network.then(
+			(answer) => {
+				clearTimeout(timer);
+				if (settled) return;
+				settled = true;
+				resolve(answer);
+			},
+			(error: unknown) => {
+				clearTimeout(timer);
+				void tryCache(error);
+			}
+		);
+	});
 }
 
 export function obsoleteCaches(keys: readonly string[], keep: readonly string[]): string[] {

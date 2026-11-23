@@ -2,7 +2,7 @@
 	import { untrack } from 'svelte';
 	import { page, updated } from '$app/state';
 	import { pitAnalysis } from '#lib/components/pit/analysis.remote.ts';
-	import { reloadDue, watchDeploys } from '#lib/components/pit/deploy.ts';
+	import { reloadDue, reloadOntoNewBuild, watchDeploys } from '#lib/components/pit/deploy.ts';
 	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
 	import TvMessage from '#lib/components/pit/TvMessage.svelte';
 	import TvScreen from '#lib/components/pit/TvScreen.svelte';
@@ -37,7 +37,7 @@
 	$effect(() => {
 		if (!session) return;
 		if (reloadDue({ updated: updated.current, replay: session.replay, call: session.call })) {
-			location.reload();
+			void reloadOntoNewBuild();
 		}
 	});
 
