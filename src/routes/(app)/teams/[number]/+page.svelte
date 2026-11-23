@@ -168,6 +168,10 @@
 		gap: 8px;
 	}
 
+	.team-actions > :global(:first-child) {
+		min-width: 7em;
+	}
+
 	.pair {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -222,6 +226,7 @@
 
 		.team-actions > :global(:first-child) {
 			flex: 1 1 auto;
+			min-width: 0;
 		}
 	}
 

@@ -223,8 +223,7 @@ describe('team page', () => {
 				.nextElementSibling;
 		expect(stat('Season OPR')).toHaveTextContent('58.2');
 		expect(stat('World rank by OPR')).toHaveTextContent('214 of 3,272');
-		expect(stat('Qual record')).toHaveTextContent('5-0-0');
-		expect(stat('Events played')).toHaveTextContent('1');
+		expect(stat('Qual record')).toHaveTextContent('5-0-0 in 1 event');
 	});
 
 	it('leads with Follow and keeps the pit screens in one menu', () => {
@@ -232,7 +231,7 @@ describe('team page', () => {
 		const follow = screen.getByRole('button', { name: 'Follow' });
 		expect(follow).toHaveClass('primary');
 		expect(screen.getByRole('link', { name: 'Compare' })).toHaveClass('secondary');
-		const pit = screen.getByText('Pit screens').closest('details') as HTMLElement;
+		const pit = screen.getByText('Pit', { selector: 'summary' }).closest('details') as HTMLElement;
 		expect(within(pit).getByRole('link', { name: /^TV display/ })).toHaveAttribute(
 			'href',
 			'/26670/tv'

@@ -17,7 +17,7 @@
 	const result = $derived(playoffResult(view));
 </script>
 
-<div class="cols" style:--cols="31em minmax(0, 1fr) 23em">
+<div class="cols" style:--cols="26em minmax(0, 1fr) 23em">
 	<section>
 		<h2 class="tv-label">Final rank</h2>
 		{#if ranking}
