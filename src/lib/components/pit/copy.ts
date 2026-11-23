@@ -287,8 +287,10 @@ export function playoffResult(view: PitView): string | null {
 	return playoff.position;
 }
 
+const SPONSOR = /\s+sponsored by\s+.+?(?=\s+\d+(?:st|nd|rd|th) place$|$)/i;
+
 export function awardName(name: string): string {
-	return sharedAwardName({ name });
+	return sharedAwardName({ name }).replace(SPONSOR, '');
 }
 
 function callText(next: NextMatch, call: QueueCall | null): string | null {

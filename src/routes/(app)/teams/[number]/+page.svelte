@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { page } from '$app/state';
-	import Comparison from '#lib/components/team/Comparison.svelte';
 	import FollowButton from '#lib/components/team/FollowButton.svelte';
 	import LastSeason from '#lib/components/team/LastSeason.svelte';
 	import OprCharts from '#lib/components/team/OprCharts.svelte';
+	import PitScreens from '#lib/components/team/PitScreens.svelte';
 	import SeasonTakeaways from '#lib/components/team/SeasonTakeaways.svelte';
 	import TeamAllies from '#lib/components/team/TeamAllies.svelte';
 	import TeamAwards from '#lib/components/team/TeamAwards.svelte';
@@ -32,6 +32,7 @@
 			.join('. ')
 	);
 	const pitEvent = $derived(eventThisWeek(view.upcoming, Date.now()));
+	const hasStats = $derived(view.stats.events > 0 || view.stats.opr !== null);
 	const previousTitle = $derived(
 		view.previous ? `Last season, ${view.previous.game ?? view.previous.season}` : ''
 	);
@@ -58,15 +59,17 @@
 		{/if}
 	{/snippet}
 	{#snippet actions()}
-		<FollowButton number={view.team.number} />
-		<Button variant="secondary" href="/compare?teams={view.team.number}">Compare</Button>
-		<Button variant="secondary" href="/{view.team.number}/tv">Pit display</Button>
-		<Button variant="secondary" href="/{view.team.number}">Phone view</Button>
-		<CalendarMenu
-			path="/teams/{view.team.number}/calendar.ics"
-			filename="{view.team.number}.ics"
-			note="This team's events and matches with estimated start times. Subscribed calendars update as schedules come out."
-		/>
+		<div class="team-actions">
+			<FollowButton number={view.team.number} />
+			<Button variant="secondary" href="/compare?teams={view.team.number}">Compare</Button>
+			<PitScreens number={view.team.number} />
+			<CalendarMenu
+				label="Calendar"
+				path="/teams/{view.team.number}/calendar.ics"
+				filename="{view.team.number}.ics"
+				note="This team's events and matches with estimated start times. Subscribed calendars update as schedules come out."
+			/>
+		</div>
 	{/snippet}
 </PageHeader>
 
@@ -78,11 +81,13 @@
 	</Hint>
 {/if}
 
-<TeamStats
-	stats={view.stats}
-	trend={view.trend}
-	team={view.source === 'ratings' ? view.team.number : undefined}
-/>
+{#if hasStats}
+	<TeamStats
+		stats={view.stats}
+		trend={view.trend}
+		team={view.source === 'ratings' ? view.team.number : undefined}
+	/>
+{/if}
 
 <SeasonTakeaways lines={view.takeaways} />
 
@@ -93,43 +98,41 @@
 	</section>
 {/if}
 
-{#if view.charts.length > 0 || view.comparison.length > 0}
-	<div class="grid2">
-		<section class="panel" aria-labelledby="opr-title">
-			<h2 class="sec-title" id="opr-title">{view.chartTitle}</h2>
-			<OprCharts charts={view.charts} />
-		</section>
-		<section class="panel" aria-labelledby="compare-title">
-			<h2 class="sec-title" id="compare-title">Compared with all teams this season</h2>
-			<Comparison rows={view.comparison} />
-		</section>
-	</div>
-{:else}
+{#if view.charts.length > 0}
 	<section class="panel" aria-labelledby="opr-title">
 		<h2 class="sec-title" id="opr-title">{view.chartTitle}</h2>
 		<OprCharts charts={view.charts} />
 	</section>
 {/if}
 
-<section class="panel" aria-labelledby="events-title">
-	<h2 class="sec-title" id="events-title">Events</h2>
-	<TeamEvents rows={view.events} team={view.team.number} />
-	{#if view.stats.events > 0}
-		<p class="more">
-			<a href="/records?team={view.team.number}">Highest scores with {view.team.number}</a>
-		</p>
-	{/if}
-</section>
+{#if view.events.length > 0 || view.upcoming.length === 0}
+	<section class="panel" aria-labelledby="events-title">
+		<div class="head">
+			<h2 class="sec-title" id="events-title">Events</h2>
+			{#if view.stats.events > 0}
+				<a href="/records?team={view.team.number}">Highest scores with {view.team.number}</a>
+			{/if}
+		</div>
+		<TeamEvents rows={view.events} team={view.team.number} />
+	</section>
+{/if}
+
+{#if view.awards.length > 0}
+	<section class="panel awards" aria-labelledby="awards-title">
+		<h2 class="sec-title" id="awards-title">Awards</h2>
+		<TeamAwards rows={view.awards} />
+	</section>
+{/if}
 
 {#if view.breakdown.length > 0}
 	<section class="panel" aria-labelledby="breakdown-title">
 		<h2 class="sec-title" id="breakdown-title">Scoring by event</h2>
-		<TeamBreakdown rows={view.breakdown} />
+		<TeamBreakdown rows={view.breakdown} comparison={view.comparison} />
 	</section>
 {/if}
 
 {#if view.allies.partnerCount > 0}
-	<div class="grid2 even">
+	<div class="pair">
 		<section class="panel" aria-labelledby="partners-title">
 			<h2 class="sec-title" id="partners-title">Partners</h2>
 			<TeamAllies kind="partners" rows={view.allies.partners} total={view.allies.partnerCount} />
@@ -148,15 +151,6 @@
 	</section>
 {/if}
 
-{#if view.awards.length > 0 || view.advancement.length > 0}
-	<section class="panel awards" aria-labelledby="awards-title">
-		<h2 class="sec-title" id="awards-title">
-			{view.advancement.length > 0 ? 'Awards and advancement' : 'Awards'}
-		</h2>
-		<TeamAwards rows={view.awards} advancement={view.advancement} />
-	</section>
-{/if}
-
 {#if view.previous}
 	<section class="panel previous" aria-labelledby="previous-title">
 		<h2 class="sec-title" id="previous-title">{previousTitle}</h2>
@@ -167,15 +161,18 @@
 <TeamBadges number={view.team.number} name={view.team.name} />
 
 <style>
-	.grid2 {
-		display: grid;
-		grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-		gap: 28px;
-		align-items: start;
+	.team-actions {
+		display: flex;
+		flex: 1 1 auto;
+		flex-wrap: wrap;
+		gap: 8px;
 	}
 
-	.grid2.even {
+	.pair {
+		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 28px;
+		align-items: start;
 	}
 
 	.panel {
@@ -186,12 +183,25 @@
 		min-width: 0;
 	}
 
-	.previous {
-		max-width: 520px;
+	.head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 4px 16px;
 	}
 
-	.more {
-		font-size: 14px;
+	.head a {
+		font-size: 13px;
+		color: var(--text-2);
+	}
+
+	.head a:hover {
+		color: var(--text);
+	}
+
+	.previous {
+		max-width: 520px;
 	}
 
 	.awards {
@@ -199,14 +209,24 @@
 	}
 
 	@media (max-width: 1060px) {
-		.grid2,
-		.grid2.even {
+		.pair {
 			grid-template-columns: minmax(0, 1fr);
 		}
 	}
 
+	@media (max-width: 600px) {
+		.team-actions {
+			flex-wrap: nowrap;
+			gap: 6px;
+		}
+
+		.team-actions > :global(:first-child) {
+			flex: 1 1 auto;
+		}
+	}
+
 	@media (pointer: coarse) {
-		.more a {
+		.head a {
 			display: inline-block;
 			margin-block: -10px;
 			padding-block: 10px;

@@ -22,7 +22,6 @@ import {
 	rpHabits,
 	seasonTakeaways,
 	upcomingEvents,
-	type AdvancementRow,
 	type AllySummary,
 	type UpcomingEventRow
 } from './season-report.ts';
@@ -77,7 +76,6 @@ export interface TeamEventRow {
 	record: RecordTotals | null;
 	opr: number | null;
 	playoffs: string | null;
-	awards: string[];
 }
 
 export interface TeamAwardRow {
@@ -140,7 +138,6 @@ export interface TeamPageData {
 	events: TeamEventRow[];
 	matches: TeamMatchEvent[];
 	awards: TeamAwardRow[];
-	advancement: AdvancementRow[];
 	upcoming: UpcomingEventRow[];
 	allies: AllySummary;
 	previous: PreviousSeason | null;
@@ -464,9 +461,13 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		entry.stats?.opr.total ??
 		null;
 
-	const events = season.events.map<TeamEventRow>((entry) => {
+	const upcoming = upcomingEvents(season, bundles, analyses, pool, now);
+	const comingUp = new Set(upcoming.map((row) => row.code));
+
+	const events = season.events.flatMap<TeamEventRow>((entry) => {
 		const { event } = entry;
 		const day = localDate(now, event.timezone);
+		if (!entry.stats && day < event.start && comingUp.has(event.code)) return [];
 		const bundle = hasPlayoffs(event.type) ? bundles[event.code] : null;
 		let playoffs: string | null;
 		if (entry.stats) playoffs = bundle ? playoffSummary(bundle, number) : null;
@@ -474,19 +475,20 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		else if (day <= event.end) playoffs = 'In progress';
 		else playoffs = event.hasMatches ? "Didn't play" : 'No results';
 		const standing = entry.stats ? (officialRanking(entry, bundles, number) ?? entry.stats) : null;
-		return {
-			code: event.code,
-			name: event.name,
-			start: event.start,
-			end: event.end,
-			rank: standing?.rank ?? null,
-			record: standing
-				? { wins: standing.wins, losses: standing.losses, ties: standing.ties }
-				: null,
-			opr: entry.stats ? eventOpr(entry) : null,
-			playoffs,
-			awards: entry.awards.map(awardLabel)
-		};
+		return [
+			{
+				code: event.code,
+				name: event.name,
+				start: event.start,
+				end: event.end,
+				rank: standing?.rank ?? null,
+				record: standing
+					? { wins: standing.wins, losses: standing.losses, ties: standing.ties }
+					: null,
+				opr: entry.stats ? eventOpr(entry) : null,
+				playoffs
+			}
+		];
 	});
 
 	const awards = season.events.flatMap((entry) =>
@@ -496,8 +498,6 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 			name: awardLabel(award)
 		}))
 	);
-	const advancement = advancementRows(season, bundles);
-	const upcoming = upcomingEvents(season, bundles, analyses, pool, now);
 	const seasonMatches = playedMatches(season, bundles);
 	const trend = seasonTrend(breakdown);
 	const previous = previousSeason(season.previousQuickStats);
@@ -505,10 +505,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		stats,
 		comparison,
 		trend,
-		awards,
-		advancement,
-		upcoming,
-		previous: previous ? { ...previous.rows[0], count: previous.count } : null,
+		advancement: advancementRows(season, bundles),
 		rookie: season.team.rookieYear === SEASON,
 		scores: allianceScores(seasonMatches),
 		rp: rpHabits(seasonMatches, bundles)
@@ -532,7 +529,6 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		events,
 		matches: teamMatches(season, bundles, number),
 		awards,
-		advancement,
 		upcoming,
 		allies: allySummary(season, bundles, pool, seasonMatches),
 		previous,

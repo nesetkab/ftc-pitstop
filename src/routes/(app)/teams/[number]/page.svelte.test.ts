@@ -205,13 +205,14 @@ describe('team page', () => {
 		).toBeInTheDocument();
 	});
 
-	it('breaks down OPR by scoring part at each event', () => {
+	it('breaks down OPR by scoring part at each event under the season percentiles', () => {
 		show();
 		const table = screen.getByRole('table', { name: 'OPR by scoring part at each event' });
 		const rows = within(table).getAllByRole('row');
-		expect(rows).toHaveLength(2);
+		expect(rows).toHaveLength(3);
+		expect(rows[1]).toHaveTextContent('Season percentile');
 		expect(
-			within(rows[1]).getByRole('link', { name: 'Roadrunner - Gilbert Qualifier' })
+			within(rows[2]).getByRole('link', { name: 'Roadrunner - Gilbert Qualifier' })
 		).toHaveAttribute('href', '/events/USAZGIQ');
 	});
 
@@ -226,26 +227,30 @@ describe('team page', () => {
 		expect(stat('Events played')).toHaveTextContent('1');
 	});
 
-	it('links to the pit display and the phone view', () => {
+	it('leads with Follow and keeps the pit screens in one menu', () => {
 		show();
-		expect(screen.getByRole('link', { name: 'Pit display' })).toHaveAttribute('href', '/26670/tv');
-		expect(screen.getByRole('link', { name: 'Phone view' })).toHaveAttribute('href', '/26670');
-		expect(screen.getByRole('button', { name: 'Follow' })).toBeInTheDocument();
+		const follow = screen.getByRole('button', { name: 'Follow' });
+		expect(follow).toHaveClass('primary');
+		expect(screen.getByRole('link', { name: 'Compare' })).toHaveClass('secondary');
+		const pit = screen.getByText('Pit screens').closest('details') as HTMLElement;
+		expect(within(pit).getByRole('link', { name: /^TV display/ })).toHaveAttribute(
+			'href',
+			'/26670/tv'
+		);
+		expect(within(pit).getByRole('link', { name: /^Phone view/ })).toHaveAttribute(
+			'href',
+			'/26670'
+		);
+		expect(screen.getByText('Calendar').closest('details')).toBeInTheDocument();
 	});
 
 	it('compares the team with all teams using percentiles', () => {
 		show();
-		const table = screen.getByRole('heading', { name: 'Compared with all teams this season' })
-			.nextElementSibling as HTMLElement;
-		const rows = within(table)
-			.getAllByRole('row')
-			.slice(1)
-			.map((row) => [...row.querySelectorAll('td')].map((cell) => cell.textContent));
-		expect(rows).toEqual([
-			['Total', '58.2', '93rd'],
-			['Auto', '13.2', '81st'],
-			['Teleop', '45.0', '94th']
-		]);
+		const table = screen.getByRole('table', { name: 'OPR by scoring part at each event' });
+		const row = within(table).getByRole('row', { name: /Season percentile/ });
+		const cells = [...row.querySelectorAll('td')].map((cell) => cell.textContent?.trim());
+		expect(cells.slice(0, 3)).toEqual(['93rd', '81st', '94th']);
+		expect(cells.slice(3)).toEqual([MISSING, MISSING, MISSING, MISSING, MISSING]);
 	});
 
 	it('draws the OPR chart for each event', () => {
@@ -255,10 +260,13 @@ describe('team page', () => {
 		expect(within(chart).getByText('58.2')).toBeInTheDocument();
 	});
 
-	it('lists events with rank, record, playoffs in words and awards', () => {
+	it('lists played events with rank, record and playoffs in words', () => {
 		show();
-		const table = screen.getByRole('heading', { name: 'Events' }).nextElementSibling as HTMLElement;
-		const rows = within(table).getAllByRole('row').slice(1);
+		const section = screen.getByRole('region', { name: 'Events' });
+		expect(
+			within(section).getByRole('link', { name: 'Highest scores with 26670' })
+		).toHaveAttribute('href', '/records?team=26670');
+		const rows = within(section).getAllByRole('row').slice(1);
 		const first = [...rows[0].querySelectorAll('td')].map((cell) => cell.textContent);
 		expect(first).toEqual([
 			'Roadrunner - Gilbert Qualifier',
@@ -267,7 +275,6 @@ describe('team page', () => {
 			'5-0-0',
 			'58.2',
 			'Captain of alliance 1, lost the final 81–178',
-			'Finalist alliance',
 			'Report'
 		]);
 		expect(
@@ -277,24 +284,15 @@ describe('team page', () => {
 			'href',
 			'/events/USAZGIQ/teams/26670'
 		);
-		const second = [...rows[1].querySelectorAll('td')].map((cell) => cell.textContent);
-		expect(second).toEqual([
-			'Phoenix Qualifier',
-			'Dec 5–6',
-			MISSING,
-			MISSING,
-			MISSING,
-			'Upcoming',
-			MISSING,
-			'Report'
-		]);
+		expect(rows).toHaveLength(1);
 	});
 
-	it('lists awards and last season', () => {
+	it('lists awards once, in their own section, and last season', () => {
 		show();
 		const awards = screen.getByRole('heading', { name: 'Awards' })
 			.nextElementSibling as HTMLElement;
 		expect(within(awards).getByText('Finalist alliance')).toBeInTheDocument();
+		expect(screen.getAllByText(/Finalist alliance/)).toHaveLength(1);
 		const last = screen.getByRole('heading', { name: 'Last season, DECODE' })
 			.nextElementSibling as HTMLElement;
 		expect(within(last).getByText('1,689 of 8,368')).toBeInTheDocument();
@@ -329,18 +327,24 @@ describe('team page', () => {
 		expect(screen.queryByRole('heading', { name: /Last season/ })).not.toBeInTheDocument();
 	});
 
-	it('tells the user when there are no matches yet', () => {
+	it('says once that a team has no events yet', () => {
 		show(
 			view({
 				charts: [],
 				comparison: [],
+				breakdown: [],
+				events: [],
+				upcoming: [],
+				takeaways: [],
 				stats: { opr: null, rank: null, of: null, record: null, events: 0, region: null }
 			})
 		);
-		expect(screen.getAllByText('No matches played yet this season.')).toHaveLength(1);
+		expect(screen.getByText('This team has no events this season.')).toBeInTheDocument();
+		expect(screen.queryByRole('heading', { name: /OPR/ })).not.toBeInTheDocument();
 		expect(
-			screen.queryByRole('heading', { name: 'Compared with all teams this season' })
+			screen.queryByText((_, node) => node?.tagName === 'DT' && node.textContent === 'Season OPR')
 		).not.toBeInTheDocument();
+		expect(screen.queryByRole('link', { name: /Highest scores/ })).not.toBeInTheDocument();
 	});
 
 	it('opens with season takeaways', () => {
@@ -349,8 +353,8 @@ describe('team page', () => {
 		const lines = within(list)
 			.getAllByRole('listitem')
 			.map((item) => item.textContent);
-		expect(lines[0]).toBe('Awards: Finalist alliance at Roadrunner - Gilbert Qualifier');
-		expect(lines.length).toBeGreaterThanOrEqual(2);
+		expect(lines[0]).toBe('Top 7% worldwide by season OPR');
+		expect(lines.join(' ')).not.toMatch(/Award|Finalist/);
 		expect(lines.length).toBeLessThanOrEqual(4);
 	});
 
@@ -422,6 +426,10 @@ describe('team page', () => {
 			'/events/USAZGIQ/matches/p10'
 		);
 		expect(screen.getByRole('heading', { name: 'Toughest opponents' })).toBeInTheDocument();
+		expect(screen.getByText(/^\d+ partners?, most matches together first\.$/)).toBeInTheDocument();
+		expect(
+			screen.getByText(/^\d+ opponents?, toughest first by season OPR\.$/)
+		).toBeInTheDocument();
 	});
 
 	it('says when the data is saved and may be old', () => {

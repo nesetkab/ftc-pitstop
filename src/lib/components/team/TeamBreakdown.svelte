@@ -1,16 +1,17 @@
 <script lang="ts">
 	import { oprTerm } from '#lib/format/glossary.ts';
 	import Term from '#lib/ui/Term.svelte';
-	import { fixed } from '#lib/format/index.ts';
+	import { fixed, MISSING, ordinal } from '#lib/format/index.ts';
 	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import Table from '#lib/ui/Table.svelte';
-	import type { TeamPartRow } from './team-view.ts';
+	import type { TeamComparisonRow, TeamPartRow } from './team-view.ts';
 
 	interface Props {
 		rows: TeamPartRow[];
+		comparison?: TeamComparisonRow[];
 	}
 
-	let { rows }: Props = $props();
+	let { rows, comparison = [] }: Props = $props();
 
 	type Part = 'opr' | 'auto' | 'teleop' | 'hive' | 'flower' | 'garden' | 'park' | 'tips';
 
@@ -26,6 +27,12 @@
 	];
 
 	const events = $derived(rows.filter((row) => row.code !== null));
+	const season = $derived(rows.filter((row) => row.code === null));
+	const percentiles = $derived(
+		new Map(
+			comparison.map((row) => [row.key === 'total' ? 'opr' : row.key, row.percentile] as const)
+		)
+	);
 	const best = $derived(
 		Object.fromEntries(
 			columns.map(({ key }) => {
@@ -36,6 +43,28 @@
 		) as Record<Part, number | null>
 	);
 </script>
+
+{#snippet line(row: TeamPartRow)}
+	<tr class:season={row.code === null}>
+		<th class="l wrap" scope="row">
+			{#if row.code}
+				<a href="/events/{row.code}">{row.label}</a>
+			{:else}
+				{row.label}
+			{/if}
+		</th>
+		{#each columns as column (column.key)}
+			{@const value = row[column.key]}
+			<td
+				class={{
+					nested: column.nested,
+					opt: column.opt,
+					best: row.code !== null && value !== null && value === best[column.key]
+				}}>{fixed(value)}</td
+			>
+		{/each}
+	</tr>
+{/snippet}
 
 <Table>
 	<caption class="visually-hidden">OPR by scoring part at each event</caption>
@@ -50,32 +79,29 @@
 		</tr>
 	</thead>
 	<tbody>
-		{#each rows as row (row.key)}
-			<tr class:season={row.code === null}>
-				<th class="l wrap" scope="row">
-					{#if row.code}
-						<a href="/events/{row.code}">{row.label}</a>
-					{:else}
-						{row.label}
-					{/if}
-				</th>
+		{#each season as row (row.key)}
+			{@render line(row)}
+		{/each}
+		{#if comparison.length > 0}
+			<tr class="percentile">
+				<th class="l" scope="row">Season percentile</th>
 				{#each columns as column (column.key)}
-					{@const value = row[column.key]}
-					<td
-						class={{
-							nested: column.nested,
-							opt: column.opt,
-							best: row.code !== null && value !== null && value === best[column.key]
-						}}>{fixed(value)}</td
-					>
+					{@const value = percentiles.get(column.key) ?? null}
+					<td class={{ nested: column.nested, opt: column.opt }}>
+						{value === null ? MISSING : ordinal(value)}
+					</td>
 				{/each}
 			</tr>
+		{/if}
+		{#each events as row (row.key)}
+			{@render line(row)}
 		{/each}
 	</tbody>
 </Table>
 <p class="note">
-	OPR for each part of the score. Hive, flower, garden and park are teleop points. Bold marks the
-	team's best event for that part.
+	OPR for each part of the score. Hive, flower, garden and park are teleop points.
+	{#if comparison.length > 0}Season percentile is the share of teams this season with a lower value.{/if}
+	{#if events.length > 1}Bold marks the team's best event for that part.{/if}
 </p>
 
 <style>
@@ -89,8 +115,26 @@
 	}
 
 	tr.season th,
-	tr.season td {
+	tr.season td,
+	tr.percentile th,
+	tr.percentile td {
 		border-bottom-color: var(--line-2);
+	}
+
+	tr.season:has(+ .percentile) th,
+	tr.season:has(+ .percentile) td {
+		border-bottom: 0;
+	}
+
+	tr.season + .percentile th,
+	tr.season + .percentile td {
+		padding-top: 0;
+	}
+
+	tr.percentile th,
+	tr.percentile td {
+		font-size: 13px;
+		color: var(--text-3);
 	}
 
 	tr.season th {

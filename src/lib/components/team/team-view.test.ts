@@ -123,7 +123,7 @@ describe('buildTeamPage without season ratings', () => {
 		expect(view.charts[0].points[0].value).toBeCloseTo(47.3615, 3);
 	});
 
-	it('lists the event with its award and no playoff text without a bundle', () => {
+	it('lists the event and its award with no playoff text without a bundle', () => {
 		const view = buildTeamPage({ season, ratings: null, analyses: {}, bundles: {}, now: NOW });
 		expect(view.events).toEqual([
 			{
@@ -134,8 +134,7 @@ describe('buildTeamPage without season ratings', () => {
 				rank: 16,
 				record: { wins: 2, losses: 3, ties: 0 },
 				opr: expect.any(Number),
-				playoffs: null,
-				awards: ['Inspire Award 3rd place']
+				playoffs: null
 			}
 		]);
 		expect(view.awards).toEqual([
@@ -200,7 +199,7 @@ describe('buildTeamPage without season ratings', () => {
 		expect(unposted.events[0].playoffs).toBe('No results');
 	});
 
-	it('labels events that have not happened or are still running', () => {
+	it('leaves events still to come to the coming up list and labels running ones', () => {
 		const entry = season.events[0];
 		const base = { ...season, quickStats: null, previousQuickStats: null };
 		const before = buildTeamPage({
@@ -210,7 +209,8 @@ describe('buildTeamPage without season ratings', () => {
 			bundles: {},
 			now: Date.parse('2026-11-10T12:00:00Z')
 		});
-		expect(before.events[0].playoffs).toBe('Upcoming');
+		expect(before.upcoming.map((row) => row.code)).toEqual([entry.event.code]);
+		expect(before.events).toEqual([]);
 		const during = buildTeamPage({
 			season: { ...base, events: [{ ...entry, stats: null, awards: [] }] },
 			ratings: null,
