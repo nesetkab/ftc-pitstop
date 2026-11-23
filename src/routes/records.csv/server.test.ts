@@ -59,7 +59,10 @@ describe('records CSV', () => {
 			updated: 1,
 			dataset: { rows: [row(100, 10, [1, 2]), row(90, 40, [3, 4]), row(80, 5, [1, 5])] }
 		});
-		const response = await call('?part=auto&team=1&page=3');
+		const moved = await call('?part=auto&team=1&page=3');
+		expect(moved.status).toBe(308);
+		expect(moved.headers.get('location')).toBe('/records.csv?part=auto&team=1');
+		const response = await call('?part=auto&team=1');
 		expect(response.headers.get('content-type')).toBe('text/csv; charset=utf-8');
 		expect(response.headers.get('content-disposition')).toBe(
 			'attachment; filename="records-2026-auto.csv"'
