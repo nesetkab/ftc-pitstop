@@ -118,7 +118,11 @@
 
 	@media (max-width: 600px) {
 		.name {
-			max-width: min(9em, 28vw);
+			max-width: min(7em, 22vw);
+		}
+
+		small {
+			display: none;
 		}
 	}
 
