@@ -9,7 +9,9 @@ import { DOC_NAMES, parseDoc, type DocName } from '#lib/workspace/schemas.ts';
 import { WorkspaceError, type WorkspaceStore } from '#lib/workspace/types.ts';
 
 export const RATE = {
-	create: { limit: 40, window: 3600 },
+	create: { limit: 10, window: 3600 },
+	createDaily: { limit: 30, window: 86_400 },
+	createAll: { limit: 400, window: 86_400 },
 	write: { limit: 90, window: 60 },
 	miss: { limit: 30, window: 600 }
 } as const;
@@ -131,14 +133,16 @@ export function createWorkspaceApi(store: WorkspaceStore, limiter: Limiter): Wor
 	const guessedTooMuch = async (ip: string) =>
 		(await limiter.used(`miss:${ip}`, RATE.miss.window)) >= RATE.miss.limit;
 	const missing = () => new WorkspaceError('not-found', 'No workspace uses this code');
+	const mayCreate = async (ip: string) =>
+		(await limiter.allow(`create:${ip}`, RATE.create.limit, RATE.create.window)) &&
+		(await limiter.allow(`create-day:${ip}`, RATE.createDaily.limit, RATE.createDaily.window)) &&
+		(await limiter.allow('create-all', RATE.createAll.limit, RATE.createAll.window));
 
 	return {
 		async create(request, ip) {
 			try {
 				requireSameOriginJson(request);
-				if (!(await limiter.allow(`create:${ip}`, RATE.create.limit, RATE.create.window))) {
-					return rateLimited();
-				}
+				if (!(await mayCreate(ip))) return rateLimited();
 				const body = createBody.safeParse(await readJson(request, 1_000));
 				if (!body.success) throw new WorkspaceError('invalid', 'Enter a team number');
 				return reply(await store.create(body.data), 201);
