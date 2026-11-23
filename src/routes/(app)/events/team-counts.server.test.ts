@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { toRosters } from '#lib/server/rosters.ts';
 import { countTeams, teamCount } from './team-counts.server.ts';
 
 const team = (teamNumber: number, played: boolean) => ({
@@ -6,16 +7,18 @@ const team = (teamNumber: number, played: boolean) => ({
 	stats: played ? {} : null
 });
 
-const counts = countTeams({
-	eventsSearch: [
-		{
-			code: 'usmtbuq',
-			teams: [team(16, true), team(54, false), team(724, true), team(12793, false)]
-		},
-		{ code: 'USMTCMP', teams: [team(16, false), team(724, false)] },
-		{ code: 'USEMPTY', teams: [] }
-	]
-});
+const counts = countTeams(
+	toRosters({
+		eventsSearch: [
+			{
+				code: 'usmtbuq',
+				teams: [team(16, true), team(54, false), team(724, true), team(12793, false)]
+			},
+			{ code: 'USMTCMP', teams: [team(16, false), team(724, false)] },
+			{ code: 'USEMPTY', teams: [] }
+		]
+	})
+);
 
 const montana = { end: '2026-11-21', timezone: 'America/Denver' };
 const after = Date.parse('2026-11-22T19:00:00Z');
