@@ -16,6 +16,15 @@ export class UndoOffer {
 		this.#timer = setTimeout(() => this.dismiss(), this.#wait);
 	}
 
+	hold() {
+		clearTimeout(this.#timer);
+	}
+
+	release() {
+		clearTimeout(this.#timer);
+		if (this.label) this.#timer = setTimeout(() => this.dismiss(), this.#wait);
+	}
+
 	undo() {
 		const restore = this.#restore;
 		this.dismiss();

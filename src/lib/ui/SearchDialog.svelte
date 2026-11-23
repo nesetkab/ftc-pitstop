@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { clearRecent, readRecent, rememberRecent } from './recent-searches.ts';
-	import { searchApi, type SearchFn, type SearchResult } from './search.svelte.ts';
+	import { searchApi } from './search-results.ts';
+	import { searchShortcut, type SearchFn, type SearchResult } from './search.svelte.ts';
 
 	interface Props {
 		open?: boolean;
@@ -18,9 +19,6 @@
 		delay = 120,
 		shortcuts = true
 	}: Props = $props();
-
-	const TEXT_ENTRY =
-		'textarea, select, [contenteditable]:not([contenteditable="false"]), input:not([type="checkbox"]):not([type="radio"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="range"]):not([type="color"])';
 
 	const id = $props.id();
 	const listId = `${id}-list`;
@@ -142,34 +140,13 @@
 		document.getElementById(optionId(active))?.scrollIntoView?.({ block: 'nearest' });
 	});
 
-	function isTextEntry(target: EventTarget | null) {
-		return target instanceof Element && target.closest(TEXT_ENTRY) !== null;
-	}
-
 	function onWindowKeydown(event: KeyboardEvent) {
-		if (!shortcuts || event.defaultPrevented || event.isComposing) return;
-		const shortcut =
-			(event.metaKey || event.ctrlKey) &&
-			!event.altKey &&
-			!event.shiftKey &&
-			event.key.toLowerCase() === 'k';
-		if (shortcut) {
-			event.preventDefault();
-			if (open) input?.select();
-			else open = true;
-			return;
-		}
-		if (
-			event.key === '/' &&
-			!open &&
-			!event.metaKey &&
-			!event.ctrlKey &&
-			!event.altKey &&
-			!isTextEntry(event.target)
-		) {
-			event.preventDefault();
-			open = true;
-		}
+		if (!shortcuts) return;
+		const shortcut = searchShortcut(event);
+		if (!shortcut || (shortcut === 'slash' && open)) return;
+		event.preventDefault();
+		if (open) input?.select();
+		else open = true;
 	}
 
 	function move(step: number) {
@@ -257,39 +234,44 @@
 			<kbd aria-hidden="true">Esc</kbd>
 		</div>
 
-		<div class="list" id={listId} role="listbox" aria-label="Results" hidden={ordered.length === 0}>
-			{#each groups as group (group.type)}
+		<div class="list" hidden={ordered.length === 0}>
+			{#if showingRecent}
 				<div class="group-label">
-					<span aria-hidden="true">{group.label}</span>
-					{#if group.type === 'recent'}
-						<button type="button" class="clear" onclick={forget}>Clear</button>
-					{/if}
+					<span aria-hidden="true">Recent</span>
+					<button type="button" class="clear" onclick={forget}>Clear</button>
 				</div>
-				<div role="group" aria-label={group.label}>
-					{#each group.items as { result, index } (index)}
-						<a
-							id={optionId(index)}
-							class="option"
-							href={result.href}
-							role="option"
-							tabindex="-1"
-							aria-selected={index === active}
-							onclick={(event) => pick(event, result)}
-							onpointermove={() => (active = index)}
-						>
-							<span class="label">{result.label}</span>
-							{#if result.meta}
-								<span class={['meta', { live: result.live }]}>
-									{#if result.live}<span class="dot" aria-hidden="true"></span>{/if}{result.meta}
-								</span>
-							{/if}
-							{#if result.sublabel}
-								<span class="sublabel">{result.sublabel}</span>
-							{/if}
-						</a>
-					{/each}
-				</div>
-			{/each}
+			{/if}
+			<div id={listId} role="listbox" aria-label="Results">
+				{#each groups as group (group.type)}
+					<div role="group" aria-label={group.label}>
+						{#if group.type !== 'recent'}
+							<div class="group-label" aria-hidden="true">{group.label}</div>
+						{/if}
+						{#each group.items as { result, index } (index)}
+							<a
+								id={optionId(index)}
+								class="option"
+								href={result.href}
+								role="option"
+								tabindex="-1"
+								aria-selected={index === active}
+								onclick={(event) => pick(event, result)}
+								onpointermove={() => (active = index)}
+							>
+								<span class="label">{result.label}</span>
+								{#if result.meta}
+									<span class={['meta', { live: result.live }]}>
+										{#if result.live}<span class="dot" aria-hidden="true"></span>{/if}{result.meta}
+									</span>
+								{/if}
+								{#if result.sublabel}
+									<span class="sublabel">{result.sublabel}</span>
+								{/if}
+							</a>
+						{/each}
+					</div>
+				{/each}
+			</div>
 		</div>
 
 		<p class={['message', { 'visually-hidden': !message }]} role="status">
@@ -372,7 +354,9 @@
 	}
 
 	.clear {
-		padding: 0;
+		min-height: 24px;
+		margin: -4px -6px -4px 0;
+		padding: 0 6px;
 		border: 0;
 		background: none;
 		font: inherit;

@@ -76,3 +76,9 @@ export function toSearchResults(body: unknown, now = Date.now()): SearchResult[]
 		? [...eventResults, ...teamResults]
 		: [...teamResults, ...eventResults];
 }
+
+export async function searchApi(query: string, signal?: AbortSignal): Promise<SearchResult[]> {
+	const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`, { signal });
+	if (!response.ok) return [];
+	return toSearchResults(await response.json());
+}

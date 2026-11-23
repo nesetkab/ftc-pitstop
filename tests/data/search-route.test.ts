@@ -81,6 +81,39 @@ describe('search route', () => {
 		expect(server.search.mock.calls[0][3]?.standings).toBeUndefined();
 	});
 
+	it('sends only the event fields the dialog shows', async () => {
+		const event = {
+			code: 'USAZGIQ',
+			name: 'Gilbert Qualifier',
+			type: 'Qualifier',
+			typeName: 'Qualifier',
+			region: 'USAZ',
+			league: null,
+			venue: 'Gilbert High School',
+			city: 'Gilbert',
+			state: 'AZ',
+			country: 'USA',
+			timezone: 'America/Phoenix',
+			start: '2026-12-05',
+			end: '2026-12-05',
+			hasMatches: false
+		};
+		server.search.mockReturnValueOnce({ teams: [], events: [event] } as never);
+		const body = await (await get('?q=gilbert')).json();
+		expect(body.events).toEqual([
+			{
+				code: 'USAZGIQ',
+				name: 'Gilbert Qualifier',
+				city: 'Gilbert',
+				state: 'AZ',
+				country: 'USA',
+				timezone: 'America/Phoenix',
+				start: '2026-12-05',
+				end: '2026-12-05'
+			}
+		]);
+	});
+
 	it('shares answers for an hour', async () => {
 		const answer = await get('?q=valley');
 		expect(answer.headers.get('cache-control')).toContain('s-maxage=3600');

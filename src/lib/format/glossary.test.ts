@@ -33,10 +33,9 @@ describe('glossary', () => {
 	});
 
 	it('gives the rankings table the same wording as everywhere else', () => {
-		for (const column of RANKING_COLUMNS) {
-			expect(column.title, column.key).toBe(explain(column.label) ?? undefined);
-		}
-		const titled = RANKING_COLUMNS.filter((column) => column.title).map((column) => column.label);
+		const titled = RANKING_COLUMNS.filter((column) => explain(column.label)).map(
+			(column) => column.label
+		);
 		expect(titled).toEqual(expect.arrayContaining(['RS', 'TBP', 'NP avg', 'Avg tips', 'OPR']));
 	});
 

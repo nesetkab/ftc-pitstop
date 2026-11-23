@@ -25,6 +25,11 @@
 		overflow-x: auto;
 	}
 
+	.table-wrap:not(.sticky) {
+		margin-block: -4px;
+		padding-block: 4px;
+	}
+
 	.table-wrap.sticky {
 		overflow-y: auto;
 	}

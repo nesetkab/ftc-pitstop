@@ -77,6 +77,7 @@
 	let open = $state<number | null>(null);
 	let drag = $state.raw<Drag | null>(null);
 	let listElement = $state<HTMLOListElement>();
+	let root = $state<HTMLElement>();
 	let frame = 0;
 
 	const picks = $derived(ranked(list));
@@ -204,6 +205,26 @@
 		moved(team, to, picks.length);
 	}
 
+	async function focusMore(team: number | undefined) {
+		await tick();
+		const more =
+			team === undefined
+				? null
+				: root?.querySelector<HTMLElement>(`[aria-controls="${id}-more-${team}"]`);
+		(more ?? document.getElementById(`${id}-team`))?.focus();
+	}
+
+	async function moveBy(button: HTMLButtonElement, team: number, index: number, target: number) {
+		move(team, index, target);
+		await tick();
+		if (button.disabled) await focusHandle(team);
+	}
+
+	async function moveTop(team: number, index: number) {
+		move(team, index, 0);
+		await focusHandle(team);
+	}
+
 	async function pressKey(event: KeyboardEvent, team: number, index: number) {
 		const targets: Record<string, number> = {
 			ArrowUp: index - 1,
@@ -220,11 +241,15 @@
 
 	function remove(entry: PickEntry) {
 		const index = list.entries.findIndex((item) => item.team === entry.team);
+		const group = entry.avoid ? avoid : picks;
+		const at = group.findIndex((item) => item.team === entry.team);
+		const neighbor = group[at + 1] ?? group[at - 1];
 		open = null;
 		update?.((current) => removeEntry(current, entry.team));
 		undo.offer(`Removed ${entry.team}.`, () =>
 			update?.((current) => restoreEntry(current, entry, index))
 		);
+		focusMore(neighbor?.team);
 	}
 
 	function changeAvoid(entry: PickEntry) {
@@ -234,6 +259,7 @@
 		announcement = next
 			? `${entry.team} moved to do not pick.`
 			: `${entry.team} moved back to the pick list.`;
+		focusMore(entry.team);
 	}
 
 	async function copyText() {
@@ -328,7 +354,7 @@
 					class="ctl-btn plain icon"
 					aria-label="Move {entry.team} up"
 					disabled={index === 0}
-					onclick={() => move(entry.team, index, index - 1)}
+					onclick={(event) => moveBy(event.currentTarget, entry.team, index, index - 1)}
 				>
 					<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
 						<path d="M2.5 7.5 6 4l3.5 3.5" />
@@ -339,7 +365,7 @@
 					class="ctl-btn plain icon"
 					aria-label="Move {entry.team} down"
 					disabled={index === last}
-					onclick={() => move(entry.team, index, index + 1)}
+					onclick={(event) => moveBy(event.currentTarget, entry.team, index, index + 1)}
 				>
 					<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
 						<path d="M2.5 4.5 6 8l3.5-3.5" />
@@ -391,7 +417,7 @@
 				</div>
 				<div class="ctl-row">
 					{#if !avoiding && index > 0}
-						<button type="button" class="ctl-btn" onclick={() => move(entry.team, index, 0)}>
+						<button type="button" class="ctl-btn" onclick={() => moveTop(entry.team, index)}>
 							Move to top
 						</button>
 					{/if}
@@ -407,7 +433,7 @@
 	</li>
 {/snippet}
 
-<section class="picklist" aria-label={title}>
+<section class="picklist" aria-label={title} bind:this={root}>
 	<div class="head">
 		<h3 class="sec-title">{title}</h3>
 		{#if share}{@render share()}{/if}

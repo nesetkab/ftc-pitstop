@@ -1,5 +1,4 @@
 import type { Projection, TeamRating } from '#lib/analysis/types.ts';
-import { explain } from '#lib/format/glossary.ts';
 import { fixed } from '#lib/format/number.ts';
 import { record } from '#lib/format/record.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
@@ -20,7 +19,6 @@ export type RankingColumn = {
 	key: string;
 	label: string;
 	name: string;
-	title?: string;
 	source: ColumnSource;
 	digits: number;
 	value: (row: RankingRow) => number | null;
@@ -39,7 +37,6 @@ function ranking<K extends string>(
 		key,
 		label,
 		name,
-		title: explain(label) ?? undefined,
 		source: 'ranking',
 		digits,
 		value: (row) => get(row.ranking)
@@ -57,7 +54,6 @@ function score<K extends string>(
 		key,
 		label,
 		name,
-		title: explain(label) ?? undefined,
 		source: 'score',
 		digits,
 		value: (row) => (row.scores ? get(row.scores) : null),
@@ -79,7 +75,6 @@ function rating<K extends string>(
 		key,
 		label,
 		name,
-		title: explain(label) ?? undefined,
 		source: 'rating',
 		digits,
 		value: (row) => (row.rating ? get(row.rating) : null)

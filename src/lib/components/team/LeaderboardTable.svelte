@@ -71,11 +71,11 @@
 					>
 						{#if filters}
 							<a href={sortHref(column.key)} data-sveltekit-reset="false">
-								<Term
-									label={column.label}
-									term={oprTerm(column.label)}
-									link={false}
-								/>{#if active}<span aria-hidden="true"> ↓</span>{/if}
+								<Term label={column.label} term={oprTerm(column.label)} nested />{#if active}<span
+										aria-hidden="true"
+									>
+										↓</span
+									>{/if}
 							</a>
 						{:else}
 							<Term label={column.label} term={oprTerm(column.label)} />

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { isTextEntry } from '#lib/ui/search.svelte.ts';
 	import type { UndoOffer } from '#lib/workspace/undo.svelte.ts';
 
 	interface Props {
@@ -6,13 +7,45 @@
 	}
 
 	let { offer }: Props = $props();
+
+	let bar = $state<HTMLElement>();
+
+	function onkeydown(event: KeyboardEvent) {
+		if (!offer.label || event.defaultPrevented || isTextEntry(event.target)) return;
+		const command = event.metaKey || event.ctrlKey;
+		if (!command || event.altKey || event.shiftKey || event.key.toLowerCase() !== 'z') return;
+		event.preventDefault();
+		offer.undo();
+	}
+
+	function onfocusout(event: FocusEvent) {
+		if (!bar?.contains(event.relatedTarget as Node | null)) offer.release();
+	}
 </script>
+
+<svelte:window {onkeydown} />
 
 <div class="dock" aria-live="polite">
 	{#if offer.label}
-		<div class="bar">
+		<div
+			class="bar"
+			role="group"
+			aria-label="Undo the last change"
+			bind:this={bar}
+			onpointerenter={() => offer.hold()}
+			onpointerleave={() => {
+				if (!bar?.contains(document.activeElement)) offer.release();
+			}}
+			onfocusin={() => offer.hold()}
+			{onfocusout}
+		>
 			<span>{offer.label}</span>
-			<button type="button" class="undo" onclick={() => offer.undo()}>Undo</button>
+			<button
+				type="button"
+				class="undo"
+				aria-keyshortcuts="Control+Z Meta+Z"
+				onclick={() => offer.undo()}>Undo</button
+			>
 			<button type="button" class="close" aria-label="Dismiss" onclick={() => offer.dismiss()}>
 				<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true">
 					<path d="M2 2l8 8M10 2l-8 8" />

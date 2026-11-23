@@ -62,7 +62,7 @@
 					>
 						{#if sortable}
 							<a href={sortHref(part.key)} data-sveltekit-reset="false">
-								<Term label={part.label} link={false} />{#if active}<span aria-hidden="true">
+								<Term label={part.label} nested />{#if active}<span aria-hidden="true">
 										↓</span
 									>{/if}
 							</a>
