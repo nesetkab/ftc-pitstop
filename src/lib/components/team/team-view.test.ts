@@ -300,6 +300,55 @@ describe('buildTeamPage with season ratings', () => {
 		expect(view.chartTitle).toBe('OPR at each event');
 	});
 
+	it('ranks a tie on OPR the same way the leaderboard lists it', () => {
+		const tied = ratings([rating(111, 80), rating(9000, 50), rating(2844, 50), rating(100, 50)]);
+		const view = buildTeamPage({ season, ratings: tied, analyses: {}, bundles: {}, now: NOW });
+		expect(view.stats).toMatchObject({ rank: 3, of: 4, region: { rank: 3, of: 4 } });
+	});
+
+	it('shows the official FIRST rank for an event instead of the FTCScout one', () => {
+		const scoutRank = season.events.find((entry) => entry.event.code === 'USAZGIQ')?.stats?.rank;
+		const official = {
+			...bundle,
+			rankings: bundle.rankings.map((row) =>
+				row.team === 2844 ? { ...row, rank: 99, wins: 1, losses: 2, ties: 3 } : row
+			)
+		};
+		const view = buildTeamPage({
+			season,
+			ratings: pool,
+			analyses: {},
+			bundles: { USAZGIQ: official },
+			now: NOW
+		});
+		const row = view.events.find((event) => event.code === 'USAZGIQ');
+		expect(scoutRank).not.toBe(99);
+		expect(row).toMatchObject({ rank: 99, record: { wins: 1, losses: 2, ties: 3 } });
+	});
+
+	it('keeps the FTCScout meet rank at league meets, where FIRST ranks the whole league', () => {
+		const league = {
+			...season,
+			events: season.events.map((entry) =>
+				entry.event.code === 'USAZGIQ'
+					? { ...entry, event: { ...entry.event, type: 'LeagueMeet' as const } }
+					: entry
+			)
+		};
+		const official = {
+			...bundle,
+			rankings: bundle.rankings.map((row) => (row.team === 2844 ? { ...row, rank: 99 } : row))
+		};
+		const view = buildTeamPage({
+			season: league,
+			ratings: pool,
+			analyses: {},
+			bundles: { USAZGIQ: official },
+			now: NOW
+		});
+		expect(view.events.find((event) => event.code === 'USAZGIQ')?.rank).not.toBe(99);
+	});
+
 	it('writes the playoff result in plain words from the event bundle', () => {
 		const view = buildTeamPage({
 			season,

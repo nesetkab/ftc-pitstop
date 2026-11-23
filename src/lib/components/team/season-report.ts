@@ -177,6 +177,15 @@ export function rpHabits(
 	};
 }
 
+export function oprRank(pool: SeasonRating[], mine: SeasonRating): number {
+	return (
+		1 +
+		pool.filter(
+			(entry) => entry.opr > mine.opr || (entry.opr === mine.opr && entry.team < mine.team)
+		).length
+	);
+}
+
 function blank(team: number, name: string | null): AllyRow {
 	return { team, name, matches: 0, wins: 0, losses: 0, ties: 0, best: null, opr: null, rank: null };
 }
@@ -205,7 +214,7 @@ export function allySummary(
 	for (const { event } of season.events)
 		for (const entry of bundles[event.code]?.teams ?? []) names.set(entry.number, entry.name);
 	const ratings = new Map(pool.map((rating) => [rating.team, rating]));
-	const ranked = [...pool].sort((a, b) => b.opr - a.opr);
+	const ranked = [...pool].sort((a, b) => b.opr - a.opr || a.team - b.team);
 	const worldRank = new Map(ranked.map((rating, index) => [rating.team, index + 1]));
 	const partners = new Map<number, AllyRow>();
 	const opponents = new Map<number, AllyRow>();
@@ -321,7 +330,7 @@ export function upcomingEvents(
 				outlook: mine ? `${integer(field.size)} teams registered` : 'No season OPR yet'
 			};
 		}
-		const rank = 1 + rated.filter((rating) => rating.opr > mine.opr).length;
+		const rank = oprRank(rated, mine);
 		return {
 			...base,
 			registered,

@@ -21,7 +21,9 @@
 	import StrengthTable from './StrengthTable.svelte';
 
 	interface Props {
-		bundle: Pick<EventBundle, 'teams' | 'matches' | 'rankings'>;
+		bundle: Pick<EventBundle, 'teams' | 'matches' | 'rankings'> & {
+			event?: Pick<EventBundle['event'], 'type'>;
+		};
 		analysis?: Pick<EventAnalysis, 'ratings' | 'projections' | 'strength'> | null;
 		rp?: Record<number, RpCounts> | null;
 		followed?: ReadonlySet<number>;
@@ -60,13 +62,23 @@
 		const here = new Set(bundle.teams.map((team) => team.number));
 		return here.size > 0 && bundle.rankings.some((row) => !here.has(row.team));
 	});
+	const league = $derived(
+		bundle.event?.type === 'LeagueMeet'
+			? Math.max(0, ...bundle.rankings.map((row) => row.counted ?? 0))
+			: 0
+	);
 	const note = $derived(
 		[
 			elsewhere
 				? "These are league rankings, so they include teams that didn't play at this meet."
 				: null,
-			shown.has('rs') ? 'RS is the average ranking points per match.' : null,
-			shown.has('tbp') ? 'TBP is the average match score without penalties.' : null,
+			league
+				? `League rankings use each team's best ${league} league matches so far. RS, TBP and the record add up those matches, and RS and TBP are divided by ${league} even for teams that have played fewer.`
+				: null,
+			shown.has('rs') && !league ? 'RS is the average ranking points per match.' : null,
+			shown.has('tbp') && !league
+				? 'TBP is the average match score without penalties. Matches a team was disqualified from or missed count as zero.'
+				: null,
 			sources.has('score') && ['npavg', 'npmax', 'npmin', 'npsd'].some((key) => shown.has(key))
 				? 'NP scores leave out points from opponent fouls and count qualification matches only. Spread is how much those scores vary.'
 				: null,

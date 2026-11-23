@@ -52,8 +52,8 @@
 		</div>
 	{/if}
 	<div>
-		<dt>Record</dt>
-		<dd>
+		<dt>Qual record</dt>
+		<dd title="Qualification matches at every event this season. Playoffs are not counted.">
 			{stats.record ? record(stats.record.wins, stats.record.losses, stats.record.ties) : MISSING}
 		</dd>
 	</div>

@@ -88,7 +88,7 @@ export function teamDescription(team: SeoTeam, stats: SeoTeamStats): string {
 	if (stats.record && stats.events > 0) {
 		const { wins, losses, ties } = stats.record;
 		const events = stats.events === 1 ? '1 event' : `${stats.events} events`;
-		parts.push(`Record ${wins}-${losses}-${ties} across ${events}.`);
+		parts.push(`Qualification record ${wins}-${losses}-${ties} across ${events}.`);
 	}
 	parts.push('Match history, OPR by part and awards.');
 	return parts.join(' ');

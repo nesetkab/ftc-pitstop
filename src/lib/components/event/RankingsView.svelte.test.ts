@@ -22,6 +22,21 @@ function bodyRows(table: HTMLElement) {
 }
 
 describe('RankingsView', () => {
+	it('explains that league rankings divide by the counted matches', () => {
+		render(RankingsView, { props: { bundle: fixtureBundle('USFLORM1') } });
+		expect(
+			screen.getByText(/League rankings use each team's best 10 league matches/)
+		).toHaveTextContent('RS and TBP are divided by 10 even for teams that have played fewer');
+		expect(screen.queryByText(/RS is the average ranking points per match/)).toBeNull();
+	});
+
+	it('says disqualified and missed matches count as zero in TBP', () => {
+		render(RankingsView, { props: { bundle: finished } });
+		expect(screen.getByText(/TBP is the average match score without penalties/)).toHaveTextContent(
+			'Matches a team was disqualified from or missed count as zero.'
+		);
+	});
+
 	it('shows the FTC rankings without any analysis', () => {
 		render(RankingsView, { props: { bundle: finished } });
 		expect(headers()).toEqual(['Rank ↑', 'Team', 'RS', 'Record', 'TBP', 'NP max', 'Avg tips']);
