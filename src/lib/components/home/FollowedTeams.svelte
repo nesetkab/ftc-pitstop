@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { compareHref, MAX_COMPARE } from '#lib/components/compare/compare.ts';
-	import { follows, syncFollows } from '#lib/components/team/follow.svelte.ts';
+	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { fixed, ordinal, shortDate } from '#lib/format/index.ts';
 	import type { EventBundle } from '#lib/types.ts';
 	import {

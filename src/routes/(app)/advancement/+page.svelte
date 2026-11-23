@@ -2,7 +2,7 @@
 	import { goto } from '$app/navigation';
 	import { isAhead } from '#lib/components/advancement/advancement.ts';
 	import ChampionshipTable from '#lib/components/advancement/ChampionshipTable.svelte';
-	import { watchFollowed } from '#lib/components/event/follow.ts';
+	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import { integer } from '#lib/format/number.ts';
 	import { regionName } from '#lib/format/places.ts';
@@ -19,7 +19,7 @@
 
 	let followed = $state<ReadonlySet<number>>(new Set());
 
-	$effect(() => watchFollowed((teams) => (followed = new Set(teams))));
+	$effect(() => watchFollows((teams) => (followed = new Set(teams))));
 
 	const regional = $derived(data.rows.filter((row) => row.level === 'regional'));
 	const world = $derived(data.rows.filter((row) => row.level === 'world'));

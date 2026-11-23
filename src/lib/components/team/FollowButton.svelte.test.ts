@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import FollowButton from './FollowButton.svelte';
-import { FOLLOW_KEY, follows, parseFollows } from './follow.svelte.ts';
+import { FOLLOW_KEY, follows, parseFollows } from '#lib/components/follow/follow.svelte.ts';
 
 beforeEach(() => {
 	localStorage.clear();

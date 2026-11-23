@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Term from '#lib/ui/Term.svelte';
-	import { follows, syncFollows } from '#lib/components/team/follow.svelte.ts';
+	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { integer, shortDate } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';

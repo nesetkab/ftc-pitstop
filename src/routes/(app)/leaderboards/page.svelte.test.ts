@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { FOLLOW_KEY, follows } from '#lib/components/team/follow.svelte.ts';
+import { FOLLOW_KEY, follows } from '#lib/components/follow/follow.svelte.ts';
 import type {
 	FilterOption,
 	LeaderboardFilters,

@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { follows } from '#lib/components/team/follow.svelte.ts';
+import { follows } from '#lib/components/follow/follow.svelte.ts';
 import type { HomeEvent, TodayEvent } from '#lib/components/home/home.ts';
 import { searchDialog } from '#lib/ui/search.svelte.ts';
 import Page from './+page.svelte';

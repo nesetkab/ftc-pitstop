@@ -5,7 +5,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
-	import { follows, syncFollows } from '#lib/components/team/follow.svelte.ts';
+	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import {
 		queryString,
 		type LeaderboardFilters,
