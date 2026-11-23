@@ -18,7 +18,8 @@
 		"format": "prettier --write .",
 		"test:unit": "vitest",
 		"test": "vitest --run",
-		"coverage": "vitest --run --coverage"
+		"coverage": "vitest --run --coverage",
+		"budget": "vite build && vitest --run tests/bundle-budget.test.ts"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
