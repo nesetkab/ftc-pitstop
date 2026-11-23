@@ -68,7 +68,15 @@ export function strayQueryRedirect(
 	return target ? movedTo(target) : null;
 }
 
+function decoded(search: string): string {
+	try {
+		return decodeURIComponent(search);
+	} catch {
+		return search;
+	}
+}
+
 export function canonicalRedirect(url: URL, search: string): Response | null {
-	if (url.search === search) return null;
+	if (decoded(url.search) === decoded(search)) return null;
 	return movedTo(`${sitePath(url.pathname)}${search}`);
 }

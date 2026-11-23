@@ -118,6 +118,11 @@ describe('canonical query strings', () => {
 		expectMoved(canonicalRedirect(url, '')!, '/records.csv');
 	});
 
+	it('treat an encoded comma as the same query', () => {
+		const url = new URL('/api/following?teams=724%2C10662', SITE);
+		expect(canonicalRedirect(url, '?teams=724,10662')).toBeNull();
+	});
+
 	it('send badges with junk options to the one real address', async () => {
 		expectMoved(await call(badgeRoute, '/badge/2844.svg?stat=nope', { number: '2844' }), '/badge/2844.svg');
 		expectMoved(
