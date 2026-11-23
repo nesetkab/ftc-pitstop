@@ -102,7 +102,7 @@ describe('moveText', () => {
 		expect(moveText(last(4, 3))).toBe('Up 3 places to 4th.');
 		expect(moveText(last(4, -1))).toBe('Down 1 place to 4th.');
 		expect(moveText(last(4, 0))).toBe('Still 4th.');
-		expect(moveText(last(4, null))).toBe('Ranked 4th.');
+		expect(moveText(last(4, null))).toBeNull();
 		expect(moveText(last(null, null))).toBeNull();
 	});
 });

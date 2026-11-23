@@ -368,7 +368,7 @@ describe('PhoneScreen', () => {
 		const { container } = phone('default');
 		const last = container.querySelector('.last')!;
 		expect(text(last as HTMLElement)).toMatch(/Last match Q\d+ (Won|Lost|Tied) \d+–\d+/);
-		expect(text(last as HTMLElement)).toContain('Ranked 8th.');
+		expect(text(last as HTMLElement)).not.toContain('Ranked');
 	});
 
 	it('makes the queue call impossible to miss', () => {

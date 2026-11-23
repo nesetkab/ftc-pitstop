@@ -307,8 +307,7 @@
 					</div>
 					<span class="muted">
 						{teamsLine(last.partners, last.opponents)}
-						{#if move}<span class={{ moved: last.move !== null && last.move !== 0 }}>{move}</span
-							>{/if}
+						{#if move}<span class={{ moved: last.move !== 0 }}>{move}</span>{/if}
 					</span>
 				</section>
 			{/if}

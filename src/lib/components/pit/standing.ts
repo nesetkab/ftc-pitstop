@@ -80,9 +80,8 @@ export function lastMatch(view: PitView, memory: RankMemory | null): LastMatch |
 }
 
 export function moveText(last: LastMatch): string | null {
-	if (last.rank === null) return null;
+	if (last.rank === null || last.move === null) return null;
 	const now = ordinal(last.rank);
-	if (last.move === null) return `Ranked ${now}.`;
 	if (last.move === 0) return `Still ${now}.`;
 	const places = Math.abs(last.move) === 1 ? 'place' : 'places';
 	return `${last.move > 0 ? 'Up' : 'Down'} ${Math.abs(last.move)} ${places} to ${now}.`;
