@@ -21,9 +21,10 @@
 		me?: number;
 		compact?: boolean;
 		caption?: string;
+		teamHref?: (team: number) => string;
 	}
 
-	let { red, blue, me, compact = false, caption = 'Prediction' }: Props = $props();
+	let { red, blue, me, compact = false, caption = 'Prediction', teamHref }: Props = $props();
 
 	const sides = $derived([
 		{ alliance: 'red' as const, side: red, lean: (blue.win ?? 0) > (red.win ?? 0) },
@@ -67,7 +68,12 @@
 							{/if}
 							{#each side.teams as team (team.number)}
 								{#if compact}
-									<TeamChip number={team.number} {alliance} me={team.number === me} />
+									<TeamChip
+										number={team.number}
+										{alliance}
+										me={team.number === me}
+										href={teamHref?.(team.number)}
+									/>
 								{:else}
 									<span class="team">
 										<b>{team.number}</b>

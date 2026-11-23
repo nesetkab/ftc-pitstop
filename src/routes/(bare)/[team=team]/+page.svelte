@@ -3,6 +3,13 @@
 	import { PitAlerts } from '#lib/components/pit/notify.svelte.ts';
 	import PhoneScreen from '#lib/components/pit/PhoneScreen.svelte';
 	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
+	import {
+		parseRankMemory,
+		postedQuals,
+		RANK_KEY,
+		rememberRank,
+		type RankMemory
+	} from '#lib/components/pit/standing.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import { pitAnalysis } from './pit.remote.ts';
 	import type { PageProps } from './$types';
@@ -27,6 +34,47 @@
 
 	const alerts = new PitAlerts();
 
+	let rankMemory = $state<RankMemory | null>(null);
+
+	const rankKey = $derived(
+		session && !session.replay ? `${RANK_KEY}:${session.code}:${session.team}` : null
+	);
+
+	const title = $derived.by(() => {
+		const base = `${data.team}${data.teamName ? ` ${data.teamName}` : ''} - PitStop`;
+		const call = session?.call;
+		return call ? `Queue now: ${call.label} - ${base}` : base;
+	});
+
+	$effect(() => {
+		const key = rankKey;
+		untrack(() => {
+			try {
+				rankMemory = key ? parseRankMemory(localStorage.getItem(key)) : null;
+			} catch {
+				rankMemory = null;
+			}
+		});
+	});
+
+	$effect(() => {
+		const view = session?.view;
+		if (!view) return;
+		const posted = postedQuals(view);
+		const rank = view.ranking?.rank ?? null;
+		untrack(() => {
+			const next = rememberRank(rankMemory, posted, rank);
+			if (next === rankMemory) return;
+			rankMemory = next;
+			if (!rankKey || !next) return;
+			try {
+				localStorage.setItem(rankKey, JSON.stringify(next));
+			} catch {
+				return;
+			}
+		});
+	});
+
 	$effect(() => {
 		alerts.load();
 	});
@@ -47,7 +95,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.team}{data.teamName ? ` ${data.teamName}` : ''} - PitStop</title>
+	<title>{title}</title>
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
@@ -74,6 +122,12 @@
 		permission={alerts.permission}
 		onalert={(key, on) => alerts.set(key, on)}
 		replaySpeed={session.replay?.speed ?? null}
+		analysis={session.analysis}
+		{rankMemory}
+		vibrate={alerts.vibrate}
+		canVibrate={alerts.canVibrate}
+		onvibrate={(on) => alerts.setVibrate(on)}
+		ontest={() => alerts.test()}
 	/>
 {:else}
 	<main class="message">
