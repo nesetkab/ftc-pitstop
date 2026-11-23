@@ -25,6 +25,8 @@ vi.mock('#lib/server/analysis.ts', () => ({
 	loadEventAnalysisEntry: server.loadEventAnalysisEntry
 }));
 
+vi.mock('#lib/server/strength.ts', () => ({ loadStrengthWithin: async () => null }));
+
 const { load: pitLoad } = await import('../../src/routes/(bare)/[team=team]/+layout.server.ts');
 const { loadBreakdowns } =
 	await import('../../src/routes/(app)/events/[code]/breakdowns.server.ts');
@@ -118,6 +120,7 @@ describe('event teams tab caching', () => {
 
 	function run(cacheControl: string) {
 		return teamsLoad({
+			params: { code: 'USAZGIQ' },
 			parent: async () => ({ bundle, cacheControl }),
 			setHeaders
 		} as never);

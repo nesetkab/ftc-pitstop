@@ -60,6 +60,8 @@
 
 	$effect(() => {
 		now = Date.now();
+		const timer = setInterval(() => (now = Date.now()), 60_000);
+		return () => clearInterval(timer);
 	});
 
 	$effect(() => {
