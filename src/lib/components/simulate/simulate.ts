@@ -82,8 +82,9 @@ export function simulateHref(sides: Sides): string {
 }
 
 export function isCanonical(params: URLSearchParams, sides: Sides): boolean {
-	const fields = [...SLOT_FIELDS.red, ...SLOT_FIELDS.blue];
-	if (fields.some((field) => params.has(field))) return false;
+	const keys = [...params.keys()];
+	if (new Set(keys).size < keys.length) return false;
+	if (keys.some((key) => !COLORS.includes(key as Color))) return false;
 	return COLORS.every((color) => {
 		const given = params.get(color);
 		return given === null ? sides[color].length === 0 : given === sides[color].join(',');

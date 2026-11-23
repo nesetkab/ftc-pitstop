@@ -88,6 +88,29 @@ describe('workspace api', () => {
 		expect((await api.create(json({ teamNumber: 1 }), '198.51.100.1')).status).toBe(201);
 	});
 
+	it('limits one address over a whole day, not just an hour', async () => {
+		time = Math.floor(time / 86_400_000) * 86_400_000;
+		let made = 0;
+		for (let hour = 0; hour < 6; hour++) {
+			for (let i = 0; i < RATE.create.limit; i++) {
+				if ((await api.create(json({ teamNumber: 1 }), IP)).status === 201) made++;
+			}
+			time += 3_600_000;
+		}
+		expect(made).toBeLessThanOrEqual(RATE.createDaily.limit);
+		expect(made).toBeGreaterThan(RATE.create.limit);
+	});
+
+	it('caps how many workspaces the whole site creates in a day', async () => {
+		time = Math.floor(time / 86_400_000) * 86_400_000;
+		let made = 0;
+		for (let i = 0; i < RATE.createAll.limit + 20; i++) {
+			const ip = `198.51.${Math.floor(i / 250)}.${i % 250}`;
+			if ((await api.create(json({ teamNumber: 1 }), ip)).status === 201) made++;
+		}
+		expect(made).toBe(RATE.createAll.limit);
+	});
+
 	it('loads a snapshot and answers 404 for unknown or malformed codes', async () => {
 		const { code } = await create();
 		const found = await get(code);

@@ -19,7 +19,11 @@ beforeEach(() => {
 describe('followed teams endpoint', () => {
 	it('loads the requested teams in one call with a short cache', async () => {
 		home.loadFollowed.mockResolvedValue([{ number: 3747 }, { number: 26670 }]);
-		const response = await call('?teams=3747,26670,3747,nope');
+		const moved = await call('?teams=26670,3747,3747,nope');
+		expect(moved.status).toBe(308);
+		expect(moved.headers.get('location')).toBe('/api/following?teams=3747,26670');
+		expect(home.loadFollowed).not.toHaveBeenCalled();
+		const response = await call('?teams=3747,26670');
 		expect(home.loadFollowed).toHaveBeenCalledTimes(1);
 		expect(home.loadFollowed).toHaveBeenCalledWith([3747, 26670]);
 		expect(response.status).toBe(200);
@@ -30,12 +34,16 @@ describe('followed teams endpoint', () => {
 	it('caps how many teams one request can ask for', async () => {
 		home.loadFollowed.mockResolvedValue([]);
 		const many = Array.from({ length: 40 }, (_, index) => index + 1).join(',');
-		await call(`?teams=${many}`);
+		const moved = await call(`?teams=${many}`);
+		const location = moved.headers.get('location') ?? '';
+		expect(location).toBe(`/api/following?teams=${many.split(',').slice(0, 12).join(',')}`);
+		await call(location.slice('/api/following'.length));
 		expect(home.loadFollowed.mock.calls[0][0]).toHaveLength(12);
 	});
 
 	it('answers an empty list without loading anything', async () => {
-		const response = await call('?teams=abc');
+		expect((await call('?teams=abc')).headers.get('location')).toBe('/api/following');
+		const response = await call('');
 		expect(await response.json()).toEqual({ teams: [] });
 		expect(home.loadFollowed).not.toHaveBeenCalled();
 	});

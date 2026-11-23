@@ -1,10 +1,12 @@
 import {
 	filterRows,
 	leaderboardScope,
-	parseFilters
+	parseFilters,
+	queryString
 } from '#lib/components/leaderboard/leaderboard.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { round, toCsv } from '#lib/format/csv.ts';
+import { canonicalRedirect } from '#lib/server/canonical.ts';
 import { csvResponse } from '#lib/server/csv.ts';
 import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
 import { loadLeaderboardSource } from '../leaderboards/source.server.ts';
@@ -28,6 +30,8 @@ const HEADER = [
 
 export const GET: RequestHandler = async ({ url }) => {
 	const filters = parseFilters(url.searchParams);
+	const moved = canonicalRedirect(url, queryString({ ...filters, team: 0 }, 1));
+	if (moved) return moved;
 	const today = new Date().toISOString().slice(0, 10);
 	const scope = leaderboardScope(filters, today);
 	const source = await loadLeaderboardSource(scope, today).catch(() => null);

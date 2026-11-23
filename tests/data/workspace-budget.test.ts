@@ -159,6 +159,31 @@ describe('redis commands for a workspace poll', () => {
 		expect(calls).toEqual([]);
 	});
 
+	it('stops spending Redis commands on an address once it is refused', async () => {
+		const api = instance();
+		for (let i = 0; i <= RATE.miss.limit; i++) await load(api, 'ZZZZZZ');
+		const guessing = await commands(async () => {
+			for (let i = 0; i < 200; i++) expect((await load(api, 'ZZZZZZ')).status).toBe(429);
+		});
+		expect(guessing).toEqual([]);
+		const code = await create(instance());
+		const writing = await commands(async () => {
+			for (let i = 0; i < 20; i++) expect((await write(api, code)).status).toBe(429);
+		});
+		expect(writing).toEqual([]);
+	});
+
+	it('stops counting writes to a busy workspace once it hits the limit', async () => {
+		const api = instance();
+		const code = await create(api);
+		for (let i = 0; i < RATE.write.limit; i++) await write(api, code);
+		expect((await write(api, code)).status).toBe(429);
+		const flood = await commands(async () => {
+			for (let i = 0; i < 100; i++) expect((await write(api, code)).status).toBe(429);
+		});
+		expect(flood).toEqual([]);
+	});
+
 	it('still refuses an address that guessed too often, even with a real code', async () => {
 		const api = instance();
 		const code = await create(api);

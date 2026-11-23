@@ -24,11 +24,15 @@ export function badgeTheme(value: string | null): BadgeTheme {
 	return value === 'dark' ? 'dark' : 'light';
 }
 
-export function badgePath(number: number, kind: BadgeKind, theme: BadgeTheme = 'light'): string {
+export function badgeQuery(kind: BadgeKind, theme: BadgeTheme = 'light'): string {
 	const params = new URLSearchParams();
 	if (kind !== 'summary' && kind !== 'card') params.set('stat', kind);
 	if (theme === 'dark') params.set('theme', 'dark');
-	const query = params.size > 0 ? `?${params}` : '';
+	return params.size > 0 ? `?${params}` : '';
+}
+
+export function badgePath(number: number, kind: BadgeKind, theme: BadgeTheme = 'light'): string {
+	const query = badgeQuery(kind, theme);
 	const file = kind === 'card' ? `${number}/card.svg` : `${number}.svg`;
 	return `/badge/${file}${query}`;
 }

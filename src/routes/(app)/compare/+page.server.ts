@@ -16,7 +16,9 @@ const loadComparison = createCompare({
 export const load: PageServerLoad = async ({ url, setHeaders }) => {
 	const requested = url.searchParams.get('teams');
 	const numbers = parseTeamList(requested, url.searchParams.get('add'));
-	if (url.searchParams.has('add') || (requested !== null && requested !== numbers.join(','))) {
+	const keys = [...url.searchParams.keys()];
+	const stray = keys.length > 1 || keys.some((key) => key !== 'teams');
+	if (stray || (requested !== null && requested !== numbers.join(','))) {
 		redirect(303, compareHref(numbers));
 	}
 

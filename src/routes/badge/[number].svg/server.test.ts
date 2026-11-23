@@ -61,7 +61,10 @@ describe('badge endpoint', () => {
 		const region = await (await call(badge, '26670', '?stat=region&theme=dark')).text();
 		expect(region).toContain('26670 rank in Arizona');
 		expect(region).toContain('#1c1c1c');
-		const light = await (await call(badge, '26670', '?stat=nope&theme=neon')).text();
+		const junk = await call(badge, '26670', '?stat=nope&theme=neon');
+		expect(junk.status).toBe(308);
+		expect(junk.headers.get('location')).toBe('/badge/26670.svg');
+		const light = await (await call(badge, '26670', '')).text();
 		expect(light).toContain('OPR 48.7');
 		expect(light).toContain('#f4f4f2');
 	});
