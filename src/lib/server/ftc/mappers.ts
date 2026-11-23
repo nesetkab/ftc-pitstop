@@ -124,6 +124,7 @@ export function mapRankings(raw: FtcRankingsResponse): Ranking[] {
 			ties: ranking.ties ?? 0,
 			played: ranking.matchesPlayed ?? 0,
 			dq: ranking.dq ?? 0,
+			counted: ranking.matchesCounted ?? undefined,
 			name: clean(ranking.teamName) ?? undefined
 		}))
 		.sort((a, b) => a.rank - b.rank);

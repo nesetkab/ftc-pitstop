@@ -119,6 +119,14 @@
 				team that has been away for weeks, because robots change between events.
 			</p>
 			<p>
+				That is why PitStop’s OPR will not match FTCScout’s exactly. FTCScout shows the classic
+				version, solved from qualification matches alone with no starting guess. PitStop also counts
+				playoff matches. Both leave penalty points out. Checked on nine finished events in November
+				2026, the two agreed on average, within 3 points either way, but a single team typically
+				differed by 2 to 7 points, and by up to 30 when its starting guess or its playoff matches
+				told a different story than its qualification matches.
+			</p>
+			<p>
 				PitStop uses OPR because it tested best. Every traditional FTC event from 2021 to 2026 was
 				replayed, predicting each match from only the matches before it. OPR with these starting
 				guesses beat every alternative tried, including several versions of EPA, in every season.
@@ -137,7 +145,17 @@
 				Official rankings come straight from FIRST. PitStop does not reorder them.
 				<dfn>RS</dfn>, the ranking score, is a team’s average ranking points per match, and it
 				decides the order. <dfn>TBP</dfn>, tiebreaker points, is the average match score without
-				penalties, and it separates teams with the same RS.
+				penalties, and it separates teams with the same RS. A match a team was disqualified from or
+				did not show up for counts as zero for both.
+			</p>
+			<p>
+				League meets show league rankings, which use each team’s best 10 league matches so far.
+				There RS and TBP are totals over those matches divided by 10, so they start low and climb as
+				the league goes on. The record counts the same matches.
+			</p>
+			<p>
+				On team pages, the season record adds up qualification matches from every event. Playoff
+				matches are not counted.
 			</p>
 			<p>
 				<dfn>NP</dfn> means non-penalty: an alliance’s score with the other alliance’s foul points taken

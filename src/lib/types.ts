@@ -177,6 +177,7 @@ export interface Ranking {
 	ties: number;
 	played: number;
 	dq: number;
+	counted?: number;
 	name?: string;
 }
 

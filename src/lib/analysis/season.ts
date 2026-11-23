@@ -78,7 +78,9 @@ export function buildSeason(
 			totals.set(team, total);
 		}
 	});
-	const latest = [...run.latest.values()].sort((a, b) => b.opr - a.opr || a.team - b.team);
+	const latest = [...run.latest.values()].sort(
+		(a, b) => points(b.opr) - points(a.opr) || a.team - b.team
+	);
 	const n = latest.length;
 	const teams: SeasonRating[] = latest.map((r, i) => {
 		const total = totals.get(r.team);

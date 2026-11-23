@@ -82,7 +82,7 @@ describe('search text', () => {
 				events: 1
 			})
 		).toBe(
-			'FTC team 724 RedNek Robotics Wun from Sun River, Montana. 2026-27 BIOBUZZ OPR 57.2, 201st of 3,871 teams worldwide. Record 4-1-0 across 1 event. Match history, OPR by part and awards.'
+			'FTC team 724 RedNek Robotics Wun from Sun River, Montana. 2026-27 BIOBUZZ OPR 57.2, 201st of 3,871 teams worldwide. Qualification record 4-1-0 across 1 event. Match history, OPR by part and awards.'
 		);
 	});
 

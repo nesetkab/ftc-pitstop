@@ -1,4 +1,5 @@
 import type { SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
+import { oprRank } from '#lib/components/team/season-report.ts';
 import { awardLabel, ratedTeams } from '#lib/components/team/team-view.ts';
 import { placeName } from '#lib/format/places.ts';
 import { fixed, integer, matchLabel, MISSING, parseMatchKey, record } from '#lib/format/index.ts';
@@ -186,7 +187,7 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 	const rated = seasons.map((season) => pool.find((entry) => entry.team === season.team.number));
 	const anyRated = rated.some(Boolean);
 	const quick = seasons.map((season) => season.quickStats);
-	const rankOf = (mine: SeasonRating) => 1 + pool.filter((entry) => entry.opr > mine.opr).length;
+	const rankOf = (mine: SeasonRating) => oprRank(pool, mine);
 	const ratingRows = anyRated
 		? [
 				row(

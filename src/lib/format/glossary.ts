@@ -11,6 +11,7 @@ export const GLOSSARY: Readonly<Record<string, string>> = {
 	RS: 'Ranking score, average ranking points per match',
 	TBP: 'Tiebreaker points, average match score without penalties',
 	Record: 'Wins, losses and ties',
+	'Qual record': 'Qualification wins, losses and ties at every event this season, not playoffs',
 	OPR,
 	'Season OPR': 'Offensive power rating over the whole season, estimated points per match',
 	'OPR here': 'Offensive power rating at this event, estimated points per match',

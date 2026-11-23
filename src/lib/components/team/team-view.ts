@@ -7,7 +7,7 @@ import type {
 import { matchLabel, parseMatchKey, shortDate } from '#lib/format/index.ts';
 import { GAME_NAME, PART_LABELS, SEASON } from '#lib/game/biobuzz.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
-import type { Award, EventBundle, QuickStat, QuickStats, TeamSeason } from '#lib/types.ts';
+import type { Award, EventBundle, QuickStat, QuickStats, Ranking, TeamSeason } from '#lib/types.ts';
 import { awardName } from '#lib/components/event/awards.ts';
 import { localDate } from '#lib/format/calendar.ts';
 import { placeName } from '#lib/format/places.ts';
@@ -17,6 +17,7 @@ import {
 	advancementRows,
 	allianceScores,
 	allySummary,
+	oprRank,
 	playedMatches,
 	rpHabits,
 	seasonTakeaways,
@@ -154,7 +155,7 @@ export interface TeamViewInput {
 	bundles: Record<
 		string,
 		| (Pick<EventBundle, 'alliances' | 'matches' | 'phase'> &
-				Partial<Pick<EventBundle, 'teams' | 'advancement'>>)
+				Partial<Pick<EventBundle, 'teams' | 'advancement' | 'rankings'>>)
 		| null
 	>;
 	now: number;
@@ -306,7 +307,7 @@ export function regionStanding(mine: SeasonRating, pool: SeasonRating[]): Region
 	const peers = pool.filter((entry) => entry.region === mine.region);
 	return {
 		code: mine.region,
-		rank: 1 + peers.filter((entry) => entry.opr > mine.opr).length,
+		rank: oprRank(peers, mine),
 		of: peers.length
 	};
 }
@@ -357,6 +358,16 @@ export function seasonTrend(breakdown: TeamPartRow[]): ChartPoint[] {
 	return events.length < 2 ? [] : events.map((row) => ({ label: row.label, value: row.opr }));
 }
 
+function officialRanking(
+	entry: TeamSeason['events'][number],
+	bundles: TeamViewInput['bundles'],
+	team: number
+): Ranking | null {
+	if (entry.event.type === 'LeagueMeet') return null;
+	const rankings = bundles[entry.event.code]?.rankings ?? [];
+	return rankings.find((row) => row.team === team) ?? null;
+}
+
 function sumRecord(season: TeamSeason): RecordTotals | null {
 	const played = season.events.filter((entry) => entry.stats !== null);
 	if (played.length === 0) return null;
@@ -402,7 +413,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 	if (mine) {
 		stats = {
 			opr: mine.opr,
-			rank: 1 + pool.filter((entry) => entry.opr > mine.opr).length,
+			rank: oprRank(pool, mine),
 			of: pool.length,
 			record: sumRecord(season),
 			events: played.length,
@@ -462,14 +473,15 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		else if (day < event.start) playoffs = 'Upcoming';
 		else if (day <= event.end) playoffs = 'In progress';
 		else playoffs = event.hasMatches ? "Didn't play" : 'No results';
+		const standing = entry.stats ? (officialRanking(entry, bundles, number) ?? entry.stats) : null;
 		return {
 			code: event.code,
 			name: event.name,
 			start: event.start,
 			end: event.end,
-			rank: entry.stats?.rank ?? null,
-			record: entry.stats
-				? { wins: entry.stats.wins, losses: entry.stats.losses, ties: entry.stats.ties }
+			rank: standing?.rank ?? null,
+			record: standing
+				? { wins: standing.wins, losses: standing.losses, ties: standing.ties }
 				: null,
 			opr: entry.stats ? eventOpr(entry) : null,
 			playoffs,

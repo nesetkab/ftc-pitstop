@@ -157,7 +157,7 @@ describe('team page', () => {
 		show();
 		const description = document.head.querySelector('meta[name="description"]');
 		expect(description?.getAttribute('content')).toBe(
-			'FTC team 26670 SCA Iron Eagles from Phoenix, Arizona. 2026-27 BIOBUZZ OPR 58.2, 214th of 3,272 teams worldwide. Record 5-0-0 across 1 event. Match history, OPR by part and awards.'
+			'FTC team 26670 SCA Iron Eagles from Phoenix, Arizona. 2026-27 BIOBUZZ OPR 58.2, 214th of 3,272 teams worldwide. Qualification record 5-0-0 across 1 event. Match history, OPR by part and awards.'
 		);
 		const canonical = document.head.querySelector('link[rel="canonical"]');
 		expect(canonical?.getAttribute('href')).toMatch(/\/teams\/26670$/);
@@ -217,7 +217,7 @@ describe('team page', () => {
 		const stat = (name: string) => screen.getByText(name, { selector: 'dt' }).nextElementSibling;
 		expect(stat('Season OPR')).toHaveTextContent('58.2');
 		expect(stat('World rank by OPR')).toHaveTextContent('214 of 3,272');
-		expect(stat('Record')).toHaveTextContent('5-0-0');
+		expect(stat('Qual record')).toHaveTextContent('5-0-0');
 		expect(stat('Events played')).toHaveTextContent('1');
 	});
 
