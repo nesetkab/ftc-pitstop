@@ -212,7 +212,7 @@ describe('leaderboard page', () => {
 		expect(
 			within(screen.getByRole('columnheader', { name: /OPR/ })).getByRole('link')
 		).toHaveAttribute('href', '/leaderboards?region=USAZ');
-		expect(screen.getByText(/Sorted by auto OPR/)).toBeInTheDocument();
+		expect(screen.getByText('USAZ · By auto')).toBeInTheDocument();
 	});
 
 	it('marks the team that was asked for and keeps it out of the pager and CSV links', () => {
@@ -243,9 +243,13 @@ describe('leaderboard page', () => {
 	});
 
 	it('says when no team matches the filters', () => {
-		show({ rows: [], total: 0, pages: 1 });
+		show({ rows: [], total: 0, pages: 1, filters: { ...base.filters, q: 'zzz' } });
 		expect(screen.getByText('No teams match these filters.')).toBeInTheDocument();
-		expect(screen.getByText('No teams')).toBeInTheDocument();
+		expect(screen.queryByText(/Showing/)).not.toBeInTheDocument();
+		expect(screen.getByRole('link', { name: 'Clear filters' })).toHaveAttribute(
+			'href',
+			'/leaderboards'
+		);
 		expect(screen.queryByRole('table')).not.toBeInTheDocument();
 	});
 
@@ -370,6 +374,25 @@ describe('leaderboard filters', () => {
 		show();
 		expect(screen.queryByRole('link', { name: 'Clear filters' })).not.toBeInTheDocument();
 	});
+
+	it('sums up the active filters beside a Filters button that opens the panel', async () => {
+		show({
+			filters: { ...base.filters, region: 'USAZ', type: 'Qualifier', min: 10, sort: 'auto' }
+		});
+		expect(screen.getByText('USAZ · Qualifier · 10+ matches · By auto')).toBeInTheDocument();
+		const toggle = screen.getByRole('button', { name: 'Filters' });
+		expect(toggle).toHaveAttribute('aria-expanded', 'false');
+		await fireEvent.click(toggle);
+		expect(toggle).toHaveAttribute('aria-expanded', 'true');
+		const panel = document.getElementById(toggle.getAttribute('aria-controls')!);
+		expect(panel).toContainElement(screen.getByLabelText('Region'));
+		expect(panel).not.toContainElement(screen.getByLabelText('Find a team'));
+	});
+
+	it('shows no summary when no filter is set', () => {
+		show();
+		expect(screen.getByRole('button', { name: 'Filters' }).nextElementSibling).toBeNull();
+	});
 });
 
 describe('leaderboard event filters', () => {
@@ -417,9 +440,8 @@ describe('leaderboard event filters', () => {
 		});
 		expect(screen.getByLabelText('Event type')).toHaveValue('Qualifier');
 		expect(screen.getByLabelText('Dates')).toHaveValue('2026-11-16');
-		expect(
-			screen.getByText('Qualifier events, Nov 16–22. Showing 1 to 2 of 120 teams')
-		).toBeInTheDocument();
+		expect(screen.getByText('Qualifier · Nov 16–22')).toBeInTheDocument();
+		expect(screen.getByText('Showing 1 to 2 of 120 teams')).toBeInTheDocument();
 		expect(screen.getByText(/as of its last event in this filter/)).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'Download CSV' })).toHaveAttribute(
 			'href',
@@ -436,7 +458,7 @@ describe('leaderboard event filters', () => {
 		expect(
 			within(screen.getByRole('columnheader', { name: /Auto/ })).getByRole('link')
 		).toHaveAttribute('href', '/leaderboards?dates=recent&sort=auto');
-		expect(screen.getByText(/^Last 2 weeks\. Showing/)).toBeInTheDocument();
+		expect(screen.getByText('Last 2 weeks', { selector: 'span' })).toBeInTheDocument();
 	});
 
 	it('hides event filters when there are no event types to offer', () => {

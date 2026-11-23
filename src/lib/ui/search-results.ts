@@ -1,4 +1,4 @@
-import { eventStatus } from '#lib/components/event/dates.ts';
+import { eventStatus, statusLabel } from '#lib/components/event/dates.ts';
 import { fixed } from '#lib/format/number.ts';
 import { placeName } from '#lib/format/places.ts';
 import { shortRange } from '#lib/format/time.ts';
@@ -6,8 +6,6 @@ import type { EventSummary, SearchTeam } from '#lib/types.ts';
 import type { SearchResult } from '#lib/ui/search.svelte.ts';
 
 type TeamHit = SearchTeam & { opr?: number; rank?: number };
-
-const STATUS = { live: 'Live', upcoming: 'Upcoming', done: 'Done' } as const;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
 	return typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -58,7 +56,7 @@ function eventResult(event: EventSummary, now: number): SearchResult {
 		type: 'event',
 		label: event.name,
 		sublabel: parts.filter(Boolean).join(' · '),
-		meta: STATUS[status],
+		meta: statusLabel(event, status, now),
 		live: status === 'live',
 		href: `/events/${event.code}`
 	};

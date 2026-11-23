@@ -346,6 +346,33 @@ export function datesChoice(filters: LeaderboardFilters, weeks: FilterOption[]):
 	return week && weeks.some((option) => option.value === filters.from) ? filters.from : 'custom';
 }
 
+export interface SummaryOptions {
+	regions: FilterOption[];
+	countries: FilterOption[];
+	states: FilterOption[];
+	types: FilterOption[];
+}
+
+function optionLabel(options: FilterOption[], value: string): string {
+	return value ? (options.find((option) => option.value === value)?.label ?? value) : '';
+}
+
+export function filterSummary(filters: LeaderboardFilters, options: SummaryOptions): string[] {
+	const dates =
+		filters.dates === 'recent'
+			? `Last ${RECENT_DAYS / 7} weeks`
+			: windowLabel(dateWindow(filters, '')).replace(/^./, (letter) => letter.toUpperCase());
+	const sort = LEADERBOARD_SORTS.find((entry) => entry.key === filters.sort);
+	return [
+		optionLabel(options.regions, filters.region),
+		optionLabel(options.states, filters.state) || optionLabel(options.countries, filters.country),
+		optionLabel(options.types, filters.type),
+		dates,
+		filters.min > 1 ? `${filters.min}+ matches` : '',
+		sort && sort.key !== 'opr' ? `By ${sort.label.toLowerCase()}` : ''
+	].filter(Boolean);
+}
+
 export function eventFilterOptions(
 	events: Pick<EventSummary, 'type' | 'start' | 'hasMatches'>[],
 	today: string

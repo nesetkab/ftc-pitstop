@@ -1,4 +1,4 @@
-import { localDate } from '#lib/format/calendar.ts';
+import { daysBetween, localDate } from '#lib/format/calendar.ts';
 
 export { addDays, weekStart } from '#lib/format/calendar.ts';
 
@@ -11,6 +11,17 @@ export function eventStatus(event: Dated, now: number): EventStatus {
 	if (today < event.start) return 'upcoming';
 	if (today > event.end) return 'done';
 	return 'live';
+}
+
+export function eventDay(event: Dated, now: number): string {
+	const length = daysBetween(event.start, event.end) + 1;
+	if (length <= 1) return 'Today';
+	return `Day ${daysBetween(event.start, localDate(now, event.timezone)) + 1} of ${length}`;
+}
+
+export function statusLabel(event: Dated, status: EventStatus, now: number): string {
+	if (status === 'live') return eventDay(event, now);
+	return status === 'upcoming' ? 'Upcoming' : 'Done';
 }
 
 export function isMultiDay(event: Pick<Dated, 'start' | 'end'>): boolean {

@@ -146,6 +146,28 @@ function keyLabel(key: string): string {
 	return parsed ? matchLabel(parsed) : key.toUpperCase();
 }
 
+const LEVEL_LABELS = { qual: 'Quals only', playoff: 'Playoffs only' } as const;
+
+function optionLabel(options: RecordOption[], value: string): string {
+	return value ? (options.find((option) => option.value === value)?.label ?? value) : '';
+}
+
+export function recordSummary(
+	filters: RecordFilters,
+	options: { regions: RecordOption[]; types: RecordOption[] }
+): string[] {
+	const range = RECORD_RANGES.find((entry) => entry.key === filters.range);
+	const part = RECORD_PARTS.find((entry) => entry.key === filters.part);
+	return [
+		range && range.key !== 'all' ? range.label : '',
+		optionLabel(options.regions, filters.region),
+		optionLabel(options.types, filters.type),
+		filters.level ? LEVEL_LABELS[filters.level] : '',
+		filters.team ? `Team ${filters.team}` : '',
+		part && part.key !== 'total' ? `By ${part.label.toLowerCase()}` : ''
+	].filter(Boolean);
+}
+
 export function matchDay(match: SeasonMatch): string {
 	if (match.time === null) return match.date;
 	const day = new Date(match.time).toISOString().slice(0, 10);

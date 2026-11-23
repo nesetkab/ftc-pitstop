@@ -75,7 +75,7 @@
 
 <form class="filters" method="get" onsubmit={(event) => event.preventDefault()}>
 	<label>
-		<span>Region</span>
+		<span class="visually-hidden">Region</span>
 		<select name="region" value={data.region ?? ''} onchange={choose}>
 			<option value="">All regions</option>
 			{#each data.regions as option (option.value)}
@@ -202,14 +202,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 10px;
-		align-items: end;
-	}
-
-	.filters label {
-		display: grid;
-		gap: 4px;
-		font-size: 13px;
-		color: var(--text-2);
+		align-items: center;
 	}
 
 	select {

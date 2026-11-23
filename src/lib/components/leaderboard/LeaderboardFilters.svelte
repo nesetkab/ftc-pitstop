@@ -3,11 +3,13 @@
 	import { onDestroy, untrack } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import { addDays } from '#lib/components/event/dates.ts';
+	import FilterPanel from '#lib/ui/FilterPanel.svelte';
 	import {
 		LEADERBOARD_SORTS,
 		MIN_MATCH_CHOICES,
 		RECENT_DAYS,
 		datesChoice,
+		filterSummary,
 		type FilterOption,
 		type LeaderboardFilters
 	} from './leaderboard.ts';
@@ -19,9 +21,18 @@
 		states: FilterOption[];
 		types?: FilterOption[];
 		weeks?: FilterOption[];
+		empty?: boolean;
 	}
 
-	let { filters, regions, countries, states, types = [], weeks = [] }: Props = $props();
+	let {
+		filters,
+		regions,
+		countries,
+		states,
+		types = [],
+		weeks = [],
+		empty = false
+	}: Props = $props();
 
 	let customOpen = $state(false);
 	const chosen = $derived(datesChoice(filters, weeks));
@@ -38,6 +49,7 @@
 		}
 	});
 
+	const summary = $derived(filterSummary(filters, { regions, countries, states, types }));
 	const minimums = $derived(
 		[...new Set([...MIN_MATCH_CHOICES, ...(filters.min > 1 ? [filters.min] : [])])].sort(
 			(a, b) => a - b
@@ -105,122 +117,126 @@
 </script>
 
 <form class="filters" method="get" role="search" onchange={apply} onsubmit={apply}>
-	<label class="find">
-		<span>Find a team</span>
-		<input
-			name="q"
-			type="search"
-			placeholder="Name, number or city"
-			autocomplete="off"
-			maxlength="40"
-			bind:value={query}
-			oninput={typed}
-		/>
-	</label>
-	<label>
-		<span>Region</span>
-		<select name="region" value={filters.region}>
-			<option value="">All regions</option>
-			{#each regions as option (option.value)}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
-	</label>
-	<label>
-		<span>Country</span>
-		<select name="country" value={filters.country}>
-			<option value="">All countries</option>
-			{#each countries as option (option.value)}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
-	</label>
-	<label>
-		<span>State or province</span>
-		<select name="state" value={filters.state} disabled={!filters.country}>
-			<option value="">All</option>
-			{#each states as option (option.value)}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
-	</label>
-	{#if types.length > 0}
+	<FilterPanel {summary}>
+		{#snippet search()}
+			<label class="find">
+				<span>Find a team</span>
+				<input
+					name="q"
+					type="search"
+					placeholder="Name, number or city"
+					autocomplete="off"
+					maxlength="40"
+					bind:value={query}
+					oninput={typed}
+				/>
+			</label>
+		{/snippet}
 		<label>
-			<span>Event type</span>
-			<select name="type" value={filters.type}>
-				<option value="">All events</option>
-				{#each types as option (option.value)}
+			<span>Region</span>
+			<select name="region" value={filters.region}>
+				<option value="">All regions</option>
+				{#each regions as option (option.value)}
 					<option value={option.value}>{option.label}</option>
 				{/each}
 			</select>
 		</label>
 		<label>
-			<span>Dates</span>
-			<select data-dates value={custom ? 'custom' : chosen}>
-				<option value="">All season</option>
-				<option value="recent">Last {RECENT_DAYS / 7} weeks</option>
-				{#if weeks.length > 0}
-					<optgroup label="Week of">
-						{#each weeks as option (option.value)}
-							<option value={option.value}>{option.label}</option>
-						{/each}
-					</optgroup>
-				{/if}
-				<option value="custom">Custom range</option>
+			<span>Country</span>
+			<select name="country" value={filters.country}>
+				<option value="">All countries</option>
+				{#each countries as option (option.value)}
+					<option value={option.value}>{option.label}</option>
+				{/each}
 			</select>
 		</label>
-		{#if custom}
+		<label>
+			<span>State or province</span>
+			<select name="state" value={filters.state} disabled={!filters.country}>
+				<option value="">All</option>
+				{#each states as option (option.value)}
+					<option value={option.value}>{option.label}</option>
+				{/each}
+			</select>
+		</label>
+		{#if types.length > 0}
 			<label>
-				<span>From</span>
-				<input
-					class="date"
-					name="from"
-					type="date"
-					value={filters.from}
-					max={filters.to || undefined}
-				/>
+				<span>Event type</span>
+				<select name="type" value={filters.type}>
+					<option value="">All events</option>
+					{#each types as option (option.value)}
+						<option value={option.value}>{option.label}</option>
+					{/each}
+				</select>
 			</label>
 			<label>
-				<span>To</span>
-				<input
-					class="date"
-					name="to"
-					type="date"
-					value={filters.to}
-					min={filters.from || undefined}
-				/>
+				<span>Dates</span>
+				<select data-dates value={custom ? 'custom' : chosen}>
+					<option value="">All season</option>
+					<option value="recent">Last {RECENT_DAYS / 7} weeks</option>
+					{#if weeks.length > 0}
+						<optgroup label="Week of">
+							{#each weeks as option (option.value)}
+								<option value={option.value}>{option.label}</option>
+							{/each}
+						</optgroup>
+					{/if}
+					<option value="custom">Custom range</option>
+				</select>
 			</label>
-		{:else if filters.dates}
-			<input type="hidden" name="dates" value={filters.dates} />
-		{:else}
-			{#if filters.from}<input type="hidden" name="from" value={filters.from} />{/if}
-			{#if filters.to}<input type="hidden" name="to" value={filters.to} />{/if}
+			{#if custom}
+				<label>
+					<span>From</span>
+					<input
+						class="date"
+						name="from"
+						type="date"
+						value={filters.from}
+						max={filters.to || undefined}
+					/>
+				</label>
+				<label>
+					<span>To</span>
+					<input
+						class="date"
+						name="to"
+						type="date"
+						value={filters.to}
+						min={filters.from || undefined}
+					/>
+				</label>
+			{:else if filters.dates}
+				<input type="hidden" name="dates" value={filters.dates} />
+			{:else}
+				{#if filters.from}<input type="hidden" name="from" value={filters.from} />{/if}
+				{#if filters.to}<input type="hidden" name="to" value={filters.to} />{/if}
+			{/if}
 		{/if}
-	{/if}
-	<label>
-		<span>Minimum matches</span>
-		<select name="min" value={filters.min > 1 ? String(filters.min) : ''}>
-			<option value="">Any</option>
-			{#each minimums as count (count)}
-				<option value={String(count)}>{count}</option>
-			{/each}
-		</select>
-	</label>
-	<label class="sort">
-		<span>Sort by</span>
-		<select name="sort" value={filters.sort}>
-			{#each LEADERBOARD_SORTS as sort (sort.key)}
-				<option value={sort.key}>{sort.label}</option>
-			{/each}
-		</select>
-	</label>
-	{#if filters.team > 0}
-		<input type="hidden" name="team" value={filters.team} />
-	{/if}
-	<noscript><button type="submit">Apply</button></noscript>
-	{#if active}
-		<a class="clear" href="/leaderboards" onclick={() => (customOpen = false)}>Clear filters</a>
-	{/if}
+		<label>
+			<span>Minimum matches</span>
+			<select name="min" value={filters.min > 1 ? String(filters.min) : ''}>
+				<option value="">Any</option>
+				{#each minimums as count (count)}
+					<option value={String(count)}>{count}</option>
+				{/each}
+			</select>
+		</label>
+		<label class="sort">
+			<span>Sort by</span>
+			<select name="sort" value={filters.sort}>
+				{#each LEADERBOARD_SORTS as sort (sort.key)}
+					<option value={sort.key}>{sort.label}</option>
+				{/each}
+			</select>
+		</label>
+		{#if filters.team > 0}
+			<input type="hidden" name="team" value={filters.team} />
+		{/if}
+		<noscript><button type="submit">Apply</button></noscript>
+		{#if active && !empty}
+			<a class="clear" href="/leaderboards" onclick={() => (customOpen = false)}>Clear filters</a>
+		{/if}
+	</FilterPanel>
 </form>
 
 <style>
@@ -298,6 +314,17 @@
 			min-width: 0;
 			max-width: none;
 			width: 100%;
+		}
+	}
+
+	@media (max-width: 640px) and (scripting: enabled) {
+		.find span {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
 		}
 	}
 

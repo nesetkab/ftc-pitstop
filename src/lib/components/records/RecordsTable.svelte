@@ -40,9 +40,11 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="No matches fit these filters."
-		>Try a wider date range or other filters.</EmptyState
-	>
+	<EmptyState title="No scores match these filters.">
+		<a href={filters.part === 'total' ? '/records' : `/records?part=${filters.part}`}
+			>Clear filters</a
+		>
+	</EmptyState>
 {:else}
 	<Table>
 		<caption class="visually-hidden">{caption}</caption>

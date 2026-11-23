@@ -6,6 +6,7 @@ import {
 	pageRecords,
 	parseRecordFilters,
 	recordQuery,
+	recordSummary,
 	type RecordFilters
 } from './records.ts';
 
@@ -173,5 +174,28 @@ describe('pageRecords', () => {
 		expect(second).toMatchObject({ page: 2, pages: 4, start: 1, total: 4 });
 		expect(second.rows[0].rank).toBe(1);
 		expect(pageRecords(sorted, 'total', 99, 3)).toMatchObject({ page: 2, start: 3 });
+	});
+});
+
+describe('recordSummary', () => {
+	const options = {
+		regions: [{ value: 'USAZ', label: 'Arizona' }],
+		types: [{ value: 'Qualifier', label: 'Qualifier' }]
+	};
+	const plain = parseRecordFilters(new URLSearchParams());
+
+	it('says nothing for the default view', () => {
+		expect(recordSummary(plain, options)).toEqual([]);
+	});
+
+	it('names each active filter and a sort other than total', () => {
+		expect(
+			recordSummary(
+				parseRecordFilters(
+					new URLSearchParams('range=7&region=USAZ&type=Qualifier&level=playoff&team=724&part=auto')
+				),
+				options
+			)
+		).toEqual(['Last 7 days', 'Arizona', 'Qualifier', 'Playoffs only', 'Team 724', 'By auto']);
 	});
 });

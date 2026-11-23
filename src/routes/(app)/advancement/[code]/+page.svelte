@@ -14,7 +14,7 @@
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import type { PageProps } from './$types';
 
-	const STATE = { upcoming: 'Upcoming', live: 'Live now' } as const;
+	const STATE = { upcoming: 'Upcoming', live: 'Today' } as const;
 
 	let { data }: PageProps = $props();
 

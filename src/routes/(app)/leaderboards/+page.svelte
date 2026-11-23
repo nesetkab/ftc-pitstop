@@ -3,12 +3,7 @@
 	import LeaderboardFilters from '#lib/components/leaderboard/LeaderboardFilters.svelte';
 	import LeaderboardTable from '#lib/components/leaderboard/LeaderboardTable.svelte';
 	import Pagination from '#lib/ui/Pagination.svelte';
-	import {
-		LEADERBOARD_SORTS,
-		queryString,
-		typeLabel,
-		windowLabel
-	} from '#lib/components/leaderboard/leaderboard.ts';
+	import { queryString } from '#lib/components/leaderboard/leaderboard.ts';
 	import { integer } from '#lib/format/index.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -20,31 +15,10 @@
 
 	const first = $derived(data.start + 1);
 	const last = $derived(data.start + data.rows.length);
-	const sortLabel = $derived(
-		LEADERBOARD_SORTS.find((sort) => sort.key === data.filters.sort)?.label ?? 'OPR'
-	);
-	const scope = $derived(
-		[
-			data.filters.type ? typeLabel(data.filters.type) : '',
-			windowLabel(data.window, data.filters.dates === 'recent')
-		].filter(Boolean)
-	);
-	const scoped = $derived(scope.length > 0);
-	const summary = $derived(
-		[
-			scope.join(', '),
-			data.filters.sort === 'opr'
-				? ''
-				: `sorted by ${data.filters.sort === 'matches' ? 'matches' : `${sortLabel.toLowerCase()} OPR`}`,
-			data.filters.q ? `matching "${data.filters.q}"` : ''
-		]
-			.filter(Boolean)
-			.join(', ')
-			.replace(/^./, (letter) => letter.toUpperCase())
-	);
+	const scoped = $derived(data.filters.type !== '' || data.window !== null);
 	const missing = $derived(data.filters.team > 0 && !data.found);
 	const showing = $derived(
-		`${summary ? `${summary}. ` : ''}Showing ${integer(first)} to ${integer(last)} of ${integer(data.total)} teams`
+		`Showing ${integer(first)} to ${integer(last)} of ${integer(data.total)} teams`
 	);
 	const regionLabel = $derived(
 		data.filters.region
@@ -86,21 +60,20 @@
 	states={data.states}
 	types={data.types}
 	weeks={data.weeks}
+	empty={data.total === 0}
 />
 
-<p class="count" aria-live="polite">
-	{#if data.total === 0}
-		No teams{missing ? '.' : ''}
-	{:else}
+{#if data.total > 0}
+	<p class="count" aria-live="polite">
 		{showing}{missing ? '.' : ''}
-	{/if}
-	{#if missing}
-		<span class="faint">Team {data.filters.team} is not in this list.</span>
-	{/if}
-	{#if regionLabel}
-		<a class="region" href="/regions/{data.filters.region}">{regionLabel} region page</a>
-	{/if}
-</p>
+		{#if missing}
+			<span class="faint">Team {data.filters.team} is not in this list.</span>
+		{/if}
+		{#if regionLabel}
+			<a class="region" href="/regions/{data.filters.region}">{regionLabel} region page</a>
+		{/if}
+	</p>
+{/if}
 
 <LeaderboardTable rows={data.rows} start={data.start} filters={data.filters} />
 
@@ -116,15 +89,13 @@
 		and only the top {integer(data.population)} teams are listed. Matches are qualification matches at
 		that event.
 	</p>
-{:else if scoped}
+{:else if data.total > 0 && scoped}
 	<p class="note">
 		Each team's rating is as of its last event in this filter. Matches and events count only those
-		events. Click a column to sort by it.
+		events.
 	</p>
-{:else}
-	<p class="note">
-		Matches is the number of matches behind each rating. Click a column to sort by it.
-	</p>
+{:else if data.total > 0}
+	<p class="note">Matches is the number of matches behind each rating.</p>
 {/if}
 
 {#if data.total > 0}

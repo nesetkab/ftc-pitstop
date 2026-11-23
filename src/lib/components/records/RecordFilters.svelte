@@ -1,21 +1,30 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
-	import { RECORD_PARTS, RECORD_RANGES, type RecordFilters, type RecordOption } from './records.ts';
+	import FilterPanel from '#lib/ui/FilterPanel.svelte';
+	import {
+		RECORD_PARTS,
+		RECORD_RANGES,
+		recordSummary,
+		type RecordFilters,
+		type RecordOption
+	} from './records.ts';
 
 	interface Props {
 		filters: RecordFilters;
 		regions: RecordOption[];
 		types: RecordOption[];
+		empty?: boolean;
 	}
 
-	let { filters, regions, types }: Props = $props();
+	let { filters, regions, types, empty = false }: Props = $props();
 
 	const active = $derived(
 		Boolean(
 			filters.range !== 'all' || filters.region || filters.type || filters.level || filters.team
 		)
 	);
+	const summary = $derived(recordSummary(filters, { regions, types }));
 	const clearHref = $derived(
 		filters.part === 'total' ? '/records' : `/records?part=${filters.part}`
 	);
@@ -33,65 +42,67 @@
 </script>
 
 <form class="filters" method="get" onchange={apply} onsubmit={apply}>
-	<label>
-		<span>Dates</span>
-		<select name="range" value={filters.range}>
-			{#each RECORD_RANGES as range (range.key)}
-				<option value={range.key}>{range.label}</option>
-			{/each}
-		</select>
-	</label>
-	<label>
-		<span>Region</span>
-		<select name="region" value={filters.region}>
-			<option value="">All regions</option>
-			{#each regions as option (option.value)}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
-	</label>
-	<label>
-		<span>Event type</span>
-		<select name="type" value={filters.type}>
-			<option value="">All types</option>
-			{#each types as option (option.value)}
-				<option value={option.value}>{option.label}</option>
-			{/each}
-		</select>
-	</label>
-	<label>
-		<span>Matches</span>
-		<select name="level" value={filters.level}>
-			<option value="">Quals and playoffs</option>
-			<option value="qual">Quals only</option>
-			<option value="playoff">Playoffs only</option>
-		</select>
-	</label>
-	<label>
-		<span>Team</span>
-		<input
-			name="team"
-			type="text"
-			inputmode="numeric"
-			pattern="[0-9]*"
-			maxlength="6"
-			placeholder="Team number"
-			autocomplete="off"
-			value={filters.team ?? ''}
-		/>
-	</label>
-	<label class="sort">
-		<span>Sort by</span>
-		<select name="part" value={filters.part}>
-			{#each RECORD_PARTS as part (part.key)}
-				<option value={part.key}>{part.label}</option>
-			{/each}
-		</select>
-	</label>
-	<noscript><button type="submit">Apply</button></noscript>
-	{#if active}
-		<a class="clear" href={clearHref}>Clear filters</a>
-	{/if}
+	<FilterPanel {summary}>
+		<label>
+			<span>Dates</span>
+			<select name="range" value={filters.range}>
+				{#each RECORD_RANGES as range (range.key)}
+					<option value={range.key}>{range.label}</option>
+				{/each}
+			</select>
+		</label>
+		<label>
+			<span>Region</span>
+			<select name="region" value={filters.region}>
+				<option value="">All regions</option>
+				{#each regions as option (option.value)}
+					<option value={option.value}>{option.label}</option>
+				{/each}
+			</select>
+		</label>
+		<label>
+			<span>Event type</span>
+			<select name="type" value={filters.type}>
+				<option value="">All types</option>
+				{#each types as option (option.value)}
+					<option value={option.value}>{option.label}</option>
+				{/each}
+			</select>
+		</label>
+		<label>
+			<span>Matches</span>
+			<select name="level" value={filters.level}>
+				<option value="">Quals and playoffs</option>
+				<option value="qual">Quals only</option>
+				<option value="playoff">Playoffs only</option>
+			</select>
+		</label>
+		<label>
+			<span>Team</span>
+			<input
+				name="team"
+				type="text"
+				inputmode="numeric"
+				pattern="[0-9]*"
+				maxlength="6"
+				placeholder="Team number"
+				autocomplete="off"
+				value={filters.team ?? ''}
+			/>
+		</label>
+		<label class="sort">
+			<span>Sort by</span>
+			<select name="part" value={filters.part}>
+				{#each RECORD_PARTS as part (part.key)}
+					<option value={part.key}>{part.label}</option>
+				{/each}
+			</select>
+		</label>
+		<noscript><button type="submit">Apply</button></noscript>
+		{#if active && !empty}
+			<a class="clear" href={clearHref}>Clear filters</a>
+		{/if}
+	</FilterPanel>
 </form>
 
 <style>

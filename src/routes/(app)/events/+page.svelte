@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
 	import EventSections from '#lib/components/event/EventSections.svelte';
+	import { statusLabel } from '#lib/components/event/dates.ts';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import {
 		filterEvents,
@@ -18,6 +19,7 @@
 	import { shortRange } from '#lib/format/time.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import FilterPanel from '#lib/ui/FilterPanel.svelte';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
@@ -32,7 +34,12 @@
 		{ value: 'past', label: 'Past' },
 		{ value: 'all', label: 'All' }
 	];
-	const STATUS = { live: 'Live', upcoming: 'Upcoming', done: 'Done' } as const;
+	const COUNTED: Record<DateFilter, [string, string]> = {
+		week: ['event this week', 'events this week'],
+		upcoming: ['upcoming event', 'upcoming events'],
+		past: ['past event', 'past events'],
+		all: ['event', 'events']
+	};
 
 	let { data }: PageProps = $props();
 
@@ -66,6 +73,14 @@
 			? (data.regions.flatMap((group) => group.options).find((option) => option.value === region)
 					?.label ?? null)
 			: null
+	);
+	const chosenType = $derived(data.types.find((option) => option === type));
+	const summary = $derived(
+		[
+			regionLabel ?? '',
+			chosenType ? typeLabel(chosenType) : '',
+			when === 'upcoming' ? '' : (WHEN.find((option) => option.value === when)?.label ?? '')
+		].filter(Boolean)
 	);
 	const count = $derived(
 		firstPageOnly ? Math.max(shown.length, partial?.upcoming ?? 0) : shown.length
@@ -156,39 +171,43 @@
 {/snippet}
 
 <form class="filters" role="search" onsubmit={(event) => event.preventDefault()}>
-	<label class="search">
-		<span class="visually-hidden">Search events</span>
-		<input
-			type="search"
-			placeholder="Search by name, code or city"
-			autocomplete="off"
-			spellcheck="false"
-			bind:value={query}
-		/>
-	</label>
-	<label>
-		<span class="visually-hidden">Region</span>
-		<select bind:value={region}>
-			<option value="">All regions</option>
-			{#each data.regions as group (group.label)}
-				<optgroup label={group.label}>
-					{#each group.options as option (option.value)}
-						<option value={option.value}>{option.label}</option>
-					{/each}
-				</optgroup>
-			{/each}
-		</select>
-	</label>
-	<label>
-		<span class="visually-hidden">Event type</span>
-		<select bind:value={type}>
-			<option value="">All types</option>
-			{#each data.types as option (option)}
-				<option value={option}>{typeLabel(option)}</option>
-			{/each}
-		</select>
-	</label>
-	<Segmented label="Dates" options={WHEN} value={when} onselect={(value) => (when = value)} />
+	<FilterPanel {summary}>
+		{#snippet search()}
+			<label class="search">
+				<span class="visually-hidden">Search events</span>
+				<input
+					type="search"
+					placeholder="Search by name, code or city"
+					autocomplete="off"
+					spellcheck="false"
+					bind:value={query}
+				/>
+			</label>
+		{/snippet}
+		<label>
+			<span class="visually-hidden">Region</span>
+			<select bind:value={region}>
+				<option value="">All regions</option>
+				{#each data.regions as group (group.label)}
+					<optgroup label={group.label}>
+						{#each group.options as option (option.value)}
+							<option value={option.value}>{option.label}</option>
+						{/each}
+					</optgroup>
+				{/each}
+			</select>
+		</label>
+		<label>
+			<span class="visually-hidden">Event type</span>
+			<select bind:value={type}>
+				<option value="">All types</option>
+				{#each data.types as option (option)}
+					<option value={option}>{typeLabel(option)}</option>
+				{/each}
+			</select>
+		</label>
+		<Segmented label="Dates" options={WHEN} value={when} onselect={(value) => (when = value)} />
+	</FilterPanel>
 </form>
 
 {#if failed && !covered}
@@ -207,12 +226,12 @@
 			{elsewhere === 1 ? 'event matches' : 'events match'} on other dates.
 			<button type="button" class="link" onclick={() => (when = 'all')}>Show all dates</button>
 		{:else}
-			<button type="button" class="link" onclick={reset}>Clear the filters</button>
+			<button type="button" class="link" onclick={reset}>Clear filters</button>
 		{/if}
 	</EmptyState>
 {:else}
 	<p class="count">
-		<span>{integer(count)} {count === 1 ? 'event' : 'events'}</span>
+		<span>{integer(count)} {COUNTED[when][count === 1 ? 0 : 1]}</span>
 		{#if regionLabel}
 			<a href="/regions/{region}">{regionLabel} region page</a>
 		{/if}
@@ -228,13 +247,12 @@
 					<th class="l" scope="col">Dates</th>
 					<th class="teams" scope="col">Teams</th>
 					<th class="opt" scope="col"><Term label="Strength" /></th>
-					<th class="l" scope="col">Status</th>
 				</tr>
 			</thead>
 			{#each groups as group (group.start)}
 				<tbody>
 					<tr class="week">
-						<th class="l" colspan="7" scope="rowgroup">
+						<th class="l" colspan="6" scope="rowgroup">
 							{#if group.current}
 								<span class="now">This week</span>
 								<span class="muted">{group.label}</span>
@@ -251,10 +269,14 @@
 							</td>
 							<td class="l type muted">{typeLabel(event.type)}</td>
 							<td class="l place muted">{event.place ?? ''}</td>
-							<td class="l">{shortRange(event.start, event.end)}</td>
+							<td class="l dates">
+								{shortRange(event.start, event.end)}
+								{#if event.status === 'live'}
+									<span class="today">{statusLabel(event, event.status, now)}</span>
+								{/if}
+							</td>
 							<td class="teams">{event.teams ?? '—'}</td>
 							<td class="opt">{fixed(event.strength)}</td>
-							<td class={['l', 'status', event.status]}>{STATUS[event.status]}</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -359,17 +381,11 @@
 		color: var(--text-2);
 	}
 
-	.status.live {
-		color: var(--text);
+	.today {
+		margin-left: 6px;
+		font-size: 13px;
 		font-weight: 600;
-	}
-
-	.status.upcoming {
-		color: var(--text-2);
-	}
-
-	.status.done {
-		color: var(--text-3);
+		color: var(--text);
 	}
 
 	.link {
@@ -395,8 +411,13 @@
 			display: none;
 		}
 
-		.sub {
+		.sub,
+		.today {
 			display: block;
+		}
+
+		.today {
+			margin-left: 0;
 		}
 
 		.name {
