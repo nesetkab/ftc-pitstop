@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { SvelteSet } from 'svelte/reactivity';
 	import Term from '#lib/ui/Term.svelte';
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { MISSING, record } from '#lib/format/index.ts';
@@ -26,10 +25,11 @@
 
 	const OUTCOME: Record<MatchOutcome, string> = { win: 'W', loss: 'L', tie: 'T' };
 
-	const opened = new SvelteSet<string>();
+	let opened = $state<string[]>([]);
 
 	function toggle(code: string, event: Event) {
-		if ((event.currentTarget as HTMLDetailsElement).open) opened.add(code);
+		const open = (event.currentTarget as HTMLDetailsElement).open;
+		if (open && !opened.includes(code)) opened = [...opened, code];
 	}
 
 	function count(entry: TeamMatchEvent): string {
@@ -48,7 +48,7 @@
 					{record(entry.record.wins, entry.record.losses, entry.record.ties)}
 				</span>
 			</summary>
-			{#if index === 0 || opened.has(entry.code)}
+			{#if index === 0 || opened.includes(entry.code)}
 				<Table>
 					<caption class="visually-hidden">Matches for {team} at {entry.name}</caption>
 					<thead>
