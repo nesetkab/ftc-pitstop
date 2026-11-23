@@ -584,6 +584,12 @@
 		}
 	}
 
+	@media (max-width: 1000px) and (pointer: coarse) {
+		.toc a {
+			padding-block: 10px;
+		}
+	}
+
 	@media (max-width: 600px) {
 		article {
 			font-size: 16px;

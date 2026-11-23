@@ -64,6 +64,7 @@
 	@media (pointer: coarse) {
 		li {
 			position: relative;
+			padding-block: 0.72em;
 		}
 
 		a.label::after {

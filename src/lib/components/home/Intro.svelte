@@ -104,5 +104,10 @@
 			margin-block: -10px;
 			padding-block: 10px;
 		}
+
+		.hide {
+			margin-inline: -8px;
+			padding-inline: 8px;
+		}
 	}
 </style>

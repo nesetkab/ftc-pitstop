@@ -96,6 +96,8 @@
 	@media (pointer: coarse) {
 		button,
 		a {
+			justify-content: center;
+			min-width: 40px;
 			min-height: 40px;
 		}
 	}
