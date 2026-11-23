@@ -1,6 +1,5 @@
 import { fixed } from '#lib/format/index.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
-import { calibratedSwarm, calibratedTips } from '#lib/model/rp.ts';
 
 export const FIT_PARTS = [
 	'auto',
@@ -44,11 +43,13 @@ export interface Fit {
 	notes: string[];
 }
 
+export type PredictAlliance = (teams: number[]) => { score: number; chances: FitChances };
+
 export interface FitInput {
 	numbers: number[];
 	teams: FitTeam[];
 	average: FitParts;
-	robotSwarm: (teams: number[]) => number;
+	predict: PredictAlliance;
 }
 
 export const MIN_FIT = 2;
@@ -89,20 +90,10 @@ export function pairsOf<T>(items: T[]): T[][] {
 	return pairs;
 }
 
-export function alliance(teams: FitTeam[], robotSwarm: (teams: number[]) => number): Alliance {
+export function alliance(teams: FitTeam[], predict: PredictAlliance): Alliance {
 	const numbers = teams.map((team) => team.number);
-	const parts = sumParts(teams.map((team) => team.parts));
-	const tips = calibratedTips(parts.tips);
-	return {
-		teams: numbers,
-		score: teams.reduce((sum, team) => sum + team.opr, 0),
-		parts,
-		chances: {
-			swarm: calibratedSwarm(robotSwarm(numbers), parts.leavePark),
-			pollinator1: tips.pollinator1,
-			pollinator2: tips.pollinator2
-		}
-	};
+	const { score, chances } = predict(numbers);
+	return { teams: numbers, score, parts: sumParts(teams.map((team) => team.parts)), chances };
 }
 
 export function partLead(members: FitTeam[], part: FitPart, score: number): string | null {
@@ -188,12 +179,12 @@ export function fitNotes(teams: FitTeam[], average: FitParts): string[] {
 }
 
 export function buildFit(input: FitInput): Fit | null {
-	const { numbers, average, robotSwarm } = input;
+	const { numbers, average, predict } = input;
 	if (numbers.length < MIN_FIT || numbers.length > MAX_FIT) return null;
 	const teams = numbers.flatMap((number) => input.teams.filter((team) => team.number === number));
 	const missing = numbers.filter((number) => !teams.some((team) => team.number === number));
 	const alliances = pairsOf(teams)
-		.map((pair) => alliance(pair, robotSwarm))
+		.map((pair) => alliance(pair, predict))
 		.sort((a, b) => b.score - a.score);
 	return { teams, missing, average, alliances, notes: fitNotes(teams, average) };
 }

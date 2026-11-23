@@ -14,7 +14,9 @@ import {
 	type FitParts,
 	type FitTeam
 } from '#lib/components/compare/fit.ts';
-import type { Rating } from '#lib/model/opr.ts';
+import { dayNumber, previousFrom } from '#lib/model/opr.ts';
+import previousSeason from '#lib/model/previous-2025.json';
+import { fitParts, freshEvent, type FreshModel, type FreshOptions } from '#lib/server/fresh.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { TeamSeason } from '#lib/types.ts';
 
@@ -26,27 +28,25 @@ export interface CompareDeps {
 		teams: number[],
 		events: string[]
 	) => Promise<{ teams: Record<number, string>; events: Record<string, string> }>;
+	previous?: Map<number, number>;
+	now?: () => number;
 }
 
-export function fitParts(rating: Pick<Rating, 'components'>): FitParts {
-	const { auto, teleop, hive, flower, garden, park, leave, tips } = rating.components;
-	return { auto, teleop, hive, flower, garden, park, leavePark: leave + park, tips };
-}
-
-export function fitFromModel(model: SeasonModel, numbers: number[], average: FitParts): Fit | null {
-	const teams: FitTeam[] = numbers.flatMap((number) => {
-		const rating = model.run.latest.get(number);
-		return rating ? [{ number, opr: rating.opr, parts: fitParts(rating) }] : [];
-	});
-	return buildFit({
-		numbers,
-		teams,
-		average,
-		robotSwarm: (pair) => model.run.swarm.chance(pair)
-	});
+export function fitFromModel(
+	model: FreshModel,
+	numbers: number[],
+	average: FitParts,
+	options: FreshOptions
+): Fit | null {
+	const rated = numbers.filter((number) => model.run.latest.has(number));
+	const event = freshEvent(model, rated, options);
+	const teams: FitTeam[] = rated.map((number) => ({ number, ...event.team(number) }));
+	return buildFit({ numbers, teams, average, predict: event.alliance });
 }
 
 export function createCompare(deps: CompareDeps) {
+	const previous = deps.previous ?? previousFrom(previousSeason.teams);
+	const now = deps.now ?? Date.now;
 	let averages: { generatedAt: number; parts: FitParts } | null = null;
 
 	function averageOf(model: SeasonModel): FitParts {
@@ -71,7 +71,10 @@ export function createCompare(deps: CompareDeps) {
 		const ratings = stored ?? model?.ratings ?? null;
 		const fit =
 			model && present.length >= MIN_FIT && present.length <= MAX_FIT
-				? fitFromModel(model, present, averageOf(model))
+				? fitFromModel(model, present, averageOf(model), {
+						previous,
+						day: dayNumber(new Date(now()).toISOString())
+					})
 				: null;
 		const view = buildComparison({
 			seasons,

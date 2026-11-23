@@ -2,7 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { analyzeEvent } from '#lib/analysis/analyze.ts';
 import { buildSeason, contextFor } from '#lib/analysis/season.ts';
 import { dayNumber, previousFrom } from '#lib/model/opr.ts';
+import { teamSeason } from '#lib/components/team/fixtures.ts';
 import { calibratedTips } from '#lib/model/rp.ts';
+import { createCompare } from '#lib/server/compare.ts';
 import { createSimulate, simulateMatch, topFour } from '#lib/server/simulate.ts';
 import { bundleFor, cutAfterQual, seasonMatchesOf } from './helpers.ts';
 
@@ -138,5 +140,63 @@ describe('createSimulate', () => {
 	it('offers the top four when nothing is picked', async () => {
 		const result = await load(model)({ red: [], blue: [] });
 		expect(result.suggestion?.sides).toEqual(topFour(model));
+	});
+});
+
+describe('compare and simulate agree', () => {
+	const now = () => Date.parse(`${START}T12:00:00Z`);
+	const compare = createCompare({
+		loadTeamSeason: async (number) => teamSeason(number, `Team ${number}`),
+		loadSeasonRatingsWithin: async () => model.ratings,
+		loadSeasonModelWithin: async () => model,
+		recordNames: async () => ({ teams: {}, events: {} }),
+		previous,
+		now
+	});
+	const simulate = createSimulate({
+		loadSeasonModelWithin: async () => model,
+		recordNames: async () => ({ teams: {}, events: {} }),
+		previous,
+		now
+	});
+	const others = model.ratings.teams
+		.map((entry) => entry.team)
+		.filter((team) => ![...red, ...blue].includes(team))
+		.slice(0, 2);
+
+	it('predicts the same score, parts and ranking point chances for an alliance', async () => {
+		for (const [pair, opponents] of [
+			[red, blue],
+			[red, others],
+			[blue, red]
+		]) {
+			const fit = (await compare(pair)).view.fit!;
+			const [predicted] = fit.alliances;
+			const simulation = (await simulate({ red: pair, blue: opponents })).simulation!;
+			expect(predicted.teams).toEqual(pair);
+			expect(predicted.score).toBeCloseTo(simulation.red.np, 6);
+			expect(predicted.parts.tips).toBeCloseTo(simulation.red.parts.tips, 6);
+			expect(predicted.parts.leavePark).toBeCloseTo(simulation.red.parts.leavePark, 6);
+			for (const key of ['swarm', 'pollinator1', 'pollinator2'] as const) {
+				expect(predicted.chances[key]).toBeCloseTo(simulation.forecast.red.rp[key], 3);
+			}
+			for (const team of fit.teams) {
+				const simulated = simulation.red.teams.find((entry) => entry.number === team.number)!;
+				expect(team.opr).toBeCloseTo(simulated.opr, 6);
+			}
+		}
+	});
+
+	it('ranks every pair of three teams by the same model', async () => {
+		const three = [red[0], red[1], blue[0]];
+		const fit = (await compare(three)).view.fit!;
+		expect(fit.alliances).toHaveLength(3);
+		for (const pair of fit.alliances) {
+			const rest = three.filter((team) => !pair.teams.includes(team));
+			const simulation = (await simulate({ red: pair.teams, blue: [...rest, blue[1]] }))
+				.simulation!;
+			expect(pair.score).toBeCloseTo(simulation.red.np, 6);
+			expect(pair.chances.swarm).toBeCloseTo(simulation.forecast.red.rp.swarm, 3);
+		}
 	});
 });

@@ -120,7 +120,7 @@ describe('compare page', () => {
 	it('shows how the teams would fit as an alliance', () => {
 		show();
 		expect(screen.getByText(/would be expected to score about/)).toHaveTextContent(
-			'Together, 100 + 200 would be expected to score about 180 points per match before fouls.'
+			'Together, 100 + 200 would be expected to score about 180 points per match before penalties.'
 		);
 		const chances = screen.getByRole('table', {
 			name: 'Predicted score and ranking point chances for each pair'

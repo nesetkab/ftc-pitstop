@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-import { calibratedSwarm, calibratedTips } from '#lib/model/rp.ts';
 import {
 	alliance,
 	averageParts,
@@ -52,29 +51,22 @@ const hive = team(10662, {
 });
 const small = team(38372, { auto: 14, teleop: 4, hive: 1, park: 3, leavePark: 6, tips: 0.4 });
 
+const chances = { swarm: 0.5, pollinator1: 0.4, pollinator2: 0.1 };
+const predict = (teams: number[]) => ({ score: teams.length * 100, chances });
+
 describe('alliance math', () => {
-	it('adds the parts and OPR of each team', () => {
-		const together = alliance([auto, hive], () => 0.5);
+	it('adds the parts of each team and takes the score and chances from the model', () => {
+		const seen: number[][] = [];
+		const together = alliance([auto, hive], (teams) => {
+			seen.push(teams);
+			return predict(teams);
+		});
+		expect(seen).toEqual([[724, 10662]]);
 		expect(together.teams).toEqual([724, 10662]);
-		expect(together.score).toBe(110);
+		expect(together.score).toBe(200);
+		expect(together.chances).toEqual(chances);
 		expect(together.parts).toMatchObject({ auto: 38, hive: 60, leavePark: 25 });
 		expect(together.parts.tips).toBeCloseTo(3.8);
-	});
-
-	it('uses the model helpers for ranking point chances', () => {
-		const together = alliance([auto, hive], () => 0.5);
-		const tips = calibratedTips(3.8);
-		expect(together.chances.swarm).toBeCloseTo(calibratedSwarm(0.5, 25));
-		expect(together.chances.pollinator1).toBeCloseTo(tips.pollinator1);
-		expect(together.chances.pollinator2).toBeCloseTo(tips.pollinator2);
-		expect(together.chances.pollinator2).toBeLessThanOrEqual(together.chances.pollinator1);
-	});
-
-	it('gives better chances to a stronger pair', () => {
-		const strong = alliance([auto, hive], () => 0.8);
-		const weak = alliance([small, small], () => 0.1);
-		expect(strong.chances.swarm).toBeGreaterThan(weak.chances.swarm);
-		expect(strong.chances.pollinator1).toBeGreaterThan(weak.chances.pollinator1);
 	});
 
 	it('sums and averages parts and lists every pair', () => {
@@ -90,18 +82,22 @@ describe('alliance math', () => {
 });
 
 describe('buildFit', () => {
-	const swarm = (teams: number[]) => teams.length / 4;
+	const strength: Record<number, number> = { 724: 3, 10662: 2, 38372: 1 };
+	const byStrength = (teams: number[]) => ({
+		score: teams.reduce((sum, team) => sum + strength[team], 0),
+		chances
+	});
 
 	it('builds one alliance for two teams and every pair for three, best first', () => {
 		expect(
-			buildFit({ numbers: [724, 10662], teams: [auto, hive], average, robotSwarm: swarm })!
+			buildFit({ numbers: [724, 10662], teams: [auto, hive], average, predict: byStrength })!
 				.alliances
 		).toHaveLength(1);
 		const three = buildFit({
 			numbers: [38372, 724, 10662],
 			teams: [auto, hive, small],
 			average,
-			robotSwarm: swarm
+			predict: byStrength
 		})!;
 		expect(three.teams.map((entry) => entry.number)).toEqual([38372, 724, 10662]);
 		expect(three.alliances.map((entry) => entry.teams)).toEqual([
@@ -112,7 +108,7 @@ describe('buildFit', () => {
 	});
 
 	it('skips one team or four, and lists teams without a rating', () => {
-		const input = { teams: [auto, hive], average, robotSwarm: swarm };
+		const input = { teams: [auto, hive], average, predict: byStrength };
 		expect(buildFit({ ...input, numbers: [724] })).toBeNull();
 		expect(buildFit({ ...input, numbers: [724, 10662, 1, 2] })).toBeNull();
 		const partial = buildFit({ ...input, numbers: [724, 5] })!;

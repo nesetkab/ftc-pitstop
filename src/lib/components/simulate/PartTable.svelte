@@ -50,6 +50,7 @@
 			nested: true
 		},
 		{ key: 'tips', label: PART_LABELS.tips, term: oprTerm(PART_LABELS.tips), part: 'tips' },
+		{ key: 'np', label: 'Score before penalties' },
 		{ key: 'fouls', label: 'Penalty points drawn' },
 		{ key: 'total', label: 'Predicted score' }
 	];
@@ -58,6 +59,7 @@
 
 	function value(side: SimSide, row: Row): number {
 		if (row.part) return Math.max(side.parts[row.part], 0);
+		if (row.key === 'np') return side.np;
 		return row.key === 'fouls' ? side.fouls : side.score;
 	}
 

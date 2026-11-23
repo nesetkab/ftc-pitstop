@@ -12,26 +12,14 @@ import {
 	type Sides,
 	type Simulation
 } from '#lib/components/simulate/simulate.ts';
-import {
-	COMPONENTS,
-	dayNumber,
-	EventRater,
-	OPR_PARAMS,
-	previousFrom,
-	type Component,
-	type Priors
-} from '#lib/model/opr.ts';
+import { dayNumber, previousFrom } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
-import { predictMatch } from '#lib/model/predict.ts';
-import { SwarmBook } from '#lib/model/rp.ts';
-import { fitParts } from '#lib/server/compare.ts';
+import { freshEvent, type FreshModel, type FreshOptions } from '#lib/server/fresh.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 
-export type SimulationModel = Pick<SeasonModel, 'run'>;
+export type SimulationModel = FreshModel;
 
-export interface SimulateOptions {
-	previous: Map<number, number>;
-	day: number;
+export interface SimulateOptions extends FreshOptions {
 	names: Record<number, string>;
 }
 
@@ -50,35 +38,20 @@ export interface SimulateDeps {
 	now?: () => number;
 }
 
-const SIMULATED = 'simulate';
-
 export function simulateMatch(
 	model: SimulationModel,
 	sides: Sides,
 	options: SimulateOptions
 ): Simulation {
-	const { run } = model;
-	const priors: Priors = { params: OPR_PARAMS, states: run.states, previous: options.previous };
 	const everyone = [...sides.red, ...sides.blue];
-	const rater = new EventRater(SIMULATED, everyone, priors, () => run.stats, options.day);
-	const book = SwarmBook.from(run.swarm.snapshot(everyone));
-	book.enterEvent(SIMULATED, everyone);
-	const forecast = rater.forecast(sides.red, sides.blue);
-	const prediction = predictMatch(forecast, {
-		swarm: { red: book.chance(sides.red), blue: book.chance(sides.blue) }
+	const event = freshEvent(model, everyone, options);
+	const prediction = event.match(sides.red, sides.blue);
+	const team = (number: number): SimTeam => ({
+		number,
+		name: options.names[number] ?? null,
+		rated: model.run.latest.has(number),
+		...event.team(number)
 	});
-	const team = (number: number): SimTeam => {
-		const components = Object.fromEntries(
-			COMPONENTS.map((part) => [part, rater.value(number, part)])
-		) as Record<Component, number>;
-		return {
-			number,
-			name: options.names[number] ?? null,
-			opr: rater.value(number),
-			rated: run.latest.has(number),
-			parts: fitParts({ components })
-		};
-	};
 	const side = (color: Color): SimSide => {
 		const predicted = prediction[color];
 		const teams = sides[color].map(team);
@@ -94,7 +67,7 @@ export function simulateMatch(
 	};
 	const red = side('red');
 	const blue = side('blue');
-	const summary = matchForecast(SIMULATED, prediction, false, null);
+	const summary = matchForecast('simulate', prediction, false, null);
 	return {
 		red,
 		blue,
