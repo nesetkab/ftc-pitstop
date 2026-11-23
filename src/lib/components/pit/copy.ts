@@ -313,3 +313,32 @@ export function liveText(view: PitView, call: QueueCall | null): string {
 	}
 	return present(parts).join(' ');
 }
+
+export function fieldLine(view: PitView): string | null {
+	const next = view.next;
+	const onField = view.onField;
+	if (!next || !onField || next.started !== null || onField === next.label) return null;
+	if (view.phase === 'upcoming' || view.phase === 'done') return null;
+	const away = next.matchesAway;
+	if (away <= 0) return `${onField} is on the field. We're up next.`;
+	return `${onField} is on the field. ${away === 1 ? 'One match' : `${away} matches`} until ours.`;
+}
+
+export function queueCountdown(
+	next: NextMatch,
+	call: QueueCall | null,
+	now: number
+): string | null {
+	if (call || next.started !== null || next.queueAt === null || next.queueAt <= now) return null;
+	return relative(next.queueAt, now);
+}
+
+export function resultLine(outcome: Outcome, ours: number, theirs: number): string {
+	return `${OUTCOME[outcome]} ${ours}–${theirs}`;
+}
+
+export function teamsLine(partners: number[], opponents: number[]): string {
+	const against = opponents.length > 0 ? opponents.join(', ') : null;
+	if (partners.length === 0) return against ? `Against ${against}.` : '';
+	return `With ${partners.join(', ')}${against ? ` against ${against}` : ''}.`;
+}

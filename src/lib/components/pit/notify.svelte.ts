@@ -1,6 +1,9 @@
 import {
 	ALERT_KEY,
 	DEFAULT_ALERTS,
+	TEST_ALERT,
+	VIBRATE_KEY,
+	VIBRATION,
 	alertSnapshot,
 	alertsBetween,
 	parseAlertSettings,
@@ -16,17 +19,36 @@ export type Permission = NotificationPermission | 'unsupported';
 export class PitAlerts {
 	settings = $state<AlertSettings>({ ...DEFAULT_ALERTS });
 	permission = $state<Permission>('default');
+	vibrate = $state(true);
+	canVibrate = $state(false);
 
 	#snapshot: AlertSnapshot | null = null;
 	#sent = new Set<string>();
 
 	load() {
 		this.permission = typeof Notification === 'undefined' ? 'unsupported' : Notification.permission;
+		this.canVibrate = typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function';
 		try {
 			this.settings = parseAlertSettings(localStorage.getItem(ALERT_KEY));
+			this.vibrate = localStorage.getItem(VIBRATE_KEY) !== 'off';
 		} catch {
 			this.settings = { ...DEFAULT_ALERTS };
 		}
+	}
+
+	setVibrate(on: boolean) {
+		this.vibrate = on;
+		if (on) this.#buzz();
+		try {
+			localStorage.setItem(VIBRATE_KEY, on ? 'on' : 'off');
+		} catch {
+			return;
+		}
+	}
+
+	test() {
+		this.#buzz();
+		void this.#show(TEST_ALERT);
 	}
 
 	get enabled(): boolean {
@@ -63,6 +85,7 @@ export class PitAlerts {
 			this.#sent.add(alert.id);
 			void this.#show(alert);
 		}
+		if (alerts.length > 0 && this.permission === 'granted') this.#buzz();
 		return alerts;
 	}
 
@@ -70,12 +93,22 @@ export class PitAlerts {
 		this.#snapshot = null;
 	}
 
+	#buzz() {
+		if (!this.vibrate || !this.canVibrate) return;
+		try {
+			navigator.vibrate(VIBRATION);
+		} catch {
+			return;
+		}
+	}
+
 	async #show(alert: PitAlert) {
 		if (this.permission !== 'granted') return;
-		const options: NotificationOptions = {
+		const options: NotificationOptions & { vibrate?: number[] } = {
 			body: alert.body,
 			tag: alert.id,
-			icon: '/icons/icon-192.png'
+			icon: '/icons/icon-192.png',
+			...(this.vibrate ? { vibrate: VIBRATION } : {})
 		};
 		try {
 			const registration = await navigator.serviceWorker?.getRegistration();

@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { ordinal } from '#lib/format/ordinal.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
 import {
 	DEFAULT_ALERTS,
+	alertPreview,
 	alertSnapshot,
 	alertsBetween,
 	parseAlertSettings,
@@ -132,5 +134,40 @@ describe('parseAlertSettings', () => {
 			...DEFAULT_ALERTS,
 			rankChanges: true
 		});
+	});
+});
+
+describe('alertPreview', () => {
+	const view = (time: number) =>
+		pitView({ bundle: replayBundle(full, time), analysis: null, queue: null, team: 14624 });
+
+	it('previews each alert with our real next match and last score', () => {
+		const now = match('q26').postedTime!;
+		const current = view(now);
+		expect(alertPreview(current, 'twoBefore', ZONE, now)?.title).toMatch(
+			/^Q\d+ is (next|one match away|two matches away)$/
+		);
+		expect(alertPreview(current, 'scorePosted', ZONE, now)).toEqual({
+			id: 'score:q26',
+			title: 'Q26: won 75–64',
+			body: 'With 25620.'
+		});
+		const rank = current.ranking!.rank;
+		expect(alertPreview(current, 'rankChanges', ZONE, now)?.title).toBe(
+			`Now ranked ${ordinal(rank)}`
+		);
+		expect(alertPreview(current, 'selectionStarts', ZONE, now)?.title).toBe(
+			'Alliance selection is starting'
+		);
+	});
+
+	it('has nothing to preview before the data exists', () => {
+		const now = full.matches[0].scheduledTime! - 3_600_000;
+		const early = view(now);
+		expect(alertPreview(early, 'scorePosted', ZONE, now)).toBeNull();
+		expect(alertPreview(early, 'rankChanges', ZONE, now)).toBeNull();
+		expect(alertPreview(early, 'selectionStarts', ZONE, now)?.body).toBe(
+			'Qualification matches are done.'
+		);
 	});
 });

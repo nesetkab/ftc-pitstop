@@ -1,35 +1,44 @@
 <script lang="ts">
-	import { fixed } from '#lib/format/number.ts';
+	import { untrack } from 'svelte';
+	import type { EventAnalysis } from '#lib/analysis/types.ts';
+	import { matchStakes } from '#lib/components/event/stakes.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
-	import { pct } from '#lib/format/pct.ts';
-	import { record } from '#lib/format/record.ts';
 	import { relative } from '#lib/format/relative.ts';
 	import { dayTime, relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
 	import type { DataSource, Event, Match } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
+	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import KeyValue, { type KeyValueItem } from '#lib/ui/KeyValue.svelte';
 	import MatchList from '#lib/ui/MatchList.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Toggle from '#lib/ui/Toggle.svelte';
-	import { ALERT_OPTIONS, type AlertKey, type AlertSettings } from './alerts.ts';
+	import { ALERT_OPTIONS, alertPreview, type AlertKey, type AlertSettings } from './alerts.ts';
+	import { matchBrief, stakeLine } from './brief.ts';
 	import {
 		absentText,
 		awardName,
 		colorName,
+		eventFacts,
+		fieldLine,
 		heroText,
 		liveText,
 		matchItem,
 		phoneDetail,
 		playoffResult,
 		qualsDoneText,
-		roleText
+		queueCountdown,
+		resultLine,
+		roleText,
+		teamsLine
 	} from './copy.ts';
+	import Facts from './Facts.svelte';
+	import MatchBrief from './MatchBrief.svelte';
 	import type { Permission } from './notify.svelte.ts';
 	import type { Connection } from './poll.ts';
 	import type { QueueCall } from './queue.ts';
 	import { sideOf } from '#lib/components/event/matches.ts';
+	import { lastMatch, moveText, type RankMemory } from './standing.ts';
 	import type { PitView } from './view.ts';
 
 	interface Props {
@@ -46,6 +55,12 @@
 		permission: Permission;
 		onalert?: (key: AlertKey, on: boolean) => void;
 		replaySpeed?: number | null;
+		analysis?: EventAnalysis | null;
+		rankMemory?: RankMemory | null;
+		vibrate?: boolean;
+		canVibrate?: boolean;
+		onvibrate?: (on: boolean) => void;
+		ontest?: () => void;
 	}
 
 	let {
@@ -61,10 +76,17 @@
 		alerts,
 		permission,
 		onalert = () => {},
-		replaySpeed = null
+		replaySpeed = null,
+		analysis = null,
+		rankMemory = null,
+		vibrate = false,
+		canVibrate = false,
+		onvibrate = () => {},
+		ontest = () => {}
 	}: Props = $props();
 
 	let tab = $state<'team' | 'matches'>('team');
+	let briefOpen = $state(false);
 
 	const timeZone = $derived(event.timezone);
 	const selectionAhead = $derived(
@@ -76,22 +98,45 @@
 	const next = $derived(view.next);
 	const text = $derived(next ? heroText(next, call, now, timeZone, view.delaySeconds) : null);
 	const href = (key: string) => `/events/${event.code}/matches/${key}`;
+	const teamHref = (number: number) => `/events/${event.code}/teams/${number}`;
+	const called = $derived(text?.urgent === true);
+	const countdown = $derived(next ? queueCountdown(next, call, now) : null);
+	const field = $derived(fieldLine(view));
+	const brief = $derived(
+		next && view.registered && view.phase !== 'done'
+			? matchBrief(next, analysis?.ratings ?? [])
+			: null
+	);
+	const stakesKey = $derived(
+		briefOpen && next?.level === 'qual' && analysis && view.hasPlayoffs
+			? `${next.key}:${analysis.generatedAt}:${view.qualsPlayed}`
+			: null
+	);
+	const stake = $derived.by(() => {
+		if (!stakesKey) return null;
+		return untrack(() => {
+			const match = matches.find((entry) => entry.key === next?.key);
+			if (!match || !analysis) return null;
+			const stakes = matchStakes({ match, matches, rankings: view.rankings, analysis });
+			return stakeLine(stakes, view.team);
+		});
+	});
+	const last = $derived(
+		view.phase === 'upcoming' || view.phase === 'done' ? null : lastMatch(view, rankMemory)
+	);
+	const previews = $derived(
+		new Map(
+			ALERT_OPTIONS.map((option) => [option.key, alertPreview(view, option.key, timeZone, now)])
+		)
+	);
 	const items = $derived(
 		view.matches.map((match) => matchItem(match, next?.key ?? null, timeZone, now, href(match.key)))
 	);
 	const facts = $derived.by(() => {
-		const ranking = view.ranking;
-		const list: KeyValueItem[] = [];
-		if (ranking) {
-			if (view.phase !== 'done') {
-				list.push({ key: 'Rank', value: `${ranking.rank} of ${view.teamCount}` });
-			}
-			list.push({ key: 'Record', value: record(ranking.wins, ranking.losses, ranking.ties) });
-			list.push({ key: 'Ranking score', value: fixed(ranking.rs, 2) });
-		}
-		if (view.opr !== null) list.push({ key: 'OPR', value: fixed(view.opr, 1) });
-		if (view.top8 !== null) list.push({ key: 'Chance of top 8', value: pct(view.top8) });
-		return list;
+		const all = eventFacts(view);
+		if (!view.ranking)
+			return all.filter((fact) => ['OPR', 'OPR rank', 'Top 8 chance'].includes(fact.label));
+		return view.phase === 'done' ? all.filter((fact) => fact.label !== 'Rank') : all;
 	});
 	const prediction = $derived.by(() => {
 		const forecast = next?.forecast;
@@ -140,20 +185,39 @@
 				{@const absent = absentText(view)}
 				<EmptyState title={absent.title}>{absent.detail}</EmptyState>
 			{:else if next && text && view.phase !== 'upcoming'}
-				<section class="next">
+				<section class={['next', { called }]}>
 					<span class="muted">Next match</span>
 					<div class="q">
 						<b>{next.label}</b>
 						<AllianceChip alliance={next.alliance} />
 					</div>
-					<span class={['big', { urgent: text.urgent }]}>{text.headline}</span>
+					<span class={['big', { urgent: text.urgent }]}>
+						{text.headline}
+						{#if countdown}<small>{countdown}</small>{/if}
+					</span>
+					{#if called}
+						<span class="with">
+							{colorName(next.alliance)} alliance{next.partners.length > 0
+								? ` with ${next.partners.join(', ')}`
+								: ''}.
+						</span>
+					{/if}
+					{#if field}
+						<span class="field">{field}</span>
+					{/if}
 					<span class="muted">{phoneDetail(next, timeZone, view.delaySeconds, now)}</span>
 					{#if next.level === 'playoff' && view.playoff?.position}
 						<span class="muted">{view.playoff.position}</span>
 					{/if}
 				</section>
 				{#if prediction}
-					<PredictionCard compact red={prediction.red} blue={prediction.blue} me={view.team} />
+					<PredictionCard
+						compact
+						red={prediction.red}
+						blue={prediction.blue}
+						me={view.team}
+						{teamHref}
+					/>
 				{/if}
 			{:else if view.phase === 'upcoming'}
 				{#if view.firstMatch}
@@ -210,8 +274,48 @@
 				</section>
 			{/if}
 
+			{#if brief}
+				<section class="sec">
+					<button
+						type="button"
+						class="brief-toggle"
+						aria-expanded={briefOpen}
+						aria-controls="match-brief"
+						onclick={() => (briefOpen = !briefOpen)}
+					>
+						<span>Match brief</span>
+						<span class="muted">{briefOpen ? 'Hide' : `${brief.label} partners and opponents`}</span
+						>
+					</button>
+					<div id="match-brief" hidden={!briefOpen}>
+						{#if briefOpen}
+							<MatchBrief {brief} {stake} href={teamHref} />
+						{/if}
+					</div>
+				</section>
+			{/if}
+
+			{#if last}
+				{@const move = moveText(last)}
+				<section class="last">
+					<span class="muted">Last match</span>
+					<div class="q">
+						<b>{last.label}</b>
+						<span class={['result', last.outcome]}>
+							{resultLine(last.outcome, last.ours, last.theirs)}
+						</span>
+					</div>
+					<span class="muted">
+						{teamsLine(last.partners, last.opponents)}
+						{#if move}<span class={{ moved: last.move !== 0 }}>{move}</span>{/if}
+					</span>
+				</section>
+			{/if}
+
 			{#if view.registered && facts.length > 0}
-				<KeyValue items={facts} />
+				<div class="facts">
+					<Facts {facts} />
+				</div>
 			{/if}
 
 			{#if view.phase === 'selection' && view.alliances.length > 0}
@@ -223,7 +327,7 @@
 								<span class="seed">{alliance.seed}</span>
 								<span class="chips">
 									{#each [alliance.captain, ...alliance.picks] as number (number)}
-										<TeamChip {number} me={number === view.team} />
+										<TeamChip {number} me={number === view.team} href={teamHref(number)} />
 									{/each}
 								</span>
 							</li>
@@ -254,13 +358,38 @@
 				<section class="sec">
 					<h2 class="sec-title">Alerts</h2>
 					{#each alertOptions as option (option.key)}
-						<Toggle
-							label={option.label}
-							checked={alerts[option.key] && permission === 'granted'}
-							disabled={blocked}
-							onchange={(on) => onalert(option.key, on)}
-						/>
+						{@const preview = previews.get(option.key)}
+						<div class="alert">
+							<Toggle
+								label={option.label}
+								checked={alerts[option.key] && permission === 'granted'}
+								disabled={blocked}
+								onchange={(on) => onalert(option.key, on)}
+							/>
+							<p class="preview">
+								{#if preview}
+									<span class="visually-hidden">For example:</span>
+									<b>{preview.title}</b>
+									{preview.body}
+								{:else}
+									{option.detail}
+								{/if}
+							</p>
+						</div>
 					{/each}
+					{#if canVibrate}
+						<Toggle
+							label="Vibrate with alerts"
+							checked={vibrate}
+							disabled={blocked}
+							onchange={(on) => onvibrate(on)}
+						/>
+					{/if}
+					{#if permission === 'granted'}
+						<div>
+							<Button variant="secondary" onclick={() => ontest()}>Send a test alert</Button>
+						</div>
+					{/if}
 					{#if permission === 'denied'}
 						<p class="note">
 							Notifications are blocked for this site. Allow them in your browser settings to use
@@ -296,13 +425,17 @@
 							<span class="side red">
 								<span class="visually-hidden">Red</span>
 								{#each match.red as slot (slot.team)}
-									<span class={{ me: slot.team === view.team }}>{slot.team}</span>
+									<a class={{ me: slot.team === view.team }} href={teamHref(slot.team)}
+										>{slot.team}</a
+									>
 								{/each}
 							</span>
 							<span class="side blue">
 								<span class="visually-hidden">Blue</span>
 								{#each match.blue as slot (slot.team)}
-									<span class={{ me: slot.team === view.team }}>{slot.team}</span>
+									<a class={{ me: slot.team === view.team }} href={teamHref(slot.team)}
+										>{slot.team}</a
+									>
 								{/each}
 							</span>
 						</li>
@@ -414,6 +547,129 @@
 		letter-spacing: -0.01em;
 	}
 
+	.big small {
+		margin-left: 6px;
+		font-size: 15px;
+		font-weight: 500;
+		color: var(--text-2);
+	}
+
+	.next.called {
+		margin-inline: -16px;
+		padding: 16px;
+		background: var(--accent);
+		color: var(--on-accent);
+	}
+
+	.next.called .q :global(.chip) {
+		background: var(--bg);
+	}
+
+	.next.called .muted,
+	.next.called .field {
+		color: inherit;
+		opacity: 0.8;
+	}
+
+	.next.called .big {
+		font-size: 34px;
+		line-height: 1.1;
+		font-weight: 700;
+		letter-spacing: -0.02em;
+	}
+
+	.next.called .big.urgent {
+		margin-inline: 0;
+		padding: 0;
+		background: none;
+		color: inherit;
+	}
+
+	.with {
+		font-size: 17px;
+		font-weight: 500;
+	}
+
+	.field {
+		font-size: 14px;
+		color: var(--text);
+	}
+
+	.brief-toggle {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 12px;
+		width: 100%;
+		min-height: 44px;
+		padding: 10px 0;
+		border: 0;
+		border-block: 1px solid var(--line);
+		background: none;
+		color: var(--text);
+		font: inherit;
+		font-size: 15px;
+		font-weight: 600;
+		text-align: left;
+	}
+
+	.brief-toggle .muted {
+		overflow: hidden;
+		font-size: 13px;
+		font-weight: 400;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.last {
+		display: grid;
+		gap: 4px;
+	}
+
+	.last .muted {
+		font-size: 14px;
+	}
+
+	.last .q b {
+		font-size: 28px;
+	}
+
+	.result {
+		font-size: 22px;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.result.loss {
+		color: var(--text-2);
+	}
+
+	.moved {
+		color: var(--text);
+		font-weight: 500;
+	}
+
+	.facts {
+		font-size: 16px;
+	}
+
+	.alert {
+		display: grid;
+		gap: 2px;
+	}
+
+	.preview {
+		padding-right: 56px;
+		font-size: 13px;
+		color: var(--text-3);
+	}
+
+	.preview b {
+		display: block;
+		font-weight: 500;
+		color: var(--text-2);
+	}
+
 	.big.urgent {
 		margin-inline: -6px;
 		justify-self: start;
@@ -517,6 +773,11 @@
 
 	.side.blue {
 		color: var(--blue);
+	}
+
+	.side a {
+		color: inherit;
+		text-decoration: none;
 	}
 
 	.side .me {

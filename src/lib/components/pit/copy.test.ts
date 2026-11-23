@@ -1,0 +1,59 @@
+import { describe, expect, it } from 'vitest';
+import { replayBundle } from '#lib/game/replay.ts';
+import { fieldLine, queueCountdown, resultLine, teamsLine } from './copy.ts';
+import { fixtureBundle } from './fixtures.ts';
+import type { QueueCall } from './queue.ts';
+import { pitView } from './view.ts';
+
+const TEAM = 14624;
+const full = fixtureBundle('USAZGIQ');
+const match = (key: string) => full.matches.find((item) => item.key === key)!;
+const view = (time: number) =>
+	pitView({ bundle: replayBundle(full, time), analysis: null, queue: null, team: TEAM });
+
+describe('fieldLine', () => {
+	it('says what is on the field and how many matches until ours', () => {
+		expect(fieldLine(view(match('q23').actualTime!))).toBe(
+			'Q23 is on the field. 2 matches until ours.'
+		);
+		expect(fieldLine(view(match('q24').actualTime!))).toBe(
+			'Q24 is on the field. One match until ours.'
+		);
+		expect(fieldLine(view(match('q25').actualTime!))).toBe("Q25 is on the field. We're up next.");
+	});
+
+	it('stays quiet when our match is on the field or nothing is', () => {
+		expect(fieldLine(view(match('q26').actualTime!))).toBeNull();
+		expect(fieldLine(view(full.matches[0].scheduledTime! - 3_600_000))).toBeNull();
+	});
+});
+
+describe('queueCountdown', () => {
+	const next = view(match('q23').actualTime!).next!;
+	const now = Date.parse('2026-11-14T20:00:00Z');
+
+	it('counts down to the queue time until we are called', () => {
+		expect(queueCountdown({ ...next, queueAt: now + 25 * 60_000 }, null, now)).toBe(
+			'in 25 minutes'
+		);
+		expect(queueCountdown({ ...next, queueAt: now - 60_000 }, null, now)).toBeNull();
+		expect(queueCountdown({ ...next, queueAt: null }, null, now)).toBeNull();
+		const call: QueueCall = {
+			key: next.key,
+			label: next.label,
+			alliance: next.alliance,
+			reason: 'timing'
+		};
+		expect(queueCountdown({ ...next, queueAt: now + 60_000 }, call, now)).toBeNull();
+	});
+});
+
+describe('result copy', () => {
+	it('reads like a scoreboard', () => {
+		expect(resultLine('win', 75, 64)).toBe('Won 75–64');
+		expect(resultLine('tie', 50, 50)).toBe('Tied 50–50');
+		expect(teamsLine([25620], [32043, 22258])).toBe('With 25620 against 32043, 22258.');
+		expect(teamsLine([], [32043])).toBe('Against 32043.');
+		expect(teamsLine([], [])).toBe('');
+	});
+});

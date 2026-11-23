@@ -6,23 +6,35 @@ import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { dayTime, sameDay } from '#lib/format/time.ts';
 import { replayBundle, revealTime } from '#lib/game/replay.ts';
 import type { EventBundle, Ranking } from '#lib/types.ts';
-import { DEFAULT_ALERTS, alertSnapshot, alertsBetween } from './alerts.ts';
 import {
+	ALERT_OPTIONS,
+	DEFAULT_ALERTS,
+	alertPreview,
+	alertSnapshot,
+	alertsBetween
+} from './alerts.ts';
+import { matchBrief } from './brief.ts';
+import {
+	fieldLine,
 	heroText,
 	matchItems,
 	phoneDetail,
 	plannedTime,
 	playoffResult,
-	qualsDoneText
+	queueCountdown,
+	qualsDoneText,
+	teamsLine
 } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
 import { sideOf } from '#lib/components/event/matches.ts';
+import { lastMatch, moveText, postedQuals, rememberRank } from './standing.ts';
 import { isGap, pitView, rankWindow, ROW_FIT, rowCapacity } from './view.ts';
 
 const MINUTE = 60_000;
 const EVENTS = readdirSync(join(process.cwd(), 'tests/fixtures/ftc/2026/'));
 const WEEKDAY = /\b(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun) \d/;
+const BROKEN = /NaN|undefined|null|Infinity/;
 
 function teamsFor(bundle: EventBundle): number[] {
 	const ranked = bundle.rankings.map((row) => row.team);
@@ -110,6 +122,23 @@ function check(full: EventBundle, team: number, now: number): string[] {
 		if (view.playoff?.state === 'eliminated' && next.level === 'playoff') {
 			say('eliminated team has a playoff match');
 		}
+		const brief = matchBrief(next, analysis.ratings);
+		if (brief.ours.teams[0]?.number !== team) say(`brief does not lead with ${team}`);
+		if (brief.ours.color !== next.alliance) say('brief puts us on the wrong alliance');
+		const briefed = [...brief.ours.teams, ...brief.theirs.teams].map((entry) => entry.number);
+		const slots = [...next.red, ...next.blue].map((slot) => slot.number);
+		if (briefed.length !== slots.length || slots.some((number) => !briefed.includes(number))) {
+			say(`brief teams ${briefed} differ from the match ${slots}`);
+		}
+		for (const note of brief.notes) if (BROKEN.test(note)) say(`broken brief note: ${note}`);
+		const countdown = queueCountdown(next, call, now);
+		if (countdown && call) say('countdown shown while called');
+		if (countdown && BROKEN.test(countdown)) say(`broken countdown: ${countdown}`);
+		const field = fieldLine(view);
+		if (field && (BROKEN.test(field) || field.startsWith(`${next.label} `))) {
+			say(`bad field line: ${field}`);
+		}
+		if (field && next.started !== null) say('field line while our match is on');
 	} else {
 		const unplayed = bundle.matches.filter(
 			(m) => sideOf(m, team) !== null && m.result === null && m.level === 'qual'
@@ -123,6 +152,23 @@ function check(full: EventBundle, team: number, now: number): string[] {
 		}
 	}
 	if (view.playoff?.state === 'won' && view.phase !== 'done') say('won before the event ended');
+	const memory = view.ranking ? rememberRank(null, postedQuals(view), view.ranking.rank) : null;
+	const last = lastMatch(view, memory);
+	if (last) {
+		const ours = view.matches.filter((m) => m.outcome !== null);
+		if (last.key !== ours.at(-1)?.key) say(`last match ${last.label} is not our latest`);
+		if (last.move !== null) say('rank move without history');
+		const line = `${teamsLine(last.partners, last.opponents)} ${moveText(last) ?? ''}`;
+		if (BROKEN.test(line)) say(`broken last match: ${line}`);
+	} else if (posted.length > 0 && view.matches.some((m) => m.outcome !== null)) {
+		say('posted result but no last match');
+	}
+	for (const option of ALERT_OPTIONS) {
+		const preview = alertPreview(view, option.key, zone, now);
+		if (preview && BROKEN.test(`${preview.title} ${preview.body}`)) {
+			say(`broken ${option.key} preview: ${preview.title} ${preview.body}`);
+		}
+	}
 	for (const item of matchItems(view.matches, next?.key ?? null, zone, now)) {
 		if (item.state === 'done' || item.status === 'On field' || item.status === '') continue;
 		const match = view.matches.find((m) => m.label === item.label)!;

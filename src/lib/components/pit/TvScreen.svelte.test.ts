@@ -302,10 +302,10 @@ describe('PhoneScreen', () => {
 		expect(content).toContain('Next match');
 		expect(content).toContain('Scheduled for 1:58 PM');
 		expect(content).toContain('3 matches from now. Field is 2 min behind.');
-		const facts = [...container.querySelectorAll('dl.kv dt, dl.kv dd')].map(
-			(item) => item.textContent
+		const facts = [...container.querySelectorAll('dl.facts dt, dl.facts dd')].map((item) =>
+			item.textContent?.replace(/\s+/g, ' ').trim()
 		);
-		expect(facts).toEqual(['Rank', '8 of 27', 'Record', '3-0-0', 'Ranking score', '3.33']);
+		expect(facts.slice(0, 6)).toEqual(['Rank', '8 of 27', 'Record', '3-0-0', 'RS', '3.33']);
 		expect(screen.getByRole('link', { name: 'Event' })).toHaveAttribute('href', '/events/USAZGIQ');
 		expect(screen.getByRole('link', { name: 'Tools' })).toHaveAttribute('href', '/w');
 	});
@@ -345,6 +345,95 @@ describe('PhoneScreen', () => {
 		);
 		expect(content).not.toContain('Playoffs');
 		expect(content).not.toContain('Waiting for the next match');
+	});
+
+	it('opens a match brief with links to each team report', async () => {
+		phone('default');
+		const toggle = screen.getByRole('button', { name: /Match brief/ });
+		expect(toggle).toHaveAttribute('aria-expanded', 'false');
+		expect(screen.queryByRole('table', { name: /Scoring by part/ })).toBeNull();
+		await fireEvent.click(toggle);
+		expect(toggle).toHaveAttribute('aria-expanded', 'true');
+		const table = screen.getByRole('table', { name: 'Scoring by part for Q26' });
+		const links = [...table.querySelectorAll('a')].map((link) => link.getAttribute('href'));
+		expect(links).toEqual([
+			`/events/USAZGIQ/teams/${TEAM}`,
+			'/events/USAZGIQ/teams/25620',
+			'/events/USAZGIQ/teams/32043',
+			'/events/USAZGIQ/teams/22258'
+		]);
+	});
+
+	it('shows our last result', () => {
+		const { container } = phone('default');
+		const last = container.querySelector('.last')!;
+		expect(text(last as HTMLElement)).toMatch(/Last match Q\d+ (Won|Lost|Tied) \d+–\d+/);
+		expect(text(last as HTMLElement)).not.toContain('Ranked');
+	});
+
+	it('makes the queue call impossible to miss', () => {
+		const time = match('q25').actualTime!;
+		const base = props(time);
+		expect(base.call).not.toBeNull();
+		const { container } = render(PhoneScreen, {
+			props: {
+				...base,
+				matches: replayBundle(full, time).matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default' as const
+			}
+		});
+		const hero = container.querySelector('.next.called')!;
+		expect(text(hero as HTMLElement)).toContain('Queue now');
+		expect(text(hero as HTMLElement)).toContain('Red alliance with 25620.');
+		expect(text(hero as HTMLElement)).toContain("Q25 is on the field. We're up next.");
+	});
+
+	it('previews what each alert will say', () => {
+		const { container } = phone('default');
+		const previews = [...container.querySelectorAll('.preview')].map((node) =>
+			text(node as HTMLElement).trim()
+		);
+		expect(previews[0]).toBe('For example: Q26 is two matches away Red alliance with 25620.');
+		expect(previews[1]).toMatch(/^For example: Q\d+: (won|lost|tied) \d+–\d+/);
+	});
+
+	it('offers vibration and a test alert only where they work', async () => {
+		const ontest = vi.fn();
+		const onvibrate = vi.fn();
+		const base = props(at('Q22'));
+		const extra = { matches: replayBundle(full, at('Q22')).matches, alerts: DEFAULT_ALERTS };
+		render(PhoneScreen, {
+			props: { ...base, ...extra, permission: 'default' as const, ontest, onvibrate }
+		});
+		expect(screen.queryByRole('switch', { name: 'Vibrate with alerts' })).toBeNull();
+		expect(screen.queryByRole('button', { name: 'Send a test alert' })).toBeNull();
+		cleanup();
+		render(PhoneScreen, {
+			props: {
+				...base,
+				...extra,
+				permission: 'granted' as const,
+				canVibrate: true,
+				vibrate: true,
+				ontest,
+				onvibrate
+			}
+		});
+		await fireEvent.click(screen.getByRole('switch', { name: 'Vibrate with alerts' }));
+		expect(onvibrate).toHaveBeenCalledWith(false);
+		await fireEvent.click(screen.getByRole('button', { name: 'Send a test alert' }));
+		expect(ontest).toHaveBeenCalledOnce();
+	});
+
+	it('links every team in the schedule to its event report', async () => {
+		phone('default');
+		await fireEvent.click(screen.getByRole('button', { name: 'Matches' }));
+		const ours = screen.getByRole('link', { name: 'Q26' }).closest('li')!;
+		expect(ours.querySelector('.side.red a')).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ/teams/25620'
+		);
 	});
 
 	it('shows alerts as on only once notifications are allowed', () => {
