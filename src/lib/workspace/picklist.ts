@@ -12,6 +12,7 @@ export type AddStatus = 'ok' | 'duplicate' | 'invalid' | 'full';
 export interface PickStat {
 	opr: number | null;
 	rank: number | null;
+	season?: boolean;
 }
 
 export interface PickContext {
@@ -139,7 +140,7 @@ export function tagText(entry: PickEntry): string {
 export function statText(stat: PickStat | undefined): string {
 	if (!stat) return '';
 	return [
-		stat.opr === null ? '' : `OPR ${stat.opr.toFixed(1)}`,
+		stat.opr === null ? '' : `${stat.season ? 'Season OPR' : 'OPR'} ${stat.opr.toFixed(1)}`,
 		stat.rank === null ? '' : `#${stat.rank}`
 	]
 		.filter(Boolean)

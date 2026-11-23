@@ -45,10 +45,10 @@ describe('team names', () => {
 });
 
 describe('selection feed', () => {
-	function start(event: () => string | null, fetcher: typeof fetch) {
+	function start(event: () => string | null, fetcher: typeof fetch, picks: number[] = []) {
 		let feed!: SelectionFeed;
 		const stop = $effect.root(() => {
-			feed = new SelectionFeed(event, 15_000, fetcher);
+			feed = new SelectionFeed(event, { fetcher, teams: () => picks });
 		});
 		flushSync();
 		return { feed, stop };
@@ -137,6 +137,32 @@ describe('selection feed', () => {
 		expect(analysis()).toBe(1);
 		await vi.advanceTimersByTimeAsync(15_000);
 		expect(analysis()).toBe(2);
+		stop();
+	});
+
+	it('falls back to season OPR for picks that are not at the event', async () => {
+		const fetcher = vi.fn(async (url: string) =>
+			url.startsWith('/api/following')
+				? respond({
+						teams: [
+							{ number: 5, opr: 33.25 },
+							{ number: 6, opr: null }
+						]
+					})
+				: respond({ alliances, teams })
+		);
+		const { feed, stop } = start(() => 'USAZGIQ', fetcher as unknown as typeof fetch, [100, 5, 6]);
+		await vi.advanceTimersByTimeAsync(0);
+		flushSync();
+		await vi.advanceTimersByTimeAsync(0);
+		expect(fetcher).toHaveBeenCalledWith('/api/following?teams=5,6');
+		expect(feed.stats.get(5)).toEqual({ opr: 33.25, rank: null, season: true });
+		expect(feed.stats.get(6)).toEqual({ opr: null, rank: null, season: true });
+		expect(feed.stats.has(100)).toBe(false);
+		await vi.advanceTimersByTimeAsync(15_000);
+		flushSync();
+		const asked = fetcher.mock.calls.filter(([url]) => String(url).startsWith('/api/following'));
+		expect(asked).toHaveLength(1);
 		stop();
 	});
 });

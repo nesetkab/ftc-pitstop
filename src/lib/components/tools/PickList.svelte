@@ -286,6 +286,7 @@
 	{@const label = auto?.get(entry.team) ?? null}
 	{@const gone = entry.taken || label !== null}
 	{@const stat = statText(stats?.get(entry.team))}
+	{@const unrated = stats?.get(entry.team)?.season === true && !stat}
 	{@const tags = tagText(entry)}
 	{@const avoiding = Boolean(entry.avoid)}
 	<li
@@ -329,8 +330,13 @@
 			><b>{entry.team}</b>{#if entry.name}<span class="name">{entry.name}</span>{/if}</span
 		>
 		<span class="meta"
-			>{#if stat}<span class="stat">{stat}</span>{/if}{#if tags}<span class="tags">{tags}</span
-				>{/if}</span
+			>{#if stat}<span class="stat">{stat}</span>{:else if unrated}<span
+					class="stat faint"
+					title="Not at this event and no season OPR yet"
+					><span aria-hidden="true">—</span><span class="visually-hidden"
+						>Not at this event, no season OPR yet</span
+					></span
+				>{/if}{#if tags}<span class="tags">{tags}</span>{/if}</span
 		>
 		{#if update}
 			<input
@@ -407,7 +413,7 @@
 					{#each PICK_TAGS as tag (tag)}
 						<button
 							type="button"
-							class="ctl-btn chip"
+							class="ctl-btn"
 							aria-pressed={entry.tags?.includes(tag) ?? false}
 							onclick={() => update((current) => toggleTag(current, entry.team, tag))}
 						>
@@ -718,6 +724,10 @@
 		white-space: nowrap;
 	}
 
+	.stat.faint {
+		color: var(--text-3);
+	}
+
 	.note-input {
 		font-size: 13px;
 		color: var(--text-2);
@@ -766,10 +776,6 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 6px;
-	}
-
-	.chip {
-		border-radius: 999px;
 	}
 
 	.gone .team b,

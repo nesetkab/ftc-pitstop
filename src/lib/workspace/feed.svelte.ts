@@ -1,4 +1,6 @@
+import { untrack } from 'svelte';
 import { SvelteMap } from 'svelte/reactivity';
+import { MAX_FOLLOWED, teamListQuery } from '#lib/components/home/followed.ts';
 import type { AllianceSelection, EventPhase, Match, Ranking, Team } from '#lib/types.ts';
 import type { PickStat } from '#lib/workspace/picklist.ts';
 import { deriveSelection, takenLabels } from '#lib/workspace/selection.ts';
@@ -12,6 +14,14 @@ export type FeedBundle = {
 };
 
 type Ratings = { ratings?: { team: number; opr: number }[] };
+
+type Following = { teams?: { number: number; opr: number | null }[] };
+
+type FeedOptions = {
+	interval?: number;
+	fetcher?: typeof fetch;
+	teams?: () => number[];
+};
 
 export const SETTLED_INTERVAL = 300_000;
 
@@ -31,11 +41,31 @@ export async function fetchTeamName(
 	return typeof name === 'string' && name.trim() ? name.trim() : null;
 }
 
+export async function fetchSeasonOprs(
+	teams: number[],
+	fetcher: typeof fetch = fetch
+): Promise<[number, number | null][]> {
+	const found: [number, number | null][] = [];
+	for (let i = 0; i < teams.length; i += MAX_FOLLOWED) {
+		const chunk = teams.slice(i, i + MAX_FOLLOWED);
+		const response = await fetcher(`/api/following?teams=${teamListQuery(chunk)}`).catch(
+			() => null
+		);
+		const body: Following | null = response?.ok ? await response.json().catch(() => null) : null;
+		for (const row of body?.teams ?? []) {
+			if (chunk.includes(row.number)) found.push([row.number, row.opr]);
+		}
+	}
+	return found;
+}
+
 function combine(
 	ranks: ReadonlyMap<number, number>,
-	oprs: ReadonlyMap<number, number>
+	oprs: ReadonlyMap<number, number>,
+	season: ReadonlyMap<number, number | null>
 ): ReadonlyMap<number, PickStat> {
 	const stats = new SvelteMap<number, PickStat>();
+	for (const [team, opr] of season) stats.set(team, { opr, rank: null, season: true });
 	for (const [team, rank] of ranks) stats.set(team, { opr: null, rank });
 	for (const [team, opr] of oprs) stats.set(team, { opr, rank: ranks.get(team) ?? null });
 	return stats;
@@ -46,15 +76,32 @@ export class SelectionFeed {
 	names = $state.raw<ReadonlyMap<number, string>>(new SvelteMap());
 	#ranks = $state.raw<ReadonlyMap<number, number>>(new SvelteMap());
 	#oprs = $state.raw<ReadonlyMap<number, number>>(new SvelteMap());
-	stats = $derived<ReadonlyMap<number, PickStat>>(combine(this.#ranks, this.#oprs));
+	#season = $state.raw<ReadonlyMap<number, number | null>>(new SvelteMap());
+	stats = $derived<ReadonlyMap<number, PickStat>>(combine(this.#ranks, this.#oprs, this.#season));
 
-	constructor(event: () => string | null, interval = 15_000, fetcher: typeof fetch = fetch) {
+	constructor(
+		event: () => string | null,
+		{ interval = 15_000, fetcher = fetch, teams = () => [] }: FeedOptions = {}
+	) {
+		$effect(() => {
+			if (this.names.size === 0) return;
+			const known = untrack(() => this.#season);
+			const away = teams().filter((team) => !this.names.has(team) && !known.has(team));
+			if (away.length === 0) return;
+			this.#season = new SvelteMap([...known, ...away.map((team) => [team, null] as const)]);
+			const code = event();
+			void fetchSeasonOprs(away, fetcher).then((found) => {
+				if (event() === code) this.#season = new SvelteMap([...this.#season, ...found]);
+			});
+		});
+
 		$effect(() => {
 			const code = event();
 			this.labels = new SvelteMap();
 			this.names = new SvelteMap();
 			this.#ranks = new SvelteMap();
 			this.#oprs = new SvelteMap();
+			this.#season = new SvelteMap();
 			if (!code) return;
 			let stopped = false;
 			let timer: ReturnType<typeof setTimeout> | undefined;
