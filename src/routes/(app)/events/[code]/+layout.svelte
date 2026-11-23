@@ -5,6 +5,7 @@
 	import { eventStatus } from '#lib/components/event/dates.ts';
 	import { eventMeta } from '#lib/components/event/event-meta.ts';
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
+	import { regionName } from '#lib/format/places.ts';
 	import { shortRange } from '#lib/format/time.ts';
 	import { httpUrl } from '#lib/format/url.ts';
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
@@ -215,6 +216,9 @@
 {#if onMatchPage}
 	<p class="crumb"><a href={base}>{event.name}</a></p>
 {:else}
+	{#if event.region}
+		<p class="crumb"><a href="/regions/{event.region}">{regionName(event.region)}</a></p>
+	{/if}
 	<PageHeader
 		title={event.name}
 		meta={eventMeta(event, scheduled ? null : bundle.teams.length)}

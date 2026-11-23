@@ -61,6 +61,12 @@
 	const firstPageOnly = $derived(
 		partial !== null && when === 'upcoming' && !query.trim() && !region && !type && shown.length > 0
 	);
+	const regionLabel = $derived(
+		region
+			? (data.regions.flatMap((group) => group.options).find((option) => option.value === region)
+					?.label ?? null)
+			: null
+	);
 	const count = $derived(
 		firstPageOnly ? Math.max(shown.length, partial?.upcoming ?? 0) : shown.length
 	);
@@ -207,6 +213,9 @@
 {:else}
 	<p class="count">
 		<span>{integer(count)} {count === 1 ? 'event' : 'events'}</span>
+		{#if regionLabel}
+			<a href="/regions/{region}">{regionLabel} region page</a>
+		{/if}
 	</p>
 	<div class="table-wrap">
 		<table class="t events">

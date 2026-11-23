@@ -7,6 +7,8 @@ import {
 	eventJsonLd,
 	jsonLdScript,
 	matchDescription,
+	regionDescription,
+	regionTitle,
 	teamDescription,
 	teamTitle
 } from './seo.ts';
@@ -111,5 +113,16 @@ describe('search text', () => {
 		expect(text).toContain(`: blue (`);
 		expect(text).toContain(`beat red (`);
 		expect(text).toContain(`, ${blue.total}–${red.total}.`);
+	});
+
+	it('titles and describes a region page', () => {
+		expect(regionTitle('Arizona')).toBe('Arizona FTC region, 2026-27 BIOBUZZ - PitStop');
+		const top = { team: 18420, name: 'Metal Masters', opr: 75.21 };
+		expect(regionDescription({ name: 'Arizona', teams: 101, events: 14, done: 3, top })).toBe(
+			'The Arizona FTC region in the 2026-27 BIOBUZZ season: 14 events, 3 played, 101 teams. Top team by OPR is 18420 Metal Masters at 75.2. Top teams, live and upcoming events, advancement and the best scores.'
+		);
+		expect(regionDescription({ name: 'Wyoming', teams: 1, events: 1, done: 0, top: null })).toBe(
+			'The Wyoming FTC region in the 2026-27 BIOBUZZ season: 1 event, 0 played, 1 team. Top teams, live and upcoming events, advancement and the best scores.'
+		);
 	});
 });

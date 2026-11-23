@@ -186,8 +186,11 @@ describe('team page', () => {
 				]
 			})
 		);
-		const stat = (name: string) => screen.getByText(name, { selector: 'dt' }).nextElementSibling;
+		const stat = (name: string) =>
+			screen.getByText((_, node) => node?.tagName === 'DT' && node.textContent === name)
+				.nextElementSibling;
 		expect(stat('Rank in Arizona')).toHaveTextContent('3 of 40');
+		expect(screen.getByRole('link', { name: 'Arizona' })).toHaveAttribute('href', '/regions/USAZ');
 		expect(within(stat('Rank in Arizona') as HTMLElement).getByRole('link')).toHaveAttribute(
 			'href',
 			'/leaderboards?region=USAZ&team=26670'
@@ -214,7 +217,9 @@ describe('team page', () => {
 
 	it('shows the stats row', () => {
 		show();
-		const stat = (name: string) => screen.getByText(name, { selector: 'dt' }).nextElementSibling;
+		const stat = (name: string) =>
+			screen.getByText((_, node) => node?.tagName === 'DT' && node.textContent === name)
+				.nextElementSibling;
 		expect(stat('Season OPR')).toHaveTextContent('58.2');
 		expect(stat('World rank by OPR')).toHaveTextContent('214 of 3,272');
 		expect(stat('Qual record')).toHaveTextContent('5-0-0');

@@ -3,7 +3,7 @@ import { eventStatus } from '#lib/components/event/dates.ts';
 import { titleOf } from '#lib/components/event/matches.ts';
 import type { RankedRecord } from '#lib/components/records/records.ts';
 import { colorName, type Sides, type Simulation } from '#lib/components/simulate/simulate.ts';
-import { placeName } from '#lib/format/places.ts';
+import { placeName, regionName } from '#lib/format/places.ts';
 import { dateRange, fixed, integer, ordinal, record, shortDate, time } from '#lib/format/index.ts';
 import { pct } from '#lib/format/pct.ts';
 import { WINNER_AWARD_ID } from '#lib/game/phase.ts';
@@ -49,6 +49,7 @@ type Settled<T> = { ok: true; value: T } | { ok: false; error: unknown } | null;
 const TEAM_PATH = /^teams\/([1-9]\d{0,4})\.png$/;
 const EVENT_PATH = /^events\/([A-Z0-9]{2,24})\.png$/;
 const MATCH_PATH = /^events\/([A-Z0-9]{2,24})\/matches\/([qp]\d{1,3}(?:-\d{1,3})?)\.png$/;
+const REGION_PATH = /^regions\/([A-Z0-9]{2,12})\.png$/;
 const COMPARE_PATH = /^compare\/([1-9]\d{0,4}(?:-[1-9]\d{0,4}){1,3})\.png$/;
 const SIMULATE_PATH =
 	/^simulate\/([1-9]\d{0,4})-([1-9]\d{0,4})-vs-([1-9]\d{0,4})-([1-9]\d{0,4})\.png$/;
@@ -70,6 +71,11 @@ const PAGES: Record<string, PageCard> = {
 		kicker: SEASON_NAME,
 		title: 'Who has advanced to each FTC championship',
 		subtitle: 'Teams advanced so far, how they earned it, and the qualifiers still to play.'
+	},
+	'regions.png': {
+		kicker: SEASON_NAME,
+		title: 'Every FTC region at a glance',
+		subtitle: 'Teams, events played and still to come, and the top team in each region.'
 	},
 	'accuracy.png': {
 		kicker: 'Prediction accuracy',
@@ -344,6 +350,37 @@ async function leaderboardCard(host: string, deps: OgDeps, budget: number) {
 	return { node: listCard({ kicker, title, rows }, host), maxAge: 6 * HOUR_SECONDS };
 }
 
+async function regionCardFor(code: string, host: string, deps: OgDeps, budget: number) {
+	const ratings = valueOf(await settle(deps.loadSeasonRatings(), budget));
+	const name = regionName(code);
+	const local = (ratings?.teams ?? [])
+		.filter((entry) => entry.region === code && entry.matches > 0)
+		.toSorted((a, b) => b.opr - a.opr || a.team - b.team);
+	if (local.length === 0) {
+		const card = { kicker: SEASON_NAME, title: `${name} FTC region` };
+		return { node: pageCard(card, host), maxAge: 300 };
+	}
+	const top = local.slice(0, 3);
+	const names = valueOf(
+		await settle(
+			deps.loadNames(
+				top.map((entry) => entry.team),
+				[]
+			),
+			budget
+		)
+	);
+	const rows = top.map((entry, at) => ({
+		rank: String(at + 1),
+		label: String(entry.team),
+		detail: names?.teams[entry.team] ?? null,
+		value: fixed(entry.opr, 1)
+	}));
+	const kicker = `${name} · ${integer(local.length)} ${local.length === 1 ? 'team' : 'teams'} rated`;
+	const title = `Top FTC teams in ${name}, ${SEASON_NAME}`;
+	return { node: listCard({ kicker, title, rows }, host), maxAge: 6 * HOUR_SECONDS };
+}
+
 async function recordsCard(host: string, deps: OgDeps, budget: number) {
 	const title = `Highest FTC scores, ${SEASON_NAME}`;
 	const top = valueOf(await settle(deps.loadTopRecords(3), budget));
@@ -436,6 +473,8 @@ export async function cardFor(
 	}
 	if (path === 'leaderboards.png') return leaderboardCard(shownHost, deps, budget);
 	if (path === 'records.png') return recordsCard(shownHost, deps, budget);
+	const region = REGION_PATH.exec(path);
+	if (region) return regionCardFor(region[1], shownHost, deps, budget);
 	const team = TEAM_PATH.exec(path);
 	if (team) return teamCardFor(Number(team[1]), shownHost, deps, budget);
 	const event = EVENT_PATH.exec(path);

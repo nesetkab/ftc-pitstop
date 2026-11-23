@@ -4,8 +4,10 @@ const server = vi.hoisted(() => ({
 	searchIndex: vi.fn(async () => ({
 		teams: [{ number: 3747 }, { number: 14624 }],
 		events: [
-			{ code: 'USMTBUQ', end: '2025-11-22' },
-			{ code: 'USWAFUTURE', end: '2999-01-01' }
+			{ code: 'USMTBUQ', end: '2025-11-22', region: 'USMT', type: 'Qualifier' },
+			{ code: 'USWAFUTURE', end: '2999-01-01', region: 'USWA', type: 'LeagueMeet' },
+			{ code: 'USMTKICK', end: '2025-09-06', region: 'USMT', type: 'Kickoff' },
+			{ code: 'USORWORK', end: '2025-09-13', region: 'USOR', type: 'Workshop' }
 		],
 		fetchedAt: 1
 	}))
@@ -23,7 +25,7 @@ function get() {
 }
 
 describe('sitemap', () => {
-	it('lists the main pages, every event and every team', async () => {
+	it('lists the main pages, every event, every team and every region with competitions', async () => {
 		const response = await get();
 		const xml = await response.text();
 		expect(response.headers.get('content-type')).toContain('application/xml');
@@ -36,13 +38,18 @@ describe('sitemap', () => {
 			'https://www.ftcpitstop.com/leaderboards',
 			'https://www.ftcpitstop.com/records',
 			'https://www.ftcpitstop.com/advancement',
+			'https://www.ftcpitstop.com/regions',
 			'https://www.ftcpitstop.com/accuracy',
 			'https://www.ftcpitstop.com/about',
 			'https://www.ftcpitstop.com/events/USMTBUQ',
 			'https://www.ftcpitstop.com/events/USWAFUTURE',
+			'https://www.ftcpitstop.com/events/USMTKICK',
+			'https://www.ftcpitstop.com/events/USORWORK',
 			'https://www.ftcpitstop.com/teams/3747',
 			'https://www.ftcpitstop.com/teams/14624',
-			'https://www.ftcpitstop.com/advancement/USMTCMP'
+			'https://www.ftcpitstop.com/advancement/USMTCMP',
+			'https://www.ftcpitstop.com/regions/USMT',
+			'https://www.ftcpitstop.com/regions/USWA'
 		]);
 	});
 
@@ -60,6 +67,6 @@ describe('sitemap', () => {
 		const response = await get();
 		const xml = await response.text();
 		expect(response.headers.get('cache-control')).toBe('public, s-maxage=300');
-		expect(xml.match(/<loc>/g)).toHaveLength(9);
+		expect(xml.match(/<loc>/g)).toHaveLength(10);
 	});
 });

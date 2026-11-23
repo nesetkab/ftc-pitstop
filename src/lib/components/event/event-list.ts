@@ -160,7 +160,7 @@ export function currentWeek(now: number): { start: string; end: string } {
 }
 
 export function listStatus(
-	event: ListedEvent,
+	event: Pick<ListedEvent, 'code' | 'start' | 'end' | 'timezone'>,
 	now: number,
 	finished: ReadonlySet<string> = new Set()
 ): EventStatus {
@@ -256,7 +256,17 @@ export function groupByWeek(
 	return groups;
 }
 
-export function regionGroups(events: EventSummary[]): RegionGroup[] {
+export type RegionBucket = 'us' | 'canada' | 'other';
+
+export type RegionLabel = { value: string; label: string; bucket: RegionBucket };
+
+export const REGION_BUCKETS: { bucket: RegionBucket; label: string }[] = [
+	{ bucket: 'us', label: 'United States' },
+	{ bucket: 'canada', label: 'Canada' },
+	{ bucket: 'other', label: 'Other countries' }
+];
+
+export function regionLabels(events: EventSummary[]): RegionLabel[] {
 	const regions = new Map<string, { areas: Map<string, number>; us: boolean; canada: boolean }>();
 	for (const event of events) {
 		if (!event.region) continue;
@@ -267,26 +277,27 @@ export function regionGroups(events: EventSummary[]): RegionGroup[] {
 		if (event.country === 'Canada') entry.canada = true;
 		regions.set(event.region, entry);
 	}
-	const groups: Record<'us' | 'canada' | 'other', { value: string; label: string }[]> = {
-		us: [],
-		canada: [],
-		other: []
-	};
-	for (const [code, entry] of regions) {
-		const names = [...entry.areas.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
-		const shown = names.slice(0, 3).join(', ');
-		const label =
-			knownRegion(code) ??
-			(shown ? `${shown}${names.length > 3 ? ' and more' : ''} (${code})` : code);
-		const bucket = entry.us ? 'us' : entry.canada ? 'canada' : 'other';
-		groups[bucket].push({ value: code, label });
-	}
-	const byLabel = (a: { label: string }, b: { label: string }) => a.label.localeCompare(b.label);
-	return [
-		{ label: 'United States', options: groups.us.sort(byLabel) },
-		{ label: 'Canada', options: groups.canada.sort(byLabel) },
-		{ label: 'Other countries', options: groups.other.sort(byLabel) }
-	].filter((group) => group.options.length > 0);
+	return [...regions]
+		.map(([code, entry]) => {
+			const names = [...entry.areas.entries()].sort((a, b) => b[1] - a[1]).map(([name]) => name);
+			const shown = names.slice(0, 3).join(', ');
+			const label =
+				knownRegion(code) ??
+				(shown ? `${shown}${names.length > 3 ? ' and more' : ''} (${code})` : code);
+			const bucket: RegionBucket = entry.us ? 'us' : entry.canada ? 'canada' : 'other';
+			return { value: code, label, bucket };
+		})
+		.sort((a, b) => a.label.localeCompare(b.label));
+}
+
+export function regionGroups(events: EventSummary[]): RegionGroup[] {
+	const labels = regionLabels(events);
+	return REGION_BUCKETS.map(({ bucket, label }) => ({
+		label,
+		options: labels
+			.filter((entry) => entry.bucket === bucket)
+			.map(({ value, label }) => ({ value, label }))
+	})).filter((group) => group.options.length > 0);
 }
 
 export function typeOptions(events: ListedEvent[]): EventType[] {

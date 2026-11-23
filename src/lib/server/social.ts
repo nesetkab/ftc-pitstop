@@ -3,12 +3,14 @@ const TEAM_PAGE = /^\/(?:teams\/)?([1-9]\d{0,4})(?:\/|$)/;
 const MATCH_PAGE = /^\/events\/([A-Za-z0-9]{2,24})\/matches\/([qp]\d{1,3}(?:-\d{1,3})?)\/?$/i;
 const EVENT_PAGE = /^\/events\/([A-Za-z0-9]{2,24})(?:\/|$)/;
 const WORKSPACE_PAGE = /^\/w(?:\/|$)/;
+const REGION_PAGE = /^\/regions\/([A-Za-z0-9]{2,12})\/?$/;
 
 const PAGE_IMAGES: Record<string, string> = {
 	'/events': '/og/events.png',
 	'/leaderboards': '/og/leaderboards.png',
 	'/records': '/og/records.png',
 	'/advancement': '/og/advancement.png',
+	'/regions': '/og/regions.png',
 	'/accuracy': '/og/accuracy.png'
 };
 
@@ -58,6 +60,8 @@ export function ogImagePath(url: URL): string {
 	if (pathname === '/compare') return compareImage(url);
 	if (pathname === '/simulate') return simulateImage(url);
 	if (WORKSPACE_PAGE.test(pathname)) return '/og/workspace.png';
+	const region = REGION_PAGE.exec(pathname);
+	if (region) return `/og/regions/${region[1].toUpperCase()}.png`;
 	if (pathname.startsWith('/advancement/')) return '/og/advancement.png';
 	return PAGE_IMAGES[pathname.replace(/\/$/, '')] ?? '/og/site.png';
 }
