@@ -35,7 +35,7 @@
 		</colgroup>
 		<thead>
 			<tr>
-				<th scope="col">Alliance</th>
+				<th scope="col"><span class="alliance-label">Alliance</span></th>
 				<th scope="col">Teams</th>
 				{#if result}
 					<th scope="col" class="right">Score</th>
@@ -118,6 +118,15 @@
 
 		col.num {
 			width: 60px;
+		}
+
+		.alliance-label {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
 		}
 
 		th {

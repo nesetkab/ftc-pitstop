@@ -68,7 +68,10 @@ describe('RankingsView', () => {
 		expect(first).toHaveTextContent('90%');
 		expect(first).toHaveTextContent('95%');
 		expect(screen.getByText(/12 remaining qualification matches/)).toBeInTheDocument();
-		expect(screen.getByRole('link', { name: 'Schedule' })).toHaveAttribute('href', '?view=schedule');
+		expect(screen.getByRole('link', { name: 'Schedule' })).toHaveAttribute(
+			'href',
+			'?view=schedule'
+		);
 	});
 
 	it('hides the projection once every qualification match is played', () => {
@@ -147,7 +150,9 @@ describe('RankingsView', () => {
 	});
 
 	it('shows where each team got its ranking points', () => {
-		render(RankingsView, { props: { bundle: finished, rp: rpCounts(finished.matches), view: 'rp' } });
+		render(RankingsView, {
+			props: { bundle: finished, rp: rpCounts(finished.matches), view: 'rp' }
+		});
 		const table = screen.getByRole('table', { name: 'Where ranking points came from' });
 		const first = bodyRows(table)[0];
 		const cells = Array.from(first.querySelectorAll('td')).map((cell) => cell.textContent?.trim());
@@ -195,7 +200,9 @@ describe('RankingsView', () => {
 
 		rerender({ ...props, view: 'rp' });
 		expect(screen.getAllByRole('table')).toHaveLength(1);
-		expect(screen.getByRole('table', { name: 'Where ranking points came from' })).toBeInTheDocument();
+		expect(
+			screen.getByRole('table', { name: 'Where ranking points came from' })
+		).toBeInTheDocument();
 		expect(within(views).getByRole('link', { name: 'Ranking points' })).toHaveAttribute(
 			'aria-current',
 			'page'

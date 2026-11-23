@@ -117,6 +117,12 @@
 		font-variant-numeric: tabular-nums;
 	}
 
+	@media (max-width: 600px) {
+		.count {
+			display: none;
+		}
+	}
+
 	.panel {
 		position: absolute;
 		top: calc(100% + 6px);

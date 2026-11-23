@@ -200,6 +200,10 @@
 	}
 
 	@media (max-width: 600px) {
+		.bar {
+			column-gap: 8px;
+		}
+
 		:global(.table-wrap.ranked .rank) {
 			width: 54px;
 		}
