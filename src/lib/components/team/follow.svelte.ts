@@ -1,4 +1,6 @@
-export const FOLLOW_KEY = 'ps-follow';
+import { FOLLOW_KEY, watchFollowed, writeFollowed } from '#lib/components/event/follow.ts';
+
+export { FOLLOW_KEY };
 
 export const follows = $state<{ teams: number[] }>({ teams: [] });
 
@@ -26,21 +28,8 @@ export function readFollows(): number[] {
 	}
 }
 
-function writeFollows(teams: number[]) {
-	try {
-		localStorage.setItem(FOLLOW_KEY, JSON.stringify(teams));
-	} catch {
-		return;
-	}
-}
-
 export function syncFollows(): () => void {
-	follows.teams = readFollows();
-	const onStorage = (event: StorageEvent) => {
-		if (event.key === null || event.key === FOLLOW_KEY) follows.teams = readFollows();
-	};
-	window.addEventListener('storage', onStorage);
-	return () => window.removeEventListener('storage', onStorage);
+	return watchFollowed(() => (follows.teams = readFollows()));
 }
 
 export function toggleFollow(team: number): boolean {
@@ -48,7 +37,7 @@ export function toggleFollow(team: number): boolean {
 	const next = current.includes(team)
 		? current.filter((number) => number !== team)
 		: [...current, team];
-	writeFollows(next);
+	writeFollowed(next);
 	follows.teams = next;
 	return next.includes(team);
 }
