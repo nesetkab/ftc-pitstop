@@ -186,6 +186,11 @@
 	}
 
 	@media (pointer: coarse) {
+		.home {
+			margin-block: -9px;
+			padding-block: 13px;
+		}
+
 		.search {
 			min-height: 40px;
 		}

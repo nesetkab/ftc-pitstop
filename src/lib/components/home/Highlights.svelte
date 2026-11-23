@@ -167,6 +167,16 @@
 	}
 
 	@media (pointer: coarse) {
+		li {
+			position: relative;
+		}
+
+		.match::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+		}
+
 		.more a {
 			display: inline-block;
 			margin-block: -10px;
