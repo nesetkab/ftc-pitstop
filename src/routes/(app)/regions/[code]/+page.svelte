@@ -346,6 +346,14 @@
 		font-variant-numeric: tabular-nums;
 	}
 
+	@media (max-width: 600px) {
+		.stats {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 12px 16px;
+		}
+	}
+
 	.stats small {
 		margin-left: 4px;
 		font-size: 14px;
