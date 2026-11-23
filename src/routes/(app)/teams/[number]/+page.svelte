@@ -7,6 +7,7 @@
 	import SeasonTakeaways from '#lib/components/team/SeasonTakeaways.svelte';
 	import TeamAllies from '#lib/components/team/TeamAllies.svelte';
 	import TeamAwards from '#lib/components/team/TeamAwards.svelte';
+	import TeamBadges from '#lib/components/team/TeamBadges.svelte';
 	import TeamBreakdown from '#lib/components/team/TeamBreakdown.svelte';
 	import TeamEvents from '#lib/components/team/TeamEvents.svelte';
 	import TeamMatches from '#lib/components/team/TeamMatches.svelte';
@@ -162,6 +163,8 @@
 		<LastSeason previous={view.previous} />
 	</section>
 {/if}
+
+<TeamBadges number={view.team.number} name={view.team.name} />
 
 <style>
 	.grid2 {

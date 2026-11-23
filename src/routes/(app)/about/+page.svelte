@@ -313,6 +313,12 @@
 					1000} seconds. Season ratings are rebuilt about once an hour. Scores appear once the event’s
 				scorekeeper sends them to FIRST, so a short delay after a match ends is normal.
 			</p>
+			<p>
+				Teams can show their numbers on a website or GitHub README with a badge, an image at
+				<code>/badge/NUMBER.svg</code>. The Badges section at the bottom of each team page has
+				copy-paste code. Badges are cached for up to an hour, so they can trail the team page a
+				little.
+			</p>
 		</section>
 
 		<section id="impossible-scores" aria-labelledby="impossible-scores-title">
