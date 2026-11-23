@@ -4,9 +4,14 @@
 	import '#lib/styles/tokens.css';
 	import '#lib/styles/table.css';
 	import '#lib/styles/print.css';
+	import { onMount } from 'svelte';
+	import { version } from '$app/env';
+	import { scheduleRecovery } from '#lib/pwa/recover.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
+
+	onMount(() => scheduleRecovery(version));
 </script>
 
 <svelte:head>

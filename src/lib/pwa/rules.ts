@@ -141,3 +141,13 @@ export function obsoleteCaches(keys: readonly string[], keep: readonly string[])
 export function overflow<T>(entries: readonly T[], max: number): T[] {
 	return entries.slice(0, Math.max(0, entries.length - max));
 }
+
+export function isStaleWorker(keys: readonly string[], version: string, pending: boolean): boolean {
+	if (pending) return false;
+	const ours = keys.filter((key) => key.startsWith(CACHE_PREFIX));
+	if (ours.length === 0) return false;
+	const shells = ours
+		.filter((key) => key.startsWith(shellCache('')))
+		.map((key) => key.slice(shellCache('').length));
+	return !shells.some((shell) => shell === version || Number(shell) > Number(version));
+}

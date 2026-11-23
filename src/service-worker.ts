@@ -71,7 +71,7 @@ async function precache(cache: Cache, path: string) {
 async function install() {
 	const cache = await caches.open(SHELL);
 	const present = new Set((await cache.keys()).map((request) => new URL(request.url).pathname));
-	await Promise.all(
+	await Promise.allSettled(
 		shellFiles.filter((path) => !present.has(path)).map((path) => precache(cache, path))
 	);
 	await worker.skipWaiting();
