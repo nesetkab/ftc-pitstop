@@ -1,5 +1,5 @@
 import { breakdownParts } from '#lib/game/biobuzz.ts';
-import type { AllianceColor, EventBundle, Match, TeamSeason, TournamentLevel } from '#lib/types.ts';
+import type { AllianceColor, EventBundle, Match, TeamSeason } from '#lib/types.ts';
 
 export type MatchOutcome = 'win' | 'loss' | 'tie';
 
@@ -14,7 +14,6 @@ export interface TeamMatchParts {
 export interface TeamMatchRow {
 	key: string;
 	label: string;
-	level: TournamentLevel;
 	alliance: AllianceColor;
 	partners: number[];
 	opponents: number[];
@@ -52,7 +51,6 @@ function rowFor(match: Match, team: number): TeamMatchRow | null {
 	return {
 		key: match.key,
 		label: match.label,
-		level: match.level,
 		alliance,
 		partners: own.filter((entry) => entry.team !== team).map((entry) => entry.team),
 		opponents: match[other].map((entry) => entry.team),

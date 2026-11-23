@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SvelteSet } from 'svelte/reactivity';
 	import Term from '#lib/ui/Term.svelte';
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { MISSING, record } from '#lib/format/index.ts';
@@ -25,6 +26,12 @@
 
 	const OUTCOME: Record<MatchOutcome, string> = { win: 'W', loss: 'L', tie: 'T' };
 
+	const opened = new SvelteSet<string>();
+
+	function toggle(code: string, event: Event) {
+		if ((event.currentTarget as HTMLDetailsElement).open) opened.add(code);
+	}
+
 	function count(entry: TeamMatchEvent): string {
 		const played = entry.rows.filter((row) => row.outcome !== null).length;
 		return played === 1 ? '1 match' : `${played} matches`;
@@ -33,7 +40,7 @@
 
 <div class="events">
 	{#each events as entry, index (entry.code)}
-		<details open={index === 0}>
+		<details open={index === 0} ontoggle={(event) => toggle(entry.code, event)}>
 			<summary>
 				<span class="name">{entry.name}</span>
 				<span class="meta">
@@ -41,57 +48,63 @@
 					{record(entry.record.wins, entry.record.losses, entry.record.ties)}
 				</span>
 			</summary>
-			<Table>
-				<caption class="visually-hidden">Matches for {team} at {entry.name}</caption>
-				<thead>
-					<tr>
-						<th class="l" scope="col">Match</th>
-						<th class="l" scope="col">Alliance and opponents</th>
-						<th scope="col">Score</th>
-						{#each parts as part (part.key)}
-							<th class="opt" scope="col"><Term label={part.label} /></th>
-						{/each}
-					</tr>
-				</thead>
-				<tbody>
-					{#each entry.rows as row (row.key)}
-						{@const other = row.alliance === 'red' ? 'blue' : 'red'}
+			{#if index === 0 || opened.has(entry.code)}
+				<Table>
+					<caption class="visually-hidden">Matches for {team} at {entry.name}</caption>
+					<thead>
 						<tr>
-							<td class="l">
-								<a class="match" href={matchHref(entry.code, row)}>{row.label}</a>
-								{#if row.surrogate}<span class="faint small">Surrogate</span>{/if}
-							</td>
-							<td class="l wrap">
-								<span class="teams">
-									<span class="side">
-										<TeamChip number={team} alliance={row.alliance} />
-										{#each row.partners as partner (partner)}
-											<TeamChip number={partner} alliance={row.alliance} href="/teams/{partner}" />
-										{/each}
-									</span>
-									<span class="side">
-										<span class="faint small">vs</span>
-										{#each row.opponents as opponent (opponent)}
-											<TeamChip number={opponent} alliance={other} href="/teams/{opponent}" />
-										{/each}
-									</span>
-								</span>
-							</td>
-							<td>
-								{#if row.outcome && row.score !== null && row.against !== null}
-									<span class={['outcome', row.outcome]}>{OUTCOME[row.outcome]}</span>
-									<b>{row.score}</b><span class="faint">–{row.against}</span>
-								{:else}
-									<span class="faint">Not played</span>
-								{/if}
-							</td>
+							<th class="l" scope="col">Match</th>
+							<th class="l" scope="col">Alliance and opponents</th>
+							<th scope="col">Score</th>
 							{#each parts as part (part.key)}
-								<td class="opt">{row.parts ? row.parts[part.key] : MISSING}</td>
+								<th class="opt" scope="col"><Term label={part.label} /></th>
 							{/each}
 						</tr>
-					{/each}
-				</tbody>
-			</Table>
+					</thead>
+					<tbody>
+						{#each entry.rows as row (row.key)}
+							{@const other = row.alliance === 'red' ? 'blue' : 'red'}
+							<tr>
+								<td class="l">
+									<a class="match" href={matchHref(entry.code, row)}>{row.label}</a>
+									{#if row.surrogate}<span class="faint small">Surrogate</span>{/if}
+								</td>
+								<td class="l wrap">
+									<span class="teams">
+										<span class="side">
+											<TeamChip number={team} alliance={row.alliance} />
+											{#each row.partners as partner (partner)}
+												<TeamChip
+													number={partner}
+													alliance={row.alliance}
+													href="/teams/{partner}"
+												/>
+											{/each}
+										</span>
+										<span class="side">
+											<span class="faint small">vs</span>
+											{#each row.opponents as opponent (opponent)}
+												<TeamChip number={opponent} alliance={other} href="/teams/{opponent}" />
+											{/each}
+										</span>
+									</span>
+								</td>
+								<td>
+									{#if row.outcome && row.score !== null && row.against !== null}
+										<span class={['outcome', row.outcome]}>{OUTCOME[row.outcome]}</span>
+										<b>{row.score}</b><span class="faint">–{row.against}</span>
+									{:else}
+										<span class="faint">Not played</span>
+									{/if}
+								</td>
+								{#each parts as part (part.key)}
+									<td class="opt">{row.parts ? row.parts[part.key] : MISSING}</td>
+								{/each}
+							</tr>
+						{/each}
+					</tbody>
+				</Table>
+			{/if}
 		</details>
 	{/each}
 </div>
