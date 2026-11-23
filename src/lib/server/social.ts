@@ -37,6 +37,16 @@ function compareImage(url: URL): string {
 	return unique.length >= 2 ? `/og/compare/${unique.join('-')}.png` : '/og/compare.png';
 }
 
+function simulateImage(url: URL): string {
+	const side = (color: string) =>
+		(url.searchParams.get(color) ?? '').split(',').filter((part) => /^[1-9]\d{0,4}$/.test(part));
+	const red = side('red');
+	const blue = side('blue');
+	const all = [...red, ...blue];
+	const full = red.length === 2 && blue.length === 2 && new Set(all).size === 4;
+	return full ? `/og/simulate/${red.join('-')}-vs-${blue.join('-')}.png` : '/og/simulate.png';
+}
+
 export function ogImagePath(url: URL): string {
 	const { pathname } = url;
 	const team = TEAM_PAGE.exec(pathname);
@@ -46,6 +56,7 @@ export function ogImagePath(url: URL): string {
 	const event = EVENT_PAGE.exec(pathname);
 	if (event) return `/og/events/${event[1].toUpperCase()}.png`;
 	if (pathname === '/compare') return compareImage(url);
+	if (pathname === '/simulate') return simulateImage(url);
 	if (WORKSPACE_PAGE.test(pathname)) return '/og/workspace.png';
 	if (pathname.startsWith('/advancement/')) return '/og/advancement.png';
 	return PAGE_IMAGES[pathname.replace(/\/$/, '')] ?? '/og/site.png';

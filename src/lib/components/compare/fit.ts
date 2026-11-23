@@ -60,6 +60,8 @@ const MEANINGFUL_SHARE = 0.1;
 const MIN_TIPS = 1;
 const MIN_AVERAGE = 3;
 const MAX_NOTES = 4;
+export const LEAD_SHARE = 0.6;
+const LEAD_MIN_SHARE = 0.05;
 
 const lower = (part: (typeof SCORING)[number]) => PART_LABELS[part].toLowerCase();
 
@@ -101,6 +103,16 @@ export function alliance(teams: FitTeam[], robotSwarm: (teams: number[]) => numb
 			pollinator2: tips.pollinator2
 		}
 	};
+}
+
+export function partLead(members: FitTeam[], part: FitPart, score: number): string | null {
+	if (members.length === 0) return null;
+	const total = members.reduce((sum, team) => sum + team.parts[part], 0);
+	const floor = part === 'tips' ? 1 : Math.max(1, score * LEAD_MIN_SHARE);
+	if (!(total >= floor)) return null;
+	const top = members.reduce((a, b) => (b.parts[part] > a.parts[part] ? b : a));
+	const share = Math.max(top.parts[part], 0) / total;
+	return share >= LEAD_SHARE ? `${top.number} ${Math.round(Math.min(share, 1) * 100)}%` : null;
 }
 
 function list(items: string[]): string {

@@ -23,6 +23,12 @@ describe('share previews', () => {
 		expect(image('/compare?teams=16,724,16')).toBe('/og/compare/16-724.png');
 		expect(image('/compare?teams=16')).toBe('/og/compare.png');
 		expect(image('/compare')).toBe('/og/compare.png');
+		expect(image('/simulate?red=724,10662&blue=5026,4133')).toBe(
+			'/og/simulate/724-10662-vs-5026-4133.png'
+		);
+		expect(image('/simulate?red=724,10662&blue=5026')).toBe('/og/simulate.png');
+		expect(image('/simulate?red=724,10662&blue=724,4133')).toBe('/og/simulate.png');
+		expect(image('/simulate')).toBe('/og/simulate.png');
 	});
 
 	it('uses the canonical compare order for the image', () => {

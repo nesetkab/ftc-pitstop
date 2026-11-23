@@ -95,7 +95,7 @@ function allianceForecast(side: AlliancePrediction, win: number): AllianceForeca
 	};
 }
 
-function matchForecast(
+export function matchForecast(
 	key: string,
 	prediction: MatchPrediction,
 	played: boolean,

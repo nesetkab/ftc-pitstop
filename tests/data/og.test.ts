@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Sides, Simulation } from '#lib/components/simulate/simulate.ts';
 import { notFound } from '#lib/server/errors.ts';
 import { compareCard, listCard, matchCard, pageCard, siteCard, teamCard, type OgNode } from '#lib/server/og/cards.ts';
 import {
@@ -96,6 +97,20 @@ function bundle(phase: EventBundle['phase'], played: number, total = 4): EventBu
 	} as unknown as EventBundle;
 }
 
+function simulated(sides: Sides): Simulation {
+	const side = (color: 'red' | 'blue', score: number) => ({
+		color,
+		teams: sides[color].map((number) => ({ number, name: number === 3747 ? 'The Hive' : null })),
+		score
+	});
+	const alliance = (win: number) => ({ win });
+	return {
+		red: side('red', 151.4),
+		blue: side('blue', 98.2),
+		forecast: { red: alliance(0.81), blue: alliance(0.17), tie: 0.02 }
+	} as unknown as Simulation;
+}
+
 function deps(overrides: Partial<OgDeps> = {}): OgDeps {
 	return {
 		loadTeamSeason: async () => season([{ wins: 4, losses: 1, ties: 0 }]),
@@ -107,6 +122,7 @@ function deps(overrides: Partial<OgDeps> = {}): OgDeps {
 			teams: { 99: 'Top Team', 3747: 'The Hive' },
 			events: { USMTBUQ: 'Montana Qualifier' }
 		}),
+		loadSimulation: async (sides) => simulated(sides),
 		...overrides
 	};
 }
@@ -237,9 +253,28 @@ describe('preview card routing', () => {
 		);
 		const compare = await cardFor('compare/3747-99.png', host, deps());
 		expect(texts(compare!.node)).toEqual(expect.arrayContaining(['3747', '99', '61.3', '1st']));
+		const simulate = await cardFor('simulate/3747-99-vs-16-724.png', host, deps());
+		expect(simulate?.maxAge).toBe(3600);
+		expect(texts(simulate!.node)).toEqual(
+			expect.arrayContaining([
+				'Match simulator',
+				'3747 & 99 vs 16 & 724',
+				'3747  99',
+				'The Hive',
+				'151',
+				'98',
+				'Predicted · Red wins 81%, Blue 17%, tie 2%'
+			])
+		);
+		const loading = await cardFor(
+			'simulate/3747-99-vs-16-724.png',
+			host,
+			deps({ loadSimulation: async () => null })
+		);
+		expect(loading?.maxAge).toBe(300);
 		const accuracy = await cardFor('accuracy.png', host, deps());
 		expect(texts(accuracy!.node)).toContain('Matches replayed');
-		for (const path of ['events.png', 'compare.png', 'workspace.png']) {
+		for (const path of ['events.png', 'compare.png', 'simulate.png', 'workspace.png']) {
 			expect((await cardFor(path, host, deps()))?.maxAge).toBe(86_400);
 		}
 	});
@@ -252,6 +287,8 @@ describe('preview card routing', () => {
 			'events/USMTBUQ/matches/x1.png',
 			'compare/3747.png',
 			'compare/3747-3747.png',
+			'simulate/3747-99-vs-16.png',
+			'simulate/3747-99-vs-16-3747.png',
 			'x.png',
 			''
 		]) {
