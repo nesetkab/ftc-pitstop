@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Feeder } from '#lib/components/advancement/advancement.ts';
 	import { watchFollowed } from '#lib/components/event/follow.ts';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import { integer } from '#lib/format/number.ts';
@@ -28,6 +29,7 @@
 	const played = $derived(
 		champ.feeders.filter((feeder) => feeder.state === 'done' || feeder.state === 'pending')
 	);
+	const posted = $derived(played.filter((feeder) => feeder.state === 'done').length);
 	const where = $derived(data.region ? regionName(data.region) : null);
 	const meta = $derived(
 		[
@@ -40,6 +42,12 @@
 			.filter(Boolean)
 			.join(' · ')
 	);
+	const tracked = $derived(new Set(data.tracked));
+
+	function feederHref(event: Feeder): string {
+		return tracked.has(event.code) ? `/advancement/${event.code}` : `/events/${event.code}`;
+	}
+
 	const query = $derived(data.region ? `?region=${data.region}` : '');
 </script>
 
@@ -69,10 +77,15 @@
 	<p>
 		<b>{integer(champ.teams.length)}</b>
 		{champ.teams.length === 1 ? 'team has' : 'teams have'} advanced from
-		<b>{integer(played.length)}</b>
-		{played.length === 1 ? 'event' : 'events'}.
+		<b>{integer(posted)}</b>
+		{posted === 1 ? 'event' : 'events'}.
 		<b>{integer(ahead.length)}</b>
 		{ahead.length === 1 ? 'event is' : 'events are'} still to play.
+		{#if played.length > posted}
+			{integer(played.length - posted)} played {played.length - posted === 1
+				? 'event has'
+				: 'events have'} no results in yet.
+		{/if}
 	</p>
 	{#if where}
 		<p class="muted">
@@ -152,7 +165,7 @@
 					{#each ahead as event (event.code)}
 						<tr>
 							<td class="l event">
-								<a href="/events/{event.code}">{event.name}</a>
+								<a href={feederHref(event)}>{event.name}</a>
 								{#if event.state === 'live'}
 									<span class="live">{STATE.live}</span>
 								{/if}
@@ -188,7 +201,7 @@
 					{#each played.toReversed() as event (event.code)}
 						<tr>
 							<td class="l event">
-								<a href="/events/{event.code}">{event.name}</a>
+								<a href={feederHref(event)}>{event.name}</a>
 								{#if !event.confirmed}
 									<span class="faint expected">Expected</span>
 								{/if}

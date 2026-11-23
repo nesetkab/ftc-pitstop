@@ -2,6 +2,7 @@ import { error } from '@sveltejs/kit';
 import {
 	championshipRow,
 	filterIndex,
+	isAhead,
 	parseRegion,
 	regionOptions,
 	unpostedIn
@@ -24,7 +25,8 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 		rows: index.championships.map((championship) =>
 			championshipRow(championship, unpostedIn(loaded.index, championship))
 		),
-		unassigned: index.unassigned,
+		unassigned: region ? index.unassigned : [],
+		unposted: index.unassigned.filter(isAhead).length,
 		updated: loaded.index.generatedAt,
 		stale: loaded.stale
 	};

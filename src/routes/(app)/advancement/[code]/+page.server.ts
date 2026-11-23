@@ -20,11 +20,13 @@ export const load: PageServerLoad = async ({ params, url, setHeaders }) => {
 	const next = found.advancesTo
 		? championships.find((entry) => entry.code === found.advancesTo)
 		: null;
+	const codes = new Set(championships.map((entry) => entry.code));
 	setHeaders({ 'cache-control': CACHE_CONTROL.list });
 	return {
 		championship: region ? forRegion(found, region) : found,
 		region,
 		unposted: unpostedIn(loaded.index, found),
+		tracked: found.feeders.flatMap((feeder) => (codes.has(feeder.code) ? [feeder.code] : [])),
 		next: next ? { code: next.code, name: next.name } : null,
 		updated: loaded.index.generatedAt,
 		stale: loaded.stale

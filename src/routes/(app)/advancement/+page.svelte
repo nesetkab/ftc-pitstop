@@ -24,7 +24,9 @@
 	const regional = $derived(data.rows.filter((row) => row.level === 'regional'));
 	const world = $derived(data.rows.filter((row) => row.level === 'world'));
 	const advanced = $derived(regional.reduce((sum, row) => sum + row.advanced, 0));
-	const ahead = $derived(regional.reduce((sum, row) => sum + row.feeders - row.played, 0));
+	const ahead = $derived(
+		regional.reduce((sum, row) => sum + row.feeders - row.played, 0) + data.unposted
+	);
 	const where = $derived(data.region ? regionName(data.region) : null);
 	const mine = $derived(
 		data.rows.flatMap((row) =>
