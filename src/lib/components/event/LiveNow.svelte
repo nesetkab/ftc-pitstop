@@ -12,6 +12,7 @@
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
+	import Term from '#lib/ui/Term.svelte';
 	import MatchStakes from './MatchStakes.svelte';
 	import { matchHref, teamHref } from './matches.ts';
 	import type { NowMatch, NowStatus, ResultTag } from './now.ts';
@@ -427,8 +428,8 @@
 							<tr>
 								<th scope="col">Rank</th>
 								<th class="l" scope="col">Team</th>
-								<th scope="col"><abbr title="Ranking score">RS</abbr></th>
-								<th class="opt" scope="col">W-L-T</th>
+								<th scope="col"><Term label="RS" /></th>
+								<th class="opt" scope="col">Record</th>
 								{#if view.since}
 									<th scope="col">Since {view.since}</th>
 								{/if}

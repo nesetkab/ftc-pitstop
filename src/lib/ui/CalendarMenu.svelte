@@ -106,6 +106,7 @@
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-panel);
 		background: var(--bg);
+		box-shadow: var(--shadow-pop);
 	}
 
 	.note {

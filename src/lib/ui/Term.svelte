@@ -63,7 +63,7 @@
 		border-radius: var(--radius-control);
 		background: var(--bg);
 		color: var(--text);
-		box-shadow: 0 6px 18px rgb(0 0 0 / 0.12);
+		box-shadow: var(--shadow-pop);
 		font: 400 13px/1.4 var(--font);
 		text-align: left;
 		white-space: normal;

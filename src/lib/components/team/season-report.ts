@@ -10,7 +10,6 @@ import {
 import { fixed, integer } from '#lib/format/number.ts';
 import { ordinal as plainOrdinal } from '#lib/format/ordinal.ts';
 import { pct } from '#lib/format/pct.ts';
-import { record } from '#lib/format/record.ts';
 import { regionName } from '#lib/format/places.ts';
 import { shortRange } from '#lib/format/time.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
@@ -354,15 +353,15 @@ function standingTakeaways(stats: SeasonFacts['stats']): Candidate[] {
 	const notableWorld = top !== null && top <= 10;
 	const notableRegion = region !== null && region.of >= 5 && region.rank <= 3;
 	if (!notableWorld && !notableRegion) return [];
-	const parts: string[] = [];
-	if (rank !== null && of !== null) {
-		const lead = notableWorld ? `Top ${top}% worldwide by season OPR` : 'World rank by season OPR';
-		parts.push(`${lead}: ${ordinal(rank)} of ${integer(of)}`);
-	}
-	if (region && notableRegion) {
-		parts.push(`${ordinal(region.rank)} of ${integer(region.of)} in ${regionName(region.code)}`);
-	}
-	return [{ weight: 85, text: parts.join(', ') }];
+	const place = region && notableRegion ? regionPlace(region.rank, regionName(region.code)) : null;
+	const text = notableWorld
+		? `Top ${top}% worldwide by season OPR${place ? `, ${place}` : ''}`
+		: `${place} by season OPR`;
+	return [{ weight: 85, text }];
+}
+
+function regionPlace(rank: number, name: string): string {
+	return rank === 1 ? `best in ${name}` : `${ordinal(rank)} in ${name}`;
 }
 
 function partTakeaways(comparison: SeasonFacts['comparison']): Candidate[] {
@@ -376,11 +375,10 @@ function partTakeaways(comparison: SeasonFacts['comparison']): Candidate[] {
 		)
 		.sort((a, b) => (b.percentile ?? 0) - (a.percentile ?? 0) || b.value - a.value)[0];
 	if (!best) return [];
-	const digits = best.key === 'tips' ? 2 : 1;
 	return [
 		{
 			weight: 80,
-			text: `Strongest part: ${PART_PHRASES[best.key]}, ${fixed(best.value, digits)} OPR, higher than ${best.percentile}% of teams`
+			text: `Strongest at ${PART_PHRASES[best.key]}, better than ${best.percentile}% of teams`
 		}
 	];
 }
@@ -457,28 +455,16 @@ function outlookTakeaways(upcoming: UpcomingEventRow[], played: boolean): Candid
 		const detail = next.kind === 'none' ? '' : `; ${lowerFirst(next.outlook)}`;
 		return [{ weight: 92, text: `${lead}${detail}` }];
 	}
-	if (next.kind === 'none') return [];
-	return [{ weight: 45, text: `Next: ${next.name}, ${lowerFirst(next.outlook)}` }];
+	return [];
 }
 
 function lowerFirst(text: string): string {
 	return text.charAt(0).toLowerCase() + text.slice(1);
 }
 
-function fallbacks(facts: SeasonFacts, ranked: boolean): Candidate[] {
+function fallbacks(facts: SeasonFacts): Candidate[] {
 	const out: Candidate[] = [];
 	if (facts.rookie) out.push({ weight: 30, text: `Rookie team: ${SEASON} is its first season` });
-	if (facts.stats.record && facts.stats.events > 0) {
-		const { wins, losses, ties } = facts.stats.record;
-		const events = facts.stats.events === 1 ? '1 event' : `${facts.stats.events} events`;
-		out.push({ weight: 20, text: `Record ${record(wins, losses, ties)} across ${events}` });
-	}
-	if (!ranked && facts.stats.rank !== null && facts.stats.of !== null) {
-		out.push({
-			weight: 15,
-			text: `World rank by season OPR: ${ordinal(facts.stats.rank)} of ${integer(facts.stats.of)}`
-		});
-	}
 	if (facts.previous) {
 		out.push({
 			weight: 10,
@@ -505,7 +491,7 @@ export function seasonTakeaways(facts: SeasonFacts): string[] {
 			: [])
 	].sort((a, b) => b.weight - a.weight);
 	const picked = candidates.slice(0, MAX_TAKEAWAYS).map((entry) => entry.text);
-	for (const entry of fallbacks(facts, standing.length > 0)) {
+	for (const entry of fallbacks(facts)) {
 		if (picked.length >= 2) break;
 		if (!picked.includes(entry.text)) picked.push(entry.text);
 	}

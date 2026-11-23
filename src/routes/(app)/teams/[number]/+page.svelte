@@ -81,16 +81,23 @@
 	</section>
 {/if}
 
-<div class="grid2">
+{#if view.charts.length > 0 || view.comparison.length > 0}
+	<div class="grid2">
+		<section class="panel" aria-labelledby="opr-title">
+			<h2 class="sec-title" id="opr-title">{view.chartTitle}</h2>
+			<OprCharts charts={view.charts} />
+		</section>
+		<section class="panel" aria-labelledby="compare-title">
+			<h2 class="sec-title" id="compare-title">Compared with all teams this season</h2>
+			<Comparison rows={view.comparison} />
+		</section>
+	</div>
+{:else}
 	<section class="panel" aria-labelledby="opr-title">
 		<h2 class="sec-title" id="opr-title">{view.chartTitle}</h2>
 		<OprCharts charts={view.charts} />
 	</section>
-	<section class="panel" aria-labelledby="compare-title">
-		<h2 class="sec-title" id="compare-title">Compared with all teams this season</h2>
-		<Comparison rows={view.comparison} />
-	</section>
-</div>
+{/if}
 
 <section class="panel" aria-labelledby="events-title">
 	<h2 class="sec-title" id="events-title">Events</h2>

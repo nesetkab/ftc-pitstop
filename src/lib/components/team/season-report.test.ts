@@ -362,15 +362,15 @@ describe('season takeaways', () => {
 		expect(lines).toEqual([
 			'Advanced to Arizona Championship from Alpha Qualifier',
 			'Awards: Inspire Award, Winning alliance at Alpha Qualifier',
-			'Top 1% worldwide by season OPR: 40th of 4,000, 1st of 120 in Arizona',
-			'Strongest part: hive scoring, 70.0 OPR, higher than 98% of teams'
+			'Top 1% worldwide by season OPR, best in Arizona',
+			'Strongest at hive scoring, better than 98% of teams'
 		]);
 	});
 
 	it('ignores tiny parts and reports the trend across events', () => {
 		const lines = seasonTakeaways(facts({ stats: { ...facts().stats, rank: 900, region: null } }));
 		expect(lines).toEqual([
-			'Strongest part: hive scoring, 70.0 OPR, higher than 98% of teams',
+			'Strongest at hive scoring, better than 98% of teams',
 			'OPR rose from 80.0 to 120.0 over 2 events'
 		]);
 	});
@@ -389,7 +389,7 @@ describe('season takeaways', () => {
 		);
 	});
 
-	it('adds plain facts when little stands out', () => {
+	it('does not repeat the stats row when little stands out', () => {
 		const lines = seasonTakeaways(
 			facts({
 				stats: {
@@ -403,10 +403,7 @@ describe('season takeaways', () => {
 				trend: []
 			})
 		);
-		expect(lines).toEqual([
-			'Record 3-2-0 across 1 event',
-			'World rank by season OPR: 2,000th of 4,000'
-		]);
+		expect(lines).toEqual([]);
 	});
 
 	it('talks about the first event and last season for a team that has not played', () => {
