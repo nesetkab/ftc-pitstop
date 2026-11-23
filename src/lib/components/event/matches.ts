@@ -1,20 +1,12 @@
 import { matchTitle, parseMatchDescription } from '#lib/format/match.ts';
-import type { AllianceColor, Match, Team } from '#lib/types.ts';
+import type { AllianceColor, Match } from '#lib/types.ts';
 
 export function teamNumbers(match: Match, color: AllianceColor): number[] {
 	return match[color].map((team) => team.team);
 }
 
-export function isPlayed(match: Match): boolean {
-	return match.result !== null;
-}
-
 export function quals(matches: Match[]): Match[] {
 	return matches.filter((match) => match.level === 'qual');
-}
-
-export function playoffs(matches: Match[]): Match[] {
-	return matches.filter((match) => match.level === 'playoff');
 }
 
 export function isFinalsOnly(match: Match): boolean {
@@ -54,10 +46,6 @@ export function colorOf(match: Match, team: number): AllianceColor | null {
 	if (match.red.some((entry) => entry.team === team)) return 'red';
 	if (match.blue.some((entry) => entry.team === team)) return 'blue';
 	return null;
-}
-
-export function teamIndex(teams: Team[]): Map<number, Team> {
-	return new Map(teams.map((team) => [team.number, team]));
 }
 
 export function neighbors(matches: Match[], key: string) {

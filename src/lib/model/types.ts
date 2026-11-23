@@ -43,8 +43,6 @@ export type ModelEvent = {
 	matches: ModelMatch[];
 };
 
-export type Alliance = 'red' | 'blue';
-
 export function isPlayed(m: ModelMatch): boolean {
 	return m.redNp !== null && m.blueNp !== null;
 }

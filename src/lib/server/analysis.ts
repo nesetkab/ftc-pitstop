@@ -313,8 +313,6 @@ export function createAnalysis(deps: AnalysisDeps) {
 	};
 }
 
-export type Analysis = ReturnType<typeof createAnalysis>;
-
 export const analysis = createAnalysis({ loaders: defaultLoaders, cache: sharedCache });
 
 export const {

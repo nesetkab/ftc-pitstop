@@ -151,8 +151,6 @@ export function createHome(deps: HomeDeps) {
 	return { loadTodayProgress, loadHighlights, loadFollowed };
 }
 
-export type Home = ReturnType<typeof createHome>;
-
 export const home = createHome({
 	cache: defaultCache,
 	loadTeamSeason,
