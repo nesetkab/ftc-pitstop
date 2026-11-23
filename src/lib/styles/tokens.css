@@ -14,6 +14,7 @@
 	--red-wash: #fae7e5;
 	--blue: #2c5fcc;
 	--blue-wash: #e6edfa;
+	--ok: #24884a;
 	--heat: 26, 26, 25;
 	color-scheme: light;
 }
@@ -34,6 +35,7 @@
 		--red-wash: rgba(255, 98, 87, 0.15);
 		--blue: #5e8eff;
 		--blue-wash: rgba(94, 142, 255, 0.16);
+		--ok: #3cbf6e;
 		--heat: 239, 239, 236;
 		color-scheme: dark;
 	}
@@ -55,6 +57,7 @@
 	--red-wash: rgba(255, 98, 87, 0.15);
 	--blue: #5e8eff;
 	--blue-wash: rgba(94, 142, 255, 0.16);
+	--ok: #3cbf6e;
 	--heat: 239, 239, 236;
 	color-scheme: dark;
 }
@@ -75,6 +78,7 @@
 	--red-wash: rgba(255, 98, 87, 0.17);
 	--blue: #5e8eff;
 	--blue-wash: rgba(94, 142, 255, 0.18);
+	--ok: #3cbf6e;
 	--heat: 242, 242, 239;
 	color-scheme: dark;
 }

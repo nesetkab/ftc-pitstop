@@ -98,7 +98,7 @@
 		height: 0.6em;
 		margin-right: 0.45em;
 		border-radius: 50%;
-		background: #3cbf6e;
+		background: var(--ok);
 	}
 
 	.dot.retrying {
