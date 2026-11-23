@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { fixtureBundle } from '#lib/components/event/test-fixtures.ts';
 import {
+	articleJsonLd,
 	breadcrumbs,
 	eventDescription,
 	eventJsonLd,
@@ -19,6 +20,22 @@ describe('structured data', () => {
 		expect(html.match(/<\/script>/g)).toHaveLength(1);
 		const body = html.slice(html.indexOf('>') + 1, html.lastIndexOf('<'));
 		expect(JSON.parse(body).name).toBe('</script><script>alert(1)</script> & co');
+	});
+
+	it('describes an explainer page as an article on the site', () => {
+		const data = articleJsonLd(ORIGIN, {
+			path: '/about',
+			headline: 'About the numbers',
+			description: 'How it works.',
+			sections: ['OPR', 'Glossary']
+		});
+		expect(data).toMatchObject({
+			'@type': 'TechArticle',
+			headline: 'About the numbers',
+			url: `${ORIGIN}/about`,
+			articleSection: ['OPR', 'Glossary'],
+			isPartOf: { '@type': 'WebSite', url: `${ORIGIN}/` }
+		});
 	});
 
 	it('describes an event as a SportsEvent with its place and dates', () => {

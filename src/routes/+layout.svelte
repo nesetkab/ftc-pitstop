@@ -3,6 +3,7 @@
 	import font from '@fontsource-variable/hanken-grotesk/files/hanken-grotesk-latin-wght-normal.woff2?url';
 	import '#lib/styles/tokens.css';
 	import '#lib/styles/table.css';
+	import '#lib/styles/print.css';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();

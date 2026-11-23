@@ -15,31 +15,39 @@ function tipFor(element: HTMLElement): HTMLElement {
 }
 
 describe('Term', () => {
-	it('makes a known abbreviation a button described by its explanation', () => {
+	it('links a known abbreviation to the glossary and describes it with a tooltip', () => {
 		render(Term, { props: { label: 'RS' } });
-		const button = screen.getByRole('button', { name: 'RS' });
-		const tip = tipFor(button);
+		const link = screen.getByRole('link', { name: 'RS' });
+		expect(link).toHaveAttribute('href', '/about#term-rs');
+		const tip = tipFor(link);
 		expect(tip).toHaveAttribute('role', 'tooltip');
 		expect(tip).toHaveTextContent(explain('RS')!);
-		expect(button).toHaveAccessibleDescription(explain('RS')!);
-		expect(button).not.toHaveAttribute('title');
+		expect(link).toHaveAccessibleDescription(explain('RS')!);
+		expect(link).not.toHaveAttribute('title');
 	});
 
 	it('can show a short label while explaining a longer term', () => {
 		render(Term, { props: { label: 'Auto', term: 'Auto OPR' } });
-		expect(tipFor(screen.getByRole('button', { name: 'Auto' }))).toHaveTextContent(
-			explain('Auto OPR')!
-		);
+		const link = screen.getByRole('link', { name: 'Auto' });
+		expect(link).toHaveAttribute('href', '/about#term-auto-opr');
+		expect(tipFor(link)).toHaveTextContent(explain('Auto OPR')!);
+	});
+
+	it('becomes a tooltip button when it should not link', () => {
+		render(Term, { props: { label: 'RS', link: false } });
+		expect(screen.queryByRole('link')).toBeNull();
+		expect(screen.getByRole('button', { name: 'RS' })).toHaveAccessibleDescription(explain('RS')!);
 	});
 
 	it('leaves plain words alone', () => {
 		const { container } = render(Term, { props: { label: 'Team' } });
 		expect(screen.queryByRole('button')).toBeNull();
+		expect(screen.queryByRole('link')).toBeNull();
 		expect(container).toHaveTextContent('Team');
 	});
 
 	it('shows on focus and tap, and hides on Escape and blur', async () => {
-		render(Term, { props: { label: 'TBP' } });
+		render(Term, { props: { label: 'TBP', link: false } });
 		const button = screen.getByRole('button', { name: 'TBP' });
 		const tip = tipFor(button);
 		expect(tip).toHaveAttribute('hidden');
@@ -73,6 +81,7 @@ describe('Term', () => {
 		render(NestedTerm, { props: { label: 'RS' } });
 		expect(screen.queryByRole('button')).toBeNull();
 		const link = screen.getByRole('link', { name: 'RS' });
+		expect(link).toHaveAttribute('href', '/sort');
 		expect(link).toHaveAccessibleDescription(explain('RS')!);
 	});
 });

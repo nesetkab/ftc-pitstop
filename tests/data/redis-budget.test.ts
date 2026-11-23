@@ -116,6 +116,22 @@ describe('redis commands for an event page view', () => {
 	});
 });
 
+describe('redis commands for team scouting reports', () => {
+	it('adds at most one batched read for season ratings and nothing once warm', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		const report = (page: ReturnType<typeof instance>) =>
+			Promise.all([page.eventPage('USAZGIQ'), page.analysis.loadSeasonRatings()]);
+		const first = instance(redis, clock);
+		await report(first);
+		expect(await commands(redis, () => report(first))).toEqual([]);
+		const fresh = instance(redis, clock);
+		const cold = reads(await commands(redis, () => report(fresh)));
+		expect(cold.every((call) => call === 'mget')).toBe(true);
+		expect(cold.length).toBeLessThanOrEqual(3);
+	});
+});
+
 describe('redis commands for season matches', () => {
 	it('reads every week in one batch', async () => {
 		const redis = createFakeRedis(() => LIVE);

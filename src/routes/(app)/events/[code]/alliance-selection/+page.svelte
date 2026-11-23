@@ -232,7 +232,7 @@
 		{#if selection.started}
 			<div class="panel main">
 				<h3 class="sec-title">{selection.complete ? 'Teams' : 'Available teams'}</h3>
-				<AvailableTeams {table} {me} {marks} />
+				<AvailableTeams {table} {me} {marks} eventCode={bundle.event.code} />
 				{#each notes as note (note)}
 					<p class="note">{note}</p>
 				{/each}

@@ -1,20 +1,24 @@
 <script lang="ts">
-	import { explain } from '#lib/format/glossary.ts';
+	import { explain, termHref } from '#lib/format/glossary.ts';
 	import { termTip } from './term-tip.ts';
 
 	interface Props {
 		label: string;
 		term?: string;
+		link?: boolean;
 		nested?: boolean;
 	}
 
-	let { label, term, nested = false }: Props = $props();
+	let { label, term, link = true, nested = false }: Props = $props();
 
 	const text = $derived(explain(term ?? label));
+	const href = $derived(link && !nested ? termHref(term ?? label) : null);
 </script>
 
 {#if text && nested}
 	<span class="term" {@attach termTip(text, true)}>{label}</span>
+{:else if text && href}
+	<a class="term" {href} {@attach termTip(text)}>{label}</a>
 {:else if text}
 	<button type="button" class="term" {@attach termTip(text)}>{label}</button>
 {:else}{label}{/if}
@@ -22,6 +26,16 @@
 <style>
 	.term {
 		cursor: help;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+
+	a:hover {
+		text-decoration: underline dotted;
+		text-underline-offset: 3px;
 	}
 
 	button {

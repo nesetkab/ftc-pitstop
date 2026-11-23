@@ -1,7 +1,7 @@
 import { searchIndex } from '#lib/server/event.ts';
 import type { RequestHandler } from './$types';
 
-const PAGES = ['/', '/events', '/leaderboards', '/records', '/accuracy'];
+const PAGES = ['/', '/events', '/leaderboards', '/records', '/accuracy', '/about'];
 
 type Page = { path: string; lastmod?: string };
 

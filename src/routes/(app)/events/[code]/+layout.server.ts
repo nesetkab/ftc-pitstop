@@ -16,7 +16,8 @@ function withoutHistory(analysis: EventAnalysis): EventAnalysis {
 	return { ...analysis, ratings: analysis.ratings.map((rating) => ({ ...rating, history: [] })) };
 }
 
-const OWN_HEADERS = /\/(teams|alliance-selection|results|matches\/\[key\])$/;
+const OWN_HEADERS =
+	/\/(teams|teams\/\[number\]|scouting|alliance-selection|results|matches\/\[key\])$/;
 
 export const load: LayoutServerLoad = async ({
 	params,

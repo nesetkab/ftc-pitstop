@@ -46,12 +46,17 @@
 		{@render children()}
 	</main>
 	<footer>
-		<p>
-			Data from <a href="https://ftc-events.firstinspires.org">FTC Events</a> and
-			<a href="https://ftcscout.org">FTCScout</a>.
-		</p>
+		<div class="credits">
+			<p>
+				Data from <a href="https://ftc-events.firstinspires.org">FIRST FTC Events</a>,
+				<a href="https://ftcscout.org">FTCScout</a> and <a href="https://ftc.nexus">Nexus</a>.
+			</p>
+			<p>Not affiliated with or endorsed by FIRST.</p>
+		</div>
 		<nav aria-label="Footer">
+			<a href="/about">About the numbers</a>
 			<a href="/accuracy">Prediction accuracy</a>
+			<a href="https://github.com/nesetkab/ftc-pitstop">GitHub</a>
 		</nav>
 		<div class="footer-theme">
 			<ThemeSwitch />
@@ -120,9 +125,22 @@
 		color: var(--text-3);
 	}
 
+	.credits {
+		display: grid;
+		gap: 2px;
+	}
+
 	footer nav {
 		display: flex;
-		gap: 16px;
+		flex-wrap: wrap;
+		align-content: start;
+		gap: 4px 16px;
+	}
+
+	footer nav a {
+		display: inline-flex;
+		align-items: center;
+		min-height: 24px;
 	}
 
 	footer a:hover {

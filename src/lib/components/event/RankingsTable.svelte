@@ -6,6 +6,7 @@
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import Term from '#lib/ui/Term.svelte';
+	import { teamHref } from './matches.ts';
 	import {
 		cellText,
 		phoneHidden,
@@ -27,6 +28,7 @@
 		hrefFor: (choice: RankingChoice) => string;
 		onchoose?: (choice: RankingChoice) => void;
 		followed?: ReadonlySet<number>;
+		eventCode?: string;
 	}
 
 	let {
@@ -38,7 +40,8 @@
 		qualCount = 0,
 		hrefFor,
 		onchoose,
-		followed = new Set()
+		followed = new Set(),
+		eventCode
 	}: Props = $props();
 
 	const names = $derived(new Map(teams.map((team) => [team.number, team.name])));
@@ -127,7 +130,11 @@
 			<tr class:me={followed.has(team)}>
 				<td class="l pin rank">{row.ranking.rank}</td>
 				<td class="pin team">
-					<TeamCell number={team} name={names.get(team) ?? row.ranking.name} href="/teams/{team}" />
+					<TeamCell
+						number={team}
+						name={names.get(team) ?? row.ranking.name}
+						href={teamHref(team, eventCode)}
+					/>
 				</td>
 				{#each columns as column (column.key)}
 					<td class={{ opt: hidden(column.key as ColumnKey), strong: choice.sort === column.key }}>

@@ -9,6 +9,7 @@
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
+	import { teamHref } from './matches.ts';
 
 	interface Props {
 		match: Match;
@@ -16,9 +17,10 @@
 		rankings: Ranking[];
 		ratings?: TeamRating[] | null;
 		followed?: ReadonlySet<number>;
+		eventCode?: string;
 	}
 
-	let { match, teams, rankings, ratings = null, followed = new Set() }: Props = $props();
+	let { match, teams, rankings, ratings = null, followed = new Set(), eventCode }: Props = $props();
 
 	const names = $derived(new Map(teams.map((team) => [team.number, team.name])));
 	const ranks = $derived(new Map(rankings.map((row) => [row.team, row])));
@@ -62,7 +64,11 @@
 			{@const ranking = ranks.get(row.team)}
 			<tr class:me={followed.has(row.team)}>
 				<td class="team">
-					<TeamCell number={row.team} name={names.get(row.team)} href="/teams/{row.team}" />
+					<TeamCell
+						number={row.team}
+						name={names.get(row.team)}
+						href={teamHref(row.team, eventCode)}
+					/>
 					{#if row.surrogate}
 						<span class="faint">surrogate</span>
 					{/if}
