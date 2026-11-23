@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import type {
 	EventAnalysis,
 	MatchForecast,
@@ -7,46 +5,11 @@ import type {
 	ScheduleStrength,
 	TeamRating
 } from '#lib/analysis/types.ts';
-import {
-	mapAlliances,
-	mapAwards,
-	mapEvent,
-	mapMatches,
-	mapRankings,
-	mapTeams
-} from '#lib/server/ftc/mappers.ts';
+import { fixtureBundle as liveBundle } from '#lib/components/pit/fixtures.ts';
 import type { EventBundle, Match } from '#lib/types.ts';
 
-const ROOT = join(process.cwd(), 'tests/fixtures/ftc/2026');
-
-function read<T>(code: string, name: string): T {
-	return JSON.parse(readFileSync(join(ROOT, code, `${name}.json`), 'utf8')) as T;
-}
-
-type Raw<F extends (...args: never[]) => unknown> = Parameters<F>[0];
-
 export function fixtureBundle(code: string): EventBundle {
-	const event = mapEvent(read<{ events: Raw<typeof mapEvent>[] }>(code, 'event').events[0]);
-	const matches = mapMatches({
-		timezone: event.timezone,
-		qualSchedule: read(code, 'schedule-qual'),
-		playoffSchedule: read(code, 'schedule-playoff'),
-		qualScores: read(code, 'scores-qual'),
-		playoffScores: read(code, 'scores-playoff')
-	});
-	return {
-		event,
-		teams: mapTeams([read(code, 'teams')]),
-		matches,
-		rankings: mapRankings(read(code, 'rankings')),
-		alliances: mapAlliances(read(code, 'alliances')),
-		awards: mapAwards(read(code, 'awards')),
-		advancement: null,
-		phase: 'done',
-		fetchedAt: Date.parse('2026-11-19T12:00:00Z'),
-		stale: false,
-		source: 'ftc'
-	};
+	return { ...liveBundle(code), advancement: null, phase: 'done' };
 }
 
 export function unplay(bundle: EventBundle, from: (match: Match) => boolean): EventBundle {
