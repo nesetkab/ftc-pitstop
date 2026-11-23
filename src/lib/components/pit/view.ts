@@ -78,6 +78,7 @@ export interface AvailableTeam {
 	rank: number | null;
 	rs: number | null;
 	opr: number | null;
+	winEvent: number | null;
 }
 
 export type AllianceRole = 'captain' | 'pick' | 'backup';
@@ -289,6 +290,7 @@ function availableTeams(
 		if (alliance.backup) taken.add(alliance.backup);
 	}
 	const ranks = new Map(bundle.rankings.map((row) => [row.team, row]));
+	const options = new Map(analysis?.picks?.options.map((option) => [option.team, option]));
 	const numbers = bundle.rankings.length
 		? bundle.rankings.map((row) => row.team)
 		: bundle.teams.map((team) => team.number);
@@ -299,11 +301,11 @@ function availableTeams(
 			name: names.get(number) ?? null,
 			rank: ranks.get(number)?.rank ?? null,
 			rs: ranks.get(number)?.rs ?? null,
-			opr: ratings.get(number)?.opr ?? null
+			opr: ratings.get(number)?.opr ?? null,
+			winEvent: options.get(number)?.winEvent ?? null
 		}));
-	const order = analysis?.picks?.options.map((option) => option.team);
-	if (order?.length) {
-		const position = new Map(order.map((team, index) => [team, index]));
+	if (options.size > 0) {
+		const position = new Map([...options.keys()].map((team, index) => [team, index]));
 		return rows.sort(
 			(a, b) =>
 				(position.get(a.number) ?? Infinity) - (position.get(b.number) ?? Infinity) ||

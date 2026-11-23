@@ -13,15 +13,24 @@
 		timeZone: string;
 		delaySeconds: number | null;
 		showRp?: boolean;
+		label?: string;
 	}
 
-	let { next, call, now, timeZone, delaySeconds, showRp = true }: Props = $props();
+	let {
+		next,
+		call,
+		now,
+		timeZone,
+		delaySeconds,
+		showRp = true,
+		label = 'Next match'
+	}: Props = $props();
 
 	const text = $derived(heroText(next, call, now, timeZone, delaySeconds));
 	const rp = $derived(showRp ? (next.forecast?.[next.alliance].rp ?? null) : null);
 </script>
 
-<h2 class="tv-label">Next match</h2>
+<h2 class="tv-label">{label}</h2>
 <div class="hero">
 	<b>{next.label}</b>
 	<AllianceTag alliance={next.alliance} />

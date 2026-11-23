@@ -25,22 +25,22 @@ export const ALERT_OPTIONS: { key: AlertKey; label: string; detail: string }[] =
 	{
 		key: 'twoBefore',
 		label: 'Two matches before ours',
-		detail: 'Says which alliance we are on, who our partners are and when to queue.'
+		detail: 'Our alliance, partners and queue time.'
 	},
 	{
 		key: 'scorePosted',
 		label: 'Our score is posted',
-		detail: 'Says whether we won and the final score.'
+		detail: 'Win or loss and the final score.'
 	},
 	{
 		key: 'rankChanges',
 		label: 'Our rank changes',
-		detail: 'Says our new rank and where we moved from.'
+		detail: 'Our new rank and where we moved from.'
 	},
 	{
 		key: 'selectionStarts',
 		label: 'Alliance selection starts',
-		detail: 'Says selection is starting and where we finished.'
+		detail: 'Where we finished in quals.'
 	}
 ];
 
@@ -187,45 +187,6 @@ export function alertsBetween(
 		});
 	}
 	return alerts;
-}
-
-const NONE: AlertSettings = {
-	twoBefore: false,
-	scorePosted: false,
-	rankChanges: false,
-	selectionStarts: false
-};
-
-function previewPair(
-	after: AlertSnapshot,
-	key: AlertKey
-): { before: AlertSnapshot; after: AlertSnapshot } | null {
-	if (key === 'twoBefore') {
-		if (!after.next) return null;
-		const next = { ...after.next, matchesAway: Math.min(after.next.matchesAway, 2) };
-		return { before: { ...after, next: null }, after: { ...after, next } };
-	}
-	if (key === 'scorePosted') {
-		if (after.posted.length === 0) return null;
-		const posted = after.posted.slice(-1);
-		return { before: { ...after, posted: [] }, after: { ...after, posted } };
-	}
-	if (key === 'rankChanges') {
-		if (after.rank === null) return null;
-		return { before: { ...after, rank: after.rank + 1 }, after };
-	}
-	return { before: { ...after, phase: 'quals' }, after: { ...after, phase: 'selection' } };
-}
-
-export function alertPreview(
-	view: PitView,
-	key: AlertKey,
-	timeZone: string,
-	now: number
-): PitAlert | null {
-	const pair = previewPair(alertSnapshot(view), key);
-	if (!pair) return null;
-	return alertsBetween(pair.before, pair.after, { ...NONE, [key]: true }, timeZone, now)[0] ?? null;
 }
 
 export const TEST_ALERT: PitAlert = {

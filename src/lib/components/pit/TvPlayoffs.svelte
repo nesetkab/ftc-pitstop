@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { pct } from '#lib/format/pct.ts';
 	import MatchList from '#lib/ui/MatchList.svelte';
+	import Facts from './Facts.svelte';
 	import NextHero from './NextHero.svelte';
 	import TeamTag from './TeamTag.svelte';
-	import { lastResultItem, matchItems, playoffResult } from './copy.ts';
+	import { lastResultItem, matchItems, playoffResult, type Fact } from './copy.ts';
 	import type { QueueCall } from './queue.ts';
 	import type { PitView } from './view.ts';
 
@@ -19,6 +20,12 @@
 	const playoff = $derived(view.playoff);
 	const next = $derived(view.next?.level === 'playoff' ? view.next : null);
 	const result = $derived(playoffResult(view));
+	const facts = $derived.by(() => {
+		if (!playoff) return [];
+		const list: Fact[] = [{ label: 'Playoff record', value: `${playoff.wins}-${playoff.losses}` }];
+		if (playoff.winEvent !== null) list.push({ label: 'Win event', value: pct(playoff.winEvent) });
+		return list;
+	});
 	const members = $derived(
 		playoff?.alliance
 			? [
@@ -33,10 +40,15 @@
 <div class="cols" style:--cols="31em 23em minmax(0, 1fr)">
 	<section>
 		{#if next}
-			<NextHero {next} {call} {now} {timeZone} delaySeconds={view.delaySeconds} showRp={false} />
-			{#if playoff?.position}
-				<p class="sub">{playoff.position}</p>
-			{/if}
+			<NextHero
+				{next}
+				{call}
+				{now}
+				{timeZone}
+				delaySeconds={view.delaySeconds}
+				showRp={false}
+				label={playoff?.position ? `Next match · ${playoff.position}` : 'Next match'}
+			/>
 		{:else}
 			<h2 class="tv-label">Playoffs</h2>
 			<p class={['status', { won: playoff?.state === 'won' }]}>
@@ -59,11 +71,7 @@
 					</li>
 				{/each}
 			</ul>
-			<p class="sub">
-				Playoff record {playoff.wins}-{playoff.losses}{playoff.winEvent !== null
-					? `. Chance to win the event ${pct(playoff.winEvent)}.`
-					: '.'}
-			</p>
+			<Facts {facts} />
 		{:else}
 			<p class="sub">{view.team} is not on a playoff alliance.</p>
 		{/if}

@@ -11,7 +11,7 @@
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Toggle from '#lib/ui/Toggle.svelte';
-	import { ALERT_OPTIONS, alertPreview, type AlertKey, type AlertSettings } from './alerts.ts';
+	import { ALERT_OPTIONS, type AlertKey, type AlertSettings } from './alerts.ts';
 	import type BriefPanelComponent from './BriefPanel.svelte';
 	import { matchBrief } from './brief.ts';
 	import {
@@ -138,11 +138,6 @@
 	const last = $derived(
 		view.phase === 'upcoming' || view.phase === 'done' ? null : lastMatch(view, rankMemory)
 	);
-	const previews = $derived(
-		new Map(
-			ALERT_OPTIONS.map((option) => [option.key, alertPreview(view, option.key, timeZone, now)])
-		)
-	);
 	const items = $derived(
 		view.matches.map((match) => matchItem(match, next?.key ?? null, timeZone, now, href(match.key)))
 	);
@@ -200,7 +195,11 @@
 				<EmptyState title={absent.title}>{absent.detail}</EmptyState>
 			{:else if next && text && view.phase !== 'upcoming'}
 				<section class={['next', { called }]}>
-					<span class="muted">Next match</span>
+					<span class="muted">
+						Next match{next.level === 'playoff' && view.playoff?.position
+							? ` · ${view.playoff.position}`
+							: ''}
+					</span>
 					<div class="q">
 						<b>{next.label}</b>
 						<AllianceChip alliance={next.alliance} />
@@ -220,9 +219,6 @@
 						<span class="field">{field}</span>
 					{/if}
 					<span class="muted">{phoneDetail(next, timeZone, view.delaySeconds, now)}</span>
-					{#if next.level === 'playoff' && view.playoff?.position}
-						<span class="muted">{view.playoff.position}</span>
-					{/if}
 				</section>
 				{#if prediction}
 					<PredictionCard
@@ -380,7 +376,6 @@
 				<section class="sec">
 					<h2 class="sec-title">Alerts</h2>
 					{#each alertOptions as option (option.key)}
-						{@const preview = previews.get(option.key)}
 						<div class="alert">
 							<Toggle
 								label={option.label}
@@ -388,18 +383,10 @@
 								disabled={blocked}
 								onchange={(on) => onalert(option.key, on)}
 							/>
-							<p class="preview">
-								{#if preview}
-									<span class="visually-hidden">For example:</span>
-									<b>{preview.title}</b>
-									{preview.body}
-								{:else}
-									{option.detail}
-								{/if}
-							</p>
+							<p class="detail">{option.detail}</p>
 						</div>
 					{/each}
-					{#if canVibrate}
+					{#if canVibrate && permission === 'granted'}
 						<Toggle
 							label="Vibrate with alerts"
 							checked={vibrate}
@@ -680,16 +667,10 @@
 		gap: 2px;
 	}
 
-	.preview {
+	.detail {
 		padding-right: 56px;
 		font-size: 13px;
 		color: var(--text-3);
-	}
-
-	.preview b {
-		display: block;
-		font-weight: 500;
-		color: var(--text-2);
 	}
 
 	.big.urgent {

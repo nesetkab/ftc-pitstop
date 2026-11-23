@@ -1,6 +1,5 @@
 import { awardName as sharedAwardName } from '#lib/components/event/awards.ts';
 import { fixed } from '#lib/format/number.ts';
-import { ordinal } from '#lib/format/ordinal.ts';
 import { pct } from '#lib/format/pct.ts';
 import { record } from '#lib/format/record.ts';
 import { relative } from '#lib/format/relative.ts';
@@ -229,13 +228,7 @@ export function roleText(view: PitView): string {
 	if (view.role === 'captain') return `Captain of alliance ${seed}`;
 	if (view.role === 'pick') return `Picked by alliance ${seed}`;
 	if (view.role === 'backup') return `Backup for alliance ${seed}`;
-	return view.alliances.length > 0 ? 'Not on an alliance yet' : 'Alliance selection is next';
-}
-
-export function standingText(view: PitView): string | null {
-	const ranking = view.ranking;
-	if (!ranking) return null;
-	return `Ranked ${ordinal(ranking.rank)} of ${view.teamCount} at ${record(ranking.wins, ranking.losses, ranking.ties)} with an RS of ${fixed(ranking.rs, 2)}.`;
+	return view.alliances.length > 0 ? 'Not on an alliance yet' : 'Starting soon';
 }
 
 export interface Fact {
@@ -314,7 +307,9 @@ export function liveText(view: PitView, call: QueueCall | null): string {
 		parts.push(`Next match ${next.label}, ${colorName(next.alliance)} alliance.`);
 		parts.push(callText(next, call));
 	} else if (view.phase === 'selection') {
-		parts.push(`${roleText(view)}.`);
+		parts.push(
+			view.alliances.length > 0 ? `${roleText(view)}.` : 'Alliance selection is starting soon.'
+		);
 	} else if (view.phase === 'done') {
 		const result = playoffResult(view);
 		if (result) parts.push(`${result}.`);

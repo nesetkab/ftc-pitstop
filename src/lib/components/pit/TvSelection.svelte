@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { fixed } from '#lib/format/number.ts';
+	import { pct } from '#lib/format/pct.ts';
 	import Facts from './Facts.svelte';
 	import RowFit from './RowFit.svelte';
 	import TeamTag from './TeamTag.svelte';
-	import { eventFacts, roleText, standingText } from './copy.ts';
+	import { eventFacts, roleText } from './copy.ts';
 	import type { PitView } from './view.ts';
 
 	interface Props {
@@ -15,6 +16,7 @@
 
 	const picked = $derived(view.role !== null);
 	const withOpr = $derived(view.available.some((team) => team.opr !== null));
+	const withOdds = $derived(view.available.some((team) => team.winEvent !== null));
 	const available = $derived(view.available.slice(0, availableRows));
 
 	function members(seed: number) {
@@ -27,9 +29,6 @@
 	<section>
 		<h2 class="tv-label">Alliance selection</h2>
 		<p class={['status', { picked }]}>{roleText(view)}</p>
-		{#if standingText(view)}
-			<p class="sub">{standingText(view)}</p>
-		{/if}
 		{#if view.picking !== null}
 			<p class="sub">Alliance {view.picking} is picking.</p>
 		{/if}
@@ -71,7 +70,7 @@
 				{/each}
 			</ol>
 		{:else}
-			<p class="sub">Alliances show up here as teams are picked.</p>
+			<p class="sub">No picks yet.</p>
 		{/if}
 	</section>
 	<section class="fill">
@@ -88,6 +87,7 @@
 							<th class="l" scope="col">Team</th>
 							<th class="l" scope="col"><span class="visually-hidden">Name</span></th>
 							<th scope="col">{withOpr ? 'OPR' : 'RS'}</th>
+							{#if withOdds}<th scope="col">Win event</th>{/if}
 						</tr>
 					</thead>
 					<tbody>
@@ -97,6 +97,7 @@
 								<td class="l">{team.number}</td>
 								<td class="name">{team.name ?? ''}</td>
 								<td>{withOpr ? fixed(team.opr, 1) : fixed(team.rs, 2)}</td>
+								{#if withOdds}<td>{pct(team.winEvent)}</td>{/if}
 							</tr>
 						{/each}
 					</tbody>
@@ -195,6 +196,7 @@
 		font-weight: 500;
 		text-align: right;
 		vertical-align: bottom;
+		white-space: nowrap;
 	}
 
 	td {

@@ -155,7 +155,7 @@ describe('TvScreen', () => {
 		expect(content).toContain('M3');
 		expect(content).toContain('Upper bracket round 2');
 		expect(content).toContain('Alliance 5');
-		expect(content).toContain('Playoff record 1-0.');
+		expect(content).toContain('Playoff record 1-0');
 	});
 
 	it('wraps up with the final rank and awards', () => {
@@ -389,13 +389,13 @@ describe('PhoneScreen', () => {
 		expect(text(hero as HTMLElement)).toContain("Q25 is on the field. We're up next.");
 	});
 
-	it('previews what each alert will say', () => {
+	it('describes each alert without guessing at live data', () => {
 		const { container } = phone('default');
-		const previews = [...container.querySelectorAll('.preview')].map((node) =>
+		const details = [...container.querySelectorAll('.alert .detail')].map((node) =>
 			text(node as HTMLElement).trim()
 		);
-		expect(previews[0]).toBe('For example: Q26 is two matches away Red alliance with 25620.');
-		expect(previews[1]).toMatch(/^For example: Q\d+: (won|lost|tied) \d+–\d+/);
+		expect(details[0]).toBe('Our alliance, partners and queue time.');
+		expect(details[1]).toBe('Win or loss and the final score.');
 	});
 
 	it('offers vibration and a test alert only where they work', async () => {

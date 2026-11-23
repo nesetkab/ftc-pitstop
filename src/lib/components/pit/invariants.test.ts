@@ -6,13 +6,7 @@ import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { dayTime, sameDay } from '#lib/format/time.ts';
 import { replayBundle, revealTime } from '#lib/game/replay.ts';
 import type { EventBundle, Ranking } from '#lib/types.ts';
-import {
-	ALERT_OPTIONS,
-	DEFAULT_ALERTS,
-	alertPreview,
-	alertSnapshot,
-	alertsBetween
-} from './alerts.ts';
+import { DEFAULT_ALERTS, alertSnapshot, alertsBetween } from './alerts.ts';
 import { matchBrief } from './brief.ts';
 import {
 	fieldLine,
@@ -162,12 +156,6 @@ function check(full: EventBundle, team: number, now: number): string[] {
 		if (BROKEN.test(line)) say(`broken last match: ${line}`);
 	} else if (posted.length > 0 && view.matches.some((m) => m.outcome !== null)) {
 		say('posted result but no last match');
-	}
-	for (const option of ALERT_OPTIONS) {
-		const preview = alertPreview(view, option.key, zone, now);
-		if (preview && BROKEN.test(`${preview.title} ${preview.body}`)) {
-			say(`broken ${option.key} preview: ${preview.title} ${preview.body}`);
-		}
 	}
 	for (const item of matchItems(view.matches, next?.key ?? null, zone, now)) {
 		if (item.state === 'done' || item.status === 'On field' || item.status === '') continue;

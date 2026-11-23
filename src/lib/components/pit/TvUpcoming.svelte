@@ -22,13 +22,14 @@
 	const startDay = $derived(
 		view.startsAt !== null ? relativeDay(view.startsAt, now, event.timezone) : null
 	);
+	const scheduled = $derived(view.matches.length > 0 || view.startsAt !== null);
 	const shownUrl = $derived(phoneUrl.replace(/^www\./, ''));
 	const where = $derived(
 		[event.venue, [event.city, event.state].filter(Boolean).join(', ')].filter(Boolean).join(', ')
 	);
 </script>
 
-<div class="cols" style:--cols="31em minmax(0, 1fr) 21em">
+<div class="cols" style:--cols={scheduled ? '31em minmax(0, 1fr) 21em' : 'minmax(0, 1fr) 21em'}>
 	<section>
 		<span class="tv-label">{dateRange(event.start, event.end)}</span>
 		<div class="team">
@@ -56,20 +57,20 @@
 			{/if}
 		</div>
 	</section>
-	<section>
-		<h2 class="tv-label">Our matches</h2>
-		{#if view.matches.length > 0}
-			<MatchList items={matchItems(view.matches, first?.key ?? null, event.timezone, now, 10)} />
-		{:else}
-			<p class="sub">Our matches show up here when the schedule is posted.</p>
-		{/if}
-		{#if view.startsAt !== null}
-			<p class="sub">
-				Matches start {startDay ? `${startDay} ` : ''}at {time(view.startsAt, event.timezone)}. {view.qualsTotal}
-				qualification matches in all.
-			</p>
-		{/if}
-	</section>
+	{#if scheduled}
+		<section>
+			<h2 class="tv-label">Our matches</h2>
+			{#if view.matches.length > 0}
+				<MatchList items={matchItems(view.matches, first?.key ?? null, event.timezone, now, 10)} />
+			{/if}
+			{#if view.startsAt !== null}
+				<p class="sub">
+					Matches start {startDay ? `${startDay} ` : ''}at {time(view.startsAt, event.timezone)}. {view.qualsTotal}
+					qualification matches in all.
+				</p>
+			{/if}
+		</section>
+	{/if}
 	<section class="phone">
 		<div class="code">
 			<QrCode text={`https://${phoneUrl}`} label={`QR code for ${phoneUrl}`} />

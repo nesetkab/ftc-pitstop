@@ -36,7 +36,9 @@
 	<Logo height="0.95em" />
 	<span class="event">{eventName}</span>
 	<span class="space"></span>
-	<h1 class="me">{team}{teamName ? ` ${teamName}` : ''}</h1>
+	<h1 class="me">
+		{team}{#if teamName}<span class="name">{` ${teamName}`}</span>{/if}
+	</h1>
 	<time datetime={new Date(now).toISOString()}>{time(now, timeZone)}</time>
 	{#if canFullscreen && !fullscreen}
 		<button type="button" onclick={enterFullscreen}>Full screen</button>
@@ -80,6 +82,12 @@
 
 	time {
 		font-variant-numeric: tabular-nums;
+	}
+
+	@media (orientation: portrait) {
+		.name {
+			display: none;
+		}
 	}
 
 	button {
