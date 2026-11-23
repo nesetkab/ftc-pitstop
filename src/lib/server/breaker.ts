@@ -12,6 +12,10 @@ export interface Breaker {
 	isOpen(): boolean;
 }
 
+export function isOutage(status: number): boolean {
+	return status === 401 || status === 403 || status === 429 || status >= 500;
+}
+
 export function createBreaker(options: BreakerOptions = {}): Breaker {
 	const threshold = options.threshold ?? 5;
 	const cooldownMs = options.cooldownMs ?? 10_000;

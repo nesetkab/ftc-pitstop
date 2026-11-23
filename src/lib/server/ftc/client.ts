@@ -1,6 +1,6 @@
 import * as z from 'zod';
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { createBreaker, type Breaker } from '#lib/server/breaker.ts';
+import { createBreaker, isOutage, type Breaker } from '#lib/server/breaker.ts';
 
 export const FTC_API_ROOT = 'https://ftc-api.firstinspires.org/v2.0/';
 
@@ -50,10 +50,6 @@ function describeStatus(status: number): string {
 	if (status === 429) return 'FTC API rate limit reached';
 	if (status >= 500) return 'FTC API is having trouble';
 	return `FTC API error ${status}`;
-}
-
-function isOutage(status: number): boolean {
-	return status === 401 || status === 403 || status === 429 || status >= 500;
 }
 
 function isTimeout(error: unknown): boolean {

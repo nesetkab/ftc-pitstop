@@ -15,14 +15,6 @@ export interface CalendarFeed {
 	cacheControl: string;
 }
 
-async function settled(task: Promise<LoadedBundle>): Promise<LoadedBundle | null> {
-	try {
-		return await task;
-	} catch {
-		return null;
-	}
-}
-
 export async function eventFeed(
 	deps: Pick<CalendarDeps, 'loadEventBundle'>,
 	code: string,
@@ -48,7 +40,9 @@ export async function teamFeed(
 	const codes = season.events
 		.filter((entry) => scheduleLikely(entry.event, now))
 		.map((entry) => entry.event.code);
-	const loaded = await Promise.all(codes.map((code) => settled(deps.loadEventBundle(code))));
+	const loaded = await Promise.all(
+		codes.map((code) => deps.loadEventBundle(code).catch(() => null))
+	);
 	const bundles: Record<string, EventBundle | null> = {};
 	const caches: string[] = [];
 	codes.forEach((code, index) => {
