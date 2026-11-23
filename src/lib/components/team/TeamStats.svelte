@@ -54,12 +54,13 @@
 	<div>
 		<dt>Qual record</dt>
 		<dd title="Qualification matches at every event this season. Playoffs are not counted.">
-			{stats.record ? record(stats.record.wins, stats.record.losses, stats.record.ties) : MISSING}
+			{#if stats.record}
+				{record(stats.record.wins, stats.record.losses, stats.record.ties)}
+				<small>in {stats.events} {stats.events === 1 ? 'event' : 'events'}</small>
+			{:else}
+				{MISSING}
+			{/if}
 		</dd>
-	</div>
-	<div>
-		<dt>Events played</dt>
-		<dd>{stats.events}</dd>
 	</div>
 	{#if change !== null}
 		<div>
@@ -133,6 +134,10 @@
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 			gap: 14px 20px;
+		}
+
+		.stats > div:last-child:nth-child(odd) {
+			grid-column: 1 / -1;
 		}
 	}
 </style>

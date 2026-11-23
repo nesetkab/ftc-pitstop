@@ -28,6 +28,11 @@
 		margin: 0;
 	}
 
+	.facts:has(> div:nth-child(4):last-child),
+	.facts:has(> div:nth-child(2):last-child) {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.facts div {
 		display: grid;
 		gap: 0.1em;

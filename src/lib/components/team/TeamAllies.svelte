@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { fixed, integer, MISSING, record } from '#lib/format/index.ts';
-	import Button from '#lib/ui/Button.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Term from '#lib/ui/Term.svelte';
@@ -20,6 +19,11 @@
 
 	const visible = $derived(open ? rows : rows.slice(0, SHOWN));
 	const hidden = $derived(rows.length - SHOWN);
+	const summary = $derived(
+		kind === 'partners'
+			? `${total} ${total === 1 ? 'partner' : 'partners'}, most matches together first.`
+			: `${total} ${total === 1 ? 'opponent' : 'opponents'}, toughest first by season OPR.`
+	);
 </script>
 
 <Table>
@@ -67,22 +71,17 @@
 		{/each}
 	</tbody>
 </Table>
-{#if hidden > 0}
-	<div class="more">
-		<Button variant="secondary" aria-expanded={open} onclick={() => (open = !open)}>
+<div class="foot">
+	<p class="note">
+		{summary}
+		{#if open && total > rows.length}Top {rows.length} shown.{/if}
+	</p>
+	{#if hidden > 0}
+		<button type="button" class="toggle" aria-expanded={open} onclick={() => (open = !open)}>
 			{open ? 'Show fewer' : `Show ${hidden} more`}
-		</Button>
-	</div>
-{/if}
-<p class="note">
-	{#if kind === 'partners'}
-		Played with {total} different {total === 1 ? 'partner' : 'partners'}. Best score is the
-		alliance's highest score together.
-	{:else}
-		Faced {total} different {total === 1 ? 'team' : 'teams'}. Sorted by season OPR, toughest first.
+		</button>
 	{/if}
-	{#if total > rows.length}Showing the top {rows.length}.{/if}
-</p>
+</div>
 
 <style>
 	.team {
@@ -106,8 +105,36 @@
 		color: var(--text-3);
 	}
 
-	.more {
+	.foot {
 		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	.toggle {
+		flex: none;
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--text-2);
+		font: inherit;
+		font-size: 13px;
+		font-weight: 500;
+		cursor: pointer;
+	}
+
+	.toggle:hover {
+		color: var(--text);
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+
+	@media (pointer: coarse) {
+		.toggle {
+			margin-block: -12px;
+			padding-block: 12px;
+		}
 	}
 
 	@media (max-width: 600px) {

@@ -5,9 +5,10 @@
 		path: string;
 		filename: string;
 		note: string;
+		label?: string;
 	}
 
-	let { path, filename, note }: Props = $props();
+	let { path, filename, note, label = 'Add to calendar' }: Props = $props();
 
 	let menu = $state<HTMLDetailsElement>();
 
@@ -41,7 +42,7 @@
 </script>
 
 <details class="calendar" bind:this={menu}>
-	<summary>Add to calendar</summary>
+	<summary>{label}</summary>
 	<div class="panel">
 		<p class="note">{note}</p>
 		<ul>

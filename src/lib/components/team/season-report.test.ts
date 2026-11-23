@@ -12,8 +12,7 @@ import {
 	seasonTakeaways,
 	upcomingEvents,
 	upcomingEntries,
-	type SeasonFacts,
-	type UpcomingEventRow
+	type SeasonFacts
 } from './season-report.ts';
 
 const NOW = Date.parse('2026-11-19T12:00:00Z');
@@ -336,10 +335,7 @@ describe('season takeaways', () => {
 				{ label: 'A', value: 80 },
 				{ label: 'B', value: 120 }
 			],
-			awards: [],
 			advancement: [],
-			upcoming: [],
-			previous: null,
 			rookie: false,
 			scores: [],
 			rp: null,
@@ -347,23 +343,19 @@ describe('season takeaways', () => {
 		};
 	}
 
-	it('leads with advancement and awards, then standing and strengths, at most four lines', () => {
+	it('leads with advancement, then standing and strengths, at most four lines', () => {
 		const lines = seasonTakeaways(
 			facts({
 				advancement: [
 					{ code: 'AAA', event: 'Alpha Qualifier', to: 'Arizona Championship', toCode: 'USAZCMP' }
-				],
-				awards: [
-					{ code: 'AAA', event: 'Alpha Qualifier', name: 'Inspire Award' },
-					{ code: 'AAA', event: 'Alpha Qualifier', name: 'Winning alliance' }
 				]
 			})
 		);
 		expect(lines).toEqual([
 			'Advanced to Arizona Championship from Alpha Qualifier',
-			'Awards: Inspire Award, Winning alliance at Alpha Qualifier',
 			'Top 1% worldwide by season OPR, best in Arizona',
-			'Strongest at hive scoring, better than 98% of teams'
+			'Strongest at hive scoring, better than 98% of teams',
+			'OPR rose from 80.0 to 120.0 over 2 events'
 		]);
 	});
 
@@ -406,32 +398,10 @@ describe('season takeaways', () => {
 		expect(lines).toEqual([]);
 	});
 
-	it('talks about the first event and last season for a team that has not played', () => {
-		const upcoming: UpcomingEventRow[] = [
-			{
-				code: 'NEXT',
-				name: 'Next Qualifier',
-				start: '2026-12-05',
-				end: '2026-12-05',
-				live: false,
-				registered: 30,
-				kind: 'opr',
-				outlook: '3rd of 28 rated teams by season OPR'
-			}
-		];
+	it('says nothing for a team that has not played, since the sections below cover it', () => {
 		const empty = { rank: null, of: null, events: 0, record: null, region: null };
-		expect(
-			seasonTakeaways(
-				facts({ stats: empty, upcoming, previous: { value: 52.2, rank: 2302, count: 8368 } })
-			)
-		).toEqual([
-			'First event: Next Qualifier, Dec 5; 3rd of 28 rated teams by season OPR',
-			'Last season: best OPR 52.2, 2,302nd of 8,368'
-		]);
-		expect(seasonTakeaways(facts({ stats: empty, rookie: true }))).toEqual([
-			'No events on the schedule yet',
-			'Rookie team: 2026 is its first season'
-		]);
+		expect(seasonTakeaways(facts({ stats: empty }))).toEqual([]);
+		expect(seasonTakeaways(facts({ stats: empty, rookie: true }))).toEqual([]);
 	});
 
 	it('mentions a rookie season when a rookie advances', () => {

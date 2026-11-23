@@ -16,10 +16,6 @@
 	function recordText(row: TeamEventRow): string {
 		return row.record ? record(row.record.wins, row.record.losses, row.record.ties) : MISSING;
 	}
-
-	function awardsText(row: TeamEventRow): string {
-		return row.awards.length > 0 ? row.awards.join(', ') : MISSING;
-	}
 </script>
 
 {#if rows.length === 0}
@@ -36,7 +32,6 @@
 				<th scope="col"><Term label="Record" /></th>
 				<th scope="col"><Term label="OPR" /></th>
 				<th class="l opt" scope="col">Playoffs</th>
-				<th class="l opt" scope="col">Awards</th>
 				<th class="l" scope="col"><span class="visually-hidden">Scouting report</span></th>
 			</tr>
 		</thead>
@@ -49,7 +44,6 @@
 					<td>{recordText(row)}</td>
 					<td>{fixed(row.opr)}</td>
 					<td class="l wrap wide opt">{row.playoffs ?? MISSING}</td>
-					<td class="l wrap wide opt">{awardsText(row)}</td>
 					<td class="l"><a href="/events/{row.code}/teams/{team}">Report</a></td>
 				</tr>
 			{/each}

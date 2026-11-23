@@ -11,8 +11,6 @@ import { fixed, integer } from '#lib/format/number.ts';
 import { ordinal as plainOrdinal } from '#lib/format/ordinal.ts';
 import { pct } from '#lib/format/pct.ts';
 import { regionName } from '#lib/format/places.ts';
-import { shortRange } from '#lib/format/time.ts';
-import { SEASON } from '#lib/game/biobuzz.ts';
 import type { AllianceColor, EventBundle, Match, TeamSeason } from '#lib/types.ts';
 import { localDate } from '#lib/format/calendar.ts';
 
@@ -73,10 +71,7 @@ export interface SeasonFacts {
 	};
 	comparison: { key: string; value: number; percentile: number | null }[];
 	trend: { label: string; value: number }[];
-	awards: { code: string; event: string; name: string }[];
 	advancement: AdvancementRow[];
-	upcoming: UpcomingEventRow[];
-	previous: { rank: number; count: number; value: number } | null;
 	rookie: boolean;
 	scores: number[];
 	rp: RpHabits | null;
@@ -437,58 +432,19 @@ function consistencyTakeaways(scores: number[]): Candidate[] {
 	return [];
 }
 
-function honorTakeaways(facts: SeasonFacts): Candidate[] {
-	const out: Candidate[] = [];
-	for (const row of facts.advancement) {
-		const to = row.to ?? 'the next level';
-		const rookie = facts.rookie ? ' in its rookie season' : '';
-		out.push({ weight: 100, text: `Advanced to ${to} from ${row.event}${rookie}` });
-	}
-	if (facts.awards.length > 0) {
-		const names = facts.awards.map((award) => award.name);
-		const shown = names.slice(0, 3).join(', ');
-		const more = names.length > 3 ? ` and ${names.length - 3} more` : '';
-		const events = new Set(facts.awards.map((award) => award.code));
-		const where = events.size === 1 ? ` at ${facts.awards[0].event}` : '';
-		out.push({ weight: 90, text: `Awards: ${shown}${more}${where}` });
-	}
-	return out;
-}
-
-function outlookTakeaways(upcoming: UpcomingEventRow[], played: boolean): Candidate[] {
-	const next = upcoming[0];
-	if (!next) return played ? [] : [{ weight: 92, text: 'No events on the schedule yet' }];
-	const when = shortRange(next.start, next.end);
-	if (!played) {
-		const lead = next.live ? `Playing now at ${next.name}` : `First event: ${next.name}, ${when}`;
-		const detail = next.kind === 'none' ? '' : `; ${lowerFirst(next.outlook)}`;
-		return [{ weight: 92, text: `${lead}${detail}` }];
-	}
-	return [];
-}
-
-function lowerFirst(text: string): string {
-	return text.charAt(0).toLowerCase() + text.slice(1);
-}
-
-function fallbacks(facts: SeasonFacts): Candidate[] {
-	const out: Candidate[] = [];
-	if (facts.rookie) out.push({ weight: 30, text: `Rookie team: ${SEASON} is its first season` });
-	if (facts.previous) {
-		out.push({
-			weight: 10,
-			text: `Last season: best OPR ${fixed(facts.previous.value)}, ${ordinal(facts.previous.rank)} of ${integer(facts.previous.count)}`
-		});
-	}
-	return out.sort((a, b) => b.weight - a.weight);
+function advancementTakeaways(facts: SeasonFacts): Candidate[] {
+	const rookie = facts.rookie ? ' in its rookie season' : '';
+	return facts.advancement.map((row) => ({
+		weight: 100,
+		text: `Advanced to ${row.to ?? 'the next level'} from ${row.event}${rookie}`
+	}));
 }
 
 export function seasonTakeaways(facts: SeasonFacts): string[] {
 	const played = facts.stats.events > 0;
 	const standing = played ? standingTakeaways(facts.stats) : [];
 	const candidates = [
-		...honorTakeaways(facts),
-		...outlookTakeaways(facts.upcoming, played),
+		...advancementTakeaways(facts),
 		...standing,
 		...(played
 			? [
@@ -499,10 +455,5 @@ export function seasonTakeaways(facts: SeasonFacts): string[] {
 				]
 			: [])
 	].sort((a, b) => b.weight - a.weight);
-	const picked = candidates.slice(0, MAX_TAKEAWAYS).map((entry) => entry.text);
-	for (const entry of fallbacks(facts)) {
-		if (picked.length >= 2) break;
-		if (!picked.includes(entry.text)) picked.push(entry.text);
-	}
-	return picked;
+	return candidates.slice(0, MAX_TAKEAWAYS).map((entry) => entry.text);
 }

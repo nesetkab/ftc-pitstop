@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import { replayBundle } from '#lib/game/replay.ts';
-import { fieldLine, queueCountdown, resultLine, teamsLine, updatedClock } from './copy.ts';
+import {
+	awardName,
+	fieldLine,
+	queueCountdown,
+	resultLine,
+	teamsLine,
+	updatedClock
+} from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import type { QueueCall } from './queue.ts';
 import { pitView } from './view.ts';
@@ -66,5 +73,14 @@ describe('updatedClock', () => {
 		expect(updatedClock(posted, Date.parse('2026-11-22T11:21:00Z'), zone)).toMatch(
 			/^Sat 11:36\sAM$/
 		);
+	});
+});
+
+describe('awardName', () => {
+	it('drops the sponsor so award names fit a pit screen row', () => {
+		expect(awardName('Innovate Award sponsored by RTX')).toBe('Innovate Award');
+		expect(awardName('Innovate Award sponsored by RTX 2nd place')).toBe('Innovate Award 2nd place');
+		expect(awardName('Winning Alliance - Captain')).toBe('Winning alliance captain');
+		expect(awardName('Control Award')).toBe('Control Award');
 	});
 });
