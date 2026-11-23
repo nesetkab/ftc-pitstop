@@ -73,14 +73,16 @@ function check(full: EventBundle, team: number, now: number): string[] {
 		if (reveal !== null && reveal <= now) say(`next ${next.label} already posted`);
 		if (next.matchesAway < 0) say('negative matches away');
 		const hero = heroText(next, call, now, zone, view.delaySeconds);
-		const text = [hero.headline, ...hero.detail].join(' ');
+		const text = [hero.headline, ...hero.facts.map((fact) => `${fact.label} ${fact.value}`)].join(
+			' '
+		);
 		if (/NaN|undefined|null/.test(text)) say(`broken hero: ${text}`);
-		const minutes = text.match(/running (\d+) minutes?/);
+		const minutes = text.match(/Field (\d+) min/);
 		if (minutes && Number(minutes[1]) > 240) say(`absurd delay: ${text}`);
 		const shownTimes = [
 			hero.headline.startsWith('Queue at') ? next.queueAt : null,
 			hero.headline.startsWith('Scheduled') ? next.scheduled : null,
-			text.includes('around') ? next.expectedStart : null
+			text.includes('On the field') ? next.expectedStart : null
 		];
 		for (const value of shownTimes) {
 			if (value === null || sameDay(value, now, zone)) continue;

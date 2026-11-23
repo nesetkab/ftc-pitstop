@@ -513,7 +513,6 @@
 							event.currentTarget.value = robotNumber;
 						}}
 					/>
-					<p class="note">Placed by the Robot tool. Drag a marker to move it.</p>
 				</div>
 				<div class="panel">
 					<label class="sec-title" for="{id}-notes">Notes</label>
@@ -712,6 +711,11 @@
 	svg.drawing.robot,
 	svg.drawing.text {
 		cursor: copy;
+	}
+
+	svg.drawing.robot :global(g.robot),
+	svg.drawing.text :global(text.note) {
+		cursor: grab;
 	}
 
 	svg.drawing.erase {

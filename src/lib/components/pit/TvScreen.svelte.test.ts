@@ -97,7 +97,10 @@ describe('TvScreen', () => {
 		expect(content).toContain('Q26');
 		expect(content).toContain('Red alliance');
 		expect(content).toContain('Scheduled for 1:58 PM');
-		expect(content).toContain('3 matches from now. The field is running 2 minutes behind.');
+		const queue = [...container.querySelectorAll('.queue dt, .queue dd')].map(
+			(item) => item.textContent
+		);
+		expect(queue).toEqual(['Away', '3 matches', 'Field', '2 min behind']);
 		expect(content).toContain('Rankings after Q22');
 		expect(content).toContain('Teams and rank');
 		expect(content).not.toContain('Win chance');

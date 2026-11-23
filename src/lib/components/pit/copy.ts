@@ -53,7 +53,7 @@ export function shortDelay(seconds: number | null): string | null {
 
 export interface HeroText {
 	headline: string;
-	detail: string[];
+	facts: Fact[];
 	urgent: boolean;
 }
 
@@ -67,6 +67,31 @@ function present(values: (string | null)[]): string[] {
 	return values.filter((value): value is string => Boolean(value));
 }
 
+function known(facts: (Fact | null)[]): Fact[] {
+	return facts.filter((fact): fact is Fact => fact !== null);
+}
+
+export function untilText(at: number, now: number): string | null {
+	const minutes = Math.max(0, Math.round((at - now) / 60_000));
+	if (minutes < 60) return `${minutes} min`;
+	const hours = Math.floor(minutes / 60);
+	if (hours >= 24) return null;
+	const rest = minutes % 60;
+	return rest > 0 ? `${hours} h ${rest} min` : `${hours} h`;
+}
+
+function awayFact(matches: number): Fact {
+	if (matches <= 0) return { label: 'Away', value: 'Next up' };
+	return { label: 'Away', value: matches === 1 ? '1 match' : `${matches} matches` };
+}
+
+function fieldFact(seconds: number | null): Fact | null {
+	if (!shown(seconds)) return null;
+	const minutes = Math.round(Math.abs(seconds) / 60);
+	if (minutes === 0) return { label: 'Field', value: 'On time' };
+	return { label: 'Field', value: `${minutes} min ${seconds > 0 ? 'behind' : 'ahead'}` };
+}
+
 export function heroText(
 	next: NextMatch,
 	call: QueueCall | null,
@@ -77,40 +102,44 @@ export function heroText(
 	if (next.started !== null) {
 		return {
 			headline: 'On the field now',
-			detail: [`Started at ${time(next.started, timeZone)}.`],
+			facts: [{ label: 'Started', value: time(next.started, timeZone) }],
 			urgent: false
 		};
 	}
-	const away = awayText(next.matchesAway);
-	const field =
+	const onField: Fact | null =
 		next.expectedStart !== null
-			? `On the field around ${dayTime(next.expectedStart, now, timeZone)}, ${away}.`
-			: `${capitalize(away)}.`;
-	const delay = delayText(delaySeconds);
+			? { label: 'On the field', value: `~${dayTime(next.expectedStart, now, timeZone)}` }
+			: null;
+	const timing = known([onField, awayFact(next.matchesAway), fieldFact(delaySeconds)]);
 	const status = next.nexus.tracked ? next.nexus.status : null;
 	if (call) {
 		const headline =
 			status && status !== 'queuing-soon' ? NEXUS_HEADLINE[status] : NEXUS_HEADLINE['now-queuing'];
-		return { headline, detail: present([field, delay]), urgent: true };
+		return { headline, facts: timing, urgent: true };
 	}
 	if (next.queueAt !== null) {
+		const until = untilText(next.queueAt, now);
 		return {
 			headline: `Queue at ${dayTime(next.queueAt, now, timeZone)}`,
-			detail: present([`${capitalize(relative(next.queueAt, now))}.`, field, delay]),
+			facts: until ? [{ label: 'Queue in', value: until }, ...timing] : timing,
 			urgent: false
 		};
 	}
 	if (status === 'queuing-soon') {
-		return { headline: 'Queuing soon', detail: present([field, delay]), urgent: false };
+		return { headline: 'Queuing soon', facts: timing, urgent: false };
 	}
 	if (next.scheduled !== null) {
 		return {
 			headline: `Scheduled for ${dayTime(next.scheduled, now, timeZone)}`,
-			detail: present([field, delay]),
+			facts: timing,
 			urgent: false
 		};
 	}
-	return { headline: capitalize(away), detail: present([delay]), urgent: false };
+	return {
+		headline: capitalize(awayText(next.matchesAway)),
+		facts: known([fieldFact(delaySeconds)]),
+		urgent: false
+	};
 }
 
 export function phoneDetail(

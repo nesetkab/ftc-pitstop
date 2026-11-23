@@ -470,13 +470,13 @@
 
 <section class="picklist" aria-label={title} bind:this={root}>
 	{#if showTitle || share || eventShown}
-		<div class="head">
+		<div class="head" class:inline={!showTitle && eventShown}>
 			{#if showTitle}
 				<h3 class="sec-title">{title}</h3>
 			{:else if eventShown}
 				{@render eventField()}
 			{/if}
-			{#if share}{@render share()}{/if}
+			{#if share}<div class="share-slot">{@render share()}</div>{/if}
 		</div>
 	{/if}
 	{#if showTitle && eventShown}
@@ -830,6 +830,41 @@
 	}
 
 	@container (max-width: 560px) {
+		.head.inline {
+			display: grid;
+			grid-template-columns: auto minmax(0, 1fr) auto;
+			align-items: center;
+			gap: 10px 12px;
+		}
+
+		.head.inline .event {
+			display: contents;
+		}
+
+		.head.inline .event > :nth-child(2) {
+			grid-column: 2 / -1;
+			justify-self: start;
+		}
+
+		.head.inline .event > :nth-child(3) {
+			grid-column: 1 / 3;
+			grid-row: 2;
+		}
+
+		.head.inline .share-slot,
+		.head.inline .share-slot > :global(*) {
+			display: contents;
+		}
+
+		.head.inline .share-slot :global(*) {
+			grid-column: 1 / -1;
+		}
+
+		.head.inline .share-slot :global(button) {
+			grid-column: 3;
+			grid-row: 2;
+		}
+
 		.rows,
 		.rows.editable {
 			grid-template-columns: minmax(0, 1fr);

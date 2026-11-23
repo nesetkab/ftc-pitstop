@@ -37,8 +37,15 @@
 </div>
 <div class={['queue', { urgent: text.urgent }]}>
 	<b>{text.headline}</b>
-	{#if text.detail.length > 0}
-		<span>{text.detail.join(' ')}</span>
+	{#if text.facts.length > 0}
+		<dl>
+			{#each text.facts as fact (fact.label)}
+				<div>
+					<dt>{fact.label}</dt>
+					<dd>{fact.value}</dd>
+				</div>
+			{/each}
+		</dl>
 	{/if}
 </div>
 <Matchup {next} />
@@ -81,9 +88,29 @@
 		color: var(--accent);
 	}
 
-	.queue span {
-		font-size: 0.9em;
+	.queue dl {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4em 1.6em;
+		margin: 0.4em 0 0;
+	}
+
+	.queue dl div {
+		display: grid;
+		gap: 0.1em;
+	}
+
+	.queue dt {
+		font-size: 0.74em;
 		color: var(--text-2);
+	}
+
+	.queue dd {
+		margin: 0;
+		font-size: 1.15em;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
 	}
 
 	.rp {

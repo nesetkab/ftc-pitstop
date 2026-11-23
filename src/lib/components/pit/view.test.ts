@@ -10,7 +10,8 @@ import {
 	liveText,
 	matchItems,
 	playoffResult,
-	shortDelay
+	shortDelay,
+	untilText
 } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
@@ -107,7 +108,10 @@ describe('pitView during quals', () => {
 		const next = current.next!;
 		expect(heroText(next, null, at('Q22'), ZONE, current.delaySeconds)).toEqual({
 			headline: nb('Scheduled for 1:58 PM'),
-			detail: ['3 matches from now.', 'The field is running 2 minutes behind.'],
+			facts: [
+				{ label: 'Away', value: '3 matches' },
+				{ label: 'Field', value: '2 min behind' }
+			],
 			urgent: false
 		});
 	});
@@ -155,10 +159,11 @@ describe('pitView during quals', () => {
 		expect(modeled.onField).toBe('Q23');
 		expect(heroText(modeled.next!, null, Date.parse('2026-11-14T20:41:00Z'), ZONE, 120)).toEqual({
 			headline: nb('Queue at 1:46 PM'),
-			detail: [
-				'In 5 minutes.',
-				nb('On the field around 2:01 PM, 3 matches from now.'),
-				'The field is running 2 minutes behind.'
+			facts: [
+				{ label: 'Queue in', value: '5 min' },
+				{ label: 'On the field', value: nb('~2:01 PM') },
+				{ label: 'Away', value: '3 matches' },
+				{ label: 'Field', value: '2 min behind' }
 			],
 			urgent: false
 		});
@@ -459,6 +464,17 @@ describe('delay copy', () => {
 	it('drops the delay when matches carried over to the next day', () => {
 		expect(delayText(894 * 60)).toBeNull();
 		expect(shortDelay(894 * 60)).toBeNull();
+	});
+});
+
+describe('untilText', () => {
+	it('counts down in short units that read from across a room', () => {
+		const now = Date.parse('2026-11-14T20:00:00Z');
+		expect(untilText(now + 44 * 60_000, now)).toBe('44 min');
+		expect(untilText(now - 60_000, now)).toBe('0 min');
+		expect(untilText(now + 125 * 60_000, now)).toBe('2 h 5 min');
+		expect(untilText(now + 180 * 60_000, now)).toBe('3 h');
+		expect(untilText(now + 25 * 3600_000, now)).toBeNull();
 	});
 });
 
