@@ -2,7 +2,6 @@ import type { EventAnalysis, RatingParts, SeasonRating, TeamRating } from '#lib/
 import { opposite } from '#lib/components/event/matches.ts';
 import { fixed, integer } from '#lib/format/number.ts';
 import { ordinal } from '#lib/format/ordinal.ts';
-import { record } from '#lib/format/record.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
 import type { AllianceColor, EventBundle, Match, Ranking } from '#lib/types.ts';
 
@@ -421,19 +420,17 @@ function partTakeaways(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 	const strong = rows
 		.filter(
 			(row) =>
+				row.key !== 'opr' &&
 				row.key !== 'teleop' &&
 				row.rank <= strongCut(row.of) &&
 				row.value > row.average &&
 				row.value >= MEANINGFUL[row.key]
 		)
-		.sort((a, b) => a.rank - b.rank || (a.key === 'opr' ? -1 : b.key === 'opr' ? 1 : 0))
+		.sort((a, b) => a.rank - b.rank)
 		.slice(0, 2)
 		.map((row) => ({
 			weight: 90 - row.rank,
-			text:
-				row.key === 'opr'
-					? `${row.rank === 1 ? 'Top' : 'High'} OPR: ${ordinal(row.rank)} of ${row.of} ${where}`
-					: `Strong ${PHRASES[row.key]}: ${ordinal(row.rank)} of ${row.of} ${where}`
+			text: `${row.rank === 1 ? 'Best' : `${ordinal(row.rank)}-best`} ${PHRASES[row.key]} ${where}`
 		}));
 	if (expected) return strong;
 	const weak = rows
@@ -516,10 +513,11 @@ function spreadTakeaways(spread: Spread | null): Candidate[] {
 		];
 	}
 	if (spread.rank > weakCut(spread.of)) {
+		const widest = spread.of - spread.rank + 1;
 		return [
 			{
 				weight: 52,
-				text: `Uneven scores: from ${integer(spread.worst.score)} to ${integer(spread.best.score)}`
+				text: `Uneven scores: ${widest === 1 ? '' : `${ordinal(widest)} `}widest spread of ${spread.of} teams`
 			}
 		];
 	}
@@ -557,19 +555,12 @@ function outlookTakeaways(upcoming: UpcomingMatch[]): Candidate[] {
 
 function fallbacks(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 	const out: Candidate[] = [];
-	const { ranking, played } = report;
+	const { played } = report;
 	if (played.length === 1) {
 		const match = played[0];
 		out.push({
 			weight: 20,
 			text: `One match played so far: alliance scored ${integer(match.score)} in ${match.label}`
-		});
-	}
-	if (ranking && ranking.played > 0) {
-		const scope = report.league ? ' in the league' : '';
-		out.push({
-			weight: 15,
-			text: `Ranked ${ordinal(ranking.rank)} of ${report.rankedOf}${scope}, record ${record(ranking.wins, ranking.losses, ranking.ties)}`
 		});
 	}
 	const best = (report.parts ?? [])
@@ -585,12 +576,6 @@ function fallbacks(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 		out.push({
 			weight: 18,
 			text: `Best part: ${PHRASES[best.key]}, ${ordinal(best.rank)} of ${best.of} at this event`
-		});
-	}
-	if (report.season) {
-		out.push({
-			weight: 5,
-			text: `Season OPR ${fixed(report.season.opr)}: ${ordinal(report.season.rank)} of ${integer(report.season.of)} worldwide`
 		});
 	}
 	return out.sort((a, b) => b.weight - a.weight);

@@ -265,7 +265,7 @@ describe('scouting report parts', () => {
 		const report = reportOf({ bundle: bundle(upcoming, TEAMS), analysis: analysis(ratings) }, 1)!;
 		expect(report.rated).toBe('expected');
 		expect(report.parts?.find((row) => row.key === 'opr')?.of).toBe(8);
-		expect(report.takeaways[0]).toBe('Top OPR: 1st of 8 by season form');
+		expect(report.takeaways[0]).toBe('Best autonomous by season form');
 	});
 
 	it('works without an analysis', () => {
@@ -341,10 +341,8 @@ describe('scouting report takeaways', () => {
 			})
 		);
 		expect(lines).toHaveLength(4);
-		expect(lines.slice(0, 2)).toEqual([
-			'Top OPR: 1st of 31 at this event',
-			'Strong autonomous: 2nd of 31 at this event'
-		]);
+		expect(lines[0]).toBe('2nd-best autonomous at this event');
+		expect(lines.join(' ')).not.toMatch(/OPR/);
 		expect(lines).toContain('Rarely earns Pollinator: 0 of 6 matches');
 		for (const line of lines) expect(line).toMatch(/^[\w\s:;,.\-'']+$/);
 	});
@@ -387,10 +385,7 @@ describe('scouting report takeaways', () => {
 				rankedOf: 20
 			})
 		);
-		expect(lines).toEqual([
-			'One match played so far: alliance scored 54 in Q1',
-			'Ranked 3rd of 20, record 1-0-0'
-		]);
+		expect(lines).toEqual(['One match played so far: alliance scored 54 in Q1']);
 	});
 
 	it('says when a team did not play', () => {
@@ -415,12 +410,12 @@ describe('scouting report takeaways', () => {
 		expect(next[0]).toBe('No matches played here yet; first is Q9');
 	});
 
-	it('falls back to season form before the event', () => {
+	it('does not repeat the season line from the header', () => {
 		expect(
 			takeaways(
 				base({ eventStarted: false, rated: null, season: { opr: 61.8, rank: 197, of: 3981 } })
 			)
-		).toEqual(['Season OPR 61.8: 197th of 3,981 worldwide']);
+		).toEqual([]);
 	});
 
 	it('mentions favored remaining matches', () => {
