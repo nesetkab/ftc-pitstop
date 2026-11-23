@@ -129,7 +129,7 @@
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-panel);
 		background: var(--bg);
-		box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+		box-shadow: var(--shadow-pop);
 	}
 
 	.panel[hidden] {
