@@ -12,15 +12,13 @@
 </script>
 
 <header class="page-header">
-	<div class="text">
-		<h1>{title}</h1>
-		{#if meta}
-			<p class="meta">{meta}</p>
-		{/if}
-		{#if status}
-			<p class="status">{@render status()}</p>
-		{/if}
-	</div>
+	<h1>{title}</h1>
+	{#if meta}
+		<p class="meta">{meta}</p>
+	{/if}
+	{#if status}
+		<p class="status">{@render status()}</p>
+	{/if}
 	{#if actions}
 		<div class="actions">{@render actions()}</div>
 	{/if}
@@ -28,15 +26,14 @@
 
 <style>
 	.page-header {
+		--title-h: calc(26px * 1.2);
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) auto;
-		gap: 12px 20px;
-		align-items: end;
+		gap: 6px 20px;
 	}
 
-	.text {
-		display: grid;
-		gap: 6px;
+	.page-header > * {
+		grid-column: 1;
 		min-width: 0;
 	}
 
@@ -63,21 +60,32 @@
 		font-weight: 500;
 	}
 
-	.actions {
+	.page-header > .actions {
+		grid-row: 1;
+		grid-column: 2;
+		align-self: start;
 		display: flex;
 		flex-wrap: wrap;
+		justify-content: flex-end;
 		gap: 8px;
+		margin-top: calc((var(--title-h) - var(--control-h)) / 2);
 	}
 
 	@media (max-width: 760px) {
 		.page-header {
 			grid-template-columns: minmax(0, 1fr);
-			align-items: start;
+		}
+
+		.page-header > .actions {
+			grid-row: auto;
+			grid-column: 1;
+			justify-content: flex-start;
+			margin-top: 6px;
 		}
 	}
 
 	@media (max-width: 600px) {
-		.actions:has(> :global(:nth-child(3))) {
+		.page-header > .actions:has(> :global(:nth-child(3))) {
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}

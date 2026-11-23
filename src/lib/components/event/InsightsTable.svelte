@@ -22,6 +22,8 @@
 
 	let { code, rows, filters, followed = new Set() }: Props = $props();
 
+	const ARROW = ' ↓';
+
 	function sortHref(sort: InsightPart) {
 		return `/events/${code}/insights${insightQuery({ ...filters, sort })}`;
 	}
@@ -42,8 +44,9 @@
 						class={{ opt: part.key !== 'total' && !active, active }}
 						aria-sort={active ? 'descending' : undefined}
 					>
-						<a href={sortHref(part.key)} data-sveltekit-noscroll>
-							<Term label={part.label} nested />{#if active}<span aria-hidden="true"> ↓</span>{/if}
+						<a class="sort-link" href={sortHref(part.key)} data-sveltekit-noscroll>
+							<Term label={part.label} nested />{#if active}<span aria-hidden="true">{ARROW}</span
+								>{/if}
 						</a>
 					</th>
 				{/each}
@@ -84,10 +87,6 @@
 {/if}
 
 <style>
-	th a {
-		color: inherit;
-	}
-
 	th.active {
 		color: var(--text);
 	}

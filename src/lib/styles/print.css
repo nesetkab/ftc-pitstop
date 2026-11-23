@@ -31,6 +31,7 @@
 	.skip,
 	.shell > footer,
 	nav.tabs,
+	.tab-row,
 	.page-header .actions,
 	.page-header .status {
 		display: none !important;
