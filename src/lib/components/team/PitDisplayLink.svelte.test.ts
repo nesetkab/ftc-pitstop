@@ -21,7 +21,7 @@ const open = () => screen.getByRole('button', { name: 'Open' });
 describe('pit display link', () => {
 	it('shows the address the team will get', () => {
 		render(PitDisplayLink);
-		expect(screen.getByText('Open the pit display for your team')).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: 'Pit display' })).toBeInTheDocument();
 		expect(screen.getByText('ftcpitstop.com/')).toBeInTheDocument();
 		expect(screen.getByText('/tv')).toBeInTheDocument();
 		expect(open()).toBeDisabled();

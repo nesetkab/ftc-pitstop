@@ -26,7 +26,7 @@
 </script>
 
 <header class="appbar">
-	<div class={['inner', { 'on-home': page.url.pathname === '/' }]}>
+	<div class="inner">
 		<a class="home" href="/"><Logo height="15px" /></a>
 		<nav aria-label="Main">
 			{#each links as link (link.href)}
@@ -165,16 +165,6 @@
 		}
 
 		.theme {
-			display: none;
-		}
-
-		.on-home {
-			grid-template-areas:
-				'home'
-				'nav';
-		}
-
-		.on-home .search {
 			display: none;
 		}
 	}

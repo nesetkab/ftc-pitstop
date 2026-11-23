@@ -41,7 +41,6 @@
 				name="add"
 				type="text"
 				inputmode="numeric"
-				pattern="[0-9 ,]*"
 				maxlength="30"
 				autocomplete="off"
 				placeholder={teams.length === 0 ? 'Team numbers, like 19666 7759' : 'Add a team number'}

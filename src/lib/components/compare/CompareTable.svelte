@@ -38,7 +38,11 @@
 						/></th
 					>
 					{#each row.values as value, index (index)}
-						<td><span class:best={row.best.includes(index)}>{value}</span></td>
+						{@const best = row.best.includes(index)}
+						<td class:lead={best}>
+							<span class:best>{value}</span>{#if best}<span class="visually-hidden">, best</span
+								>{/if}
+						</td>
 					{/each}
 				</tr>
 			{/each}
@@ -88,10 +92,16 @@
 		background: var(--bg);
 	}
 
+	td {
+		color: var(--text-2);
+	}
+
+	td.lead {
+		color: var(--text);
+	}
+
 	.best {
-		padding-bottom: 1px;
-		border-bottom: 2px solid var(--text);
-		font-weight: 600;
+		font-weight: 650;
 	}
 
 	@media (max-width: 600px) {

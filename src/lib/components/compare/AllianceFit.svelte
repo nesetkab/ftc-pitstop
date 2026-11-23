@@ -53,8 +53,8 @@
 			Together, {pairName(best)} would be expected to score about
 			<b>{integer(best.score)}</b> points per match before penalties.
 		{:else}
-			Two robots play in each match, so every pair is shown. The highest predicted pair is
-			{pairName(best)}, at about <b>{integer(best.score)}</b> points per match before penalties.
+			{pairName(best)} is the strongest pair, at about <b>{integer(best.score)}</b> points per match before
+			penalties.
 		{/if}
 	</p>
 

@@ -53,10 +53,6 @@
 </script>
 
 <form class="finder" onsubmit={submit} role="search" aria-label="Follow a team">
-	<p class="hint">
-		Follow your team to see its next match, rank and last result here, and to highlight it across
-		the site.
-	</p>
 	<label class="visually-hidden" for="{id}-query">Team number or name</label>
 	<input
 		id="{id}-query"
@@ -64,7 +60,7 @@
 		type="search"
 		autocomplete="off"
 		enterkeyhint="go"
-		placeholder="Team number or name"
+		placeholder="Follow a team by number or name"
 		bind:value={query}
 	/>
 	{#if hits.length > 0}
@@ -98,11 +94,6 @@
 		display: grid;
 		gap: 10px;
 		max-width: 560px;
-	}
-
-	.hint {
-		font-size: 14px;
-		color: var(--text-2);
 	}
 
 	ul {

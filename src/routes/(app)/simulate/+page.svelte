@@ -1,6 +1,5 @@
 <script lang="ts">
 	import CompareSections from '#lib/components/compare/CompareSections.svelte';
-	import { compareHref } from '#lib/components/compare/compare.ts';
 	import RpChances from '#lib/components/event/RpChances.svelte';
 	import PartTable from '#lib/components/simulate/PartTable.svelte';
 	import SimulatePicker from '#lib/components/simulate/SimulatePicker.svelte';
@@ -72,7 +71,7 @@
 
 <PageHeader
 	title="Match simulator"
-	meta="Put any two teams on each alliance and see how the match would likely go, from the same model as PitStop's match predictions."
+	meta="Any four teams in one match, predicted with the same model as PitStop's match predictions."
 />
 
 <SimulatePicker {sides} picked={data.picked} />
@@ -121,12 +120,8 @@
 
 			<section class="panel" aria-labelledby="rp-title">
 				<h2 class="sec-title" id="rp-title">Ranking point chances</h2>
-				<RpChances forecast={simulation.forecast} />
+				<RpChances forecast={simulation.forecast} measure="Ranking point" />
 			</section>
-
-			<p class="links">
-				<a href={compareHref([...sides.red, ...sides.blue])}>Compare these four teams</a>
-			</p>
 		</div>
 	</div>
 
@@ -199,10 +194,6 @@
 		padding-left: 18px;
 		font-size: 14px;
 		color: var(--text);
-	}
-
-	.links {
-		font-size: 14px;
 	}
 
 	@media (max-width: 1120px) {

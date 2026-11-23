@@ -1,21 +1,13 @@
 <script lang="ts">
-	import Button from '#lib/ui/Button.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import type { HomeEvent } from './home.ts';
 
 	interface Props {
 		rows: HomeEvent[];
 		caption: string;
-		datesHeader: string;
-		statusHeader: string;
-		limit?: number;
 	}
 
-	let { rows, caption, datesHeader, statusHeader, limit = 12 }: Props = $props();
-
-	let expanded = $state(false);
-
-	const shown = $derived(expanded ? rows : rows.slice(0, limit));
+	let { rows, caption }: Props = $props();
 </script>
 
 <div class="events">
@@ -26,19 +18,17 @@
 			<col class="where" />
 			<col class="type" />
 			<col class="dates" />
-			<col class="status" />
 		</colgroup>
 		<thead>
 			<tr>
 				<th class="l" scope="col">Event</th>
 				<th class="l where" scope="col">Where</th>
 				<th class="l type" scope="col">Type</th>
-				<th class="l" scope="col">{datesHeader}</th>
-				<th class="l" scope="col">{statusHeader}</th>
+				<th class="l" scope="col">Dates</th>
 			</tr>
 		</thead>
 		<tbody>
-			{#each shown as row (row.code)}
+			{#each rows as row (row.code)}
 				<tr>
 					<td class="l name">
 						<a href="/events/{row.code}">{row.name}</a>
@@ -46,21 +36,12 @@
 					</td>
 					<td class="l where">{row.place}</td>
 					<td class="l type">{row.type}</td>
-					<td class="l">{row.dates}</td>
-					<td class="l">{row.status}</td>
+					<td class="l dates">{row.dates}</td>
 				</tr>
 			{/each}
 		</tbody>
 	</Table>
 </div>
-
-{#if rows.length > limit}
-	<div class="more">
-		<Button variant="secondary" aria-expanded={expanded} onclick={() => (expanded = !expanded)}>
-			{expanded ? 'Show fewer' : `Show all ${rows.length}`}
-		</Button>
-	</div>
-{/if}
 
 <style>
 	.events :global(td) {
@@ -69,33 +50,25 @@
 	}
 
 	col.event {
-		width: 34%;
+		width: 44%;
 	}
 
 	col.where {
-		width: 20%;
+		width: 26%;
 	}
 
 	col.type {
-		width: 14%;
+		width: 16%;
 	}
 
 	col.dates {
-		width: 15%;
-	}
-
-	col.status {
-		width: 17%;
+		width: 14%;
 	}
 
 	.sub {
 		display: none;
 		font-size: 13px;
 		color: var(--text-2);
-	}
-
-	.more {
-		display: flex;
 	}
 
 	@media (min-width: 641px) {
@@ -117,15 +90,14 @@
 			width: auto;
 		}
 
-		col.dates,
-		col.status {
+		col.dates {
 			width: 1%;
 		}
 
-		.type,
 		.where,
-		col.type,
-		col.where {
+		.type,
+		col.where,
+		col.type {
 			display: none;
 		}
 	}

@@ -9,9 +9,10 @@
 	interface Props {
 		forecast?: MatchForecast | null;
 		result?: MatchResult | null;
+		measure?: string;
 	}
 
-	let { forecast = null, result = null }: Props = $props();
+	let { forecast = null, result = null, measure }: Props = $props();
 
 	type Key = 'win' | 'swarm' | 'pollinator1' | 'pollinator2';
 
@@ -54,7 +55,9 @@
 			</tr>
 		{:else}
 			<tr>
-				<th class="l" scope="col"><span class="visually-hidden">Ranking point</span></th>
+				<th class="l" scope="col">
+					{#if measure}{measure}{:else}<span class="visually-hidden">Ranking point</span>{/if}
+				</th>
 				<th scope="col">Red</th>
 				<th scope="col">Blue</th>
 			</tr>

@@ -8,11 +8,12 @@
 	import PitDisplayLink from '#lib/components/team/PitDisplayLink.svelte';
 	import { SEASON_NAME, SITE_NAME } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import { searchDialog } from '#lib/ui/search.svelte.ts';
 	import Seo from '#lib/ui/Seo.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const WEEK_ROWS = 6;
 
 	const website = $derived({
 		'@context': 'https://schema.org',
@@ -21,6 +22,7 @@
 		url: `${page.url.origin}/`,
 		description: 'FIRST Tech Challenge event results, rankings and team stats.'
 	});
+	const live = $derived(data.today?.filter((row) => row.state === 'live').length ?? 0);
 </script>
 
 <Seo
@@ -32,82 +34,85 @@
 
 <h1 class="visually-hidden">PitStop</h1>
 
-<Intro />
+<div class="home">
+	<div class="top">
+		<div class="start">
+			<Intro />
+			<FollowedTeams />
+		</div>
+		<PitDisplayLink />
+	</div>
 
-<button
-	type="button"
-	class="search"
-	aria-haspopup="dialog"
-	aria-keyshortcuts="/ Control+K Meta+K"
-	onclick={() => (searchDialog.open = true)}
->
-	<span>Search teams and events</span>
-	<kbd aria-hidden="true">/</kbd>
-</button>
+	<section aria-labelledby="today-title">
+		<div class="head">
+			<h2 class="sec-title" id="today-title">Events today</h2>
+			{#if live > 0 && data.today}
+				<p class="aside">{live} of {data.today.length} running now</p>
+			{/if}
+		</div>
+		{#if data.today === null}
+			<EmptyState title="Today's events could not be loaded.">Try again in a moment.</EmptyState>
+		{:else if data.today.length === 0}
+			<EmptyState title="No events are running today.">
+				Events show here on the days they run, with live progress and the current leader.
+			</EmptyState>
+		{:else}
+			<TodayEvents rows={data.today} />
+		{/if}
+	</section>
 
-<FollowedTeams />
-
-<section aria-labelledby="today-title">
-	<h2 class="sec-title" id="today-title">Events today</h2>
-	{#if data.today === null}
-		<EmptyState title="Today's events could not be loaded.">Try again in a moment.</EmptyState>
-	{:else if data.today.length === 0}
-		<EmptyState title="No events are running today.">
-			Events show here on the days they run, with live progress and the current leader.
-		</EmptyState>
-	{:else}
-		<TodayEvents rows={data.today} />
+	{#if data.highlights}
+		<Highlights highlights={data.highlights} />
 	{/if}
-</section>
 
-{#if data.highlights}
-	<Highlights highlights={data.highlights} />
-{/if}
-
-<section aria-labelledby="week-title">
-	<h2 class="sec-title" id="week-title">This week</h2>
-	{#if data.week === null}
-		<EmptyState title="This week's events could not be loaded.">Try again in a moment.</EmptyState>
-	{:else if data.week.length === 0}
-		<EmptyState title="No events start in the next 7 days.">
-			Events show here a week before they start.
-		</EmptyState>
-	{:else}
-		<EventTable
-			rows={data.week}
-			caption="Events starting in the next 7 days"
-			datesHeader="Dates"
-			statusHeader="Starts"
-		/>
-	{/if}
-	<p class="more"><a href="/events">All events this season</a></p>
-</section>
-
-<PitDisplayLink />
+	<section aria-labelledby="week-title">
+		<div class="head">
+			<h2 class="sec-title" id="week-title">Starting this week</h2>
+			<a class="aside" href="/events">
+				{data.week && data.week.length > WEEK_ROWS
+					? `All ${data.week.length} events this week`
+					: 'All events'}
+			</a>
+		</div>
+		{#if data.week === null}
+			<EmptyState title="This week's events could not be loaded.">Try again in a moment.</EmptyState
+			>
+		{:else if data.week.length === 0}
+			<EmptyState title="No events start in the next 7 days." />
+		{:else}
+			<EventTable
+				rows={data.week.slice(0, WEEK_ROWS)}
+				caption="Events starting in the next 7 days"
+			/>
+		{/if}
+	</section>
+</div>
 
 <style>
-	.search {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		width: 100%;
-		max-width: 560px;
-		padding: 11px 14px;
-		border: 1px solid var(--line-2);
-		border-radius: var(--radius-control);
-		background: transparent;
-		color: var(--text-3);
-		font-size: 16px;
-		text-align: left;
+	.home {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 44px;
 	}
 
-	.search:hover {
-		border-color: var(--text-3);
-		color: var(--text-2);
+	.top {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 36px;
+		align-items: start;
 	}
 
-	.search kbd {
-		margin-left: auto;
+	.start {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 32px;
+	}
+
+	@media (min-width: 900px) {
+		.top {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+			column-gap: 72px;
+		}
 	}
 
 	section {
@@ -117,18 +122,41 @@
 		align-content: start;
 	}
 
-	.more {
-		font-size: 14px;
+	.head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 4px 16px;
 	}
 
-	@media (hover: none) {
-		.search kbd {
-			display: none;
+	.aside {
+		font-size: 14px;
+		color: var(--text-2);
+	}
+
+	a.aside:hover {
+		color: var(--text);
+	}
+
+	@media (max-width: 899px) {
+		.top {
+			display: contents;
+		}
+
+		.top > :global(#pit) {
+			order: 1;
+		}
+	}
+
+	@media (max-width: 600px) {
+		.home {
+			gap: 36px;
 		}
 	}
 
 	@media (pointer: coarse) {
-		.more a {
+		a.aside {
 			display: inline-block;
 			margin-block: -10px;
 			padding-block: 10px;

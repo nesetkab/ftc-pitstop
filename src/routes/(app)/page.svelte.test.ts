@@ -66,10 +66,11 @@ function show(data: {
 }
 
 describe('home page', () => {
-	it('opens the search dialog from the search field', async () => {
+	it('leaves search to the header', () => {
 		show({ today, week });
-		await fireEvent.click(screen.getByRole('button', { name: /Search teams and events/ }));
-		expect(searchDialog.open).toBe(true);
+		expect(
+			screen.queryByRole('button', { name: /Search teams and events/ })
+		).not.toBeInTheDocument();
 	});
 
 	it('lists events today with their progress and leader', () => {
@@ -100,21 +101,27 @@ describe('home page', () => {
 		expect(screen.queryByText(/running now/)).not.toBeInTheDocument();
 	});
 
-	it('lists events starting this week with when they start', () => {
-		show({ today, week });
+	it('lists the first events starting this week and links to the rest', () => {
+		const many = Array.from({ length: 9 }, (_, index) => ({ ...week[0], code: `EV${index}` }));
+		show({ today, week: many });
 		const table = screen.getByRole('table', { name: 'Events starting in the next 7 days' });
-		const row = within(table).getAllByRole('row')[1];
-		expect([...row.querySelectorAll('td')].map((cell) => cell.textContent)).toEqual([
+		const rows = within(table).getAllByRole('row').slice(1);
+		expect(rows).toHaveLength(6);
+		expect([...rows[0].querySelectorAll('td')].map((cell) => cell.textContent)).toEqual([
 			'Montana Qualifier - Butte MT-Tech Butte, MT',
 			'Butte, MT',
 			'Qualifier',
-			'Nov 20–21',
-			'In 2 days'
+			'Nov 20–21'
 		]);
-		expect(screen.getByRole('link', { name: 'All events this season' })).toHaveAttribute(
+		expect(screen.getByRole('link', { name: 'All 9 events this week' })).toHaveAttribute(
 			'href',
 			'/events'
 		);
+	});
+
+	it('links to all events when the week fits', () => {
+		show({ today, week });
+		expect(screen.getByRole('link', { name: 'All events' })).toHaveAttribute('href', '/events');
 	});
 
 	it('says plainly when there is nothing to list', () => {
@@ -132,7 +139,7 @@ describe('home page', () => {
 
 	it('has the pit display address with a team number field', () => {
 		show({ today, week });
-		expect(screen.getByText('Open the pit display for your team')).toBeInTheDocument();
+		expect(screen.getByRole('heading', { name: 'Pit display' })).toBeInTheDocument();
 		expect(screen.getByRole('textbox', { name: 'Team number' })).toBeInTheDocument();
 		expect(screen.getByText('ftcpitstop.com/')).toBeInTheDocument();
 	});

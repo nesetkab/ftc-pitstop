@@ -110,7 +110,14 @@
 </script>
 
 <section aria-labelledby="your-teams">
-	<h2 class="sec-title" id="your-teams">Your teams</h2>
+	<div class="head">
+		<h2 class="sec-title" id="your-teams">Your teams</h2>
+		{#if ready && teams.length >= 2}
+			<a class="more" href={compareHref(teams.slice(0, MAX_COMPARE))}>
+				Compare {teams.length > MAX_COMPARE ? `the first ${MAX_COMPARE}` : 'these teams'}
+			</a>
+		{/if}
+	</div>
 	{#if !ready || teams.length === 0}
 		<div class={{ pending: !ready }}>
 			<TeamFinder />
@@ -216,13 +223,6 @@
 		{#if follows.teams.length > MAX_FOLLOWED}
 			<p class="note">Showing {MAX_FOLLOWED} of {follows.teams.length} followed teams.</p>
 		{/if}
-		{#if teams.length >= 2}
-			<p class="more">
-				<a href={compareHref(teams.slice(0, MAX_COMPARE))}>
-					Compare {teams.length > MAX_COMPARE ? `the first ${MAX_COMPARE}` : 'these teams'}
-				</a>
-			</p>
-		{/if}
 	{/if}
 </section>
 
@@ -233,8 +233,21 @@
 		gap: 10px;
 	}
 
+	.head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 4px 16px;
+	}
+
 	.more {
 		font-size: 14px;
+		color: var(--text-2);
+	}
+
+	.more:hover {
+		color: var(--text);
 	}
 
 	:global(:root[data-following]) .pending {
@@ -243,7 +256,7 @@
 
 	.teams {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
 		gap: 16px 32px;
 		margin: 0;
 		padding: 0;
@@ -370,7 +383,7 @@
 
 	@media (pointer: coarse) {
 		.pit-link,
-		.more a {
+		.more {
 			display: inline-block;
 			margin-block: -10px;
 			padding-block: 10px;

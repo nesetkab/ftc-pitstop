@@ -13,15 +13,8 @@
 	let expanded = $state(false);
 
 	const shown = $derived(expanded ? rows : rows.slice(0, limit));
-	const live = $derived(rows.filter((row) => row.state === 'live').length);
 	const leaders = $derived(shown.some((row) => row.leader));
 </script>
-
-{#if live > 0}
-	<p class="summary muted">
-		{live} of {rows.length} running now
-	</p>
-{/if}
 
 <div class={['events', { leaders }]}>
 	<Table>
@@ -86,10 +79,6 @@
 {/if}
 
 <style>
-	.summary {
-		font-size: 14px;
-	}
-
 	.events :global(td) {
 		overflow: hidden;
 		text-overflow: ellipsis;

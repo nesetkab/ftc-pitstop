@@ -32,9 +32,12 @@
 </script>
 
 <section aria-labelledby="best-title">
-	<h2 class="sec-title" id="best-title">
-		Best matches {highlights.range === 'today' ? 'today' : 'this week'}
-	</h2>
+	<div class="head">
+		<h2 class="sec-title" id="best-title">
+			Best matches {highlights.range === 'today' ? 'today' : 'this week'}
+		</h2>
+		<a class="more" href="/records?range=7">More records</a>
+	</div>
 	<div class="groups">
 		{#each groups as group (group.id)}
 			<div class="group">
@@ -64,11 +67,6 @@
 			</div>
 		{/each}
 	</div>
-	<p class="more">
-		<a href="/records?range=7">More records</a>
-		<span class="faint">·</span>
-		<a href="/compare">Compare teams</a>
-	</p>
 </section>
 
 <style>
@@ -162,8 +160,27 @@
 		font-size: 12.5px;
 	}
 
+	.head {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 4px 16px;
+	}
+
 	.more {
 		font-size: 14px;
+		color: var(--text-2);
+	}
+
+	.more:hover {
+		color: var(--text);
+	}
+
+	@media (max-width: 600px) {
+		li:nth-child(n + 3) {
+			display: none;
+		}
 	}
 
 	@media (pointer: coarse) {
@@ -177,7 +194,7 @@
 			inset: 0;
 		}
 
-		.more a {
+		.more {
 			display: inline-block;
 			margin-block: -10px;
 			padding-block: 10px;

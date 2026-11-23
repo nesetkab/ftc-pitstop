@@ -13,10 +13,10 @@
 </script>
 
 <form id="pit" onsubmit={open} aria-labelledby="pit-label">
-	<h2 class="sec-title" id="pit-label">Open the pit display for your team</h2>
+	<h2 class="sec-title" id="pit-label">Pit display</h2>
 	<p class="about">
-		A full-screen page for the TV in your pit with your next match, queue time, alliances and rank,
-		updated live. Leave off /tv for the phone version.
+		Your next match, queue time and rank on the TV in your pit, updated live. Leave off /tv for the
+		phone version.
 	</p>
 	<div class="row">
 		<label class="address">

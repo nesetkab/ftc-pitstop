@@ -122,10 +122,6 @@ describe('simulate page', () => {
 		expect(within(autoRow).getByText('724 79%')).toBeInTheDocument();
 		expect(screen.getByText(/Auto is the biggest gap/)).toBeInTheDocument();
 		expect(screen.getByText('Expected RP')).toBeInTheDocument();
-		expect(screen.getByRole('link', { name: 'Compare these four teams' })).toHaveAttribute(
-			'href',
-			'/compare?teams=724,10662,5026,4133'
-		);
 		expect(screen.getByText(/No matches yet this season for 4133/)).toBeInTheDocument();
 	});
 
