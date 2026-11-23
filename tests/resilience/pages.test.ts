@@ -71,7 +71,11 @@ describe('error responses', () => {
 		const { handle } = await import('../../src/hooks.server.ts');
 		const run = (status: number) =>
 			handle({
-				event: { url: new URL('http://localhost/events/USAZGIQ') },
+				event: {
+					url: new URL('http://localhost/events/USAZGIQ'),
+					request: new Request('http://localhost/events/USAZGIQ'),
+					route: { id: null }
+				},
 				resolve: async () =>
 					new Response('x', {
 						status,

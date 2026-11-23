@@ -4,6 +4,7 @@ import {
 	csvHeader,
 	csvValues,
 	parseRankingChoice,
+	rankingQuery,
 	rankingRows,
 	scoreStats,
 	sortRankingRows,
@@ -11,18 +12,21 @@ import {
 } from '#lib/components/event/ranking-columns.ts';
 import { loadEventAnalysisEntry } from '#lib/server/analysis.ts';
 import { round, toCsv } from '#lib/format/csv.ts';
+import { canonicalRedirect } from '#lib/server/canonical.ts';
 import { csvResponse } from '#lib/server/csv.ts';
 import { loadEventBundle } from '#lib/server/event.ts';
 import { CACHE_CONTROL, errorResponse, shortestCache } from '#lib/server/http.ts';
 import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ params, url }) => {
+	const choice = parseRankingChoice(url.searchParams);
+	const moved = canonicalRedirect(url, rankingQuery(choice));
+	if (moved) return moved;
 	try {
 		const [{ cacheControl, ...bundle }, entry] = await Promise.all([
 			loadEventBundle(params.code),
 			loadEventAnalysisEntry(params.code).catch(() => null)
 		]);
-		const choice = parseRankingChoice(url.searchParams);
 		const names = new Map(bundle.teams.map((team) => [team.number, team.name]));
 		const ratings = entry?.analysis.ratings ?? null;
 		const stats = scoreStats(bundle.matches);

@@ -1,5 +1,11 @@
-import { parseInsightFilters, rankInsights, sortInsights } from '#lib/components/event/insights.ts';
+import {
+	insightQuery,
+	parseInsightFilters,
+	rankInsights,
+	sortInsights
+} from '#lib/components/event/insights.ts';
 import { toCsv } from '#lib/format/csv.ts';
+import { canonicalRedirect } from '#lib/server/canonical.ts';
 import { csvResponse } from '#lib/server/csv.ts';
 import { errorResponse } from '#lib/server/http.ts';
 import { loadInsightRows } from '#lib/server/insights.ts';
@@ -24,8 +30,10 @@ const HEADER = [
 ];
 
 export const GET: RequestHandler = async ({ params, url }) => {
+	const filters = parseInsightFilters(url.searchParams);
+	const moved = canonicalRedirect(url, insightQuery(filters));
+	if (moved) return moved;
 	try {
-		const filters = parseInsightFilters(url.searchParams);
 		const { event, rows, cacheControl } = await loadInsightRows(params.code);
 		const ranked = rankInsights(sortInsights(rows, filters), filters.sort);
 		const body = toCsv(

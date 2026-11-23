@@ -1,4 +1,5 @@
 import type { Handle, HandleServerError } from '@sveltejs/kit/hooks';
+import { strayQueryRedirect } from '#lib/server/canonical.ts';
 import { describeError } from '#lib/server/errors.ts';
 import { uncachedErrors } from '#lib/server/http.ts';
 import { legacyRedirect } from '#lib/server/legacy.ts';
@@ -10,6 +11,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	if (target) {
 		return withSecurityHeaders(new Response(null, { status: 308, headers: { location: target } }));
 	}
+	const stray = strayQueryRedirect(event.request.method, event.route.id, event.url);
+	if (stray) return withSecurityHeaders(stray);
 	const response = await resolve(event, {
 		transformPageChunk: ({ html }) => withSocialTags(html, event.url)
 	});

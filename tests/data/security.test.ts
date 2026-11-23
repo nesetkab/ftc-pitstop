@@ -25,7 +25,7 @@ afterEach(() => vi.restoreAllMocks());
 
 function respond(response: Response) {
 	return handle({
-		event: { url: new URL('https://www.ftcpitstop.com/') } as never,
+		event: { url: new URL('https://www.ftcpitstop.com/'), request: new Request('https://www.ftcpitstop.com/'), route: { id: null } } as never,
 		resolve: async () => response
 	} as never);
 }
@@ -195,7 +195,7 @@ describe('server errors', () => {
 describe('legacy links', () => {
 	it('redirects old routes before rendering anything', async () => {
 		const response = await handle({
-			event: { url: new URL('https://www.ftcpitstop.com/dashboard/usmtbuq/3747') } as never,
+			event: { url: new URL('https://www.ftcpitstop.com/dashboard/usmtbuq/3747'), request: new Request('https://www.ftcpitstop.com/dashboard/usmtbuq/3747'), route: { id: null } } as never,
 			resolve: async () => {
 				throw new Error('rendered a legacy route');
 			}
@@ -209,7 +209,7 @@ describe('legacy links', () => {
 describe('share previews in pages', () => {
 	it('adds preview tags to rendered HTML', async () => {
 		const response = await handle({
-			event: { url: new URL('https://www.ftcpitstop.com/events/USMTBUQ') } as never,
+			event: { url: new URL('https://www.ftcpitstop.com/events/USMTBUQ'), request: new Request('https://www.ftcpitstop.com/events/USMTBUQ'), route: { id: null } } as never,
 			resolve: async (
 				_event: unknown,
 				options: { transformPageChunk: (input: { html: string; done: boolean }) => string }

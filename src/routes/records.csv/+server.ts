@@ -2,11 +2,13 @@ import {
 	filterRecords,
 	pageRecords,
 	parseRecordFilters,
-	RECORDS_CSV_LIMIT
+	RECORDS_CSV_LIMIT,
+	recordQuery
 } from '#lib/components/records/records.ts';
 import { localDate } from '#lib/format/calendar.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { toCsv } from '#lib/format/csv.ts';
+import { canonicalRedirect } from '#lib/server/canonical.ts';
 import { csvResponse } from '#lib/server/csv.ts';
 import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
 import { loadRecordDataset, recordNames } from '#lib/server/records.ts';
@@ -36,6 +38,8 @@ const HEADER = [
 
 export const GET: RequestHandler = async ({ url }) => {
 	const filters = parseRecordFilters(url.searchParams);
+	const moved = canonicalRedirect(url, recordQuery({ ...filters, page: 1 }));
+	if (moved) return moved;
 	const source = await loadRecordDataset(20_000).catch(() => null);
 	if (!source) {
 		return jsonResponse(
