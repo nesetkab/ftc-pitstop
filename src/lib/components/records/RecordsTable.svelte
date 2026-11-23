@@ -62,7 +62,7 @@
 						aria-sort={active ? 'descending' : undefined}
 					>
 						{#if sortable}
-							<a href={sortHref(part.key)} data-sveltekit-reset="false">
+							<a class="sort-link" href={sortHref(part.key)} data-sveltekit-reset="false">
 								<Term label={part.label} nested />{#if active}<span aria-hidden="true">
 										↓</span
 									>{/if}
