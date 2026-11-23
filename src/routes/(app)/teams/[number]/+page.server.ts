@@ -1,10 +1,13 @@
 import { error } from '@sveltejs/kit';
 import { localDay } from '#lib/components/team/dates.ts';
+import { upcomingEntries } from '#lib/components/team/season-report.ts';
 import { buildTeamPage } from '#lib/components/team/team-view.ts';
 import { loadEventAnalysis, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
+import { settleWithin } from '#lib/server/cache.ts';
 import { DataError } from '#lib/server/errors.ts';
 import { loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
+import type { EventBundle } from '#lib/types.ts';
 import type { PageServerLoad } from './$types';
 
 async function settled<T>(task: Promise<T>): Promise<T | null> {
@@ -13,6 +16,18 @@ async function settled<T>(task: Promise<T>): Promise<T | null> {
 	} catch {
 		return null;
 	}
+}
+
+const AHEAD_WAIT_MS = 2500;
+
+async function lookAhead(code: string) {
+	const bundle = await settled(loadEventBundle(code));
+	const analysis = scheduled(bundle) ? await settled(loadEventAnalysis(code)) : null;
+	return { bundle, analysis };
+}
+
+function scheduled(bundle: EventBundle | null): boolean {
+	return bundle?.matches.some((match) => match.level === 'qual' && !match.result) ?? false;
 }
 
 function fail(cause: unknown): never {
@@ -30,18 +45,24 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 		(entry) => entry.stats !== null && localDay(now, entry.event.timezone) >= entry.event.start
 	);
 
-	const [ratings, analysisList, bundleList] = await Promise.all([
+	const startedCodes = new Set(started.map((entry) => entry.event.code));
+	const ahead = upcomingEntries(season, now).filter((entry) => !startedCodes.has(entry.event.code));
+
+	const [ratings, analysisList, bundleList, aheadList] = await Promise.all([
 		ratingsTask,
 		Promise.all(started.map((entry) => settled(loadEventAnalysis(entry.event.code)))),
-		Promise.all(started.map((entry) => settled(loadEventBundle(entry.event.code))))
+		Promise.all(started.map((entry) => settled(loadEventBundle(entry.event.code)))),
+		Promise.all(ahead.map((entry) => settleWithin(lookAhead(entry.event.code), AHEAD_WAIT_MS)))
 	]);
 
-	const analyses = Object.fromEntries(
-		started.map((entry, index) => [entry.event.code, analysisList[index]])
-	);
-	const bundles = Object.fromEntries(
-		started.map((entry, index) => [entry.event.code, bundleList[index]])
-	);
+	const analyses = Object.fromEntries([
+		...started.map((entry, index) => [entry.event.code, analysisList[index]] as const),
+		...ahead.map((entry, index) => [entry.event.code, aheadList[index]?.analysis ?? null] as const)
+	]);
+	const bundles = Object.fromEntries([
+		...started.map((entry, index) => [entry.event.code, bundleList[index]] as const),
+		...ahead.map((entry, index) => [entry.event.code, aheadList[index]?.bundle ?? null] as const)
+	]);
 
 	setHeaders({ 'cache-control': CACHE_CONTROL.short });
 	return { view: buildTeamPage({ season, ratings, analyses, bundles, now }) };

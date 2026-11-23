@@ -405,7 +405,7 @@ export function createReporter(input: ReportInput) {
 	};
 }
 
-type Candidate = { weight: number; text: string };
+export type Candidate = { weight: number; text: string };
 
 function strongCut(of: number): number {
 	return Math.max(3, Math.round(of * 0.1));
@@ -456,7 +456,7 @@ function partTakeaways(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 	return [...strong, ...weak];
 }
 
-function rpTakeaways(rp: RpHabits | null): Candidate[] {
+export function rpTakeaways(rp: RpHabits | null): Candidate[] {
 	if (!rp || rp.played < 3) return [];
 	const habit = (key: RpKey) => rp.habits.find((entry) => entry.key === key) as RpHabit;
 	const share = (entry: RpHabit) => entry.earned / rp.played;
