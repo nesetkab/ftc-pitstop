@@ -332,7 +332,10 @@ describe('team page', () => {
 				stats: { opr: null, rank: null, of: null, record: null, events: 0, region: null }
 			})
 		);
-		expect(screen.getAllByText('No matches played yet this season.')).toHaveLength(2);
+		expect(screen.getAllByText('No matches played yet this season.')).toHaveLength(1);
+		expect(
+			screen.queryByRole('heading', { name: 'Compared with all teams this season' })
+		).not.toBeInTheDocument();
 	});
 
 	it('opens with season takeaways', () => {

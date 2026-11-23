@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { fixed, integer, MISSING, record } from '#lib/format/index.ts';
+	import Button from '#lib/ui/Button.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Term from '#lib/ui/Term.svelte';
@@ -66,12 +67,14 @@
 		{/each}
 	</tbody>
 </Table>
-<p class="note">
-	{#if hidden > 0}
-		<button type="button" class="more" aria-expanded={open} onclick={() => (open = !open)}>
+{#if hidden > 0}
+	<div class="more">
+		<Button variant="secondary" aria-expanded={open} onclick={() => (open = !open)}>
 			{open ? 'Show fewer' : `Show ${hidden} more`}
-		</button>
-	{/if}
+		</Button>
+	</div>
+{/if}
+<p class="note">
 	{#if kind === 'partners'}
 		Played with {total} different {total === 1 ? 'partner' : 'partners'}. Best score is the
 		alliance's highest score together.
@@ -104,16 +107,7 @@
 	}
 
 	.more {
-		margin-right: 8px;
-		padding: 0;
-		border: 0;
-		background: none;
-		color: var(--text);
-		font: inherit;
-		font-weight: 600;
-		text-decoration: underline;
-		text-underline-offset: 3px;
-		cursor: pointer;
+		display: flex;
 	}
 
 	@media (max-width: 600px) {
@@ -123,14 +117,6 @@
 
 		small {
 			display: none;
-		}
-	}
-
-	@media (pointer: coarse) {
-		.more {
-			display: inline-block;
-			margin-block: -10px;
-			padding-block: 10px;
 		}
 	}
 </style>
