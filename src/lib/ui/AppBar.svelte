@@ -10,18 +10,18 @@
 	let { onsearch }: Props = $props();
 
 	const links = [
-		{ href: '/events', label: 'Events' },
+		{ href: '/events', label: 'Events', also: ['/advancement'] },
 		{ href: '/teams', label: 'Teams' },
 		{ href: '/leaderboards', label: 'Leaderboards' },
 		{ href: '/records', label: 'Records' },
 		{ href: '/compare', label: 'Compare' }
 	];
 
-	function current(href: string) {
+	function current(href: string, also: string[] = []) {
 		const path = page.url.pathname;
 		if (path === href) return 'page';
-		if (path.startsWith(`${href}/`)) return 'true';
-		return undefined;
+		const within = (base: string) => path === base || path.startsWith(`${base}/`);
+		return within(href) || also.some(within) ? 'true' : undefined;
 	}
 </script>
 
@@ -30,7 +30,7 @@
 		<a class="home" href="/"><Logo height="15px" /></a>
 		<nav aria-label="Main">
 			{#each links as link (link.href)}
-				<a href={link.href} aria-current={current(link.href)}>{link.label}</a>
+				<a href={link.href} aria-current={current(link.href, link.also)}>{link.label}</a>
 			{/each}
 		</nav>
 		<button

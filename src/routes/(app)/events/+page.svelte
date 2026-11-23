@@ -2,14 +2,18 @@
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
+	import EventSections from '#lib/components/event/EventSections.svelte';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import {
 		filterEvents,
 		groupByWeek,
-		typeOptions,
+		PAGE_SIZE,
 		unpackEvents,
-		type DateFilter
+		windowCovers,
+		type DateFilter,
+		type ListedEvent
 	} from '#lib/components/event/event-list.ts';
+	import { seasonEvents } from '#lib/components/event/season-events.ts';
 	import { fixed, integer } from '#lib/format/number.ts';
 	import { shortRange } from '#lib/format/time.ts';
 	import Button from '#lib/ui/Button.svelte';
@@ -22,7 +26,6 @@
 	import Term from '#lib/ui/Term.svelte';
 	import type { PageProps } from './$types';
 
-	const PAGE_SIZE = 200;
 	const WHEN: { value: DateFilter; label: string }[] = [
 		{ value: 'week', label: 'This week' },
 		{ value: 'upcoming', label: 'Upcoming' },
@@ -41,19 +44,39 @@
 	let type = $state('');
 	let when = $state<DateFilter>('upcoming');
 	let limit = $state(PAGE_SIZE);
+	let season = $state<ListedEvent[] | null>(null);
+	let failed = $state(false);
 	let ready = false;
 
-	const events = $derived(unpackEvents(data.events));
-	const types = $derived(typeOptions(events));
+	const events = $derived(season ?? unpackEvents(data.events));
 	const filters = $derived({ query, region, type, when });
 	const finished = $derived(new Set(data.finished));
 	const shown = $derived(filterEvents(events, filters, now, finished));
 	const groups = $derived(groupByWeek(shown.slice(0, limit), now));
+	const partial = $derived(season === null ? data.window : null);
+	const covered = $derived(
+		partial === null || windowCovers(partial, filters, limit, shown.length, now)
+	);
+	const waiting = $derived(!covered && !failed);
+	const firstPageOnly = $derived(
+		partial !== null && when === 'upcoming' && !query.trim() && !region && !type && shown.length > 0
+	);
+	const count = $derived(
+		firstPageOnly ? Math.max(shown.length, partial?.upcoming ?? 0) : shown.length
+	);
 	const elsewhere = $derived(
 		shown.length === 0 && when !== 'all'
 			? filterEvents(events, { ...filters, when: 'all' }, now, finished).length
 			: 0
 	);
+
+	$effect(() => {
+		if (covered || failed) return;
+		seasonEvents.load().then(
+			(list) => (season = list),
+			() => (failed = true)
+		);
+	});
 
 	$effect(() => {
 		now = Date.now();
@@ -91,6 +114,10 @@
 		limit = PAGE_SIZE;
 	});
 
+	function retry() {
+		failed = false;
+	}
+
 	function reset() {
 		query = '';
 		region = '';
@@ -102,14 +129,16 @@
 <Seo
 	title={siteTitle(`FTC events, ${SEASON_NAME} season`)}
 	description="All {integer(
-		events.length
+		data.total
 	)} FTC events in the {SEASON_NAME} season: qualifiers, league meets, championships and more, with live rankings, schedules, results and awards."
 	path="/events"
 />
 
+<EventSections />
+
 <PageHeader
 	title="Events"
-	meta="{integer(events.length)} events in the BIOBUZZ season."
+	meta="{integer(data.total)} events in the BIOBUZZ season."
 	status={data.stale ? staleLine : undefined}
 />
 
@@ -148,7 +177,7 @@
 		<span class="visually-hidden">Event type</span>
 		<select bind:value={type}>
 			<option value="">All types</option>
-			{#each types as option (option)}
+			{#each data.types as option (option)}
 				<option value={option}>{typeLabel(option)}</option>
 			{/each}
 		</select>
@@ -156,7 +185,16 @@
 	<Segmented label="Dates" options={WHEN} value={when} onselect={(value) => (when = value)} />
 </form>
 
-{#if shown.length === 0}
+{#if failed && !covered}
+	<p class="notice" role="status">
+		Some events couldn't load.
+		<button type="button" class="link" onclick={retry}>Try again</button>
+	</p>
+{/if}
+
+{#if waiting && !firstPageOnly}
+	<p class="count" role="status">Loading all {integer(data.total)} events…</p>
+{:else if shown.length === 0}
 	<EmptyState title="No events match.">
 		{#if elsewhere > 0}
 			{integer(elsewhere)}
@@ -168,8 +206,7 @@
 	</EmptyState>
 {:else}
 	<p class="count">
-		<span>{integer(shown.length)} {shown.length === 1 ? 'event' : 'events'}</span>
-		<a href="/events/strength">Strongest events</a>
+		<span>{integer(count)} {count === 1 ? 'event' : 'events'}</span>
 	</p>
 	<div class="table-wrap">
 		<table class="t events">
@@ -215,7 +252,9 @@
 			{/each}
 		</table>
 	</div>
-	{#if shown.length > limit}
+	{#if waiting}
+		<p class="notice" role="status">Loading more events…</p>
+	{:else if count > limit}
 		<div>
 			<Button variant="secondary" onclick={() => (limit += PAGE_SIZE * 2)}>Show more events</Button>
 		</div>
@@ -265,6 +304,11 @@
 		font-size: 14px;
 		color: var(--text-2);
 		font-variant-numeric: tabular-nums;
+	}
+
+	.notice {
+		font-size: 14px;
+		color: var(--text-2);
 	}
 
 	.table-wrap {

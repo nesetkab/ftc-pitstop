@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { SeasonRatings } from '#lib/analysis/types.ts';
 import { createCache, redisStore } from '#lib/server/cache.ts';
-import { createStrength, STRENGTH_KEY, toRosters } from '#lib/server/strength.ts';
+import { toRosters } from '#lib/server/rosters.ts';
+import { createStrength, STRENGTH_KEY } from '#lib/server/strength.ts';
 import type { EventSummary } from '#lib/types.ts';
 import { createFakeRedis, type FakeRedis } from '#lib/workspace/fake-redis.ts';
 

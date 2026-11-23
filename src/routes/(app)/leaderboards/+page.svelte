@@ -69,7 +69,8 @@
 	meta="Teams ranked by OPR this season. OPR is the points a team adds to its alliance's score."
 >
 	{#snippet status()}
-		<StaleNotice updated={data.updated} staleAfter={86400} prefix="Updated" />
+		<StaleNotice updated={data.updated} staleAfter={86400} prefix="Updated" />.
+		<a href="/about">How the numbers work</a>
 	{/snippet}
 </PageHeader>
 

@@ -1,23 +1,10 @@
-import * as z from 'zod';
-import { SEASON } from '#lib/game/biobuzz.ts';
-import { cache, keepAlive } from '#lib/server/cache.ts';
-import { scoutClient as scout } from '#lib/server/ftcscout.ts';
+import type { Rosters } from '#lib/components/event/strength.ts';
 import { localDate } from '#lib/format/calendar.ts';
+import { settleWithin } from '#lib/server/cache.ts';
+import { loadRosters } from '#lib/server/rosters.ts';
 import type { EventSummary } from '#lib/types.ts';
 
-const DAY = 86_400;
 const WAIT_MS = 3_000;
-
-const schema = z.object({
-	eventsSearch: z.array(
-		z.object({
-			code: z.string(),
-			teams: z.array(z.object({ teamNumber: z.number(), stats: z.object({}).nullable() }))
-		})
-	)
-});
-
-const DOCUMENT = `query EventsSearch($season: Int!) { eventsSearch(season: $season) { code teams { teamNumber stats { __typename } } } }`;
 
 export interface TeamCount {
 	registered: number;
@@ -26,13 +13,10 @@ export interface TeamCount {
 
 export type TeamCounts = Record<string, TeamCount>;
 
-export function countTeams(data: z.infer<typeof schema>): TeamCounts {
+export function countTeams(rosters: Rosters): TeamCounts {
 	const counts: TeamCounts = {};
-	for (const event of data.eventsSearch) {
-		counts[event.code.toUpperCase()] = {
-			registered: event.teams.length,
-			played: event.teams.filter((team) => team.stats !== null).length
-		};
+	for (const [code, roster] of Object.entries(rosters)) {
+		counts[code] = { registered: roster.registered.length, played: roster.played.length };
 	}
 	return counts;
 }
@@ -47,32 +31,20 @@ export function teamCount(
 	return (over && count.played > 0 ? count.played : count.registered) || null;
 }
 
-function fetchCounts() {
-	return cache.get(
-		`scout:${SEASON}:event-team-counts:played`,
-		{ ttl: 3600, maxStale: 7 * DAY },
-		async () => {
-			const data = await scout.query('EventsSearch', DOCUMENT, { season: SEASON }, schema, {
-				timeoutMs: 30_000
-			});
-			return { status: 'ok', body: countTeams(data) };
-		}
-	);
+const counted = new WeakMap<Rosters, TeamCounts>();
+
+function countsOf(rosters: Rosters): TeamCounts {
+	let counts = counted.get(rosters);
+	if (!counts) {
+		counts = countTeams(rosters);
+		counted.set(rosters, counts);
+	}
+	return counts;
 }
 
-export async function loadTeamCounts(): Promise<TeamCounts | null> {
-	let timer: ReturnType<typeof setTimeout> | undefined;
-	const timeout = new Promise<null>((resolve) => {
-		timer = setTimeout(() => resolve(null), WAIT_MS);
-	});
-	const counts = fetchCounts().then(
-		(value) => value.body,
-		() => null
-	);
-	keepAlive(counts);
-	try {
-		return await Promise.race([counts, timeout]);
-	} finally {
-		clearTimeout(timer);
-	}
+export function loadTeamCounts(
+	load: () => Promise<Rosters> = loadRosters,
+	ms = WAIT_MS
+): Promise<TeamCounts | null> {
+	return settleWithin(load().then(countsOf), ms);
 }
