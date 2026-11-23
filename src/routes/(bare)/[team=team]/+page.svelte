@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
+	import { pitAnalysis } from '#lib/components/pit/analysis.remote.ts';
 	import { PitAlerts } from '#lib/components/pit/notify.svelte.ts';
 	import PhoneScreen from '#lib/components/pit/PhoneScreen.svelte';
 	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
@@ -11,7 +12,6 @@
 		type RankMemory
 	} from '#lib/components/pit/standing.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import { pitAnalysis } from './pit.remote.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();

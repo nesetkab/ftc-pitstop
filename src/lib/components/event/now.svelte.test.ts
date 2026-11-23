@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fixtureBundle } from '#lib/components/pit/fixtures.ts';
+import { withoutBreakdowns } from '#lib/game/breakdowns.ts';
 import { replayBundle, replayStart } from '#lib/game/replay.ts';
 import { RELOAD_GAP } from './now.ts';
 import { NowSession } from './now.svelte.ts';
@@ -75,5 +76,48 @@ describe('NowSession', () => {
 		expect(replay.clock).toBe(start + 20 * 60_000 * 60);
 		expect(replay.view.phase).not.toBe('quals');
 		expect(reload).not.toHaveBeenCalled();
+	});
+
+	it('replays with forecasts from the replay time, not the finished event', async () => {
+		const start = at('Q10');
+		const early = fakeAnalysis(replayBundle(full, start));
+		const loadAnalysis = vi.fn(async () => early);
+		const replay = new NowSession({
+			bundle: full,
+			analysis,
+			replay: { start, speed: 1 },
+			reload: vi.fn(),
+			loadAnalysis,
+			now: () => 1_000,
+			fetch: vi.fn()
+		});
+		expect(replay.analysis).toBeNull();
+		await replay.refreshAnalysis();
+		expect(loadAnalysis).toHaveBeenCalledWith({
+			code: 'USAZGIQ',
+			at: start,
+			version: replay.signature
+		});
+		expect(replay.analysis).toBe(early);
+		replay.update(full, analysis);
+		expect(replay.analysis).toBe(early);
+	});
+
+	it('replays rankings with bonus ranking points from the scored bundle', async () => {
+		const start = at('Q20');
+		const fetcher = vi.fn(async () => Response.json(full));
+		const replay = new NowSession({
+			bundle: withoutBreakdowns(full),
+			analysis: null,
+			replay: { start, speed: 1 },
+			reload: vi.fn(),
+			now: () => 1_000,
+			fetch: fetcher as unknown as typeof fetch
+		});
+		const truth = replayBundle(full, start).rankings[0];
+		expect(replay.view.standings[0].rs).toBeLessThan(truth.rs);
+		await replay.loadScores();
+		expect(fetcher).toHaveBeenCalledWith('/api/events/USAZGIQ');
+		expect(replay.view.standings[0]).toMatchObject({ team: truth.team, rs: truth.rs });
 	});
 });

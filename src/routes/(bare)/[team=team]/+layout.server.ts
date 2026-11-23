@@ -106,7 +106,7 @@ export const load: LayoutServerLoad = async ({ params, url, setHeaders }) => {
 		teamName,
 		code,
 		reason,
-		bundle: bundle ? withoutBreakdowns(bundle) : null,
+		bundle: bundle && !replay ? withoutBreakdowns(bundle) : bundle,
 		analysis,
 		queue: status.queue,
 		nexus: status.nexus,

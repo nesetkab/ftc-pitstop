@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { page } from '$app/state';
+	import { pitAnalysis } from '#lib/components/pit/analysis.remote.ts';
 	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
 	import TvMessage from '#lib/components/pit/TvMessage.svelte';
 	import TvScreen from '#lib/components/pit/TvScreen.svelte';
 	import { keepAwake } from '#lib/components/pit/wake.ts';
-	import { pitAnalysis } from '../pit.remote.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
