@@ -8,6 +8,7 @@ const PAGE_IMAGES: Record<string, string> = {
 	'/events': '/og/events.png',
 	'/leaderboards': '/og/leaderboards.png',
 	'/records': '/og/records.png',
+	'/advancement': '/og/advancement.png',
 	'/accuracy': '/og/accuracy.png'
 };
 
@@ -46,6 +47,7 @@ export function ogImagePath(url: URL): string {
 	if (event) return `/og/events/${event[1].toUpperCase()}.png`;
 	if (pathname === '/compare') return compareImage(url);
 	if (WORKSPACE_PAGE.test(pathname)) return '/og/workspace.png';
+	if (pathname.startsWith('/advancement/')) return '/og/advancement.png';
 	return PAGE_IMAGES[pathname.replace(/\/$/, '')] ?? '/og/site.png';
 }
 

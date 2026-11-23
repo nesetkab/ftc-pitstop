@@ -61,6 +61,11 @@ const PAGES: Record<string, PageCard> = {
 		title: 'Every FTC event this season',
 		subtitle: 'Live rankings, schedules with predictions, results and awards.'
 	},
+	'advancement.png': {
+		kicker: SEASON_NAME,
+		title: 'Who has advanced to each FTC championship',
+		subtitle: 'Teams advanced so far, how they earned it, and the qualifiers still to play.'
+	},
 	'accuracy.png': {
 		kicker: 'Prediction accuracy',
 		title: 'How PitStop’s match predictions did on past seasons',

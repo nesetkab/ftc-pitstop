@@ -18,6 +18,8 @@ describe('share previews', () => {
 		expect(image('/records')).toBe('/og/records.png');
 		expect(image('/events')).toBe('/og/events.png');
 		expect(image('/accuracy')).toBe('/og/accuracy.png');
+		expect(image('/advancement?region=USMI')).toBe('/og/advancement.png');
+		expect(image('/advancement/USMISECMP')).toBe('/og/advancement.png');
 		expect(image('/compare?teams=16,724,16')).toBe('/og/compare/16-724.png');
 		expect(image('/compare?teams=16')).toBe('/og/compare.png');
 		expect(image('/compare')).toBe('/og/compare.png');
