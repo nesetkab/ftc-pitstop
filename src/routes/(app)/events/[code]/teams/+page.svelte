@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { getEventView } from '#lib/components/event/context.ts';
+	import { strengthLine } from '#lib/components/event/strength.ts';
 	import TeamsTable from '#lib/components/event/TeamsTable.svelte';
+	import Term from '#lib/ui/Term.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -20,6 +22,12 @@
 {#if bundle.teams.length === 0}
 	<p class="muted">No teams have registered yet.</p>
 {:else}
+	{#if data.strength}
+		<p class="strength muted">
+			<Term label="Strength" />: {strengthLine(data.strength)}.
+			<a href="/events/strength">All events by strength</a>
+		</p>
+	{/if}
 	<TeamsTable
 		teams={bundle.teams}
 		rankings={bundle.rankings}
@@ -34,3 +42,14 @@
 		<a href="/events/{bundle.event.code}/scouting">print reports for every team</a>.
 	</p>
 {/if}
+
+<style>
+	.strength {
+		font-size: 14px;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.strength a {
+		margin-left: 4px;
+	}
+</style>

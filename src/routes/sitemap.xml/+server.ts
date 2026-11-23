@@ -3,7 +3,16 @@ import { settleWithin } from '#lib/server/cache.ts';
 import { searchIndex } from '#lib/server/event.ts';
 import type { RequestHandler } from './$types';
 
-const PAGES = ['/', '/events', '/leaderboards', '/records', '/advancement', '/accuracy', '/about'];
+const PAGES = [
+	'/',
+	'/events',
+	'/events/strength',
+	'/leaderboards',
+	'/records',
+	'/advancement',
+	'/accuracy',
+	'/about'
+];
 
 type Page = { path: string; lastmod?: string };
 

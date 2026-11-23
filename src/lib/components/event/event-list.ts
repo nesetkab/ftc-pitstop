@@ -15,9 +15,14 @@ export type ListedEvent = {
 	start: string;
 	end: string;
 	teams: number | null;
+	strength: number | null;
 };
 
-export function listed(event: EventSummary, teams: number | null): ListedEvent {
+export function listed(
+	event: EventSummary,
+	teams: number | null,
+	strength: number | null = null
+): ListedEvent {
 	return {
 		code: event.code,
 		name: event.name,
@@ -27,7 +32,8 @@ export function listed(event: EventSummary, teams: number | null): ListedEvent {
 		timezone: event.timezone,
 		start: event.start,
 		end: event.end,
-		teams
+		teams,
+		strength
 	};
 }
 
@@ -40,7 +46,8 @@ export type PackedEvent = [
 	timezone: number,
 	start: string,
 	days: number,
-	teams: number | null
+	teams: number | null,
+	strength: number | null
 ];
 
 export type PackedEvents = { words: string[]; rows: PackedEvent[] };
@@ -71,13 +78,14 @@ export function packEvents(events: ListedEvent[]): PackedEvents {
 		word(event.timezone),
 		event.start,
 		dayGap(event.start, event.end),
-		event.teams
+		event.teams,
+		event.strength
 	]);
 	return { words, rows };
 }
 
 export function unpackEvents({ words, rows }: PackedEvents): ListedEvent[] {
-	return rows.map(([code, name, type, region, place, timezone, start, days, teams]) => ({
+	return rows.map(([code, name, type, region, place, timezone, start, days, teams, strength]) => ({
 		code,
 		name,
 		type: words[type] as EventType,
@@ -86,7 +94,8 @@ export function unpackEvents({ words, rows }: PackedEvents): ListedEvent[] {
 		timezone: words[timezone],
 		start,
 		end: days === 0 ? start : addDays(start, days),
-		teams
+		teams,
+		strength
 	}));
 }
 
