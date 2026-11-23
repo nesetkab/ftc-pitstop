@@ -1,4 +1,5 @@
 <script lang="ts">
+	import '#lib/ui/score-table.css';
 	import type { MatchForecast } from '#lib/analysis/types.ts';
 	import { fixed } from '#lib/format/number.ts';
 	import { pct } from '#lib/format/pct.ts';
@@ -18,7 +19,7 @@
 	const result = $derived(match.result);
 </script>
 
-<div class="card">
+<div class="score-table">
 	<table>
 		<caption class="visually-hidden">{result ? 'Final score' : 'Alliances'}</caption>
 		<colgroup>
@@ -76,61 +77,10 @@
 </div>
 
 <style>
-	.card {
-		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
-		overflow: hidden;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		table-layout: fixed;
-	}
-
-	col.alliance {
-		width: 98px;
-	}
-
-	col.num {
-		width: 102px;
-	}
-
-	th {
-		padding: 8px 6px;
-		background: var(--surface);
-		color: var(--text-3);
-		font-size: 12.5px;
-		font-weight: 500;
-		text-align: left;
-	}
-
-	td {
-		padding: 12px 6px;
-		border-top: 1px solid var(--line);
-		vertical-align: middle;
-	}
-
-	th:first-child,
-	td:first-child {
-		padding-left: 16px;
-	}
-
-	th:last-child,
-	td:last-child {
-		padding-right: 16px;
-	}
-
-	.right {
-		text-align: right;
-	}
-
 	.teams {
-		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 4px;
-		font-size: 14px;
 	}
 
 	.team {
@@ -141,30 +91,8 @@
 		text-decoration: underline;
 	}
 
-	.team b {
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-	}
-
 	.team.me b {
 		box-shadow: inset 0 -2px 0 var(--accent);
-	}
-
-	.name {
-		color: var(--text-2);
-	}
-
-	.v {
-		text-align: right;
-		font-size: 22px;
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-		white-space: nowrap;
-	}
-
-	.v.lean {
-		font-weight: 500;
-		color: var(--text-2);
 	}
 
 	.v.small {
@@ -174,32 +102,13 @@
 	}
 
 	@media (max-width: 760px) {
-		col.alliance {
-			width: 64px;
-		}
-
 		col.num {
 			width: 64px;
-		}
-
-		th,
-		td {
-			padding-inline: 4px;
 		}
 
 		th {
 			line-height: 1.2;
 			vertical-align: bottom;
-		}
-
-		th:first-child,
-		td:first-child {
-			padding-left: 12px;
-		}
-
-		th:last-child,
-		td:last-child {
-			padding-right: 12px;
 		}
 
 		.teams {
