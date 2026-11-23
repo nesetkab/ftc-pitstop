@@ -9,9 +9,10 @@
 	interface Props {
 		search?: SearchFn;
 		delay?: number;
+		onfollow?: (team: number) => void;
 	}
 
-	let { search = searchApi, delay = 200 }: Props = $props();
+	let { search = searchApi, delay = 200, onfollow }: Props = $props();
 
 	const id = $props.id();
 	let query = $state('');
@@ -46,9 +47,14 @@
 		};
 	});
 
+	function follow(team: number) {
+		toggleFollow(team);
+		onfollow?.(team);
+	}
+
 	function submit(event: SubmitEvent) {
 		event.preventDefault();
-		if (hits[0]) toggleFollow(hits[0].number);
+		if (hits[0]) follow(hits[0].number);
 	}
 </script>
 
@@ -75,7 +81,7 @@
 					<Button
 						variant="secondary"
 						aria-label="Follow {hit.number}"
-						onclick={() => toggleFollow(hit.number)}
+						onclick={() => follow(hit.number)}
 					>
 						Follow
 					</Button>

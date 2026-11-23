@@ -20,6 +20,8 @@
 	let info = $state<Record<number, FollowedTeam>>({});
 	let bundles = $state<Record<string, LiveBundle | null>>({});
 	let now = $state(Date.now());
+	let list = $state<HTMLUListElement>();
+	let focusTeam = $state<number | null>(null);
 
 	const teams = $derived(follows.teams.slice(0, MAX_FOLLOWED));
 	const ordered = $derived(
@@ -92,6 +94,12 @@
 		};
 	});
 
+	$effect(() => {
+		if (focusTeam === null || !list) return;
+		list.querySelector<HTMLAnchorElement>(`a[href="/teams/${focusTeam}"]`)?.focus();
+		focusTeam = null;
+	});
+
 	function standingOf(team: number): keyof typeof STANDING_ORDER {
 		return info[team]?.event?.reason ?? 'none';
 	}
@@ -120,10 +128,10 @@
 	</div>
 	{#if !ready || teams.length === 0}
 		<div class={{ pending: !ready }}>
-			<TeamFinder />
+			<TeamFinder onfollow={(team) => (focusTeam = team)} />
 		</div>
 	{:else}
-		<ul class="teams">
+		<ul class="teams" bind:this={list}>
 			{#each ordered as team (team)}
 				{@const row = info[team]}
 				{@const event = row?.event}

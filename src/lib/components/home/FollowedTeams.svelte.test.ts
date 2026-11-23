@@ -112,6 +112,7 @@ describe('followed teams', () => {
 			'/26670'
 		);
 		expect(screen.queryByRole('searchbox')).not.toBeInTheDocument();
+		expect(screen.getByRole('link', { name: /^26670/ })).toHaveFocus();
 	});
 
 	it('says when no team matches the search', async () => {

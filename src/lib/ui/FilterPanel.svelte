@@ -11,11 +11,24 @@
 
 	const id = $props.id();
 	let open = $state(false);
+	let toggle = $state<HTMLButtonElement>();
+	let panel = $state<HTMLDivElement>();
+
+	function onkeydown(event: KeyboardEvent) {
+		if (!open || event.key !== 'Escape') return;
+		const target = event.target as Node;
+		if (target !== toggle && !panel?.contains(target)) return;
+		open = false;
+		toggle?.focus();
+	}
 </script>
+
+<svelte:window {onkeydown} />
 
 <div class={['bar', { searching: search !== undefined }]}>
 	{@render search?.()}
 	<button
+		bind:this={toggle}
 		type="button"
 		class="toggle"
 		aria-expanded={open}
@@ -31,7 +44,7 @@
 		<span class="summary">{summary.join(' · ')}</span>
 	{/if}
 </div>
-<div class={['panel', { open }]} {id}>
+<div class={['panel', { open }]} {id} bind:this={panel}>
 	{@render children()}
 </div>
 

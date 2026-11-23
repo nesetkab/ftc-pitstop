@@ -217,6 +217,18 @@
 		(more ?? document.getElementById(`${id}-team`))?.focus();
 	}
 
+	function closeMore(event: KeyboardEvent) {
+		if (event.key !== 'Escape' || open === null) return;
+		const team = open;
+		const target = event.target as Node;
+		const region = document.getElementById(`${id}-more-${team}`);
+		const button = root?.querySelector(`[aria-controls="${id}-more-${team}"]`);
+		if (target !== button && !region?.contains(target)) return;
+		event.preventDefault();
+		open = null;
+		focusMore(team);
+	}
+
 	async function moveBy(button: HTMLButtonElement, team: number, index: number, target: number) {
 		move(team, index, target);
 		await tick();
@@ -441,6 +453,8 @@
 		{/if}
 	</li>
 {/snippet}
+
+<svelte:window onkeydown={closeMore} />
 
 {#snippet eventField()}
 	<div class="event">

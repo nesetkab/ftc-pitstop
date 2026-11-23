@@ -393,6 +393,18 @@ describe('keyboard focus', () => {
 		);
 	});
 
+	it('closes the team menu on Escape and returns focus to More', async () => {
+		live(list(1, 2));
+		const more = screen.getByRole('button', { name: 'More for 1' });
+		await fireEvent.click(more);
+		const tag = screen.getByRole('button', { name: 'Strong auto' });
+		tag.focus();
+		await fireEvent.keyDown(tag, { key: 'Escape' });
+		expect(more).toHaveAttribute('aria-expanded', 'false');
+		expect(screen.queryByRole('button', { name: 'Strong auto' })).not.toBeInTheDocument();
+		await vi.waitFor(() => expect(more).toHaveFocus());
+	});
+
 	it('follows a team into the do not pick section', async () => {
 		live(list(1, 2));
 		await fireEvent.click(screen.getByRole('button', { name: 'More for 1' }));

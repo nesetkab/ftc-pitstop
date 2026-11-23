@@ -9,33 +9,46 @@
 	let { label, children }: Props = $props();
 
 	let menu = $state<HTMLDetailsElement>();
+	let summary = $state<HTMLElement>();
 
 	function close() {
-		if (menu) menu.open = false;
+		if (!menu?.open) return;
+		const inside = menu.contains(document.activeElement);
+		menu.open = false;
+		if (inside) summary?.focus();
+	}
+
+	function onkeydown(event: KeyboardEvent) {
+		if (event.key !== 'Escape' || !menu?.open) return;
+		event.preventDefault();
+		close();
+	}
+
+	function onfocusout(event: FocusEvent) {
+		const next = event.relatedTarget as Node | null;
+		if (menu && next && !menu.contains(next)) menu.open = false;
+	}
+
+	function onclick(event: MouseEvent) {
+		if (menu?.open && !menu.contains(event.target as Node)) menu.open = false;
 	}
 
 	$effect(() => {
 		const element = menu;
 		if (!element) return;
-		const outside = (event: Event) => {
-			if (element.open && !element.contains(event.target as Node)) close();
-		};
-		const escape = (event: KeyboardEvent) => {
-			if (event.key !== 'Escape' || !element.open) return;
-			close();
-			element.querySelector('summary')?.focus();
-		};
-		document.addEventListener('click', outside);
-		document.addEventListener('keydown', escape);
+		element.addEventListener('keydown', onkeydown);
+		element.addEventListener('focusout', onfocusout);
 		return () => {
-			document.removeEventListener('click', outside);
-			document.removeEventListener('keydown', escape);
+			element.removeEventListener('keydown', onkeydown);
+			element.removeEventListener('focusout', onfocusout);
 		};
 	});
 </script>
 
+<svelte:document {onclick} />
+
 <details class="menu" bind:this={menu}>
-	<summary>{label}</summary>
+	<summary bind:this={summary}>{label}</summary>
 	<div class="panel">{@render children(close)}</div>
 </details>
 
