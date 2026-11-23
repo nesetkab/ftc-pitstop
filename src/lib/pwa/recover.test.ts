@@ -49,6 +49,13 @@ describe('recoverWorker', () => {
 		expect(stuck.mark).toHaveBeenCalledWith('200');
 	});
 
+	it('clears the caches even when unregistering never settles', async () => {
+		const hung = deps(['pitstop-shell-100']);
+		hung.unregister.mockImplementation(() => new Promise(() => {}));
+		expect(await recoverWorker('200', hung.value)).toBe(true);
+		expect(hung.remove).toHaveBeenCalledWith('pitstop-shell-100');
+	});
+
 	it('does nothing when the worker is current, pending, absent or already reset', async () => {
 		const current = deps(['pitstop-shell-200']);
 		expect(await recoverWorker('200', current.value)).toBe(false);
