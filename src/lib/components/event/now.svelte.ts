@@ -146,7 +146,7 @@ export class NowSession {
 
 	start(): () => void {
 		const stop = this.feed.start();
-		if (this.replay) void this.loadScores();
+		if (this.replay) untrack(() => void this.loadScores());
 		const timer = setInterval(() => this.check(), this.replay ? REPLAY_TICK : LIVE_TICK);
 		return () => {
 			clearInterval(timer);

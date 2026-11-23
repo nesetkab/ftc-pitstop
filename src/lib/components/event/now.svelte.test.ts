@@ -1,3 +1,4 @@
+import { flushSync } from 'svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { fixtureBundle } from '#lib/components/pit/fixtures.ts';
 import { withoutBreakdowns } from '#lib/game/breakdowns.ts';
@@ -119,5 +120,28 @@ describe('NowSession', () => {
 		await replay.loadScores();
 		expect(fetcher).toHaveBeenCalledWith('/api/events/USAZGIQ');
 		expect(replay.view.standings[0]).toMatchObject({ team: truth.team, rs: truth.rs });
+	});
+
+	it('fetches the scored bundle once when a replay starts on the page', async () => {
+		const fetcher = vi.fn(
+			() => new Promise((resolve) => setTimeout(() => resolve(Response.json(full)), 0))
+		);
+		const replay = new NowSession({
+			bundle: withoutBreakdowns(full),
+			analysis: null,
+			replay: { start: at('Q20'), speed: 60 },
+			reload: vi.fn(),
+			fetch: fetcher as unknown as typeof fetch
+		});
+		const stop = $effect.root(() => {
+			$effect(() => replay.start());
+		});
+		flushSync();
+		for (let tick = 0; tick < 5; tick++) {
+			await new Promise((resolve) => setTimeout(resolve, 0));
+			flushSync();
+		}
+		expect(fetcher).toHaveBeenCalledTimes(1);
+		stop();
 	});
 });
