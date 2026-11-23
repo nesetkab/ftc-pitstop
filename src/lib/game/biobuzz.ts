@@ -44,6 +44,11 @@ export const RP_THRESHOLDS = {
 	pollinator2: 7
 } as const;
 
+export const RANKING_POINTS = {
+	win: 3,
+	tie: 1
+} as const;
+
 export const FLOWER_NAMES = [
 	'red',
 	'blue',

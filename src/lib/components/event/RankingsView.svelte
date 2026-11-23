@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
 	import { RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
+	import { LEAGUE_MATCHES } from '#lib/game/rankings.ts';
 	import type { EventBundle } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import ColumnMenu from './ColumnMenu.svelte';
@@ -21,9 +22,10 @@
 	import StrengthTable from './StrengthTable.svelte';
 
 	interface Props {
-		bundle: Pick<EventBundle, 'teams' | 'matches' | 'rankings'> & {
-			event?: Pick<EventBundle['event'], 'type'>;
-		};
+		bundle: Pick<EventBundle, 'teams' | 'matches' | 'rankings'> &
+			Partial<Pick<EventBundle, 'source'>> & {
+				event?: Pick<EventBundle['event'], 'type'>;
+			};
 		analysis?: Pick<EventAnalysis, 'ratings' | 'projections' | 'strength'> | null;
 		rp?: Record<number, RpCounts> | null;
 		followed?: ReadonlySet<number>;
@@ -67,6 +69,11 @@
 			? Math.max(0, ...bundle.rankings.map((row) => row.counted ?? 0))
 			: 0
 	);
+	const meetOnly = $derived(
+		bundle.source === 'ftcscout' &&
+			!league &&
+			(bundle.event?.type === 'LeagueMeet' || bundle.event?.type === 'LeagueTournament')
+	);
 	const note = $derived(
 		[
 			elsewhere
@@ -74,6 +81,9 @@
 				: null,
 			league
 				? `League rankings use each team's best ${league} league matches so far. RS, TBP and the record add up those matches, and RS and TBP are divided by ${league} even for teams that have played fewer.`
+				: null,
+			meetOnly
+				? `FIRST's rankings aren't loading, so these count this event's matches only. FIRST's league rankings also add each team's best ${LEAGUE_MATCHES} matches from earlier meets.`
 				: null,
 			shown.has('rs') && !league ? 'RS is the average ranking points per match.' : null,
 			shown.has('tbp') && !league

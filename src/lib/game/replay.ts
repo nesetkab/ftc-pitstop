@@ -1,14 +1,9 @@
 import { timeZoneOffset } from '#lib/format/calendar.ts';
-import { tips } from '#lib/game/biobuzz.ts';
 import { detectPhase } from '#lib/game/phase.ts';
-import type {
-	AllianceColor,
-	AllianceSelection,
-	EventBundle,
-	Match,
-	MatchResult,
-	Ranking
-} from '#lib/types.ts';
+import { computeRankings } from '#lib/game/rankings.ts';
+import type { AllianceSelection, EventBundle, Match } from '#lib/types.ts';
+
+export { computeRankings };
 
 const MINUTE = 60_000;
 
@@ -109,108 +104,6 @@ export function replayAlliances(
 			backup: null,
 			backupReplaced: null
 		}));
-}
-
-interface Totals {
-	team: number;
-	rp: number;
-	np: number;
-	tips: number;
-	auto: number;
-	wins: number;
-	losses: number;
-	ties: number;
-	played: number;
-	dq: number;
-}
-
-function rankingPoints(result: MatchResult, color: AllianceColor): number {
-	const outcome = result.winner === color ? 3 : result.winner === null ? 1 : 0;
-	const rp = result[color].breakdown?.rp;
-	return (
-		outcome +
-		Number(rp?.swarm ?? false) +
-		Number(rp?.pollinator1 ?? false) +
-		Number(rp?.pollinator2 ?? false)
-	);
-}
-
-function average(total: number, count: number): number {
-	return count > 0 ? total / count : 0;
-}
-
-export function computeRankings(matches: Match[], teams: number[] = []): Ranking[] {
-	const totals = new Map<number, Totals>();
-	const entry = (team: number) => {
-		let value = totals.get(team);
-		if (!value) {
-			value = {
-				team,
-				rp: 0,
-				np: 0,
-				tips: 0,
-				auto: 0,
-				wins: 0,
-				losses: 0,
-				ties: 0,
-				played: 0,
-				dq: 0
-			};
-			totals.set(team, value);
-		}
-		return value;
-	};
-	for (const team of teams) entry(team);
-	for (const match of matches) {
-		if (match.level !== 'qual') continue;
-		for (const color of ['red', 'blue'] as const) {
-			for (const slot of match[color]) entry(slot.team);
-		}
-		const result = match.result;
-		if (!result) continue;
-		for (const color of ['red', 'blue'] as const) {
-			const score = result[color];
-			const points = rankingPoints(result, color);
-			const alliance = score.breakdown ? tips(score.breakdown) : 0;
-			for (const slot of match[color]) {
-				if (slot.surrogate) continue;
-				const stats = entry(slot.team);
-				const disqualified = slot.dq || slot.noShow;
-				stats.played++;
-				if (disqualified) stats.dq++;
-				if (result.winner === color) stats.wins++;
-				else if (result.winner === null) stats.ties++;
-				else stats.losses++;
-				if (disqualified) continue;
-				stats.rp += points;
-				stats.np += score.preFoulTotal;
-				stats.tips += alliance;
-				stats.auto += score.auto;
-			}
-		}
-	}
-	const rows = [...totals.values()].map((stats) => ({
-		team: stats.team,
-		rs: average(stats.rp, stats.played),
-		tbp: average(stats.np, stats.played),
-		avgTips: average(stats.tips, stats.played),
-		avgAuto: average(stats.auto, stats.played),
-		wins: stats.wins,
-		losses: stats.losses,
-		ties: stats.ties,
-		played: stats.played,
-		dq: stats.dq
-	}));
-	rows.sort(
-		(a, b) =>
-			Number(b.played > 0) - Number(a.played > 0) ||
-			b.rs - a.rs ||
-			b.tbp - a.tbp ||
-			b.avgTips - a.avgTips ||
-			b.avgAuto - a.avgAuto ||
-			a.team - b.team
-	);
-	return rows.map((row, index) => ({ rank: index + 1, ...row }));
 }
 
 function teamsOf(slots: Match['red']): number[] {
