@@ -46,7 +46,7 @@ const season = [
 	}),
 	summary('LATER', '2026-12-05', '2026-12-05', { type: 'LeagueMeet', typeName: 'League Meet' })
 ];
-const events = season.map((event) => listed(event, 20));
+const events = season.map((event, at) => listed(event, 20, at === 2 ? 41.5 : null));
 
 describe('event list', () => {
 	it('filters by date, region, type and text', () => {
@@ -133,7 +133,8 @@ describe('event list', () => {
 			4,
 			'2026-11-21',
 			1,
-			20
+			20,
+			41.5
 		]);
 		expect(unpackEvents(JSON.parse(JSON.stringify(packed)))).toEqual(events);
 	});

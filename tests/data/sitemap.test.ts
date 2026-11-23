@@ -32,6 +32,7 @@ describe('sitemap', () => {
 		expect(locations).toEqual([
 			'https://www.ftcpitstop.com/',
 			'https://www.ftcpitstop.com/events',
+			'https://www.ftcpitstop.com/events/strength',
 			'https://www.ftcpitstop.com/leaderboards',
 			'https://www.ftcpitstop.com/records',
 			'https://www.ftcpitstop.com/advancement',
@@ -59,6 +60,6 @@ describe('sitemap', () => {
 		const response = await get();
 		const xml = await response.text();
 		expect(response.headers.get('cache-control')).toBe('public, s-maxage=300');
-		expect(xml.match(/<loc>/g)).toHaveLength(8);
+		expect(xml.match(/<loc>/g)).toHaveLength(9);
 	});
 });

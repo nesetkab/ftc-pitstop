@@ -10,7 +10,7 @@
 		unpackEvents,
 		type DateFilter
 	} from '#lib/components/event/event-list.ts';
-	import { integer } from '#lib/format/number.ts';
+	import { fixed, integer } from '#lib/format/number.ts';
 	import { shortRange } from '#lib/format/time.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -19,6 +19,7 @@
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
+	import Term from '#lib/ui/Term.svelte';
 	import type { PageProps } from './$types';
 
 	const PAGE_SIZE = 200;
@@ -166,7 +167,10 @@
 		{/if}
 	</EmptyState>
 {:else}
-	<p class="count">{integer(shown.length)} {shown.length === 1 ? 'event' : 'events'}</p>
+	<p class="count">
+		<span>{integer(shown.length)} {shown.length === 1 ? 'event' : 'events'}</span>
+		<a href="/events/strength">Strongest events</a>
+	</p>
 	<div class="table-wrap">
 		<table class="t events">
 			<caption class="visually-hidden">Events</caption>
@@ -177,13 +181,14 @@
 					<th class="l place" scope="col">Location</th>
 					<th class="l" scope="col">Dates</th>
 					<th class="teams" scope="col">Teams</th>
+					<th class="opt" scope="col"><Term label="Strength" /></th>
 					<th class="l" scope="col">Status</th>
 				</tr>
 			</thead>
 			{#each groups as group (group.start)}
 				<tbody>
 					<tr class="week">
-						<th class="l" colspan="6" scope="rowgroup">
+						<th class="l" colspan="7" scope="rowgroup">
 							{#if group.current}
 								<span class="now">This week</span>
 								<span class="muted">{group.label}</span>
@@ -202,6 +207,7 @@
 							<td class="l place muted">{event.place ?? ''}</td>
 							<td class="l">{shortRange(event.start, event.end)}</td>
 							<td class="teams">{event.teams ?? '—'}</td>
+							<td class="opt">{fixed(event.strength)}</td>
 							<td class={['l', 'status', event.status]}>{STATUS[event.status]}</td>
 						</tr>
 					{/each}
@@ -252,6 +258,9 @@
 	}
 
 	.count {
+		display: flex;
+		justify-content: space-between;
+		gap: 12px;
 		margin-bottom: -12px;
 		font-size: 14px;
 		color: var(--text-2);

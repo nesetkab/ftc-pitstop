@@ -6,6 +6,7 @@
 		ABOUT_TITLE,
 		type AboutSectionId
 	} from '#lib/components/about/sections.ts';
+	import { DEEP, TOP } from '#lib/components/event/strength.ts';
 	import { BUNDLE_INTERVAL, QUEUE_INTERVAL } from '#lib/components/pit/poll.ts';
 	import { QUEUE_EARLIEST, QUEUE_MATCHES_AHEAD } from '#lib/components/pit/queue.ts';
 	import { GLOSSARY, termId } from '#lib/format/glossary.ts';
@@ -241,6 +242,26 @@
 			<p>
 				The <a href="/accuracy">accuracy page</a> shows how close the start time estimates came on this
 				season’s events, next to the printed schedule.
+			</p>
+		</section>
+
+		<section id="event-strength" aria-labelledby="event-strength-title">
+			{@render heading('event-strength')}
+			<p>
+				<dfn>Strength</dfn> is how tough an event’s field is: the average season OPR of the {TOP} best
+				rated teams there. The top of the field decides who wins and advances, so a few strong teams count
+				for more than a long tail of new ones.
+			</p>
+			<p>
+				Before and during an event, it uses every registered team. Once the event is over, it uses
+				only the teams that played. Every team is measured by its current season OPR, so a past
+				event’s strength moves as its teams improve. Teams with no matches yet have no OPR and are
+				left out.
+			</p>
+			<p>
+				An event needs at least {TOP} rated teams to get a strength. The
+				<a href="/events/strength">strongest events</a> page ranks every event this season, and also
+				shows the top {DEEP} average and the average over every rated team.
 			</p>
 		</section>
 
