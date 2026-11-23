@@ -46,6 +46,11 @@
 	const showing = $derived(
 		`${summary ? `${summary}. ` : ''}Showing ${integer(first)} to ${integer(last)} of ${integer(data.total)} teams`
 	);
+	const regionLabel = $derived(
+		data.filters.region
+			? (data.regions.find((option) => option.value === data.filters.region)?.label ?? null)
+			: null
+	);
 	const csvHref = $derived(`/leaderboards.csv${queryString({ ...data.filters, team: 0 }, 1)}`);
 
 	$effect(() => {
@@ -92,6 +97,9 @@
 	{#if missing}
 		<span class="faint">Team {data.filters.team} is not in this list.</span>
 	{/if}
+	{#if regionLabel}
+		<a class="region" href="/regions/{data.filters.region}">{regionLabel} region page</a>
+	{/if}
 </p>
 
 <LeaderboardTable rows={data.rows} start={data.start} filters={data.filters} />
@@ -132,5 +140,10 @@
 
 	.csv {
 		font-size: 14px;
+	}
+
+	.region {
+		margin-left: 8px;
+		white-space: nowrap;
 	}
 </style>

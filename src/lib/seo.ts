@@ -179,3 +179,31 @@ export function matchDescription(match: Match, title: string, event: Event): str
 				: `${red} tied ${blue}, ${score}`;
 	return `${head}: ${outcome}. Score breakdown, predictions and team stats.`;
 }
+
+type SeoRegion = {
+	name: string;
+	teams: number;
+	events: number;
+	done: number;
+	top: { team: number; name: string | null; opr: number } | null;
+};
+
+function count(value: number, noun: string): string {
+	return `${integer(value)} ${value === 1 ? noun : `${noun}s`}`;
+}
+
+export function regionTitle(name: string): string {
+	return siteTitle(`${name} FTC region, ${SEASON_NAME}`);
+}
+
+export function regionDescription(region: SeoRegion): string {
+	const parts = [
+		`The ${region.name} FTC region in the ${SEASON_NAME} season: ${count(region.events, 'event')}, ${integer(region.done)} played, ${count(region.teams, 'team')}.`
+	];
+	if (region.top) {
+		const name = region.top.name ? ` ${region.top.name}` : '';
+		parts.push(`Top team by OPR is ${region.top.team}${name} at ${fixed(region.top.opr)}.`);
+	}
+	parts.push('Top teams, live and upcoming events, advancement and the best scores.');
+	return parts.join(' ');
+}

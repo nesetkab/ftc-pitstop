@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { eventSummary, teamSeason } from '#lib/components/team/fixtures.ts';
+import { buildRecordDataset } from '#lib/components/records/records.ts';
+import { createAdvancement } from '#lib/server/advancement.ts';
 import { createAnalysis } from '#lib/server/analysis.ts';
 import { loadBadgeFacts } from '#lib/server/badge/load.ts';
 import { teamFeed } from '#lib/server/calendar/load.ts';
@@ -9,6 +11,9 @@ import { createHome } from '#lib/server/home.ts';
 import { createFtcClient } from '#lib/server/ftc/client.ts';
 import { createFtcScoutClient } from '#lib/server/ftcscout.ts';
 import { createNexusClient } from '#lib/server/nexus.ts';
+import { createRegions } from '#lib/server/regions.ts';
+import { createRosters } from '#lib/server/rosters.ts';
+import { createStrength } from '#lib/server/strength.ts';
 import type { EventSummary } from '#lib/types.ts';
 import { createFakeRedis, type FakeRedis } from '#lib/workspace/fake-redis.ts';
 import { bundleFor, seasonMatchesOf } from '../analysis/helpers.ts';
@@ -21,10 +26,10 @@ const earlier = seasonMatchesOf(await bundleFor('USAZGIQ'), 'USAZXXQ', '2026-11-
 
 const scoutFetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
 	const body = JSON.parse(String(init?.body ?? '{}')) as { variables?: { start?: string } };
-	const data = body.variables?.start
-		? { data: { eventsSearch: [] } }
-		: scoutSeasonList('USAZGIQ', 'USAZCMP');
-	return Response.json(data);
+	if (body.variables?.start) return Response.json({ data: { eventsSearch: [] } });
+	const list = scoutSeasonList('USAZGIQ', 'USAZCMP');
+	const events = list.data.eventsSearch.map((event) => ({ ...event, regionCode: 'USAZ' }));
+	return Response.json({ data: { eventsSearch: events } });
 }) as typeof fetch;
 
 function instance(redis: FakeRedis, clock: { now: number }) {
@@ -69,6 +74,7 @@ function instance(redis: FakeRedis, clock: { now: number }) {
 		now
 	});
 	return {
+		cache,
 		loaders,
 		analysis,
 		home,
@@ -246,6 +252,79 @@ describe('redis commands for a team badge', () => {
 		expect(calls).toEqual(['mget']);
 		expect(facts).toMatchObject({ number: 26670, complete: true });
 		expect(await commands(redis, () => loadBadgeFacts(deps, 26670, clock.now))).toEqual([]);
+	});
+});
+
+describe('redis commands for region pages', () => {
+	function regionPages(page: ReturnType<typeof instance>, redis: FakeRedis, clock: { now: number }) {
+		const now = () => clock.now;
+		const rosters = createRosters({
+			cache: page.cache,
+			fetchRosters: async () => ({
+				eventsSearch: [{ code: 'USAZGIQ', teams: [{ teamNumber: 26670, stats: {} }] }]
+			})
+		});
+		const strength = createStrength({
+			cache: page.cache,
+			loadRosters: rosters.loadRosters,
+			loadSeasonEvents: page.loaders.loadSeasonEvents,
+			loadSeasonRatings: page.analysis.loadSeasonRatings,
+			now
+		});
+		const advancement = createAdvancement({
+			cache: page.cache,
+			store: redisStore(redis),
+			loadSeasonEvents: page.loaders.loadSeasonEvents,
+			teamNames: async () => null,
+			now
+		});
+		return createRegions({
+			loadSeasonEvents: page.loaders.loadSeasonEvents,
+			loadRosters: rosters.loadRosters,
+			loadSeasonRatings: page.analysis.loadSeasonRatings,
+			loadTeams: async () => (await page.loaders.searchIndex()).teams,
+			loadStrength: strength.loadStrength,
+			loadAdvancement: advancement.loadAdvancement,
+			loadRecords: async () => {
+				const model = await page.analysis.loadSeasonModelWithin();
+				return model ? buildRecordDataset(model.matches).rows : null;
+			},
+			finishedEvents: page.loaders.finishedEvents,
+			now
+		});
+	}
+
+	async function seedTeams(redis: FakeRedis) {
+		const team = { number: 26670, name: 'SCA Iron Eagles', city: 'Phoenix', state: 'AZ' };
+		const entry = { body: [{ ...team, country: 'USA' }], lastModified: null, fetchedAt: LIVE };
+		await redis.set('pitstop:cache:ftc:2026:teams:all', JSON.stringify(entry), { ex: 86_400 });
+	}
+
+	it('reads every cached part in at most two batches on a fresh instance, then nothing', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		await seedTeams(redis);
+		const warm = regionPages(instance(redis, clock), redis, clock);
+		const page = await warm.loadRegion('USAZ');
+		expect(page.summary.events).toBe(2);
+		expect(page.teams.map((team) => team.name)).toContain('SCA Iron Eagles');
+		const fresh = regionPages(instance(redis, clock), redis, clock);
+		const cold = reads(await commands(redis, () => fresh.loadRegion('USAZ')));
+		expect(cold.length).toBeGreaterThan(0);
+		expect(cold.length).toBeLessThanOrEqual(2);
+		expect(cold.every((call) => call === 'mget')).toBe(true);
+		expect(await commands(redis, () => fresh.loadRegion('USAZ'))).toEqual([]);
+		expect(await commands(redis, () => fresh.loadRegionList())).toEqual([]);
+	});
+
+	it('reads the region list in one batch on a fresh instance', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		await seedTeams(redis);
+		await regionPages(instance(redis, clock), redis, clock).loadRegion('USAZ');
+		const fresh = regionPages(instance(redis, clock), redis, clock);
+		expect(await commands(redis, () => fresh.loadRegionList())).toEqual(['mget']);
+		expect(await commands(redis, () => fresh.loadRegionList())).toEqual([]);
 	});
 });
 

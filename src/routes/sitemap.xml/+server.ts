@@ -1,6 +1,8 @@
+import { isCompetition } from '#lib/game/event-types.ts';
 import { loadAdvancement } from '#lib/server/advancement.ts';
 import { settleWithin } from '#lib/server/cache.ts';
 import { searchIndex } from '#lib/server/event.ts';
+import type { EventSummary } from '#lib/types.ts';
 import type { RequestHandler } from './$types';
 
 const PAGES = [
@@ -10,6 +12,7 @@ const PAGES = [
 	'/leaderboards',
 	'/records',
 	'/advancement',
+	'/regions',
 	'/accuracy',
 	'/about'
 ];
@@ -18,6 +21,13 @@ type Page = { path: string; lastmod?: string };
 
 function escapeXml(text: string): string {
 	return text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+}
+
+function regionCodes(events: EventSummary[]): string[] {
+	const codes = events.flatMap((event) =>
+		event.region && isCompetition(event.type) ? [event.region] : []
+	);
+	return [...new Set(codes)].sort();
 }
 
 export const GET: RequestHandler = async ({ url }) => {
@@ -35,7 +45,8 @@ export const GET: RequestHandler = async ({ url }) => {
 		...(index?.teams ?? []).map((team) => ({ path: `/teams/${team.number}` })),
 		...(advancement?.index.championships ?? []).map((championship) => ({
 			path: `/advancement/${championship.code}`
-		}))
+		})),
+		...regionCodes(index?.events ?? []).map((code) => ({ path: `/regions/${code}` }))
 	];
 	const entries = pages.map(({ path, lastmod }) => {
 		const loc = `<loc>${escapeXml(url.origin + path)}</loc>`;

@@ -55,8 +55,8 @@ function season(played: { wins: number; losses: number; ties: number }[] = []): 
 const ratings = {
 	generatedAt: 0,
 	teams: [
-		{ team: 99, rank: 1, opr: 120 },
-		{ team: 3747, rank: 1787, opr: 61.25 }
+		{ team: 99, rank: 1, opr: 120, region: 'USUT', matches: 10 },
+		{ team: 3747, rank: 1787, opr: 61.25, region: 'USMT', matches: 10 }
 	]
 } as never;
 
@@ -274,7 +274,16 @@ describe('preview card routing', () => {
 		expect(loading?.maxAge).toBe(300);
 		const accuracy = await cardFor('accuracy.png', host, deps());
 		expect(texts(accuracy!.node)).toContain('Matches replayed');
-		for (const path of ['events.png', 'compare.png', 'simulate.png', 'workspace.png']) {
+		const region = await cardFor('regions/USMT.png', host, deps());
+		expect(region?.maxAge).toBe(21_600);
+		expect(texts(region!.node)).toEqual(
+			expect.arrayContaining(['Montana · 1 team rated', '1', '3747', 'The Hive', '61.3'])
+		);
+		expect(texts(region!.node)).not.toContain('99');
+		const quiet = await cardFor('regions/USWY.png', host, deps());
+		expect(quiet?.maxAge).toBe(300);
+		expect(texts(quiet!.node)).toContain('Wyoming FTC region');
+		for (const path of ['events.png', 'compare.png', 'simulate.png', 'workspace.png', 'regions.png']) {
 			expect((await cardFor(path, host, deps()))?.maxAge).toBe(86_400);
 		}
 	});
@@ -286,6 +295,7 @@ describe('preview card routing', () => {
 			'events/usmtbuq.png',
 			'events/USMTBUQ/matches/x1.png',
 			'compare/3747.png',
+			'regions/usmt.png',
 			'compare/3747-3747.png',
 			'simulate/3747-99-vs-16.png',
 			'simulate/3747-99-vs-16-3747.png',

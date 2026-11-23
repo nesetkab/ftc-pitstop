@@ -42,7 +42,7 @@
 	</div>
 	{#if stats.region}
 		<div>
-			<dt>Rank in {region}</dt>
+			<dt>Rank in <a href="/regions/{stats.region.code}">{region}</a></dt>
 			<dd>
 				<a href={regionHref} title="Find {team} on the {region} leaderboard"
 					>{integer(stats.region.rank)}</a
@@ -104,8 +104,15 @@
 		text-underline-offset: 4px;
 	}
 
-	dd a:hover {
+	dd a:hover,
+	dt a:hover {
 		text-decoration-color: currentColor;
+	}
+
+	dt a {
+		color: inherit;
+		text-decoration: underline;
+		text-decoration-color: var(--line-2);
 	}
 
 	.trend {
