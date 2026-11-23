@@ -33,7 +33,7 @@
 	<caption class="visually-hidden">Results between each pair of teams</caption>
 	<thead>
 		<tr>
-			<th class="l" scope="col">Teams</th>
+			<th class="l pin" scope="col">Teams</th>
 			<th class="l" scope="col">Against each other</th>
 			<th class="l" scope="col">As partners</th>
 		</tr>
@@ -41,9 +41,17 @@
 	<tbody>
 		{#each pairs as pair (`${pair.a}-${pair.b}`)}
 			<tr>
-				<th class="l pair" scope="row">{pair.a} and {pair.b}</th>
+				<th class="l pair pin" scope="row">{pair.a} and {pair.b}</th>
 				<td class="l wrap" class:dim={count(pair.against) === 0}>{against(pair)}</td>
-				<td class="l wrap" class:dim={count(pair.together) === 0}>{together(pair)}</td>
+				<td class="l wrap" class:dim={count(pair.together) === 0}>
+					{together(pair)}
+					{#if pair.best}
+						<span class="best"
+							>best score {pair.best.score} in
+							<a href="/events/{pair.best.code}/matches/{pair.best.key}">{pair.best.label}</a></span
+						>
+					{/if}
+				</td>
 			</tr>
 		{/each}
 	</tbody>
@@ -98,7 +106,25 @@
 {/if}
 
 <style>
+	.pin {
+		position: sticky;
+		left: 0;
+		z-index: 1;
+		background: var(--bg);
+	}
+
+	td.wrap {
+		vertical-align: top;
+	}
+
+	.best {
+		display: block;
+		font-size: 12.5px;
+		color: var(--text-3);
+	}
+
 	th.pair {
+		vertical-align: top;
 		padding: 9px 10px;
 		border-bottom: 1px solid var(--line);
 		font-size: 14px;
@@ -170,8 +196,13 @@
 
 	@media (max-width: 600px) {
 		th.pair {
+			min-width: 76px;
 			padding-inline: 6px;
 			white-space: normal;
+		}
+
+		.pin {
+			box-shadow: inset -1px 0 var(--line);
 		}
 
 		.phone {

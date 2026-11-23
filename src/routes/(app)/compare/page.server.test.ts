@@ -4,17 +4,15 @@ import { load } from './+page.server.ts';
 
 const server = vi.hoisted(() => ({
 	loadTeamSeason: vi.fn(),
-	loadEventBundle: vi.fn(),
 	loadSeasonRatingsWithin: vi.fn(),
+	loadSeasonModelWithin: vi.fn(),
 	recordNames: vi.fn()
 }));
 
-vi.mock('#lib/server/event.ts', () => ({
-	loadTeamSeason: server.loadTeamSeason,
-	loadEventBundle: server.loadEventBundle
-}));
+vi.mock('#lib/server/event.ts', () => ({ loadTeamSeason: server.loadTeamSeason }));
 vi.mock('#lib/server/analysis.ts', () => ({
-	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin
+	loadSeasonRatingsWithin: server.loadSeasonRatingsWithin,
+	loadSeasonModelWithin: server.loadSeasonModelWithin
 }));
 vi.mock('#lib/server/records.ts', () => ({ recordNames: server.recordNames }));
 
@@ -22,7 +20,13 @@ type Result = {
 	numbers: number[];
 	missing: number[];
 	suggestions: { number: number; name: string | null }[];
-	view: { teams: { number: number }[]; shared: { code: string }[] };
+	view: {
+		teams: { number: number }[];
+		shared: { code: string }[];
+		meetings: { key: string }[];
+		history: boolean;
+		fit: { alliances: { teams: number[] }[] } | null;
+	};
 };
 
 function call(query: string) {
@@ -49,7 +53,7 @@ beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
 	server.loadSeasonRatingsWithin.mockResolvedValue(null);
 	server.recordNames.mockResolvedValue({ teams: {}, events: {} });
-	server.loadEventBundle.mockResolvedValue({ matches: [] });
+	server.loadSeasonModelWithin.mockResolvedValue(null);
 	server.loadTeamSeason.mockImplementation(async (number: number) =>
 		number === 404
 			? null
@@ -73,14 +77,59 @@ describe('compare load', () => {
 		await expect(call('?teams=100,200').result).resolves.toMatchObject({ numbers: [100, 200] });
 	});
 
-	it('loads each team once and only the events they shared', async () => {
+	it('loads each team once and keeps the page short lived while history loads', async () => {
 		const { result, setHeaders } = call('?teams=100,200,404');
 		const data = await result;
 		expect(data.numbers).toEqual([100, 200]);
 		expect(data.missing).toEqual([404]);
+		expect(server.loadTeamSeason).toHaveBeenCalledTimes(3);
 		expect(data.view.shared.map((event) => event.code)).toEqual(['BBB']);
-		expect(server.loadEventBundle).toHaveBeenCalledExactlyOnceWith('BBB');
+		expect(data.view.history).toBe(false);
+		expect(data.view.fit).toBeNull();
 		expect(data.suggestions).toEqual([]);
+		expect(server.recordNames).not.toHaveBeenCalled();
+		expect(setHeaders).toHaveBeenCalledWith({
+			'cache-control': 'public, s-maxage=30, stale-while-revalidate=300'
+		});
+	});
+
+	it('sends only the season matches the teams met in, and their alliance fit', async () => {
+		const side = (teams: number[], total: number) => ({ teams, noShows: [], total });
+		const seasonMatch = (key: string, red: number[], blue: number[]) => ({
+			eventCode: 'BBB',
+			date: '2026-11-14',
+			time: null,
+			key,
+			level: 'qual',
+			series: 0,
+			number: Number(key.slice(1)),
+			red: side(red, 100),
+			blue: side(blue, 90)
+		});
+		const components = { auto: 10, teleop: 40, hive: 30, flower: 0, garden: 2, park: 5 };
+		const rating = (opr: number) => ({ opr, components: { ...components, leave: 6, tips: 2 } });
+		server.loadSeasonModelWithin.mockResolvedValue({
+			generatedAt: 1,
+			ratings: { generatedAt: 1, teams: [] },
+			matches: [
+				seasonMatch('q1', [100, 200], [1, 2]),
+				seasonMatch('q2', [100, 3], [4, 5]),
+				seasonMatch('q3', [3, 4], [200, 100])
+			],
+			run: {
+				latest: new Map([
+					[100, rating(50)],
+					[200, rating(40)],
+					[7, rating(20)]
+				]),
+				swarm: { chance: () => 0.5 }
+			}
+		});
+		const { result, setHeaders } = call('?teams=100,200');
+		const data = await result;
+		expect(data.view.history).toBe(true);
+		expect(data.view.meetings.map((meeting) => meeting.key)).toEqual(['q1', 'q3']);
+		expect(data.view.fit?.alliances.map((entry) => entry.teams)).toEqual([[100, 200]]);
 		expect(setHeaders).toHaveBeenCalledWith({
 			'cache-control': 'public, s-maxage=300, stale-while-revalidate=3600'
 		});
@@ -106,7 +155,7 @@ describe('compare load', () => {
 			{ number: 7, name: 'Seven' },
 			{ number: 8, name: null }
 		]);
-		expect(server.loadEventBundle).not.toHaveBeenCalled();
+		expect(server.loadSeasonModelWithin).not.toHaveBeenCalled();
 	});
 
 	it('shows an empty picker without loading anything', async () => {

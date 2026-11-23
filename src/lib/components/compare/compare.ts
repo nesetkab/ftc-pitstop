@@ -1,13 +1,18 @@
 import type { SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import { awardLabel, ratedTeams } from '#lib/components/team/team-view.ts';
 import { placeName } from '#lib/format/places.ts';
-import { fixed, integer, MISSING, record } from '#lib/format/index.ts';
+import { fixed, integer, matchLabel, MISSING, parseMatchKey, record } from '#lib/format/index.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
-import type { AllianceColor, EventBundle, Match, TeamSeason, TeamSeasonEvent } from '#lib/types.ts';
+import type {
+	AllianceColor,
+	SeasonMatch,
+	SeasonMatchAlliance,
+	TeamSeason,
+	TeamSeasonEvent
+} from '#lib/types.ts';
+import type { Fit } from './fit.ts';
 
 export const MAX_COMPARE = 4;
-export const MAX_SHARED_EVENTS = 10;
-
 const WINNING_ALLIANCE = 13;
 const FINALIST_ALLIANCE = 12;
 
@@ -31,11 +36,19 @@ export interface Tally {
 	ties: number;
 }
 
+export interface BestScore {
+	score: number;
+	code: string;
+	key: string;
+	label: string;
+}
+
 export interface PairRecord {
 	a: number;
 	b: number;
 	together: Tally;
 	against: Tally;
+	best: BestScore | null;
 }
 
 export interface Meeting {
@@ -72,13 +85,16 @@ export interface Comparison {
 	pairs: PairRecord[];
 	meetings: Meeting[];
 	shared: SharedEvent[];
+	fit: Fit | null;
+	history: boolean;
 	source: 'ratings' | 'scout' | null;
 }
 
 export interface CompareInput {
 	seasons: TeamSeason[];
 	ratings: SeasonRatings | null;
-	bundles: Record<string, Pick<EventBundle, 'matches'> | null>;
+	matches: SeasonMatch[] | null;
+	fit?: Fit | null;
 }
 
 export function parseTeamList(...values: (string | null | undefined)[]): number[] {
@@ -316,59 +332,95 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 	];
 }
 
-function onField(match: Match, color: AllianceColor): number[] {
-	return match[color].filter((team) => team.onField && !team.noShow).map((team) => team.team);
+function playing(alliance: SeasonMatchAlliance): number[] {
+	return alliance.teams.filter((team) => !alliance.noShows.includes(team));
 }
 
 function emptyTally(): Tally {
 	return { wins: 0, losses: 0, ties: 0 };
 }
 
-function headToHead(
+function keyLabel(key: string): string {
+	const parsed = parseMatchKey(key);
+	return parsed ? matchLabel(parsed) : key.toUpperCase();
+}
+
+export function matchesInvolving(matches: SeasonMatch[], numbers: number[]): SeasonMatch[] {
+	const wanted = new Set(numbers);
+	return matches.filter(
+		(match) =>
+			[...playing(match.red), ...playing(match.blue)].filter((team) => wanted.has(team)).length >= 2
+	);
+}
+
+function order(a: SeasonMatch, b: SeasonMatch): number {
+	const time = (match: SeasonMatch) => match.time ?? Date.parse(`${match.date}T00:00:00Z`);
+	const level = (match: SeasonMatch) => (match.level === 'qual' ? 0 : 1);
+	return (
+		a.date.localeCompare(b.date) ||
+		a.eventCode.localeCompare(b.eventCode) ||
+		level(a) - level(b) ||
+		time(a) - time(b) ||
+		a.series - b.series ||
+		a.number - b.number
+	);
+}
+
+export function meetingsFrom(
+	matches: SeasonMatch[],
 	numbers: number[],
-	shared: SharedEvent[],
-	bundles: CompareInput['bundles']
-): { pairs: PairRecord[]; meetings: Meeting[] } {
+	events: Map<string, { name: string; start: string }> = new Map()
+): Meeting[] {
+	return matchesInvolving(matches, numbers)
+		.toSorted(order)
+		.map((match) => {
+			const { red, blue } = match;
+			return {
+				code: match.eventCode,
+				event: events.get(match.eventCode)?.name ?? match.eventCode,
+				start: events.get(match.eventCode)?.start ?? match.date,
+				key: match.key,
+				label: keyLabel(match.key),
+				red: playing(red),
+				blue: playing(blue),
+				redScore: red.total,
+				blueScore: blue.total,
+				winner: red.total === blue.total ? null : red.total > blue.total ? 'red' : 'blue'
+			};
+		});
+}
+
+export function pairRecords(numbers: number[], meetings: Meeting[]): PairRecord[] {
 	const pairs: PairRecord[] = [];
 	for (let i = 0; i < numbers.length; i++)
 		for (let j = i + 1; j < numbers.length; j++)
-			pairs.push({ a: numbers[i], b: numbers[j], together: emptyTally(), against: emptyTally() });
-	const meetings: Meeting[] = [];
-	for (const event of [...shared].sort((x, y) => x.start.localeCompare(y.start))) {
-		for (const match of bundles[event.code]?.matches ?? []) {
-			const result = match.result;
-			if (!result) continue;
-			const red = onField(match, 'red');
-			const blue = onField(match, 'blue');
-			const present = numbers.filter((team) => red.includes(team) || blue.includes(team));
-			if (present.length < 2) continue;
-			meetings.push({
-				code: event.code,
-				event: event.name,
-				start: event.start,
-				key: match.key,
-				label: match.label,
-				red,
-				blue,
-				redScore: result.red.total,
-				blueScore: result.blue.total,
-				winner: result.winner
+			pairs.push({
+				a: numbers[i],
+				b: numbers[j],
+				together: emptyTally(),
+				against: emptyTally(),
+				best: null
 			});
-			for (const pair of pairs) {
-				const aRed = red.includes(pair.a);
-				const bRed = red.includes(pair.b);
-				const aIn = aRed || blue.includes(pair.a);
-				const bIn = bRed || blue.includes(pair.b);
-				if (!aIn || !bIn) continue;
-				const aColor: AllianceColor = aRed ? 'red' : 'blue';
-				const tally = aRed === bRed ? pair.together : pair.against;
-				if (result.winner === null) tally.ties += 1;
-				else if (result.winner === aColor) tally.wins += 1;
-				else tally.losses += 1;
+	for (const meeting of meetings) {
+		for (const pair of pairs) {
+			const aRed = meeting.red.includes(pair.a);
+			const bRed = meeting.red.includes(pair.b);
+			const aIn = aRed || meeting.blue.includes(pair.a);
+			const bIn = bRed || meeting.blue.includes(pair.b);
+			if (!aIn || !bIn) continue;
+			const aColor: AllianceColor = aRed ? 'red' : 'blue';
+			const together = aRed === bRed;
+			const tally = together ? pair.together : pair.against;
+			if (meeting.winner === null) tally.ties += 1;
+			else if (meeting.winner === aColor) tally.wins += 1;
+			else tally.losses += 1;
+			const score = aRed ? meeting.redScore : meeting.blueScore;
+			if (together && (pair.best === null || score > pair.best.score)) {
+				pair.best = { score, code: meeting.code, key: meeting.key, label: meeting.label };
 			}
 		}
 	}
-	return { pairs, meetings };
+	return pairs;
 }
 
 function sharedEvents(seasons: TeamSeason[]): SharedEvent[] {
@@ -406,18 +458,16 @@ function sharedEvents(seasons: TeamSeason[]): SharedEvent[] {
 		.sort((a, b) => b.start.localeCompare(a.start) || a.name.localeCompare(b.name));
 }
 
-export function sharedEventCodes(seasons: TeamSeason[]): string[] {
-	return sharedEvents(seasons)
-		.filter((event) => event.cells.filter((cell) => cell.record !== null).length >= 2)
-		.slice(0, MAX_SHARED_EVENTS)
-		.map((event) => event.code);
-}
-
 export function buildComparison(input: CompareInput): Comparison {
-	const { seasons, ratings, bundles } = input;
+	const { seasons, ratings, matches } = input;
 	const numbers = seasons.map((season) => season.team.number);
 	const shared = sharedEvents(seasons);
-	const { pairs, meetings } = headToHead(numbers, shared, bundles);
+	const events = new Map(
+		seasons.flatMap((season) =>
+			season.events.map((entry) => [entry.event.code, entry.event] as const)
+		)
+	);
+	const meetings = meetingsFrom(matches ?? [], numbers, events);
 	const pool = ratedTeams(ratings);
 	const anyRated = numbers.some((number) => pool.some((entry) => entry.team === number));
 	return {
@@ -427,9 +477,11 @@ export function buildComparison(input: CompareInput): Comparison {
 			place: placeName(season.team, 'short')
 		})),
 		rows: seasons.length > 0 ? seasonRows(seasons, ratings) : [],
-		pairs,
+		pairs: pairRecords(numbers, meetings),
 		meetings,
 		shared,
+		fit: input.fit ?? null,
+		history: matches !== null,
 		source: anyRated ? 'ratings' : seasons.some((s) => s.quickStats) ? 'scout' : null
 	};
 }
