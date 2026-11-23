@@ -1,7 +1,9 @@
+import { loadAdvancement } from '#lib/server/advancement.ts';
+import { settleWithin } from '#lib/server/cache.ts';
 import { searchIndex } from '#lib/server/event.ts';
 import type { RequestHandler } from './$types';
 
-const PAGES = ['/', '/events', '/leaderboards', '/records', '/accuracy', '/about'];
+const PAGES = ['/', '/events', '/leaderboards', '/records', '/advancement', '/accuracy', '/about'];
 
 type Page = { path: string; lastmod?: string };
 
@@ -10,7 +12,10 @@ function escapeXml(text: string): string {
 }
 
 export const GET: RequestHandler = async ({ url }) => {
-	const index = await searchIndex().catch(() => null);
+	const [index, advancement] = await Promise.all([
+		searchIndex().catch(() => null),
+		settleWithin(loadAdvancement(), 3000)
+	]);
 	const today = new Date().toISOString().slice(0, 10);
 	const pages: Page[] = [
 		...PAGES.map((path) => ({ path })),
@@ -18,7 +23,10 @@ export const GET: RequestHandler = async ({ url }) => {
 			path: `/events/${event.code}`,
 			lastmod: event.end < today ? event.end : undefined
 		})),
-		...(index?.teams ?? []).map((team) => ({ path: `/teams/${team.number}` }))
+		...(index?.teams ?? []).map((team) => ({ path: `/teams/${team.number}` })),
+		...(advancement?.index.championships ?? []).map((championship) => ({
+			path: `/advancement/${championship.code}`
+		}))
 	];
 	const entries = pages.map(({ path, lastmod }) => {
 		const loc = `<loc>${escapeXml(url.origin + path)}</loc>`;

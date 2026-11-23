@@ -12,6 +12,9 @@ const server = vi.hoisted(() => ({
 }));
 
 vi.mock('#lib/server/event.ts', () => ({ searchIndex: server.searchIndex }));
+vi.mock('#lib/server/advancement.ts', () => ({
+	loadAdvancement: async () => ({ index: { championships: [{ code: 'USMTCMP' }] }, stale: false })
+}));
 
 const { GET } = await import('../../src/routes/sitemap.xml/+server.ts');
 
@@ -31,12 +34,14 @@ describe('sitemap', () => {
 			'https://www.ftcpitstop.com/events',
 			'https://www.ftcpitstop.com/leaderboards',
 			'https://www.ftcpitstop.com/records',
+			'https://www.ftcpitstop.com/advancement',
 			'https://www.ftcpitstop.com/accuracy',
 			'https://www.ftcpitstop.com/about',
 			'https://www.ftcpitstop.com/events/USMTBUQ',
 			'https://www.ftcpitstop.com/events/USWAFUTURE',
 			'https://www.ftcpitstop.com/teams/3747',
-			'https://www.ftcpitstop.com/teams/14624'
+			'https://www.ftcpitstop.com/teams/14624',
+			'https://www.ftcpitstop.com/advancement/USMTCMP'
 		]);
 	});
 
@@ -54,6 +59,6 @@ describe('sitemap', () => {
 		const response = await get();
 		const xml = await response.text();
 		expect(response.headers.get('cache-control')).toBe('public, s-maxage=300');
-		expect(xml.match(/<loc>/g)).toHaveLength(6);
+		expect(xml.match(/<loc>/g)).toHaveLength(8);
 	});
 });

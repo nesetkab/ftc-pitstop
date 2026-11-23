@@ -54,6 +54,7 @@
 			<p>Not affiliated with or endorsed by FIRST.</p>
 		</div>
 		<nav aria-label="Footer">
+			<a href="/advancement">Advancement</a>
 			<a href="/about">About the numbers</a>
 			<a href="/accuracy">Prediction accuracy</a>
 			<a href="https://github.com/nesetkab/ftc-pitstop">GitHub</a>
