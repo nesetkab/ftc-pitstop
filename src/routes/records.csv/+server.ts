@@ -6,7 +6,8 @@ import {
 } from '#lib/components/records/records.ts';
 import { localDate } from '#lib/format/calendar.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { csvResponse, toCsv } from '#lib/server/csv.ts';
+import { toCsv } from '#lib/format/csv.ts';
+import { csvResponse } from '#lib/server/csv.ts';
 import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
 import { loadRecordDataset, recordNames } from '#lib/server/records.ts';
 import type { RequestHandler } from './$types';

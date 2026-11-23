@@ -1,5 +1,6 @@
 import { parseInsightFilters, rankInsights, sortInsights } from '#lib/components/event/insights.ts';
-import { csvResponse, toCsv } from '#lib/server/csv.ts';
+import { toCsv } from '#lib/format/csv.ts';
+import { csvResponse } from '#lib/server/csv.ts';
 import { errorResponse } from '#lib/server/http.ts';
 import { loadInsightRows } from '#lib/server/insights.ts';
 import type { RequestHandler } from './$types';
