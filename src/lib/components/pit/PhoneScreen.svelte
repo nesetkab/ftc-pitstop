@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
-	import { matchStakes } from '#lib/components/event/stakes.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { relative } from '#lib/format/relative.ts';
 	import { dayTime, relativeDay, time, timeWithSeconds } from '#lib/format/time.ts';
@@ -14,7 +12,8 @@
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Toggle from '#lib/ui/Toggle.svelte';
 	import { ALERT_OPTIONS, alertPreview, type AlertKey, type AlertSettings } from './alerts.ts';
-	import { matchBrief, stakeLine } from './brief.ts';
+	import type BriefPanelComponent from './BriefPanel.svelte';
+	import { matchBrief } from './brief.ts';
 	import {
 		absentText,
 		awardName,
@@ -33,7 +32,6 @@
 		teamsLine
 	} from './copy.ts';
 	import Facts from './Facts.svelte';
-	import MatchBrief from './MatchBrief.svelte';
 	import type { Permission } from './notify.svelte.ts';
 	import type { Connection } from './poll.ts';
 	import type { QueueCall } from './queue.ts';
@@ -112,14 +110,29 @@
 			? `${next.key}:${analysis.generatedAt}:${view.qualsPlayed}`
 			: null
 	);
-	const stake = $derived.by(() => {
-		if (!stakesKey) return null;
-		return untrack(() => {
-			const match = matches.find((entry) => entry.key === next?.key);
-			if (!match || !analysis) return null;
-			const stakes = matchStakes({ match, matches, rankings: view.rankings, analysis });
-			return stakeLine(stakes, view.team);
+	const hasBrief = $derived(brief !== null);
+	let BriefPanel = $state<typeof BriefPanelComponent>();
+	let briefLoading: Promise<void> | undefined;
+
+	function loadBrief() {
+		briefLoading ??= import('./BriefPanel.svelte').then((module) => {
+			BriefPanel = module.default;
 		});
+		return briefLoading;
+	}
+
+	$effect(() => {
+		if (briefOpen) loadBrief();
+	});
+
+	$effect(() => {
+		if (!hasBrief || BriefPanel) return;
+		if ('requestIdleCallback' in window) {
+			const handle = requestIdleCallback(loadBrief, { timeout: 4000 });
+			return () => cancelIdleCallback(handle);
+		}
+		const timer = setTimeout(loadBrief, 2000);
+		return () => clearTimeout(timer);
 	});
 	const last = $derived(
 		view.phase === 'upcoming' || view.phase === 'done' ? null : lastMatch(view, rankMemory)
@@ -288,8 +301,16 @@
 						>
 					</button>
 					<div id="match-brief" hidden={!briefOpen}>
-						{#if briefOpen}
-							<MatchBrief {brief} {stake} href={teamHref} />
+						{#if briefOpen && BriefPanel}
+							<BriefPanel
+								{brief}
+								{stakesKey}
+								{matches}
+								rankings={view.rankings}
+								{analysis}
+								team={view.team}
+								href={teamHref}
+							/>
 						{/if}
 					</div>
 				</section>

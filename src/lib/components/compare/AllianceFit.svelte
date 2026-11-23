@@ -51,10 +51,10 @@
 	<p class="lead">
 		{#if fit.alliances.length === 1}
 			Together, {pairName(best)} would be expected to score about
-			<b>{integer(best.score)}</b> points per match before fouls.
+			<b>{integer(best.score)}</b> points per match before penalties.
 		{:else}
 			Two robots play in each match, so every pair is shown. The highest predicted pair is
-			{pairName(best)}, at about <b>{integer(best.score)}</b> points per match before fouls.
+			{pairName(best)}, at about <b>{integer(best.score)}</b> points per match before penalties.
 		{/if}
 	</p>
 
@@ -137,10 +137,12 @@
 {/if}
 
 <p class="note">
-	Predicted score adds up each team's season OPR. Swarm needs {RP_THRESHOLDS.swarm}+ leave and park
-	points, Pollinator 1 needs {RP_THRESHOLDS.pollinator1}+ tips and Pollinator 2 needs
-	{RP_THRESHOLDS.pollinator2}+ tips; chances are for one match, from the same model as match
-	predictions. Tips are counts, not points. A team's share is shown when it brings
+	Predicted scores and chances come from the same model as match predictions and the match
+	simulator, as if these teams met at a new event today. Penalty points depend on the other
+	alliance, so they are left out. Swarm needs {RP_THRESHOLDS.swarm}+ leave and park points,
+	Pollinator 1 needs {RP_THRESHOLDS.pollinator1}+ tips and Pollinator 2 needs
+	{RP_THRESHOLDS.pollinator2}+ tips; chances are for one match. Tips are counts, not points. A
+	team's share is shown when it brings
 	{LEAD_SHARE * 100}% or more of a part.
 	{#if fit.missing.length > 0}
 		No season rating yet for {fit.missing.join(', ')}.

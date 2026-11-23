@@ -83,6 +83,19 @@ function show(overrides: Partial<{ view: Comparison; missing: number[] }> = {}) 
 }
 
 describe('compare page', () => {
+	it('links to the simulator with the same teams from the tab row', () => {
+		show();
+		const tabs = screen.getByRole('navigation', { name: 'Team tools' });
+		expect(within(tabs).getByRole('link', { name: 'Compare' })).toHaveAttribute(
+			'href',
+			'/compare?teams=100,200'
+		);
+		expect(within(tabs).getByRole('link', { name: 'Simulate' })).toHaveAttribute(
+			'href',
+			'/simulate?red=100,200'
+		);
+	});
+
 	it('shows the teams side by side and marks the best value', () => {
 		show();
 		const table = screen.getByRole('table', { name: 'Season stats side by side' });
@@ -120,7 +133,7 @@ describe('compare page', () => {
 	it('shows how the teams would fit as an alliance', () => {
 		show();
 		expect(screen.getByText(/would be expected to score about/)).toHaveTextContent(
-			'Together, 100 + 200 would be expected to score about 180 points per match before fouls.'
+			'Together, 100 + 200 would be expected to score about 180 points per match before penalties.'
 		);
 		const chances = screen.getByRole('table', {
 			name: 'Predicted score and ranking point chances for each pair'

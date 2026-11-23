@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { teamEvent, teamSeason } from '#lib/components/team/fixtures.ts';
+import { COMPONENTS } from '#lib/model/opr.ts';
+import { SwarmBook } from '#lib/model/rp.ts';
 import { load } from './+page.server.ts';
 
 const server = vi.hoisted(() => ({
@@ -122,7 +124,9 @@ describe('compare load', () => {
 					[200, rating(40)],
 					[7, rating(20)]
 				]),
-				swarm: { chance: () => 0.5 }
+				states: new Map(),
+				stats: { mean: 100, sd: 30, parts: COMPONENTS.map(() => 5), matches: 100 },
+				swarm: new SwarmBook()
 			}
 		});
 		const { result, setHeaders } = call('?teams=100,200');
