@@ -1,5 +1,10 @@
 const MAX_LENGTH = 2048;
 
+export function search(params: URLSearchParams): string {
+	const text = params.toString();
+	return text ? `?${text}` : '';
+}
+
 export function httpUrl(value: string | null | undefined): string | null {
 	const text = value?.trim();
 	if (!text || text.length > MAX_LENGTH) return null;

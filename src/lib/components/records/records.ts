@@ -1,6 +1,7 @@
 import { addDays } from '#lib/format/calendar.ts';
 import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
 import { regionName } from '#lib/format/places.ts';
+import { search } from '#lib/format/url.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
 import { EVENT_TYPE_NAMES } from '#lib/game/event-types.ts';
 import { plausibleScore } from '#lib/model/types.ts';
@@ -137,8 +138,7 @@ export function recordQuery(filters: Partial<RecordFilters>, page = filters.page
 	if (filters.level) params.set('level', filters.level);
 	if (filters.team) params.set('team', String(filters.team));
 	if (page > 1) params.set('page', String(page));
-	const text = params.toString();
-	return text ? `?${text}` : '';
+	return search(params);
 }
 
 function keyLabel(key: string): string {

@@ -1,5 +1,6 @@
 import type { RankedRecord, RecordRow } from '#lib/components/records/records.ts';
 import { localDate } from '#lib/format/calendar.ts';
+import { search } from '#lib/format/url.ts';
 import { breakdownParts, PART_LABELS, tips } from '#lib/game/biobuzz.ts';
 import type { AllianceColor, Event, Match, TournamentLevel } from '#lib/types.ts';
 
@@ -51,8 +52,7 @@ export function insightQuery(filters: Partial<InsightFilters>): string {
 	if (filters.sort && filters.sort !== 'total') params.set('sort', filters.sort);
 	if (filters.level) params.set('level', filters.level);
 	if (filters.all) params.set('all', '1');
-	const text = params.toString();
-	return text ? `?${text}` : '';
+	return search(params);
 }
 
 function dayOf(event: InsightEvent, match: Match): string {
