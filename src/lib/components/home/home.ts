@@ -4,7 +4,7 @@ import {
 	type EventLeader,
 	type EventProgress,
 	type TodayState
-} from '#lib/components/home/today.ts';
+} from './today.ts';
 import { placeName } from '#lib/format/places.ts';
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';

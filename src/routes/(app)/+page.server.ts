@@ -1,5 +1,5 @@
 import type { EventProgress } from '#lib/components/home/today.ts';
-import { buildHomeEvents, todayCompetitions } from '#lib/components/team/home.ts';
+import { buildHomeEvents, todayCompetitions } from '#lib/components/home/home.ts';
 import { keepAlive, settleWithin } from '#lib/server/cache.ts';
 import { loadEventsToday, loadSeasonEvents } from '#lib/server/event.ts';
 import { loadHighlights, loadTodayProgress } from '#lib/server/home.ts';
