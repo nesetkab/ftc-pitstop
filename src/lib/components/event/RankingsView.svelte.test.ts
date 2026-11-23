@@ -132,6 +132,16 @@ describe('RankingsView', () => {
 		expect(screen.queryByText(/league rankings/)).toBeNull();
 	});
 
+	it('says FTCScout fallback league rankings leave out earlier meets', () => {
+		const meet = fixtureBundle('USFLORM1');
+		const rankings = meet.rankings.map(({ counted: _, ...row }) => row);
+		render(RankingsView, { props: { bundle: { ...meet, rankings, source: 'ftcscout' } } });
+		expect(screen.getByText(/count this event's matches only/)).toHaveTextContent(
+			"FIRST's league rankings also add each team's best 10 matches from earlier meets."
+		);
+		expect(screen.getByText(/RS is the average ranking points per match/)).toBeInTheDocument();
+	});
+
 	it('says when there are no rankings yet', () => {
 		render(RankingsView, { props: { bundle: fixtureBundle('USMTBUQ') } });
 		expect(screen.getByText('No rankings yet.')).toBeInTheDocument();

@@ -154,6 +154,12 @@
 				the league goes on. The record counts the same matches.
 			</p>
 			<p>
+				When FIRST’s rankings are down and PitStop falls back to FTCScout, it works the rankings out
+				from the match results with FIRST’s rules, so disqualified and missed matches still count as
+				zero. Only the current event is loaded then, so after a league’s first meet those rankings
+				leave out earlier meets and show plain per-match averages.
+			</p>
+			<p>
 				On team pages, the season record adds up qualification matches from every event. Playoff
 				matches are not counted.
 			</p>

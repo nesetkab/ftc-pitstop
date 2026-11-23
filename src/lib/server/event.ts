@@ -1,5 +1,6 @@
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { detectPhase, lastPosted, WINNER_AWARD_ID } from '#lib/game/phase.ts';
+import { rankingsFromMatches } from '#lib/game/rankings.ts';
 import {
 	cache as defaultCache,
 	LruMap,
@@ -39,7 +40,8 @@ import {
 	fetchSeasonMatches,
 	fetchTeamSeason,
 	scoutClient,
-	type FtcScoutClient
+	type FtcScoutClient,
+	type ScoutEventData
 } from '#lib/server/ftcscout.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import { nexus as defaultNexus, type NexusClient } from '#lib/server/nexus.ts';
@@ -356,6 +358,17 @@ export function createLoaders(deps: LoaderDeps) {
 		cache.prefetch([...paths.map((path) => `ftc:${SEASON}:${path}`), analysisKey(code)]);
 	}
 
+	function scoutRankings(data: ScoutEventData) {
+		if (data.event.remote) return data.rankings;
+		const events = cache.peek(`scout:${SEASON}:events`)?.body as EventSummary[] | undefined;
+		return rankingsFromMatches(
+			data.event,
+			data.matches,
+			data.teams.map((team) => team.number),
+			events ?? null
+		);
+	}
+
 	async function scoutBundle(
 		code: string,
 		time: number,
@@ -389,7 +402,7 @@ export function createLoaders(deps: LoaderDeps) {
 			event: data.event,
 			teams: data.teams,
 			matches: [...data.matches].sort(compareMatches),
-			rankings: data.rankings,
+			rankings: scoutRankings(data),
 			alliances: [],
 			awards: data.awards,
 			advancement: null,
