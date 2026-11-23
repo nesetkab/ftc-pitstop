@@ -1,10 +1,12 @@
 import { flushSync } from 'svelte';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { retime } from '#lib/analysis/analyze.ts';
 import { nowView } from '#lib/components/event/now.ts';
 import { fakeAnalysis } from '#lib/components/event/test-fixtures.ts';
 import { replayBundle, replayStart } from '#lib/game/replay.ts';
+import type { EventBundle, QueueStatusSnapshot } from '#lib/types.ts';
 import { fixtureBundle } from './fixtures.ts';
+import { BUNDLE_INTERVAL, QUEUE_INTERVAL } from './poll.ts';
 import { analysisLoader, PitSession, type SessionOptions } from './session.svelte.ts';
 
 const full = fixtureBundle('USAZGIQ');
@@ -21,6 +23,11 @@ function options(start: number): SessionOptions {
 		replay: { start, speed: 1 }
 	};
 }
+
+afterEach(() => {
+	vi.useRealTimers();
+	vi.restoreAllMocks();
+});
 
 describe('PitSession', () => {
 	it('is created once per page data, not on every clock tick', () => {
@@ -81,6 +88,48 @@ describe('PitSession', () => {
 		expect(next.expectedStart).not.toBe(loaded.timing.matches[next.key].expectedStart);
 		expect(next.expectedStart).toBe(listed?.expected);
 		expect(session.view!.delaySeconds).toBe(now.delaySeconds);
+	});
+});
+
+describe('PitSession polling on a page', () => {
+	it('keeps refreshing scores while Nexus queue updates keep arriving', async () => {
+		vi.useFakeTimers();
+		vi.setSystemTime(Date.parse('2026-11-14T19:00:00Z'));
+		const live: EventBundle = { ...full, phase: 'quals' };
+		const queue: QueueStatusSnapshot = {
+			eventKey: 'USAZGIQ',
+			dataAsOfTime: Date.now(),
+			nowQueuing: null,
+			matches: [],
+			announcements: []
+		};
+		const fetcher = vi.fn(async (input: RequestInfo | URL) =>
+			String(input).includes('/api/nexus/')
+				? Response.json({ ...queue, dataAsOfTime: Date.now() })
+				: Response.json({ ...live, fetchedAt: Date.now() })
+		);
+		const session = new PitSession({
+			...options(0),
+			bundle: live,
+			queue,
+			nexus: true,
+			replay: null,
+			fetch: fetcher as unknown as typeof fetch
+		});
+		const stop = $effect.root(() => {
+			$effect(() => session.start());
+		});
+		flushSync();
+		const minutes = 2;
+		for (let second = 0; second < minutes * 60; second++) {
+			await vi.advanceTimersByTimeAsync(1000);
+			flushSync();
+		}
+		const count = (part: string) =>
+			fetcher.mock.calls.filter(([url]) => String(url).includes(part)).length;
+		expect(count('/lite')).toBe((minutes * 60_000) / BUNDLE_INTERVAL);
+		expect(count('/api/nexus/')).toBe((minutes * 60_000) / QUEUE_INTERVAL);
+		stop();
 	});
 });
 
