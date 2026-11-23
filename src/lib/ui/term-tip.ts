@@ -29,6 +29,7 @@ export function termTip(text: string, nested = false): Attachment<HTMLElement> {
 		target.setAttribute('aria-describedby', tip.id);
 
 		let timer: ReturnType<typeof setTimeout> | undefined;
+		let tapToShow = false;
 
 		function hide() {
 			clearTimeout(timer);
@@ -71,12 +72,27 @@ export function termTip(text: string, nested = false): Attachment<HTMLElement> {
 			if (event.pointerType !== 'touch') show();
 		}
 
+		function press(event: PointerEvent) {
+			tapToShow = event.pointerType === 'touch' && tip.hidden && target!.matches('a[href]');
+		}
+
+		function click(event: MouseEvent) {
+			if (tapToShow) event.preventDefault();
+			tapToShow = false;
+			show();
+		}
+
 		function focus() {
 			if (!nested || target!.matches(':focus-visible')) show();
 		}
 
 		const stay = () => clearTimeout(timer);
-		const on = nested ? [] : ([['click', show]] as const);
+		const on = nested
+			? []
+			: ([
+					['pointerdown', press],
+					['click', click]
+				] as const);
 		const events = [
 			['pointerenter', hover],
 			['pointerleave', leave],
