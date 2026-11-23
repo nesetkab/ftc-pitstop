@@ -154,11 +154,11 @@ export function titleOf(match: Pick<Match, 'description' | 'label'>): string {
 	return parsed ? matchTitle(parsed) : match.label;
 }
 
-function isUnplayed(match: Match): boolean {
+export function isUnplayed(match: Match): boolean {
 	return match.actualTime === null && match.result === null;
 }
 
-function expectedStart(
+export function expectedStart(
 	key: string,
 	analysis: EventAnalysis | null,
 	queue: QueueStatusSnapshot | null
@@ -208,7 +208,7 @@ function pitMatch(
 	};
 }
 
-function postTime(match: Match): number {
+export function postTime(match: Match): number {
 	return match.postedTime ?? match.actualTime ?? match.scheduledTime ?? 0;
 }
 
@@ -257,7 +257,7 @@ function queueTime(timing: MatchTiming | undefined): number | null {
 	return Math.max(timing.queueAt, timing.expectedStart - QUEUE_EARLIEST);
 }
 
-function factualDelay(matches: Match[]): number | null {
+export function factualDelay(matches: Match[]): number | null {
 	const started = matches.filter(
 		(match) => match.actualTime !== null && match.scheduledTime !== null
 	);
@@ -275,7 +275,7 @@ function allianceOf(alliances: AllianceSelection[], team: number) {
 	return null;
 }
 
-function currentPick(alliances: AllianceSelection[]): number | null {
+export function currentPick(alliances: AllianceSelection[]): number | null {
 	if (alliances.length === 0) return null;
 	const most = Math.max(...alliances.map((alliance) => alliance.picks.length));
 	const behind = alliances.filter((alliance) => alliance.picks.length < most);
@@ -389,7 +389,7 @@ function allianceTeams(alliance: AllianceSelection): number[] {
 	return [alliance.captain, ...alliance.picks, ...(alliance.backup ? [alliance.backup] : [])];
 }
 
-function standings(bundle: EventBundle): AllianceStanding[] {
+export function standings(bundle: EventBundle): AllianceStanding[] {
 	const playoffs = bundle.matches.filter((match) => match.level === 'playoff');
 	if (bundle.alliances.length === 0) return [];
 	const decided = bracketDecided(playoffs, bundle.alliances);

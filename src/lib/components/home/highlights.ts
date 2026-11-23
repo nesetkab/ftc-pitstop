@@ -31,7 +31,7 @@ export interface HighlightNames {
 
 export const HIGHLIGHT_COUNT = 3;
 export const TODAY_MINIMUM = 12;
-const UPSET_CHANCE = 0.4;
+export const UPSET_CHANCE = 0.4;
 
 export type WinnerChance = (match: SeasonMatch, winner: AllianceColor) => number | null;
 
