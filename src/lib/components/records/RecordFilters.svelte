@@ -14,20 +14,11 @@
 		filters: RecordFilters;
 		regions: RecordOption[];
 		types: RecordOption[];
-		empty?: boolean;
 	}
 
-	let { filters, regions, types, empty = false }: Props = $props();
+	let { filters, regions, types }: Props = $props();
 
-	const active = $derived(
-		Boolean(
-			filters.range !== 'all' || filters.region || filters.type || filters.level || filters.team
-		)
-	);
 	const summary = $derived(recordSummary(filters, { regions, types }));
-	const clearHref = $derived(
-		filters.part === 'total' ? '/records' : `/records?part=${filters.part}`
-	);
 
 	function apply(event: Event) {
 		event.preventDefault();
@@ -99,9 +90,6 @@
 			</select>
 		</label>
 		<noscript><button type="submit">Apply</button></noscript>
-		{#if active && !empty}
-			<a class="clear" href={clearHref}>Clear filters</a>
-		{/if}
 	</FilterPanel>
 </form>
 
@@ -144,12 +132,6 @@
 		display: none;
 	}
 
-	.clear {
-		padding-block: 8px;
-		font-size: 13px;
-		color: var(--text-2);
-	}
-
 	@media (max-width: 900px) {
 		.sort {
 			display: grid;
@@ -169,15 +151,8 @@
 	}
 
 	@media (pointer: coarse) {
-		input,
-		.clear {
+		input {
 			min-height: 40px;
-		}
-
-		.clear {
-			display: inline-flex;
-			align-items: center;
-			padding-block: 0;
 		}
 	}
 </style>

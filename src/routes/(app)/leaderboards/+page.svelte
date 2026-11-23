@@ -3,7 +3,7 @@
 	import LeaderboardFilters from '#lib/components/leaderboard/LeaderboardFilters.svelte';
 	import LeaderboardTable from '#lib/components/leaderboard/LeaderboardTable.svelte';
 	import Pagination from '#lib/ui/Pagination.svelte';
-	import { queryString } from '#lib/components/leaderboard/leaderboard.ts';
+	import { hasFilters, queryString } from '#lib/components/leaderboard/leaderboard.ts';
 	import { integer } from '#lib/format/index.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -60,17 +60,21 @@
 	states={data.states}
 	types={data.types}
 	weeks={data.weeks}
-	empty={data.total === 0}
 />
 
 {#if data.total > 0}
 	<p class="count" aria-live="polite">
-		{showing}{missing ? '.' : ''}
-		{#if missing}
-			<span class="faint">Team {data.filters.team} is not in this list.</span>
-		{/if}
+		<span>
+			{showing}{missing ? '.' : ''}
+			{#if missing}
+				<span class="faint">Team {data.filters.team} is not in this list.</span>
+			{/if}
+		</span>
 		{#if regionLabel}
 			<a class="region" href="/regions/{data.filters.region}">{regionLabel} region page</a>
+		{/if}
+		{#if hasFilters(data.filters)}
+			<a class="clear" href="/leaderboards">Clear filters</a>
 		{/if}
 	</p>
 {/if}
@@ -104,9 +108,17 @@
 
 <style>
 	.count {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 4px 16px;
 		font-size: 14px;
 		color: var(--text-2);
 		font-variant-numeric: tabular-nums;
+	}
+
+	.clear {
+		margin-left: auto;
 	}
 
 	.csv {
@@ -114,7 +126,6 @@
 	}
 
 	.region {
-		margin-left: 8px;
 		white-space: nowrap;
 	}
 </style>

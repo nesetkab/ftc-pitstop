@@ -5,6 +5,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import {
+		clearedRecords,
 		RECORD_PARTS,
 		recordQuery,
 		type RankedRecord,
@@ -41,9 +42,7 @@
 
 {#if rows.length === 0}
 	<EmptyState title="No scores match these filters.">
-		<a href={filters.part === 'total' ? '/records' : `/records?part=${filters.part}`}
-			>Clear filters</a
-		>
+		<a href={clearedRecords(filters)}>Clear filters</a>
 	</EmptyState>
 {:else}
 	<Table>

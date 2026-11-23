@@ -146,6 +146,16 @@ function keyLabel(key: string): string {
 	return parsed ? matchLabel(parsed) : key.toUpperCase();
 }
 
+export function hasRecordFilters(filters: RecordFilters): boolean {
+	return Boolean(
+		filters.range !== 'all' || filters.region || filters.type || filters.level || filters.team
+	);
+}
+
+export function clearedRecords(filters: RecordFilters): string {
+	return filters.part === 'total' ? '/records' : `/records?part=${filters.part}`;
+}
+
 const LEVEL_LABELS = { qual: 'Quals only', playoff: 'Playoffs only' } as const;
 
 function optionLabel(options: RecordOption[], value: string): string {

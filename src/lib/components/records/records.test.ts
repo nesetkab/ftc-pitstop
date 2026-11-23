@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import type { SeasonMatch, SeasonMatchAlliance } from '#lib/types.ts';
 import {
 	buildRecordDataset,
+	clearedRecords,
+	hasRecordFilters,
 	filterRecords,
 	pageRecords,
 	parseRecordFilters,
@@ -197,5 +199,16 @@ describe('recordSummary', () => {
 				options
 			)
 		).toEqual(['Last 7 days', 'Arizona', 'Qualifier', 'Playoffs only', 'Team 724', 'By auto']);
+	});
+});
+
+describe('clearing record filters', () => {
+	it('treats the sort as a view, not a filter, and keeps it when clearing', () => {
+		const sorted = parseRecordFilters(new URLSearchParams('part=auto'));
+		expect(hasRecordFilters(sorted)).toBe(false);
+		const filtered = parseRecordFilters(new URLSearchParams('part=auto&range=7'));
+		expect(hasRecordFilters(filtered)).toBe(true);
+		expect(clearedRecords(filtered)).toBe('/records?part=auto');
+		expect(clearedRecords(parseRecordFilters(new URLSearchParams('team=724')))).toBe('/records');
 	});
 });

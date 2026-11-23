@@ -346,6 +346,20 @@ export function datesChoice(filters: LeaderboardFilters, weeks: FilterOption[]):
 	return week && weeks.some((option) => option.value === filters.from) ? filters.from : 'custom';
 }
 
+export function hasFilters(filters: LeaderboardFilters): boolean {
+	return Boolean(
+		filters.region ||
+		filters.country ||
+		filters.state ||
+		filters.min > 1 ||
+		filters.q ||
+		filters.type ||
+		filters.dates ||
+		filters.from ||
+		filters.to
+	);
+}
+
 export interface SummaryOptions {
 	regions: FilterOption[];
 	countries: FilterOption[];

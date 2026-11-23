@@ -1,7 +1,12 @@
 <script lang="ts">
 	import RecordFilters from '#lib/components/records/RecordFilters.svelte';
 	import RecordsTable from '#lib/components/records/RecordsTable.svelte';
-	import { RECORDS_CSV_LIMIT, recordQuery } from '#lib/components/records/records.ts';
+	import {
+		clearedRecords,
+		hasRecordFilters,
+		RECORDS_CSV_LIMIT,
+		recordQuery
+	} from '#lib/components/records/records.ts';
 	import Pagination from '#lib/ui/Pagination.svelte';
 	import { integer } from '#lib/format/index.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
@@ -31,16 +36,15 @@
 	{/snippet}
 </PageHeader>
 
-<RecordFilters
-	filters={data.filters}
-	regions={data.regions}
-	types={data.types}
-	empty={data.total === 0}
-/>
+<RecordFilters filters={data.filters} regions={data.regions} types={data.types} />
 
 {#if data.total > 0}
 	<p class="count" aria-live="polite">
-		Showing {integer(first)} to {integer(last)} of {integer(data.total)} alliance scores
+		<span>Showing {integer(first)} to {integer(last)} of {integer(data.total)} alliance scores</span
+		>
+		{#if hasRecordFilters(data.filters)}
+			<a class="clear" href={clearedRecords(data.filters)}>Clear filters</a>
+		{/if}
 	</p>
 {/if}
 
@@ -75,8 +79,16 @@
 	}
 
 	.count {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 4px 16px;
 		font-size: 14px;
 		color: var(--text-2);
 		font-variant-numeric: tabular-nums;
+	}
+
+	.clear {
+		margin-left: auto;
 	}
 </style>

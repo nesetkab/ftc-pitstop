@@ -159,7 +159,7 @@
 
 <PageHeader
 	title="Events"
-	meta="{integer(data.total)} events in the BIOBUZZ season."
+	meta="{integer(data.total)} events this season."
 	status={data.stale ? staleLine : undefined}
 />
 

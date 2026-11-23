@@ -10,6 +10,7 @@
 		RECENT_DAYS,
 		datesChoice,
 		filterSummary,
+		hasFilters,
 		type FilterOption,
 		type LeaderboardFilters
 	} from './leaderboard.ts';
@@ -21,18 +22,9 @@
 		states: FilterOption[];
 		types?: FilterOption[];
 		weeks?: FilterOption[];
-		empty?: boolean;
 	}
 
-	let {
-		filters,
-		regions,
-		countries,
-		states,
-		types = [],
-		weeks = [],
-		empty = false
-	}: Props = $props();
+	let { filters, regions, countries, states, types = [], weeks = [] }: Props = $props();
 
 	let customOpen = $state(false);
 	const chosen = $derived(datesChoice(filters, weeks));
@@ -55,19 +47,11 @@
 			(a, b) => a - b
 		)
 	);
-	const active = $derived(
-		Boolean(
-			filters.region ||
-			filters.country ||
-			filters.state ||
-			filters.min > 1 ||
-			filters.q ||
-			filters.type ||
-			filters.dates ||
-			filters.from ||
-			filters.to
-		)
-	);
+	const active = $derived(hasFilters(filters));
+
+	$effect.pre(() => {
+		if (!active) untrack(() => (customOpen = false));
+	});
 
 	function pickDates(params: URLSearchParams, choice: string): boolean {
 		params.delete('dates');
@@ -233,9 +217,6 @@
 			<input type="hidden" name="team" value={filters.team} />
 		{/if}
 		<noscript><button type="submit">Apply</button></noscript>
-		{#if active && !empty}
-			<a class="clear" href="/leaderboards" onclick={() => (customOpen = false)}>Clear filters</a>
-		{/if}
 	</FilterPanel>
 </form>
 
@@ -287,12 +268,6 @@
 		display: none;
 	}
 
-	.clear {
-		padding-block: 8px;
-		font-size: 13px;
-		color: var(--text-2);
-	}
-
 	@media (max-width: 640px) {
 		.sort {
 			display: grid;
@@ -329,15 +304,8 @@
 	}
 
 	@media (pointer: coarse) {
-		input,
-		.clear {
+		input {
 			min-height: 40px;
-		}
-
-		.clear {
-			display: inline-flex;
-			align-items: center;
-			padding-block: 0;
 		}
 	}
 </style>
