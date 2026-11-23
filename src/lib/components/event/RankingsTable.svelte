@@ -9,6 +9,7 @@
 	import { teamHref } from './matches.ts';
 	import {
 		cellText,
+		defaultDir,
 		phoneHidden,
 		sortBy,
 		type ColumnKey,
@@ -64,7 +65,9 @@
 
 {#snippet sorter(key: SortKey, label: string)}
 	<a
+		class="sort-link"
 		href={hrefFor(sortBy(choice, key))}
+		style:--sort-hint={defaultDir(key) === 'asc' ? "'↑'" : undefined}
 		onclick={(event) => choose(event, key)}
 		data-sveltekit-replacestate
 		data-sveltekit-reset="false"
@@ -156,10 +159,6 @@
 </Table>
 
 <style>
-	th a {
-		color: inherit;
-	}
-
 	th.active {
 		color: var(--text);
 	}

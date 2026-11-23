@@ -77,6 +77,37 @@ table.t a:hover {
 	text-decoration: underline;
 }
 
+table.t th a.sort-link {
+	position: relative;
+	color: inherit;
+	cursor: pointer;
+}
+
+@media (hover: hover) {
+	table.t th a.sort-link:hover {
+		color: var(--text);
+		text-decoration: none;
+	}
+
+	table.t th:not([aria-sort]) a.sort-link::before {
+		content: var(--sort-hint, '↓');
+		position: absolute;
+		right: calc(100% + 3px);
+		opacity: 0;
+		transition: opacity 0.12s;
+	}
+
+	table.t th.l:not([aria-sort]) a.sort-link::before {
+		right: auto;
+		left: calc(100% + 3px);
+	}
+
+	table.t th:not([aria-sort]) a.sort-link:hover::before,
+	table.t th:not([aria-sort]) a.sort-link:focus-visible::before {
+		opacity: 0.6;
+	}
+}
+
 table.t.sticky thead {
 	position: sticky;
 	top: 0;

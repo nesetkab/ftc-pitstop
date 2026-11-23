@@ -18,6 +18,7 @@
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import FilterPanel from '#lib/ui/FilterPanel.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
@@ -55,6 +56,21 @@
 	const filters = $derived({ region, type, when, by });
 	const shown = $derived(filterStrength(rows, filters, now));
 	const filtered = $derived(region !== '' || type !== '' || when !== 'all');
+	const regionLabel = $derived(
+		data.regions.flatMap((group) => group.options).find((option) => option.value === region)
+			?.label ?? ''
+	);
+	const chosenType = $derived(types.find((option) => option === type));
+	const summary = $derived(
+		[
+			region ? regionLabel : '',
+			chosenType ? typeLabel(chosenType) : '',
+			when === 'all' ? '' : (WHEN.find((option) => option.value === when)?.label ?? ''),
+			by === 'top'
+				? ''
+				: `Ranked by ${BY.find((option) => option.value === by)?.label.toLowerCase()}`
+		].filter(Boolean)
+	);
 	const meta = $derived(
 		`${integer(data.total)} events this season, ranked by the average season OPR of their ${TOP} best teams.`
 	);
@@ -131,30 +147,32 @@
 	</EmptyState>
 {:else}
 	<form class="filters" onsubmit={(event) => event.preventDefault()}>
-		<label>
-			<span class="visually-hidden">Region</span>
-			<select bind:value={region}>
-				<option value="">All regions</option>
-				{#each data.regions as group (group.label)}
-					<optgroup label={group.label}>
-						{#each group.options as option (option.value)}
-							<option value={option.value}>{option.label}</option>
-						{/each}
-					</optgroup>
-				{/each}
-			</select>
-		</label>
-		<label>
-			<span class="visually-hidden">Event type</span>
-			<select bind:value={type}>
-				<option value="">All types</option>
-				{#each types as option (option)}
-					<option value={option}>{typeLabel(option)}</option>
-				{/each}
-			</select>
-		</label>
-		<Segmented label="Dates" options={WHEN} value={when} onselect={(value) => (when = value)} />
-		<Segmented label="Rank by" options={BY} value={by} onselect={(value) => (by = value)} />
+		<FilterPanel {summary}>
+			<label>
+				<span class="visually-hidden">Region</span>
+				<select bind:value={region}>
+					<option value="">All regions</option>
+					{#each data.regions as group (group.label)}
+						<optgroup label={group.label}>
+							{#each group.options as option (option.value)}
+								<option value={option.value}>{option.label}</option>
+							{/each}
+						</optgroup>
+					{/each}
+				</select>
+			</label>
+			<label>
+				<span class="visually-hidden">Event type</span>
+				<select bind:value={type}>
+					<option value="">All types</option>
+					{#each types as option (option)}
+						<option value={option}>{typeLabel(option)}</option>
+					{/each}
+				</select>
+			</label>
+			<Segmented label="Dates" options={WHEN} value={when} onselect={(value) => (when = value)} />
+			<Segmented label="Rank by" options={BY} value={by} onselect={(value) => (by = value)} />
+		</FilterPanel>
 	</form>
 
 	{#if shown.length === 0}
@@ -162,7 +180,7 @@
 			{#if by === 'deep'}
 				Only events with {DEEP} or more rated teams have a top {DEEP} average.
 			{/if}
-			<button type="button" class="link" onclick={reset}>Clear the filters</button>
+			<button type="button" class="link" onclick={reset}>Clear filters</button>
 		</EmptyState>
 	{:else}
 		<p class="count">

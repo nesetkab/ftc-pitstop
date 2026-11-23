@@ -7,6 +7,7 @@ import {
 	dateWindow,
 	datesChoice,
 	eventFilterOptions,
+	filterSummary,
 	filterRows,
 	isScoped,
 	leaderboardScope,
@@ -456,5 +457,34 @@ describe('scopeRows', () => {
 		const scrims = scopeRows(base, table, { type: 'Scrimmage', window: null });
 		expect(scrims.map((entry) => entry.team)).toEqual([1]);
 		expect(scopeRows(base, table, { type: 'Championship', window: null })).toEqual([]);
+	});
+});
+
+describe('filterSummary', () => {
+	const options = {
+		regions: [{ value: 'USMI', label: 'Michigan' }],
+		countries: [{ value: 'USA', label: 'USA' }],
+		states: [{ value: 'MI', label: 'Michigan' }],
+		types: [{ value: 'official', label: 'Official events' }]
+	};
+
+	it('says nothing when no filter is set', () => {
+		expect(filterSummary(none, options)).toEqual([]);
+	});
+
+	it('names each active filter with its label', () => {
+		expect(
+			filterSummary(
+				{ ...none, region: 'USMI', type: 'official', dates: 'recent', min: 10, sort: 'tips' },
+				options
+			)
+		).toEqual(['Michigan', 'Official events', 'Last 2 weeks', '10+ matches', 'By tips']);
+	});
+
+	it('prefers the state over the country and spells out custom dates', () => {
+		expect(
+			filterSummary({ ...none, country: 'USA', state: 'MI', from: '2026-11-01' }, options)
+		).toEqual(['Michigan', 'Since Nov 1']);
+		expect(filterSummary({ ...none, country: 'USA' }, options)).toEqual(['USA']);
 	});
 });

@@ -746,10 +746,9 @@
 	}
 
 	.awards li {
-		padding: 8px 0;
+		padding: 6px 0;
 		border-bottom: 1px solid var(--line);
-		font-size: 15px;
-		font-weight: 500;
+		font-size: 14px;
 	}
 
 	.schedule li {

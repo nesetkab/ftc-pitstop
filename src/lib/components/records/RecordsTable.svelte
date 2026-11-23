@@ -5,6 +5,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import {
+		clearedRecords,
 		RECORD_PARTS,
 		recordQuery,
 		type RankedRecord,
@@ -40,9 +41,9 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="No matches fit these filters."
-		>Try a wider date range or other filters.</EmptyState
-	>
+	<EmptyState title="No scores match these filters.">
+		<a href={clearedRecords(filters)}>Clear filters</a>
+	</EmptyState>
 {:else}
 	<Table>
 		<caption class="visually-hidden">{caption}</caption>
@@ -61,7 +62,7 @@
 						aria-sort={active ? 'descending' : undefined}
 					>
 						{#if sortable}
-							<a href={sortHref(part.key)} data-sveltekit-reset="false">
+							<a class="sort-link" href={sortHref(part.key)} data-sveltekit-reset="false">
 								<Term label={part.label} nested />{#if active}<span aria-hidden="true">
 										↓</span
 									>{/if}

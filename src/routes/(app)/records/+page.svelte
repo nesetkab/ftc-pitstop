@@ -2,8 +2,8 @@
 	import RecordFilters from '#lib/components/records/RecordFilters.svelte';
 	import RecordsTable from '#lib/components/records/RecordsTable.svelte';
 	import {
-		RECORD_PARTS,
-		RECORD_RANGES,
+		clearedRecords,
+		hasRecordFilters,
 		RECORDS_CSV_LIMIT,
 		recordQuery
 	} from '#lib/components/records/records.ts';
@@ -19,21 +19,6 @@
 
 	const first = $derived(data.start + 1);
 	const last = $derived(data.start + data.rows.length);
-	const part = $derived(RECORD_PARTS.find((entry) => entry.key === data.filters.part)!);
-	const range = $derived(RECORD_RANGES.find((entry) => entry.key === data.filters.range)!);
-	const team = $derived(data.filters.team);
-	const teamName = $derived(team ? data.names.teams[team] : undefined);
-	const summary = $derived(
-		[
-			part.key === 'total'
-				? 'Sorted by total score'
-				: `Sorted by ${part.label.toLowerCase()} points`,
-			range.key === 'all' ? '' : range.label.toLowerCase(),
-			team ? `alliances with ${team}${teamName ? ` ${teamName}` : ''}` : ''
-		]
-			.filter(Boolean)
-			.join(', ')
-	);
 </script>
 
 <Seo
@@ -53,13 +38,15 @@
 
 <RecordFilters filters={data.filters} regions={data.regions} types={data.types} />
 
-<p class="count" aria-live="polite">
-	{#if data.total === 0}
-		No matches
-	{:else}
-		{summary}. Showing {integer(first)} to {integer(last)} of {integer(data.total)} alliance scores.
-	{/if}
-</p>
+{#if data.total > 0}
+	<p class="count" aria-live="polite">
+		<span>Showing {integer(first)} to {integer(last)} of {integer(data.total)} alliance scores</span
+		>
+		{#if hasRecordFilters(data.filters)}
+			<a class="clear" href={clearedRecords(data.filters)}>Clear filters</a>
+		{/if}
+	</p>
+{/if}
 
 <RecordsTable rows={data.rows} filters={data.filters} names={data.names} />
 
@@ -69,12 +56,12 @@
 	href={(page) => `/records${recordQuery(data.filters, page)}`}
 />
 
-<p class="note">
-	Each match counts twice, once for each alliance. Hive, flower and garden are teleop points.
-	Opponent is the other alliance's score. Click a column to sort by it.
-</p>
-
 {#if data.total > 0}
+	<p class="note">
+		Each match counts twice, once for each alliance. Hive, flower and garden are teleop points.
+		Opponent is the other alliance's score.
+	</p>
+
 	<p class="csv">
 		<a href="/records.csv{recordQuery({ ...data.filters, page: 1 })}" download>Download CSV</a>
 		{#if data.total > RECORDS_CSV_LIMIT}
@@ -92,8 +79,16 @@
 	}
 
 	.count {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		gap: 4px 16px;
 		font-size: 14px;
 		color: var(--text-2);
 		font-variant-numeric: tabular-nums;
+	}
+
+	.clear {
+		margin-left: auto;
 	}
 </style>

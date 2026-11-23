@@ -17,7 +17,7 @@
 	const result = $derived(playoffResult(view));
 </script>
 
-<div class="cols" style:--cols="31em minmax(0, 1fr) 23em">
+<div class="cols" style:--cols="26em minmax(0, 1fr) 23em">
 	<section>
 		<h2 class="tv-label">Final rank</h2>
 		{#if ranking}
@@ -140,6 +140,7 @@
 
 	.awards {
 		display: grid;
+		grid-template-columns: fit-content(62%) minmax(0, 1fr);
 		margin: 0;
 		padding: 0;
 		list-style: none;
@@ -147,9 +148,10 @@
 
 	.awards li {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		grid-column: 1 / -1;
+		grid-template-columns: subgrid;
 		align-items: center;
-		gap: 0.8em;
+		column-gap: 0.8em;
 		padding-inline: 0.5em;
 		box-shadow: inset 0 -1px var(--line);
 		white-space: nowrap;
@@ -180,6 +182,10 @@
 	@media (orientation: portrait) {
 		.event-awards :global(.fit) {
 			--row: 2.75;
+		}
+
+		.awards {
+			grid-template-columns: minmax(0, 1fr);
 		}
 
 		.awards li {

@@ -11,7 +11,9 @@ import {
 	DEFAULT_COLUMNS,
 	hasChoice,
 	parseRankingChoice,
+	parseRankingView,
 	phoneHidden,
+	rankingPageQuery,
 	rankingQuery,
 	rankingRows,
 	scoreStats,
@@ -76,6 +78,29 @@ describe('rankingQuery', () => {
 		const query = rankingQuery(choice);
 		expect(query).toBe('?cols=rs,npavg,opr-tips&sort=npavg&dir=asc');
 		expect(parse(query.slice(1))).toEqual({ ...choice, columns: ['rs', 'npavg', 'opr-tips'] });
+	});
+});
+
+describe('ranking views', () => {
+	it('reads the view and falls back to standings', () => {
+		expect(parseRankingView(new URLSearchParams('view=rp'))).toBe('rp');
+		expect(parseRankingView(new URLSearchParams('view=schedule&sort=opr'))).toBe('schedule');
+		expect(parseRankingView(new URLSearchParams('view=standings'))).toBe('standings');
+		expect(parseRankingView(new URLSearchParams('view=bogus'))).toBe('standings');
+		expect(parseRankingView(new URLSearchParams(''))).toBe('standings');
+	});
+
+	it('keeps the columns and sort when the view changes', () => {
+		const choice = parse('sort=opr&dir=asc');
+		expect(rankingPageQuery(choice, 'standings')).toBe('?sort=opr&dir=asc');
+		expect(rankingPageQuery(choice, 'rp')).toBe('?sort=opr&dir=asc&view=rp');
+		expect(rankingPageQuery(DEFAULT_CHOICE, 'schedule')).toBe('?view=schedule');
+		expect(rankingPageQuery(DEFAULT_CHOICE, 'standings')).toBe('');
+	});
+
+	it('does not count the view as a column choice', () => {
+		expect(hasChoice(new URLSearchParams('view=rp'))).toBe(false);
+		expect(parse('view=rp')).toEqual(DEFAULT_CHOICE);
 	});
 });
 

@@ -2,10 +2,13 @@ import { describe, expect, it } from 'vitest';
 import type { SeasonMatch, SeasonMatchAlliance } from '#lib/types.ts';
 import {
 	buildRecordDataset,
+	clearedRecords,
+	hasRecordFilters,
 	filterRecords,
 	pageRecords,
 	parseRecordFilters,
 	recordQuery,
+	recordSummary,
 	type RecordFilters
 } from './records.ts';
 
@@ -173,5 +176,39 @@ describe('pageRecords', () => {
 		expect(second).toMatchObject({ page: 2, pages: 4, start: 1, total: 4 });
 		expect(second.rows[0].rank).toBe(1);
 		expect(pageRecords(sorted, 'total', 99, 3)).toMatchObject({ page: 2, start: 3 });
+	});
+});
+
+describe('recordSummary', () => {
+	const options = {
+		regions: [{ value: 'USAZ', label: 'Arizona' }],
+		types: [{ value: 'Qualifier', label: 'Qualifier' }]
+	};
+	const plain = parseRecordFilters(new URLSearchParams());
+
+	it('says nothing for the default view', () => {
+		expect(recordSummary(plain, options)).toEqual([]);
+	});
+
+	it('names each active filter and a sort other than total', () => {
+		expect(
+			recordSummary(
+				parseRecordFilters(
+					new URLSearchParams('range=7&region=USAZ&type=Qualifier&level=playoff&team=724&part=auto')
+				),
+				options
+			)
+		).toEqual(['Last 7 days', 'Arizona', 'Qualifier', 'Playoffs only', 'Team 724', 'By auto']);
+	});
+});
+
+describe('clearing record filters', () => {
+	it('treats the sort as a view, not a filter, and keeps it when clearing', () => {
+		const sorted = parseRecordFilters(new URLSearchParams('part=auto'));
+		expect(hasRecordFilters(sorted)).toBe(false);
+		const filtered = parseRecordFilters(new URLSearchParams('part=auto&range=7'));
+		expect(hasRecordFilters(filtered)).toBe(true);
+		expect(clearedRecords(filtered)).toBe('/records?part=auto');
+		expect(clearedRecords(parseRecordFilters(new URLSearchParams('team=724')))).toBe('/records');
 	});
 });

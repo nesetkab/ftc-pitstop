@@ -53,7 +53,9 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="No teams match these filters.">Try other filters.</EmptyState>
+	<EmptyState title="No teams match these filters.">
+		<a href="/leaderboards">Clear filters</a>
+	</EmptyState>
 {:else}
 	<Table>
 		<caption class="visually-hidden">{caption}</caption>
@@ -70,7 +72,7 @@
 						aria-sort={active ? 'descending' : undefined}
 					>
 						{#if filters}
-							<a href={sortHref(column.key)} data-sveltekit-reset="false">
+							<a class="sort-link" href={sortHref(column.key)} data-sveltekit-reset="false">
 								<Term label={column.label} term={oprTerm(column.label)} nested />{#if active}<span
 										aria-hidden="true"
 									>
