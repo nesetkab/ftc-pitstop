@@ -18,6 +18,7 @@ async function openBadges() {
 	const details = summary.closest('details') as HTMLDetailsElement;
 	details.open = true;
 	await fireEvent(details, new Event('toggle'));
+	await screen.findByLabelText('Badge');
 	return details;
 }
 

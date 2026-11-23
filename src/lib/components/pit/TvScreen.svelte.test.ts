@@ -354,7 +354,7 @@ describe('PhoneScreen', () => {
 		expect(screen.queryByRole('table', { name: /Scoring by part/ })).toBeNull();
 		await fireEvent.click(toggle);
 		expect(toggle).toHaveAttribute('aria-expanded', 'true');
-		const table = screen.getByRole('table', { name: 'Scoring by part for Q26' });
+		const table = await screen.findByRole('table', { name: 'Scoring by part for Q26' });
 		const links = [...table.querySelectorAll('a')].map((link) => link.getAttribute('href'));
 		expect(links).toEqual([
 			`/events/USAZGIQ/teams/${TEAM}`,
