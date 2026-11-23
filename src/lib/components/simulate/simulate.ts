@@ -68,6 +68,12 @@ export function parseSides(params: URLSearchParams): Sides {
 	return { red, blue };
 }
 
+export function sidesFrom(red: readonly number[], blue: readonly number[]): Sides {
+	const reds = [...new Set(red)].slice(0, SIDE_SIZE);
+	const blues = [...new Set(blue)].filter((number) => !reds.includes(number)).slice(0, SIDE_SIZE);
+	return { red: reds, blue: blues };
+}
+
 export function simulateHref(sides: Sides): string {
 	const query = COLORS.filter((color) => sides[color].length > 0)
 		.map((color) => `${color}=${sides[color].join(',')}`)

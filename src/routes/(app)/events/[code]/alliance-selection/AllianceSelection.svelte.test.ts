@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup, render, screen, within } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import type { AllianceOdds, EventAnalysis } from '#lib/analysis/types.ts';
 import type { AllianceSelection, Ranking, Team } from '#lib/types.ts';
@@ -8,6 +8,7 @@ import { deriveSelection, selectionTable } from '#lib/workspace/selection.ts';
 import AllianceTable from './AllianceTable.svelte';
 import AvailableTeams from './AvailableTeams.svelte';
 import PlayoffOdds from './PlayoffOdds.svelte';
+import SimulateAlliances from './SimulateAlliances.svelte';
 
 afterEach(() => cleanup());
 
@@ -56,6 +57,17 @@ function ranking(team: number, rank: number): Ranking {
 const rankings = [100, 101, 200, 300, 201, 301].map((team, index) => ranking(team, index + 1));
 
 const selection = deriveSelection(alliances);
+
+describe('simulate a playoff match', () => {
+	it('links the first two alliances and follows the chosen ones', async () => {
+		render(SimulateAlliances, { props: { alliances } });
+		const link = screen.getByRole('link', { name: 'Simulate this match' });
+		expect(link).toHaveAttribute('href', '/simulate?red=100,101&blue=200');
+		const blue = screen.getByRole('combobox', { name: 'Blue alliance' });
+		await fireEvent.change(blue, { target: { value: '3' } });
+		expect(link).toHaveAttribute('href', '/simulate?red=100,101&blue=300');
+	});
+});
 
 describe('alliance table', () => {
 	it('lists every alliance with its captain and pick', () => {

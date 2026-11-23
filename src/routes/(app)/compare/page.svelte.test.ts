@@ -136,6 +136,11 @@ describe('compare page', () => {
 		expect(within(autoRow).getByText('100 83%')).toBeInTheDocument();
 		expect(within(autoRow).getByText('16.0')).toBeInTheDocument();
 		expect(screen.getByText('100 brings 83% of the combined auto points.')).toBeInTheDocument();
+		expect(
+			screen.getByRole('link', {
+				name: 'Simulate a match with 100 + 200 as an alliance and pick their opponents'
+			})
+		).toHaveAttribute('href', '/simulate?red=100,200');
 	});
 
 	it('says when match history has not loaded yet', () => {
