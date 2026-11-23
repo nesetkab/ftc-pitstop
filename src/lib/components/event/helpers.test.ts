@@ -4,12 +4,15 @@ import { awardName, groupAwards, noAwardsText } from './awards.ts';
 import { eventMeta } from './event-meta.ts';
 import {
 	filterEvents,
+	firstPage,
 	groupByWeek,
 	listed,
 	listStatus,
 	packEvents,
 	regionGroups,
-	unpackEvents
+	unpackEvents,
+	windowCovers,
+	type EventFilters
 } from './event-list.ts';
 import { fixtureBundle } from './test-fixtures.ts';
 
@@ -137,6 +140,57 @@ describe('event list', () => {
 			41.5
 		]);
 		expect(unpackEvents(JSON.parse(JSON.stringify(packed)))).toEqual(events);
+	});
+});
+
+describe('event list first page', () => {
+	const later = [
+		...events,
+		listed(summary('LAST', '2026-12-12', '2026-12-12'), 20),
+		listed(summary('TIED', '2026-12-05', '2026-12-05'), 20)
+	];
+	const upcoming: EventFilters = { query: '', region: '', type: '', when: 'upcoming' };
+	const shown = (list: typeof later, filters: EventFilters, now = NOW) =>
+		filterEvents(list, filters, now).map((event) => event.code);
+
+	it('keeps this week and the first upcoming events, ties included', () => {
+		const page = firstPage(later, NOW, new Set(), 3);
+		expect(page.events.map((event) => event.code)).toEqual(['LIVE', 'SOON', 'LATER', 'TIED']);
+		expect(page.window).toEqual({ from: '2026-11-16', to: '2026-11-22', upcoming: 5 });
+		expect(shown(page.events, upcoming).slice(0, 3)).toEqual(shown(later, upcoming).slice(0, 3));
+	});
+
+	it('keeps every open event when the season has fewer than a page left', () => {
+		const page = firstPage(later, NOW, new Set(), 50);
+		expect(page.events.map((event) => event.code)).toEqual(
+			later.filter((event) => event.code !== 'PAST').map((event) => event.code)
+		);
+		expect(windowCovers(page.window, upcoming, 50, 5, NOW)).toBe(true);
+	});
+
+	it('serves the default views from the first page and asks for the season otherwise', () => {
+		const { events: kept, window } = firstPage(later, NOW, new Set(), 3);
+		const covers = (filters: Partial<EventFilters>, limit = 3, now = NOW) => {
+			const all = { ...upcoming, ...filters };
+			return windowCovers(window, all, limit, shown(kept, all, now).length, now);
+		};
+		expect(covers({})).toBe(true);
+		expect(covers({ when: 'week' })).toBe(true);
+		expect(covers({}, 6)).toBe(false);
+		expect(covers({ when: 'past' })).toBe(false);
+		expect(covers({ when: 'all' })).toBe(false);
+		expect(covers({ query: 'butte' })).toBe(false);
+		expect(covers({ region: 'USMT' })).toBe(false);
+		expect(covers({ type: 'LeagueMeet' })).toBe(false);
+		expect(covers({ when: 'week' }, 3, Date.parse('2026-11-25T18:00:00Z'))).toBe(false);
+	});
+
+	it('asks for more once events on the first page have finished', () => {
+		const { events: kept, window } = firstPage(later, NOW, new Set(), 3);
+		const after = Date.parse('2026-11-24T18:00:00Z');
+		const left = shown(kept, upcoming, after).length;
+		expect(left).toBeLessThan(3);
+		expect(windowCovers(window, upcoming, 3, left, after)).toBe(false);
 	});
 });
 

@@ -99,6 +99,8 @@ export function unpackEvents({ words, rows }: PackedEvents): ListedEvent[] {
 	}));
 }
 
+export const PAGE_SIZE = 100;
+
 export type DateFilter = 'week' | 'upcoming' | 'past' | 'all';
 
 export type EventFilters = {
@@ -187,6 +189,48 @@ export function filterEvents(
 	const ascending = (a: ListedEvent, b: ListedEvent) =>
 		a.start.localeCompare(b.start) || a.name.localeCompare(b.name);
 	return list.sort(filters.when === 'past' ? (a, b) => ascending(b, a) : ascending);
+}
+
+export type EventWindow = { from: string; to: string; upcoming: number };
+
+export function firstPage(
+	events: ListedEvent[],
+	now: number,
+	finished: ReadonlySet<string>,
+	size: number
+): { events: ListedEvent[]; window: EventWindow } {
+	const today = localDate(now, 'UTC');
+	const from = weekStart(addDays(today, -1));
+	const to = addDays(weekStart(addDays(today, 1)), 6);
+	const open = (event: ListedEvent) => listStatus(event, now, finished) !== 'done';
+	const starts = events
+		.filter(open)
+		.map((event) => event.start)
+		.sort();
+	const cutoff = starts[size - 1];
+	return {
+		events: events.filter(
+			(event) =>
+				(event.start <= to && event.end >= from) ||
+				((cutoff === undefined || event.start <= cutoff) && open(event))
+		),
+		window: { from, to, upcoming: starts.length }
+	};
+}
+
+export function windowCovers(
+	window: EventWindow,
+	filters: EventFilters,
+	limit: number,
+	matches: number,
+	now: number
+): boolean {
+	if (matches === 0 || filters.query.trim() || filters.region || filters.type) return false;
+	if (filters.when === 'week') {
+		const week = currentWeek(now);
+		return week.start >= window.from && week.end <= window.to;
+	}
+	return filters.when === 'upcoming' && matches >= Math.min(limit, window.upcoming);
 }
 
 export function groupByWeek(
