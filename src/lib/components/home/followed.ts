@@ -1,5 +1,5 @@
 import type { SeasonRating } from '#lib/analysis/types.ts';
-import { opposite, scheduleTimes, sideOf } from '#lib/components/event/matches.ts';
+import { nextMatchIndex, opposite, scheduleTimes, sideOf } from '#lib/components/event/matches.ts';
 import { pickEvent, type EventPickReason } from '#lib/components/pit/resolve.ts';
 import { dayTime } from '#lib/format/time.ts';
 import { estimateStarts, PLAYOFF_SCHEDULE } from '#lib/model/schedule.ts';
@@ -142,7 +142,7 @@ function estimateFor(matches: Match[], next: Match, now: number): number | null 
 }
 
 function nextMatch(bundle: LiveBundle, team: number, now: number): NextMatch | null {
-	const next = bundle.matches.find((match) => match.result === null && sideOf(match, team));
+	const next = bundle.matches[nextMatchIndex(bundle.matches, team)];
 	if (!next) return null;
 	const estimate = next.scheduledTime === null ? null : estimateFor(bundle.matches, next, now);
 	const at = estimate ?? next.scheduledTime;
@@ -174,7 +174,7 @@ function lastMatch(bundle: LiveBundle, team: number): LastMatch | null {
 }
 
 export function liveStatus(bundle: LiveBundle, team: number, now: number): LiveStatus {
-	const ranking = bundle.rankings.find((entry) => entry.team === team);
+	const ranking = bundle.rankings.find((entry) => entry.team === team && entry.played > 0);
 	const plays = bundle.matches.some((match) => sideOf(match, team));
 	const next = nextMatch(bundle, team, now);
 	let note: string | null = null;
