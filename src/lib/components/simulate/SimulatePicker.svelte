@@ -132,7 +132,7 @@
 		}
 	}
 
-	@media (max-width: 420px) {
+	@media (max-width: 340px) {
 		.slots {
 			grid-template-columns: minmax(0, 1fr);
 		}

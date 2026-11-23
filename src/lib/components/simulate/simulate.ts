@@ -144,7 +144,7 @@ function underdogNote(underdog: SimSide, favorite: SimSide): string {
 		.sort((a, b) => b.gap - a.gap);
 	const name = colorName(underdog.color);
 	if (leads.length === 0) {
-		return `${name} does not lead in any scoring part, so it needs ${colorName(favorite.color)} to have an off match.`;
+		return `${name} is not ${EVEN_PART} or more points ahead in any scoring part, so it needs ${colorName(favorite.color)} to have an off match.`;
 	}
 	const [best] = leads;
 	return `${name}'s way back is ${partWord(best.part)}, where it is expected to lead by ${fixed(best.gap)} points.`;

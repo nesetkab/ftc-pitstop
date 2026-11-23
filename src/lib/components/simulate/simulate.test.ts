@@ -122,7 +122,7 @@ describe('where the match is decided', () => {
 	it('says when the underdog leads nowhere', () => {
 		const weak = side('blue', { auto: 10, teleop: 20, hive: 15, garden: 2, park: 2 });
 		expect(decisionNotes(red, weak, forecast(0.95, 0.04), 60, 30)[1]).toBe(
-			'Blue does not lead in any scoring part, so it needs Red to have an off match.'
+			'Blue is not 3 or more points ahead in any scoring part, so it needs Red to have an off match.'
 		);
 	});
 

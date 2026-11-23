@@ -57,7 +57,7 @@
 	const sides = $derived({ red, blue });
 
 	function value(side: SimSide, row: Row): number {
-		if (row.part) return side.parts[row.part];
+		if (row.part) return Math.max(side.parts[row.part], 0);
 		return row.key === 'fouls' ? side.fouls : side.score;
 	}
 

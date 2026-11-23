@@ -106,7 +106,7 @@
 			type="text"
 			autocomplete="off"
 			enterkeyhint="go"
-			placeholder="Team number or name"
+			placeholder="Number or name"
 			role="combobox"
 			aria-expanded={open}
 			aria-controls="{id}-list"
@@ -125,7 +125,7 @@
 			>
 		{/if}
 	</div>
-	{#if team}
+	{#if team && !typed}
 		<a class="name" href="/teams/{team.number}">{team.name ?? `Team ${team.number}`}</a>
 	{/if}
 	<div class="pop" id="{id}-list" role="listbox" aria-label="Teams matching {label}" hidden={!open}>
