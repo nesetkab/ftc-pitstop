@@ -1,3 +1,4 @@
+import { round, toCsv } from '#lib/format/csv.ts';
 import {
 	LIMITS,
 	PICK_TAGS,
@@ -168,11 +169,6 @@ export function pickListText(list: PickList, context: PickContext = {}): string 
 	return lines.join('\n');
 }
 
-function cell(value: string | number | null): string {
-	const text = value === null ? '' : String(value);
-	return /[",\n\r]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
-}
-
 export function pickListCsv(list: PickList, context: PickContext = {}): string {
 	const header = ['rank', 'team', 'name', 'list', 'status', 'opr', 'event rank', 'tags', 'note'];
 	const rows = [...ranked(list), ...avoided(list)].map((entry, index) => {
@@ -183,13 +179,13 @@ export function pickListCsv(list: PickList, context: PickContext = {}): string {
 			entry.name,
 			entry.avoid ? 'do not pick' : 'pick',
 			status(entry, context),
-			stat?.opr === null || stat?.opr === undefined ? null : stat.opr.toFixed(1),
+			round(stat?.opr, 1),
 			stat?.rank ?? null,
 			tagText(entry),
 			entry.note
 		];
 	});
-	return [header, ...rows].map((row) => row.map(cell).join(',')).join('\r\n');
+	return toCsv(header, rows);
 }
 
 export interface PickMark {

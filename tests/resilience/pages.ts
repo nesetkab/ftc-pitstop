@@ -1,7 +1,15 @@
 import { isHttpError, isRedirect } from '@sveltejs/kit';
+import { afterEach, beforeEach, expect, vi } from 'vitest';
+import type { EventBundle } from '#lib/types.ts';
+import { ceiling } from '../timing.ts';
+import { fakeUpstreams, type Modes } from './upstream.ts';
 
 export const CODE = 'USAZGIQ';
 export const TEAM = 2844;
+export const EVENT_DAY = Date.parse('2026-11-14T20:00:00Z');
+export const PAGE_BUDGET_MS = 7_000;
+export const OUTAGE_BUDGET_MS = 9_000;
+export const NEEDS_SCOUT = new Set(['/leaderboards', '/records']);
 
 export interface Outcome {
 	page: string;
@@ -169,4 +177,51 @@ export function find(outcomes: Outcome[], page: string): Outcome {
 	const found = outcomes.find((outcome) => outcome.page === page);
 	if (!found) throw new Error(`no outcome for ${page}`);
 	return found;
+}
+
+export function onEventDay() {
+	beforeEach(() => {
+		vi.resetModules();
+		vi.useFakeTimers({ toFake: ['Date'] });
+		vi.setSystemTime(EVENT_DAY);
+		vi.spyOn(console, 'warn').mockImplementation(() => {});
+		vi.spyOn(console, 'error').mockImplementation(() => {});
+	});
+
+	afterEach(() => {
+		vi.useRealTimers();
+		vi.unstubAllGlobals();
+		vi.restoreAllMocks();
+	});
+}
+
+export async function visit(modes: Partial<Modes>) {
+	const upstreams = fakeUpstreams(modes);
+	vi.stubGlobal('fetch', upstreams.fetch);
+	const pages = await importPages();
+	return { upstreams, pages, outcomes: await visitAll(pages) };
+}
+
+export function bundleOf(outcome: Outcome): EventBundle {
+	const data = outcome.data as { bundle?: EventBundle } & EventBundle;
+	return data.bundle ?? data;
+}
+
+export function sharedMaxAge(cacheControl: string | null): number {
+	return Number(/s-maxage=(\d+)/.exec(cacheControl ?? '')?.[1] ?? 0);
+}
+
+export function expectGraceful(outcomes: Outcome[], budgetMs: number) {
+	const limit = ceiling(budgetMs);
+	for (const outcome of outcomes) {
+		expect(outcome.status, `${outcome.page}: ${outcome.message}`).not.toBe(500);
+		expect([200, 503], outcome.page).toContain(outcome.status);
+		expect(outcome.ms, outcome.page).toBeLessThan(limit);
+	}
+}
+
+export function expectAllOk(outcomes: Outcome[]) {
+	for (const outcome of outcomes) {
+		expect(outcome.status, `${outcome.page}: ${outcome.message}`).toBe(200);
+	}
 }

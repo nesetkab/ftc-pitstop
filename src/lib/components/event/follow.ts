@@ -28,17 +28,6 @@ export function writeFollowed(teams: number[]): number[] {
 	return list;
 }
 
-export function isFollowed(team: number): boolean {
-	return readFollowed().includes(team);
-}
-
-export function toggleFollowed(team: number): number[] {
-	const list = readFollowed();
-	return writeFollowed(
-		list.includes(team) ? list.filter((other) => other !== team) : [...list, team]
-	);
-}
-
 export function watchFollowed(callback: (teams: number[]) => void): () => void {
 	const update = () => callback(readFollowed());
 	const onStorage = (event: StorageEvent) => {

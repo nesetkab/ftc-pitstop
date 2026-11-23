@@ -1,7 +1,7 @@
 import * as z from 'zod';
 import { NEXUS_API_KEY } from '$app/env/private';
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { createBreaker, type Breaker } from '#lib/server/breaker.ts';
+import { createBreaker, isOutage, type Breaker } from '#lib/server/breaker.ts';
 import type { QueueMatch, QueueStatus, QueueStatusSnapshot } from '#lib/types.ts';
 
 export const NEXUS_API_ROOT = 'https://ftc.nexus/api/v1/';
@@ -129,10 +129,6 @@ export interface NexusClientOptions {
 	fetch?: typeof fetch;
 	timeoutMs?: number;
 	breaker?: Breaker;
-}
-
-function isOutage(status: number): boolean {
-	return status === 401 || status === 403 || status === 429 || status >= 500;
 }
 
 export function createNexusClient(options: NexusClientOptions = {}) {

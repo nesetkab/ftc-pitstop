@@ -34,6 +34,7 @@ export default defineConfig({
 				test: {
 					name: 'client',
 					environment: 'jsdom',
+					pool: 'vmThreads',
 					include: ['src/**/*.svelte.{test,spec}.{js,ts}'],
 					exclude: ['src/lib/server/**'],
 					setupFiles: ['./vitest-setup-client.ts']

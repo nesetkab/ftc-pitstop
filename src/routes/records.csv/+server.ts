@@ -4,9 +4,10 @@ import {
 	parseRecordFilters,
 	RECORDS_CSV_LIMIT
 } from '#lib/components/records/records.ts';
-import { localDay } from '#lib/components/team/dates.ts';
+import { localDate } from '#lib/format/calendar.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { csvResponse, toCsv } from '#lib/server/csv.ts';
+import { toCsv } from '#lib/format/csv.ts';
+import { csvResponse } from '#lib/server/csv.ts';
 import { CACHE_CONTROL, jsonResponse } from '#lib/server/http.ts';
 import { loadRecordDataset, recordNames } from '#lib/server/records.ts';
 import type { RequestHandler } from './$types';
@@ -43,7 +44,7 @@ export const GET: RequestHandler = async ({ url }) => {
 			503
 		);
 	}
-	const sorted = filterRecords(source.dataset.rows, filters, localDay(Date.now(), 'UTC'));
+	const sorted = filterRecords(source.dataset.rows, filters, localDate(Date.now(), 'UTC'));
 	const { rows } = pageRecords(sorted, filters.part, 1, RECORDS_CSV_LIMIT);
 	const names = await recordNames(
 		rows.flatMap((row) => row.teams),

@@ -1,4 +1,4 @@
-import { addDays } from '#lib/components/team/dates.ts';
+import { addDays } from '#lib/format/calendar.ts';
 import { matchDay, plausibleMatch } from '#lib/components/records/records.ts';
 import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
 import type { AllianceColor, SeasonMatch } from '#lib/types.ts';

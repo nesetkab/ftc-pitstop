@@ -1,4 +1,4 @@
-import { addDays, isValidTimeZone, timeZoneOffset } from '#lib/server/time.ts';
+import { addDays, isValidTimeZone, timeZoneOffset } from '#lib/format/calendar.ts';
 
 export type IcsTime = { date: string } | { at: number; timeZone: string };
 

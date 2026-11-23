@@ -1,3 +1,4 @@
+import { localDate } from '#lib/format/calendar.ts';
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';
 
@@ -8,32 +9,9 @@ export interface EventPick {
 	reason: EventPickReason;
 }
 
-const formatters = new Map<string, Intl.DateTimeFormat>();
-
-function formatter(timeZone: string): Intl.DateTimeFormat {
-	let format = formatters.get(timeZone);
-	if (!format) {
-		const options = { year: 'numeric', month: '2-digit', day: '2-digit' } as const;
-		try {
-			format = new Intl.DateTimeFormat('en-US', { ...options, timeZone });
-		} catch {
-			format = new Intl.DateTimeFormat('en-US', { ...options, timeZone: 'UTC' });
-		}
-		formatters.set(timeZone, format);
-	}
-	return format;
-}
-
-export function localDay(instant: number, timeZone: string): string {
-	const parts = formatter(timeZone).formatToParts(new Date(instant));
-	const part = (type: Intl.DateTimeFormatPartTypes) =>
-		parts.find((item) => item.type === type)?.value ?? '';
-	return `${part('year')}-${part('month')}-${part('day')}`;
-}
-
 export function pickEvent(events: EventSummary[], now: number): EventPick | null {
 	const competitions = events.filter((event) => isCompetition(event.type));
-	const today = (event: EventSummary) => localDay(now, event.timezone);
+	const today = (event: EventSummary) => localDate(now, event.timezone);
 	const live = competitions
 		.filter((event) => event.start <= today(event) && today(event) <= event.end)
 		.sort((a, b) => b.start.localeCompare(a.start));

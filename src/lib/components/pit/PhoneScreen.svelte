@@ -29,7 +29,8 @@
 	import type { Permission } from './notify.svelte.ts';
 	import type { Connection } from './poll.ts';
 	import type { QueueCall } from './queue.ts';
-	import { sideOf, type PitView } from './view.ts';
+	import { sideOf } from '#lib/components/event/matches.ts';
+	import type { PitView } from './view.ts';
 
 	interface Props {
 		view: PitView;

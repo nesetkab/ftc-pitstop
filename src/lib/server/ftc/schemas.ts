@@ -246,13 +246,11 @@ export const ftcAdvancementResponse = z.object({
 });
 
 export type FtcEvent = z.output<typeof ftcEvent>;
-export type FtcEventsResponse = z.output<typeof ftcEventsResponse>;
 export type FtcTeam = z.output<typeof ftcTeam>;
 export type FtcTeamsResponse = z.output<typeof ftcTeamsResponse>;
 export type FtcRankingsResponse = z.output<typeof ftcRankingsResponse>;
 export type FtcScheduleMatch = z.output<typeof ftcScheduleMatch>;
 export type FtcScheduleResponse = z.output<typeof ftcScheduleResponse>;
-export type FtcMatchesResponse = z.output<typeof ftcMatchesResponse>;
 export type FtcAllianceScore = z.output<typeof ftcAllianceScore>;
 export type FtcMatchScore = z.output<typeof ftcMatchScore>;
 export type FtcScoresResponse = z.output<typeof ftcScoresResponse>;

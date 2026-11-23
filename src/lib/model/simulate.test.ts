@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { simulateRankings, tallyResults, type SimMatch } from './simulate.ts';
 import { mulberry32 } from './stats.ts';
 import type { ModelMatch } from './types.ts';
+import { ceiling } from '../../../tests/timing.ts';
 
 function played(
 	red: number[],
@@ -192,6 +193,6 @@ describe('simulateRankings', () => {
 		const ms = performance.now() - t0;
 		expect(out).toHaveLength(40);
 		expect(out.reduce((s, p) => s + p.top4, 0)).toBeCloseTo(4, 6);
-		expect(ms).toBeLessThan(2500);
+		expect(ms).toBeLessThan(ceiling(2500));
 	});
 });

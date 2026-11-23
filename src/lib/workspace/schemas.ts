@@ -173,11 +173,8 @@ export type PickList = z.output<typeof pickListSchema>;
 export type Battery = z.output<typeof batterySchema>;
 export type Batteries = z.output<typeof batteriesSchema>;
 export type CheckItem = z.output<typeof checkItemSchema>;
-export type CheckHistory = z.output<typeof checkHistorySchema>;
 export type Checklist = z.output<typeof checklistSchema>;
 export type Shape = z.output<typeof shapeSchema>;
-export type PenShape = Extract<Shape, { kind: 'pen' }>;
-export type ArrowShape = Extract<Shape, { kind: 'arrow' }>;
 export type RobotShape = Extract<Shape, { kind: 'robot' }>;
 export type TextShape = Extract<Shape, { kind: 'text' }>;
 export type Plan = z.output<typeof planSchema>;
@@ -237,13 +234,6 @@ export const sharePayloadSchema = z.discriminatedUnion('tool', [
 ]);
 
 export type SharePayload = z.output<typeof sharePayloadSchema>;
-
-export const TOOL_DOC: Record<ShareTool, DocName> = {
-	picklist: 'picklist',
-	batteries: 'batteries',
-	checklist: 'checklist',
-	board: 'boards'
-};
 
 export function emptyDoc<K extends DocName>(name: K): DocMap[K] {
 	return DOC_SCHEMAS[name].parse({}) as DocMap[K];

@@ -1,7 +1,13 @@
 import { eventStatus } from '#lib/components/event/dates.ts';
 import { typeNoun } from '#lib/components/event/event-meta.ts';
-import { titleOf } from '#lib/components/event/matches.ts';
-import { addDays, localDay } from '#lib/components/team/dates.ts';
+import {
+	opposite,
+	scheduleTimes,
+	sideOf,
+	teamNumbers,
+	titleOf
+} from '#lib/components/event/matches.ts';
+import { addDays, localDate } from '#lib/format/calendar.ts';
 import { ordinal } from '#lib/format/ordinal.ts';
 import { dateRange, time } from '#lib/format/time.ts';
 import { placeName } from '#lib/format/places.ts';
@@ -34,14 +40,6 @@ export interface MatchTime {
 
 type Place = Pick<Event, 'venue' | 'city' | 'state' | 'country'> & { address?: string | null };
 
-function timed(matches: Match[]) {
-	return matches.map((match) => ({
-		key: match.key,
-		scheduled: match.scheduledTime,
-		actual: match.actualTime ?? (match.result ? (match.postedTime ?? match.scheduledTime) : null)
-	}));
-}
-
 function byLevel(matches: Match[]): [Match[], ScheduleOptions][] {
 	const quals = matches.filter((m) => m.level === 'qual').sort((a, b) => a.number - b.number);
 	const playoffs = matches
@@ -63,7 +61,7 @@ export function matchTimes(bundle: EventBundle, now: number): Map<string, MatchT
 	const live = bundle.phase !== 'done' && eventStatus(bundle.event, now) === 'live';
 	for (const [list, options] of byLevel(bundle.matches)) {
 		if (list.length === 0) continue;
-		const rows = timed(list);
+		const rows = scheduleTimes(list);
 		const estimates = live ? estimateStarts(rows, { ...options, now }) : null;
 		list.forEach((match, index) => {
 			const played = rows[index].actual !== null;
@@ -95,16 +93,6 @@ function teamName(names: Map<number, Team>, number: number): string {
 function joined(items: string[]): string {
 	if (items.length <= 1) return items.join('');
 	return `${items.slice(0, -1).join(', ')} and ${items.at(-1)}`;
-}
-
-function sideOf(match: Match, team: number): AllianceColor | null {
-	if (match.red.some((entry) => entry.team === team)) return 'red';
-	if (match.blue.some((entry) => entry.team === team)) return 'blue';
-	return null;
-}
-
-function numbers(match: Match, color: AllianceColor): number[] {
-	return match[color].map((entry) => entry.team);
 }
 
 function clockText(instant: number, timeZone: string): string {
@@ -146,8 +134,8 @@ function eventSpan(
 	if (event.start === event.end && times.length > 0) {
 		const first = Math.min(...times.map((at) => at.start));
 		const last = Math.max(...times.map(matchEnd));
-		const sameDay = localDay(first, event.timezone) === event.start;
-		if (sameDay && localDay(last, event.timezone) === event.start) {
+		const sameDay = localDate(first, event.timezone) === event.start;
+		if (sameDay && localDate(last, event.timezone) === event.start) {
 			return zonedRange(first, last, event.timezone);
 		}
 	}
@@ -198,8 +186,8 @@ export function eventCalendar(bundle: EventBundle, origin: string, now: number):
 	const matches: IcsEvent[] = bundle.matches.flatMap((match) => {
 		const at = times.get(match.key);
 		if (!at) return [];
-		const red = numbers(match, 'red');
-		const blue = numbers(match, 'blue');
+		const red = teamNumbers(match, 'red');
+		const blue = teamNumbers(match, 'blue');
 		const score = match.result ? ` (${match.result.red.total}–${match.result.blue.total})` : '';
 		const url = `${origin}/events/${event.code}/matches/${match.key}`;
 		return [
@@ -236,7 +224,7 @@ export function eventCalendar(bundle: EventBundle, origin: string, now: number):
 function outcomeText(match: Match, side: AllianceColor): string | null {
 	const result = match.result;
 	if (!result) return null;
-	const other = side === 'red' ? 'blue' : 'red';
+	const other = opposite(side);
 	const own = result[side].total;
 	const theirs = result[other].total;
 	if (result.winner === null) return `tied ${own}–${theirs}`;
@@ -254,9 +242,9 @@ function teamMatch(
 	if (!side) return null;
 	const { event } = bundle;
 	const names = new Map(bundle.teams.map((entry) => [entry.number, entry]));
-	const other = side === 'red' ? 'blue' : 'red';
-	const partners = numbers(match, side).filter((number) => number !== team);
-	const opponents = numbers(match, other);
+	const other = opposite(side);
+	const partners = teamNumbers(match, side).filter((number) => number !== team);
+	const opponents = teamNumbers(match, other);
 	const outcome = outcomeText(match, side);
 	const withText = partners.length > 0 ? ` with ${partners.join(', ')}` : '';
 	const summary = outcome
@@ -284,7 +272,7 @@ function teamMatch(
 }
 
 export function scheduleLikely(event: Pick<EventSummary, 'start' | 'timezone'>, now: number) {
-	return addDays(event.start, -SCHEDULE_LEAD_DAYS) <= localDay(now, event.timezone);
+	return addDays(event.start, -SCHEDULE_LEAD_DAYS) <= localDate(now, event.timezone);
 }
 
 function standing(entry: TeamSeason['events'][number]): string[] {

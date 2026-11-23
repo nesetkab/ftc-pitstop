@@ -1,3 +1,4 @@
+import { search } from '#lib/format/url.ts';
 import { DOC_NAMES, REV_PATTERN, type DocName } from '#lib/workspace/schemas.ts';
 import type { LoadOptions, Versions } from '#lib/workspace/types.ts';
 
@@ -14,8 +15,7 @@ export function encodeLoadOptions(options: LoadOptions): string {
 	if (options.docs) params.set('docs', options.docs.join(','));
 	if (options.rev) params.set('rev', options.rev);
 	if (options.key) params.set('key', options.key);
-	const query = params.toString();
-	return query ? `?${query}` : '';
+	return search(params);
 }
 
 export function parseLoadOptions(params: URLSearchParams): LoadOptions {

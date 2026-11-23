@@ -43,7 +43,7 @@ import {
 } from '#lib/server/ftcscout.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import { nexus as defaultNexus, type NexusClient } from '#lib/server/nexus.ts';
-import { addDays, localDate, startOfLocalDay } from '#lib/server/time.ts';
+import { addDays, localDate, startOfLocalDay } from '#lib/format/calendar.ts';
 import type {
 	Award,
 	Event,

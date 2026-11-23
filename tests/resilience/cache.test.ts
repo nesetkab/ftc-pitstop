@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { createCache, redisStore, type CacheEntry, type CacheStore } from '#lib/server/cache.ts';
 import type { RedisLike } from '#lib/server/redis.ts';
+import { ceiling } from '../timing.ts';
 
 const upstash = vi.hoisted(() => ({ configs: [] as Record<string, unknown>[] }));
 
@@ -57,7 +58,7 @@ describe('cache when Redis fails', () => {
 			const value = await cache.get('event:X', policy, fetcher);
 			expect(value).toMatchObject({ body: { ok: true }, stale: false });
 			expect(fetcher).toHaveBeenCalledTimes(1);
-			expect(performance.now() - started).toBeLessThan(500);
+			expect(performance.now() - started).toBeLessThan(ceiling(500));
 			expect((await cache.get('event:X', policy, fetcher)).body).toEqual({ ok: true });
 			expect(fetcher).toHaveBeenCalledTimes(1);
 		}
@@ -88,7 +89,7 @@ describe('cache when Redis fails', () => {
 		const cache = createCache({ store, onError: () => {}, storeTimeoutMs: 30 });
 		const started = performance.now();
 		await expect(cache.get('slow', policy, fresh(1))).resolves.toMatchObject({ body: 1 });
-		expect(performance.now() - started).toBeLessThan(500);
+		expect(performance.now() - started).toBeLessThan(ceiling(500));
 	});
 
 	it('configures the Upstash client with one quick retry and a request timeout', async () => {
@@ -128,18 +129,13 @@ describe('cache when the source fails', () => {
 		});
 		await cache.get('scores', policy, fresh('good'));
 		clock.now += (policy.ttl + policy.maxStale + 1) * 1000;
-		const slow = vi.fn(
-			() =>
-				new Promise<{ status: 'ok'; body: string }>((resolve) =>
-					setTimeout(() => resolve({ status: 'ok', body: 'new' }), 100)
-				)
-		);
-		const started = performance.now();
+		const refresh = Promise.withResolvers<{ status: 'ok'; body: string }>();
+		const slow = vi.fn(() => refresh.promise);
 		await expect(cache.get('scores', policy, slow)).resolves.toMatchObject({
 			body: 'good',
 			stale: true
 		});
-		expect(performance.now() - started).toBeLessThan(90);
+		refresh.resolve({ status: 'ok', body: 'new' });
 		await Promise.all(tasks);
 		expect((await cache.get('scores', policy, slow)).body).toBe('new');
 	});

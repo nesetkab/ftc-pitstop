@@ -10,7 +10,8 @@ import {
 	visibleColumns
 } from '#lib/components/event/ranking-columns.ts';
 import { loadEventAnalysisEntry } from '#lib/server/analysis.ts';
-import { csvResponse, round, toCsv } from '#lib/server/csv.ts';
+import { round, toCsv } from '#lib/format/csv.ts';
+import { csvResponse } from '#lib/server/csv.ts';
 import { loadEventBundle } from '#lib/server/event.ts';
 import { CACHE_CONTROL, errorResponse, shortestCache } from '#lib/server/http.ts';
 import type { RequestHandler } from './$types';

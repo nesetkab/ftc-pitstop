@@ -23,7 +23,7 @@ import {
 	matchKey,
 	schoolFromFullName
 } from '#lib/server/ftc/mappers.ts';
-import { isValidTimeZone } from '#lib/server/time.ts';
+import { isValidTimeZone } from '#lib/format/calendar.ts';
 import type { Match } from '#lib/types.ts';
 import { FIXTURE_EVENTS, fixture } from './helpers.ts';
 

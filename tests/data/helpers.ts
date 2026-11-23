@@ -116,5 +116,3 @@ export function scoutSeasonList(...codes: string[]) {
 		}
 	};
 }
-
-export const instant = (iso: string) => Date.parse(iso);

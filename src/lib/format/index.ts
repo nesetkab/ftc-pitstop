@@ -4,26 +4,20 @@ export { record } from './record.ts';
 export { ordinal } from './ordinal.ts';
 export { httpUrl } from './url.ts';
 export {
-	toDate,
 	time,
 	timeWithSeconds,
 	longDate,
 	shortDate,
 	shortRange,
 	relativeDay,
-	dateRange,
-	dayTime,
-	type DateInput
+	dateRange
 } from './time.ts';
-export { relative, secondsBetween } from './relative.ts';
+export { relative } from './relative.ts';
 export {
 	matchLabel,
 	matchKey,
 	matchTitle,
 	parseMatchKey,
 	parseMatchDescription,
-	shortMatchLabel,
-	type MatchRef,
-	type ParsedMatch,
-	type Bracket
+	shortMatchLabel
 } from './match.ts';

@@ -2,8 +2,6 @@ import type { Sums, TeamState } from '#lib/model/opr.ts';
 import type { SwarmState } from '#lib/model/rp.ts';
 import type { EventType } from '#lib/types.ts';
 
-export type Alliance = 'red' | 'blue';
-
 export type RatingParts = {
 	auto: number;
 	hive: number;

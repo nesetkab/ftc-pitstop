@@ -3,7 +3,7 @@ import { SEASON } from '#lib/game/biobuzz.ts';
 import { EVENT_TYPE_NAMES, eventTypeFromName } from '#lib/game/event-types.ts';
 import { httpUrl } from '#lib/format/url.ts';
 import { createBreaker, type Breaker } from '#lib/server/breaker.ts';
-import { isValidTimeZone } from '#lib/server/time.ts';
+import { isValidTimeZone } from '#lib/format/calendar.ts';
 import type {
 	AllianceColor,
 	AllianceScore,
