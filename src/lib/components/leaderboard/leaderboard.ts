@@ -9,7 +9,7 @@ import { shortDate } from '#lib/format/time.ts';
 import { EVENT_TYPE_NAMES, isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary, EventType, SearchTeam } from '#lib/types.ts';
 import { regionName, stateName } from '#lib/format/places.ts';
-import { ratedTeams } from './team-view.ts';
+import { ratedTeams } from '#lib/components/team/team-view.ts';
 
 export const PAGE_SIZE = 50;
 

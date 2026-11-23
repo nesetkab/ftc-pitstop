@@ -3,7 +3,7 @@
 	import FollowedTeams from '#lib/components/home/FollowedTeams.svelte';
 	import Highlights from '#lib/components/home/Highlights.svelte';
 	import TodayEvents from '#lib/components/home/TodayEvents.svelte';
-	import EventTable from '#lib/components/team/EventTable.svelte';
+	import EventTable from '#lib/components/home/EventTable.svelte';
 	import PitDisplayLink from '#lib/components/team/PitDisplayLink.svelte';
 	import { SEASON_NAME, SITE_NAME } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';

@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { localDay } from '#lib/components/team/dates.ts';
+import { localDate } from '#lib/format/calendar.ts';
 import { upcomingEntries } from '#lib/components/team/season-report.ts';
 import { buildTeamPage } from '#lib/components/team/team-view.ts';
 import { loadEventAnalysis, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
@@ -42,7 +42,7 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 
 	const now = Date.now();
 	const started = season.events.filter(
-		(entry) => entry.stats !== null && localDay(now, entry.event.timezone) >= entry.event.start
+		(entry) => entry.stats !== null && localDate(now, entry.event.timezone) >= entry.event.start
 	);
 
 	const startedCodes = new Set(started.map((entry) => entry.event.code));

@@ -4,12 +4,12 @@ import {
 	type EventLeader,
 	type EventProgress,
 	type TodayState
-} from '#lib/components/home/today.ts';
+} from './today.ts';
 import { placeName } from '#lib/format/places.ts';
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';
 import { shortRange } from '#lib/format/time.ts';
-import { addDays, daysBetween, localDay } from './dates.ts';
+import { addDays, daysBetween, localDate } from '#lib/format/calendar.ts';
 
 export interface HomeEvent {
 	code: string;
@@ -50,7 +50,7 @@ function byName(a: EventSummary, b: EventSummary): number {
 
 function todayRow(event: EventSummary, progress: EventProgress | null, now: number): TodayEvent {
 	const length = daysBetween(event.start, event.end) + 1;
-	const day = daysBetween(event.start, localDay(now, event.timezone)) + 1;
+	const day = daysBetween(event.start, localDate(now, event.timezone)) + 1;
 	const status = progress?.label ?? (event.hasMatches ? 'Matches posted' : 'Not started');
 	return {
 		...row(event, length > 1 ? `Day ${day} of ${length}` : 'Today', status),
@@ -61,7 +61,7 @@ function todayRow(event: EventSummary, progress: EventProgress | null, now: numb
 }
 
 function weekRow(event: EventSummary, now: number): HomeEvent {
-	const until = daysBetween(localDay(now, event.timezone), event.start);
+	const until = daysBetween(localDate(now, event.timezone), event.start);
 	return row(
 		event,
 		shortRange(event.start, event.end),
@@ -91,7 +91,7 @@ export function buildHomeEvents(
 		? input.season
 				.filter((event) => {
 					if (!isCompetition(event.type)) return false;
-					const day = localDay(now, event.timezone);
+					const day = localDate(now, event.timezone);
 					return event.start > day && event.start <= addDays(day, WEEK_DAYS);
 				})
 				.sort((a, b) => a.start.localeCompare(b.start) || byName(a, b))

@@ -7,7 +7,9 @@
 
 	const workspace = getWorkspace();
 	const list = $derived(workspace.docs.picklist);
-	const feed = new SelectionFeed(() => list.event);
+	const feed = new SelectionFeed(() => list.event, {
+		teams: () => list.entries.map((entry) => entry.team)
+	});
 </script>
 
 <svelte:head>

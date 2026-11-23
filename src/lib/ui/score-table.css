@@ -1,0 +1,91 @@
+.score-table {
+	border: 1px solid var(--line);
+	border-radius: var(--radius-panel);
+	overflow: hidden;
+}
+
+:where(.score-table) table {
+	width: 100%;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+:where(.score-table) col.alliance {
+	width: 98px;
+}
+
+:where(.score-table) col.num {
+	width: 102px;
+}
+
+:where(.score-table) th {
+	padding: 8px 6px;
+	background: var(--surface);
+	color: var(--text-3);
+	font-size: 12.5px;
+	font-weight: 500;
+	text-align: left;
+}
+
+:where(.score-table) td {
+	padding: 12px 6px;
+	border-top: 1px solid var(--line);
+	vertical-align: middle;
+}
+
+:where(.score-table) :is(th, td):first-child {
+	padding-left: 16px;
+}
+
+:where(.score-table) :is(th, td):last-child {
+	padding-right: 16px;
+}
+
+:where(.score-table) .right {
+	text-align: right;
+}
+
+:where(.score-table) .teams {
+	display: flex;
+	font-size: 14px;
+}
+
+:where(.score-table) .team b {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+:where(.score-table) .name {
+	color: var(--text-2);
+}
+
+:where(.score-table) .v {
+	text-align: right;
+	font-size: 22px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+}
+
+:where(.score-table) .v.lean {
+	font-weight: 500;
+	color: var(--text-2);
+}
+
+@media (max-width: 760px) {
+	:where(.score-table) col.alliance {
+		width: 64px;
+	}
+
+	:where(.score-table) :is(th, td) {
+		padding-inline: 4px;
+	}
+
+	:where(.score-table) :is(th, td):first-child {
+		padding-left: 12px;
+	}
+
+	:where(.score-table) :is(th, td):last-child {
+		padding-right: 12px;
+	}
+}

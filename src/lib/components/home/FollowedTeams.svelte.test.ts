@@ -2,7 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { match, ranking } from '#lib/components/team/fixtures.ts';
-import { FOLLOW_KEY, follows } from '#lib/components/team/follow.svelte.ts';
+import { FOLLOW_KEY, follows } from '#lib/components/follow/follow.svelte.ts';
 import type { FollowedTeam } from './followed.ts';
 import FollowedTeams from './FollowedTeams.svelte';
 

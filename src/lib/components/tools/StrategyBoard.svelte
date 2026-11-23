@@ -72,7 +72,7 @@
 		ink: 'Black',
 		red: 'Red',
 		blue: 'Blue',
-		accent: 'Yellow'
+		green: 'Green'
 	};
 
 	const ERASE_RADIUS = 7;
@@ -671,8 +671,8 @@
 		color: var(--blue);
 	}
 
-	.swatch.accent {
-		color: var(--accent);
+	.swatch.green {
+		color: var(--ok);
 	}
 
 	.canvas {

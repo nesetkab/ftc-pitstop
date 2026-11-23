@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '#lib/ui/Button.svelte';
-	import { follows, syncFollows, toggleFollow } from './follow.svelte.ts';
+	import { follows, syncFollows, toggleFollow } from '#lib/components/follow/follow.svelte.ts';
 
 	interface Props {
 		number: number;

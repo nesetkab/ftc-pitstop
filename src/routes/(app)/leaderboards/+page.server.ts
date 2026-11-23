@@ -6,7 +6,7 @@ import {
 	parseFilters,
 	teamPage,
 	type LeaderboardFilters
-} from '#lib/components/team/leaderboard.ts';
+} from '#lib/components/leaderboard/leaderboard.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
 import { loadLeaderboardSource } from './source.server.ts';

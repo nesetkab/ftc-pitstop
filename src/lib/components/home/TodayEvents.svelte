@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TodayEvent } from '#lib/components/team/home.ts';
+	import type { TodayEvent } from './home.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import Table from '#lib/ui/Table.svelte';
 

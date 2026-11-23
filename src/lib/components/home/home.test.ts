@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { eventSummary } from './fixtures.ts';
+import { eventSummary } from '#lib/components/team/fixtures.ts';
 import { buildHomeEvents } from './home.ts';
 
 const NOW = Date.parse('2026-11-14T20:00:00Z');

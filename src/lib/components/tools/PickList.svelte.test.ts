@@ -411,6 +411,18 @@ describe('stats and export', () => {
 		expect(rows[1]).not.toHaveTextContent('OPR');
 	});
 
+	it('uses season OPR for teams away from the event and explains a missing one', () => {
+		setup(list(1, 2), {
+			stats: new Map([
+				[1, { opr: 30, rank: null, season: true }],
+				[2, { opr: null, rank: null, season: true }]
+			])
+		});
+		const rows = screen.getAllByRole('listitem');
+		expect(rows[0]).toHaveTextContent('Season OPR 30.0');
+		expect(rows[1]).toHaveTextContent('Not at this event, no season OPR yet');
+	});
+
 	it('copies the list as text', async () => {
 		const writeText = vi.fn(async () => undefined);
 		Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });

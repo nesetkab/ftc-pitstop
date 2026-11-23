@@ -70,6 +70,29 @@ describe('Term', () => {
 		expect(tip).toHaveAttribute('hidden');
 	});
 
+	it('shows the tooltip on the first tap of a linked term and follows the link on the next', async () => {
+		render(Term, { props: { label: 'RS' } });
+		const link = screen.getByRole('link', { name: 'RS' });
+		const tip = tipFor(link);
+
+		await fireEvent.pointerDown(link, { pointerType: 'touch' });
+		expect(await fireEvent.click(link)).toBe(false);
+		expect(tip).not.toHaveAttribute('hidden');
+
+		await fireEvent.pointerDown(link, { pointerType: 'touch' });
+		expect(await fireEvent.click(link)).toBe(true);
+	});
+
+	it('follows a linked term straight away on mouse click or keyboard', async () => {
+		render(Term, { props: { label: 'RS' } });
+		const link = screen.getByRole('link', { name: 'RS' });
+
+		await fireEvent.pointerDown(link, { pointerType: 'mouse' });
+		expect(await fireEvent.click(link)).toBe(true);
+		await fireEvent.keyDown(document, { key: 'Escape' });
+		expect(await fireEvent.click(link)).toBe(true);
+	});
+
 	it('removes its tooltip when it goes away', () => {
 		const { unmount } = render(Term, { props: { label: 'OPR' } });
 		expect(document.querySelectorAll('.term-tip')).toHaveLength(1);

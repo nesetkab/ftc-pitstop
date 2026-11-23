@@ -14,7 +14,7 @@ import { regionName } from '#lib/format/places.ts';
 import { shortRange } from '#lib/format/time.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import type { AllianceColor, EventBundle, Match, TeamSeason } from '#lib/types.ts';
-import { localDay } from './dates.ts';
+import { localDate } from '#lib/format/calendar.ts';
 
 export type SeasonBundle = Pick<EventBundle, 'matches'> &
 	Partial<Pick<EventBundle, 'teams' | 'advancement' | 'phase'>>;
@@ -291,7 +291,7 @@ export function upcomingEvents(
 	const mine = pool.find((rating) => rating.team === team) ?? null;
 	return upcomingEntries(season, now).map(({ event }) => {
 		const bundle = bundles[event.code] ?? null;
-		const live = localDay(now, event.timezone) >= event.start;
+		const live = localDate(now, event.timezone) >= event.start;
 		const field = new Set(bundle?.teams?.map((entry) => entry.number) ?? []);
 		for (const match of bundle?.matches ?? [])
 			for (const seat of [...match.red, ...match.blue]) field.add(seat.team);
@@ -333,7 +333,7 @@ export function upcomingEvents(
 
 export function upcomingEntries(season: TeamSeason, now: number): TeamSeason['events'] {
 	return season.events
-		.filter(({ event }) => localDay(now, event.timezone) <= event.end)
+		.filter(({ event }) => localDate(now, event.timezone) <= event.end)
 		.sort((a, b) => a.event.start.localeCompare(b.event.start))
 		.slice(0, MAX_UPCOMING);
 }

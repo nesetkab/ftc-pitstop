@@ -4,7 +4,7 @@
 	import { setEventView } from '#lib/components/event/context.ts';
 	import { eventStatus } from '#lib/components/event/dates.ts';
 	import { eventMeta } from '#lib/components/event/event-meta.ts';
-	import { watchFollowed } from '#lib/components/event/follow.ts';
+	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { shortRange } from '#lib/format/time.ts';
 	import { httpUrl } from '#lib/format/url.ts';
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
@@ -164,7 +164,7 @@
 		}
 	});
 
-	$effect(() => watchFollowed((teams) => (followed = new Set(teams))));
+	$effect(() => watchFollows((teams) => (followed = new Set(teams))));
 
 	$effect(() => {
 		if (!live || section === 'now') return;

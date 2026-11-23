@@ -9,7 +9,7 @@ import { GAME_NAME, PART_LABELS, SEASON } from '#lib/game/biobuzz.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import type { Award, EventBundle, QuickStat, QuickStats, TeamSeason } from '#lib/types.ts';
 import { awardName } from '#lib/components/event/awards.ts';
-import { localDay } from './dates.ts';
+import { localDate } from '#lib/format/calendar.ts';
 import { placeName } from '#lib/format/places.ts';
 import { teamMatches, type TeamMatchEvent } from './matches.ts';
 import { playoffSummary } from './playoffs.ts';
@@ -455,7 +455,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 
 	const events = season.events.map<TeamEventRow>((entry) => {
 		const { event } = entry;
-		const day = localDay(now, event.timezone);
+		const day = localDate(now, event.timezone);
 		const bundle = hasPlayoffs(event.type) ? bundles[event.code] : null;
 		let playoffs: string | null;
 		if (entry.stats) playoffs = bundle ? playoffSummary(bundle, number) : null;

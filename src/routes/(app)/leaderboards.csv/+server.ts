@@ -1,4 +1,8 @@
-import { filterRows, leaderboardScope, parseFilters } from '#lib/components/team/leaderboard.ts';
+import {
+	filterRows,
+	leaderboardScope,
+	parseFilters
+} from '#lib/components/leaderboard/leaderboard.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { round, toCsv } from '#lib/format/csv.ts';
 import { csvResponse } from '#lib/server/csv.ts';

@@ -8,6 +8,7 @@
 </script>
 
 <script lang="ts">
+	import './score-table.css';
 	import Term from './Term.svelte';
 	import { fixed } from '#lib/format/number.ts';
 	import { pct } from '#lib/format/pct.ts';
@@ -30,7 +31,7 @@
 	]);
 </script>
 
-<div class={['pred', { compact }]}>
+<div class={['score-table', 'pred', { compact }]}>
 	<table>
 		<caption class="visually-hidden">{caption}</caption>
 		<colgroup>
@@ -87,82 +88,9 @@
 </div>
 
 <style>
-	.pred {
-		border: 1px solid var(--line);
-		border-radius: var(--radius-panel);
-		overflow: hidden;
-	}
-
-	table {
-		width: 100%;
-		border-collapse: collapse;
-		table-layout: fixed;
-	}
-
-	col.alliance {
-		width: 98px;
-	}
-
-	col.num {
-		width: 102px;
-	}
-
-	th {
-		padding: 8px 6px;
-		background: var(--surface);
-		color: var(--text-3);
-		font-size: 12.5px;
-		font-weight: 500;
-		text-align: left;
-	}
-
-	td {
-		padding: 12px 6px;
-		border-top: 1px solid var(--line);
-		vertical-align: middle;
-	}
-
-	th:first-child,
-	td:first-child {
-		padding-left: 16px;
-	}
-
-	th:last-child,
-	td:last-child {
-		padding-right: 16px;
-	}
-
-	.right {
-		text-align: right;
-	}
-
 	.teams {
-		display: flex;
 		flex-wrap: wrap;
 		gap: 4px 14px;
-		font-size: 14px;
-	}
-
-	.team b {
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-	}
-
-	.name {
-		color: var(--text-2);
-	}
-
-	.v {
-		text-align: right;
-		font-size: 22px;
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-		white-space: nowrap;
-	}
-
-	.v.lean {
-		font-weight: 500;
-		color: var(--text-2);
 	}
 
 	.compact col.num {
@@ -197,10 +125,6 @@
 	}
 
 	@media (max-width: 760px) {
-		col.alliance {
-			width: 64px;
-		}
-
 		col.num {
 			width: 76px;
 		}
@@ -209,23 +133,8 @@
 			width: 60px;
 		}
 
-		th,
-		td {
-			padding-inline: 4px;
-		}
-
 		th {
 			white-space: nowrap;
-		}
-
-		th:first-child,
-		td:first-child {
-			padding-left: 12px;
-		}
-
-		th:last-child,
-		td:last-child {
-			padding-right: 12px;
 		}
 
 		td {

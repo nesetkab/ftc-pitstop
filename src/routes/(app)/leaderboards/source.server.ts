@@ -7,7 +7,7 @@ import {
 	type EventFilterOptions,
 	type LeaderboardDataset,
 	type LeaderboardScope
-} from '#lib/components/team/leaderboard.ts';
+} from '#lib/components/leaderboard/leaderboard.ts';
 import { ratedTeams } from '#lib/components/team/team-view.ts';
 import { loadSeasonEventRatingsWithin, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import { LruMap, settleWithin } from '#lib/server/cache.ts';
