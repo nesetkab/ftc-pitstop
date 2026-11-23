@@ -1,4 +1,5 @@
 import type { EventAnalysis, MatchForecast, TeamRating } from '#lib/analysis/types.ts';
+import { opposite } from '#lib/components/event/matches.ts';
 import { allianceCountFor } from '#lib/model/bracket.ts';
 import { simulateRankings, type SimMatch, type Tally } from '#lib/model/simulate.ts';
 import type { AllianceColor, Match, Ranking } from '#lib/types.ts';
@@ -102,7 +103,7 @@ export function matchStakes(input: StakeInput, sims = 2000): Stakes | null {
 		match[color]
 			.filter((entry) => !entry.surrogate)
 			.map((entry) => {
-				const other = color === 'red' ? 'blue' : 'red';
+				const other = opposite(color);
 				return {
 					team: entry.team,
 					color,

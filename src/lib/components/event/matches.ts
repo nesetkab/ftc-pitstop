@@ -48,6 +48,10 @@ export function sideOf(match: Match, team: number): AllianceColor | null {
 	return null;
 }
 
+export function opposite(color: AllianceColor): AllianceColor {
+	return color === 'red' ? 'blue' : 'red';
+}
+
 export function scheduleTimes(matches: Match[]) {
 	return matches.map((match) => ({
 		key: match.key,

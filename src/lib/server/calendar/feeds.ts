@@ -1,6 +1,12 @@
 import { eventStatus } from '#lib/components/event/dates.ts';
 import { typeNoun } from '#lib/components/event/event-meta.ts';
-import { scheduleTimes, sideOf, teamNumbers, titleOf } from '#lib/components/event/matches.ts';
+import {
+	opposite,
+	scheduleTimes,
+	sideOf,
+	teamNumbers,
+	titleOf
+} from '#lib/components/event/matches.ts';
 import { addDays, localDate } from '#lib/format/calendar.ts';
 import { ordinal } from '#lib/format/ordinal.ts';
 import { dateRange, time } from '#lib/format/time.ts';
@@ -218,7 +224,7 @@ export function eventCalendar(bundle: EventBundle, origin: string, now: number):
 function outcomeText(match: Match, side: AllianceColor): string | null {
 	const result = match.result;
 	if (!result) return null;
-	const other = side === 'red' ? 'blue' : 'red';
+	const other = opposite(side);
 	const own = result[side].total;
 	const theirs = result[other].total;
 	if (result.winner === null) return `tied ${own}–${theirs}`;
@@ -236,7 +242,7 @@ function teamMatch(
 	if (!side) return null;
 	const { event } = bundle;
 	const names = new Map(bundle.teams.map((entry) => [entry.number, entry]));
-	const other = side === 'red' ? 'blue' : 'red';
+	const other = opposite(side);
 	const partners = teamNumbers(match, side).filter((number) => number !== team);
 	const opponents = teamNumbers(match, other);
 	const outcome = outcomeText(match, side);

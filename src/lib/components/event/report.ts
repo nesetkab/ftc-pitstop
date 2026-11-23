@@ -1,4 +1,5 @@
 import type { EventAnalysis, RatingParts, SeasonRating, TeamRating } from '#lib/analysis/types.ts';
+import { opposite } from '#lib/components/event/matches.ts';
 import { fixed, integer } from '#lib/format/number.ts';
 import { ordinal } from '#lib/format/ordinal.ts';
 import { record } from '#lib/format/record.ts';
@@ -172,10 +173,6 @@ function partValue(key: ReportPart, opr: number, parts: RatingParts): number {
 	return parts[key];
 }
 
-function other(color: AllianceColor): AllianceColor {
-	return color === 'red' ? 'blue' : 'red';
-}
-
 function outcome(match: Match, color: AllianceColor): MatchOutcome {
 	const winner = match.result?.winner ?? null;
 	if (winner === color) return 'win';
@@ -199,10 +196,10 @@ function playedBy(matches: Match[]): Map<number, PlayedMatch[]> {
 					level: match.level,
 					alliance: color,
 					score: score.preFoulTotal,
-					opponentScore: result[other(color)].preFoulTotal,
+					opponentScore: result[opposite(color)].preFoulTotal,
 					result: outcome(match, color),
 					partners: match[color].map((t) => t.team).filter((t) => t !== entry.team),
-					opponents: match[other(color)].map((t) => t.team),
+					opponents: match[opposite(color)].map((t) => t.team),
 					surrogate: entry.surrogate,
 					dq: entry.dq,
 					rp: breakdown ? { ...breakdown.rp } : null
@@ -341,10 +338,10 @@ export function createReporter(input: ReportInput) {
 					time: timing?.expectedStart ?? match.scheduledTime,
 					alliance: color,
 					partners: match[color].map((t) => t.team).filter((t) => t !== team),
-					opponents: match[other(color)].map((t) => t.team),
+					opponents: match[opposite(color)].map((t) => t.team),
 					win: forecast ? forecast[color].win : null,
 					score: forecast ? forecast[color].score : null,
-					opponentScore: forecast ? forecast[other(color)].score : null
+					opponentScore: forecast ? forecast[opposite(color)].score : null
 				}
 			];
 		});

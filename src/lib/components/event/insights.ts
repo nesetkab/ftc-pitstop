@@ -1,3 +1,4 @@
+import { opposite } from '#lib/components/event/matches.ts';
 import type { RankedRecord, RecordRow } from '#lib/components/records/records.ts';
 import { localDate } from '#lib/format/calendar.ts';
 import { search } from '#lib/format/url.ts';
@@ -65,7 +66,7 @@ function dayOf(event: InsightEvent, match: Match): string {
 
 function side(event: InsightEvent, match: Match, alliance: AllianceColor): RecordRow | null {
 	const result = match.result;
-	const other: AllianceColor = alliance === 'red' ? 'blue' : 'red';
+	const other = opposite(alliance);
 	if (!result || match[alliance].length === 0 || match[other].length === 0) return null;
 	const own = result[alliance];
 	const parts = breakdownParts(own);

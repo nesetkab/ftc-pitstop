@@ -1,5 +1,5 @@
 import type { SeasonRating } from '#lib/analysis/types.ts';
-import { scheduleTimes, sideOf } from '#lib/components/event/matches.ts';
+import { opposite, scheduleTimes, sideOf } from '#lib/components/event/matches.ts';
 import { pickEvent, type EventPickReason } from '#lib/components/pit/resolve.ts';
 import { dayTime } from '#lib/format/time.ts';
 import { estimateStarts, PLAYOFF_SCHEDULE } from '#lib/model/schedule.ts';
@@ -162,7 +162,7 @@ function lastMatch(bundle: LiveBundle, team: number): LastMatch | null {
 	const last = played.at(-1);
 	if (!last?.result) return null;
 	const side = sideOf(last, team)!;
-	const other = side === 'red' ? 'blue' : 'red';
+	const other = opposite(side);
 	const winner = last.result.winner;
 	return {
 		key: last.key,
