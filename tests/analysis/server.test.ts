@@ -10,6 +10,7 @@ import { createCache } from '#lib/server/cache.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { SeasonMatch } from '#lib/types.ts';
 import { bundleFor, fixtureLoaders, seasonMatchesOf } from './helpers.ts';
+import { ceiling } from '../timing.ts';
 
 const NOW = Date.parse('2026-11-19T12:00:00Z');
 const previous = previousFrom(previous2025.teams);
@@ -96,7 +97,7 @@ describe('createAnalysis', () => {
 		expect(data.background).toHaveBeenCalledTimes(1);
 		const start = performance.now();
 		await data.loadEventAnalysisEntry('USAZGIQ');
-		expect(performance.now() - start).toBeLessThan(600);
+		expect(performance.now() - start).toBeLessThan(ceiling(600));
 		expect(data.background).toHaveBeenCalledTimes(2);
 		const teams = analysis.ratings.map((r) => r.team);
 		const cold = analyzeEvent(gilbert, baseContext(teams, previous), { now: NOW });

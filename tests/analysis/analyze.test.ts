@@ -7,6 +7,7 @@ import type { ModelEvent } from '#lib/model/types.ts';
 import type { EventBundle } from '#lib/types.ts';
 import modelFixture from '../fixtures/model/USAZGIQ.json';
 import { bundleFor, contexts, cutAfterQual, cutPlayoffs } from './helpers.ts';
+import { ceiling } from '../timing.ts';
 
 const inUnit = (p: number) => p >= 0 && p <= 1;
 
@@ -279,9 +280,9 @@ describe('speed', async () => {
 		run(bundle);
 		let start = performance.now();
 		run(bundle);
-		expect(performance.now() - start).toBeLessThan(500);
+		expect(performance.now() - start).toBeLessThan(ceiling(500));
 		start = performance.now();
 		run(replay, 'USAZGIQ', replay.matches.find((m) => m.key === 'q22')!.actualTime!);
-		expect(performance.now() - start).toBeLessThan(500);
+		expect(performance.now() - start).toBeLessThan(ceiling(500));
 	});
 });

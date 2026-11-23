@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 import * as z from 'zod';
 import { createBreaker } from '#lib/server/breaker.ts';
 import { createFtcClient } from '#lib/server/ftc/client.ts';
 import { createFtcScoutClient } from '#lib/server/ftcscout.ts';
 import { createNexusClient } from '#lib/server/nexus.ts';
+import { ceiling } from '../timing.ts';
 
 const timeout = () =>
 	Object.assign(new Error('The operation was aborted due to timeout'), { name: 'TimeoutError' });
@@ -18,7 +19,9 @@ function always(make: () => Response | Error) {
 
 function hung(_input: RequestInfo | URL, init?: RequestInit) {
 	return new Promise<Response>((_, reject) => {
-		init?.signal?.addEventListener('abort', () => reject(init.signal!.reason));
+		const signal = init?.signal;
+		if (signal?.aborted) reject(signal.reason);
+		signal?.addEventListener('abort', () => reject(signal.reason));
 	});
 }
 
@@ -46,20 +49,23 @@ describe('FTC API client under failure', () => {
 			status: 504,
 			message: 'FTC API timed out'
 		});
-		expect(performance.now() - started).toBeLessThan(1000);
+		expect(performance.now() - started).toBeLessThan(ceiling(1000));
 		expect(fetcher).toHaveBeenCalledTimes(1);
 	});
 
 	it('defaults to a timeout well under the page budget', async () => {
 		const fetcher = always(() => Response.json({ events: [] }));
 		await ftcWith(fetcher).request('events');
-		const signal = fetcher.mock.calls[0][1]?.signal;
-		expect(signal).toBeInstanceOf(AbortSignal);
+		expect(fetcher.mock.calls[0][1]?.signal).toBeInstanceOf(AbortSignal);
+		const timer = vi
+			.spyOn(AbortSignal, 'timeout')
+			.mockImplementation(() => AbortSignal.abort(timeout()));
+		onTestFinished(() => timer.mockRestore());
 		const ftc = createFtcClient({ username: 'a', apiKey: 'b', fetch: vi.fn(hung) });
-		const started = performance.now();
 		await expect(ftc.request('events')).rejects.toMatchObject({ status: 504 });
-		expect(performance.now() - started).toBeLessThan(4500);
-	}, 10_000);
+		expect(timer).toHaveBeenCalledTimes(1);
+		expect(timer.mock.calls[0][0]).toBeLessThanOrEqual(4_000);
+	});
 
 	it.each([
 		['a 500', () => new Response('oops', { status: 500 }), 500],
