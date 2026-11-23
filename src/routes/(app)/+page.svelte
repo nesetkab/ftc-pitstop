@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import FollowedTeams from '#lib/components/home/FollowedTeams.svelte';
 	import Highlights from '#lib/components/home/Highlights.svelte';
+	import Intro from '#lib/components/home/Intro.svelte';
 	import TodayEvents from '#lib/components/home/TodayEvents.svelte';
 	import EventTable from '#lib/components/home/EventTable.svelte';
 	import PitDisplayLink from '#lib/components/team/PitDisplayLink.svelte';
@@ -31,6 +32,8 @@
 
 <h1 class="visually-hidden">PitStop</h1>
 
+<Intro />
+
 <button
 	type="button"
 	class="search"
@@ -49,7 +52,9 @@
 	{#if data.today === null}
 		<EmptyState title="Today's events could not be loaded.">Try again in a moment.</EmptyState>
 	{:else if data.today.length === 0}
-		<EmptyState title="No events are running today." />
+		<EmptyState title="No events are running today.">
+			Events show here on the days they run, with live progress and the current leader.
+		</EmptyState>
 	{:else}
 		<TodayEvents rows={data.today} />
 	{/if}
@@ -64,7 +69,9 @@
 	{#if data.week === null}
 		<EmptyState title="This week's events could not be loaded.">Try again in a moment.</EmptyState>
 	{:else if data.week.length === 0}
-		<EmptyState title="No events start in the next 7 days." />
+		<EmptyState title="No events start in the next 7 days.">
+			Events show here a week before they start.
+		</EmptyState>
 	{:else}
 		<EventTable
 			rows={data.week}

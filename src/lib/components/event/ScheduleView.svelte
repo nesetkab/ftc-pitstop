@@ -74,7 +74,9 @@
 {#if sections.length === 0}
 	<EmptyState
 		title={chosen ? `${chosen.number} has no matches in the schedule.` : 'No matches yet.'}
-	/>
+	>
+		{chosen ? 'Pick another team, or All teams.' : 'Matches show here once the schedule is posted.'}
+	</EmptyState>
 {:else}
 	{#each sections as section (section.title)}
 		<div class="section">

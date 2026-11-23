@@ -10,6 +10,7 @@
 		type FollowedTeam,
 		type LiveBundle
 	} from './followed.ts';
+	import TeamFinder from './TeamFinder.svelte';
 
 	const REFRESH_MS = 60_000;
 	const STANDING_ORDER = { today: 0, next: 1, last: 2, none: 3 } as const;
@@ -111,9 +112,9 @@
 <section aria-labelledby="your-teams">
 	<h2 class="sec-title" id="your-teams">Your teams</h2>
 	{#if !ready || teams.length === 0}
-		<p class={['muted hint', { pending: !ready }]}>
-			Follow a team from its page and it will show up here.
-		</p>
+		<div class={{ pending: !ready }}>
+			<TeamFinder />
+		</div>
 	{:else}
 		<ul class="teams">
 			{#each ordered as team (team)}
@@ -232,12 +233,11 @@
 		gap: 10px;
 	}
 
-	.hint,
 	.more {
 		font-size: 14px;
 	}
 
-	.pending {
+	:global(:root[data-following]) .pending {
 		visibility: hidden;
 	}
 

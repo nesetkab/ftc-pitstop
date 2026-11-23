@@ -101,7 +101,9 @@
 
 {#if data.state === 'no-events'}
 	<main class="message">
-		<EmptyState title="{data.team} has no events this season." />
+		<EmptyState title="{data.team} has no events this season.">
+			Its next event shows here once the team is registered for one.
+		</EmptyState>
 	</main>
 {:else if data.state === 'unavailable'}
 	<main class="message">

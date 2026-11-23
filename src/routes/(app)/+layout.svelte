@@ -54,6 +54,7 @@
 			<p>Not affiliated with or endorsed by FIRST.</p>
 		</div>
 		<nav aria-label="Footer">
+			<a href="/w">Team workspace</a>
 			<a href="/advancement">Advancement</a>
 			<a href="/about">About the numbers</a>
 			<a href="/accuracy">Prediction accuracy</a>

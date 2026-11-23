@@ -362,6 +362,29 @@ describe('team page', () => {
 		);
 	});
 
+	it('points to the pit display when the team has an event this week', async () => {
+		const day = (offset: number) =>
+			new Date(Date.now() + offset * 86_400_000).toISOString().slice(0, 10);
+		const upcoming = (start: string, live: boolean) => ({
+			code: 'USAZNEXT',
+			name: 'Phoenix Qualifier',
+			start,
+			end: start,
+			live,
+			registered: null,
+			kind: 'none' as const,
+			outlook: ''
+		});
+		show(view({ upcoming: [upcoming(day(0), true)] }));
+		expect(await screen.findByText(/At Phoenix Qualifier today\?/)).toBeInTheDocument();
+		expect(screen.getByRole('link', { name: 'pit display' })).toHaveAttribute('href', '/26670/tv');
+		expect(screen.getByRole('link', { name: 'phone view' })).toHaveAttribute('href', '/26670');
+		cleanup();
+		show(view({ upcoming: [upcoming(day(30), false)] }));
+		await screen.findByRole('heading', { name: 'Coming up' });
+		expect(screen.queryByRole('link', { name: 'pit display' })).not.toBeInTheDocument();
+	});
+
 	it('lists partners and opponents from played matches', () => {
 		const played = { ...finalMatch(), result: null } as Match;
 		const score = (total: number) => ({

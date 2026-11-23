@@ -23,7 +23,9 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="This team has no events this season." />
+	<EmptyState title="This team has no events this season.">
+		Events show here as soon as the team is registered for one.
+	</EmptyState>
 {:else}
 	<Table>
 		<thead>
