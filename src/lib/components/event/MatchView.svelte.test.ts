@@ -51,6 +51,12 @@ describe('MatchView after the match', () => {
 			'/events/USAZGIQ/matches/q25'
 		);
 		expect(screen.getByRole('link', { name: 'Next match, Q27' })).toBeInTheDocument();
+		const red = q26.red.map((entry) => entry.team).join(',');
+		const blue = q26.blue.map((entry) => entry.team).join(',');
+		expect(screen.getByRole('link', { name: 'Simulate with different teams' })).toHaveAttribute(
+			'href',
+			`/simulate?red=${red}&blue=${blue}`
+		);
 	});
 
 	it('puts the prediction next to the result when analysis is present', () => {

@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
 	import { time } from '#lib/format/time.ts';
+	import { sidesFrom, simulateHref } from '#lib/components/simulate/simulate.ts';
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import type { EventBundle, Match } from '#lib/types.ts';
 	import Button from '#lib/ui/Button.svelte';
@@ -49,6 +50,10 @@
 		analysis && hasPlayoffs(bundle.event.type)
 			? matchStakes({ match, matches: bundle.matches, rankings: bundle.rankings, analysis })
 			: null
+	);
+
+	const simulate = $derived(
+		simulateHref(sidesFrom(teamNumbers(match, 'red'), teamNumbers(match, 'blue')))
 	);
 
 	function at(value: number) {
@@ -114,6 +119,7 @@
 		{:else}
 			<MatchScoreCard {match} teams={bundle.teams} {forecast} {followed} />
 		{/if}
+		<p class="simulate"><a href={simulate}>Simulate with different teams</a></p>
 
 		{#if match.result && (ranks || oprShifts)}
 			<div class="panel">
@@ -183,6 +189,11 @@
 
 	.panel.wide {
 		gap: 22px;
+	}
+
+	.simulate {
+		margin-top: -12px;
+		font-size: 14px;
 	}
 
 	@media (max-width: 1120px) {

@@ -21,6 +21,7 @@
 	import AllianceTable from './AllianceTable.svelte';
 	import AvailableTeams from './AvailableTeams.svelte';
 	import PlayoffOdds from './PlayoffOdds.svelte';
+	import SimulateAlliances from './SimulateAlliances.svelte';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -177,6 +178,12 @@
 					<h3 class="sec-title">Alliances</h3>
 					<AllianceTable {selection} {me} />
 				</div>
+				{#if selection.alliances.length >= 2}
+					<div class="panel">
+						<h3 class="sec-title">Simulate a playoff match</h3>
+						<SimulateAlliances alliances={selection.alliances} />
+					</div>
+				{/if}
 				{#if analysis?.playoffs && analysis.playoffs.length > 0 && bundle.phase !== 'done'}
 					<div class="panel">
 						<h3 class="sec-title">Chance to win the event</h3>

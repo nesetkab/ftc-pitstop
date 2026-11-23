@@ -1,12 +1,18 @@
 import { error } from '@sveltejs/kit';
 import { filterRecords, pageRecords, parseRecordFilters } from '#lib/components/records/records.ts';
 import { localDate } from '#lib/format/calendar.ts';
-import { loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
+import { loadSeasonModelWithin, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import { loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
 import { cardFor, type OgDeps } from '#lib/server/og/load.ts';
 import { renderPng } from '#lib/server/og/render.ts';
 import { loadRecordDataset, recordNames } from '#lib/server/records.ts';
+import { createSimulate } from '#lib/server/simulate.ts';
 import type { RequestHandler } from './$types';
+
+const loadSimulation = createSimulate({
+	loadSeasonModelWithin: () => loadSeasonModelWithin(3500),
+	recordNames
+});
 
 const deps: OgDeps = {
 	loadTeamSeason,
@@ -19,7 +25,8 @@ const deps: OgDeps = {
 		const sorted = filterRecords(source.dataset.rows, filters, localDate(Date.now(), 'UTC'));
 		return pageRecords(sorted, 'total', 1, count).rows;
 	},
-	loadNames: recordNames
+	loadNames: recordNames,
+	loadSimulation: async (sides) => (await loadSimulation(sides)).simulation
 };
 
 export const GET: RequestHandler = async ({ params, url }) => {

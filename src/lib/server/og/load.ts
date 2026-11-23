@@ -2,8 +2,10 @@ import type { SeasonRatings } from '#lib/analysis/types.ts';
 import { eventStatus } from '#lib/components/event/dates.ts';
 import { titleOf } from '#lib/components/event/matches.ts';
 import type { RankedRecord } from '#lib/components/records/records.ts';
+import { colorName, type Sides, type Simulation } from '#lib/components/simulate/simulate.ts';
 import { placeName } from '#lib/format/places.ts';
 import { dateRange, fixed, integer, ordinal, record, shortDate, time } from '#lib/format/index.ts';
+import { pct } from '#lib/format/pct.ts';
 import { WINNER_AWARD_ID } from '#lib/game/phase.ts';
 import { SEASON_NAME } from '#lib/seo.ts';
 import { DataError } from '#lib/server/errors.ts';
@@ -34,6 +36,7 @@ export interface OgDeps {
 	loadEventBundle(code: string): Promise<EventBundle>;
 	loadTopRecords(count: number): Promise<RankedRecord[] | null>;
 	loadNames(teams: number[], events: string[]): Promise<Names>;
+	loadSimulation(sides: Sides): Promise<Simulation | null>;
 }
 
 export interface OgCard {
@@ -47,6 +50,8 @@ const TEAM_PATH = /^teams\/([1-9]\d{0,4})\.png$/;
 const EVENT_PATH = /^events\/([A-Z0-9]{2,24})\.png$/;
 const MATCH_PATH = /^events\/([A-Z0-9]{2,24})\/matches\/([qp]\d{1,3}(?:-\d{1,3})?)\.png$/;
 const COMPARE_PATH = /^compare\/([1-9]\d{0,4}(?:-[1-9]\d{0,4}){1,3})\.png$/;
+const SIMULATE_PATH =
+	/^simulate\/([1-9]\d{0,4})-([1-9]\d{0,4})-vs-([1-9]\d{0,4})-([1-9]\d{0,4})\.png$/;
 const LIVE_SECONDS = 120;
 const published = import.meta.glob('/src/lib/model/accuracy.json', {
 	eager: true,
@@ -75,6 +80,11 @@ const PAGES: Record<string, PageCard> = {
 		kicker: 'Compare',
 		title: 'Compare FTC teams side by side',
 		subtitle: 'OPR by part, records, shared events and head-to-head results.'
+	},
+	'simulate.png': {
+		kicker: 'Match simulator',
+		title: 'Pick any four FTC teams and see the predicted match',
+		subtitle: 'Predicted score, win chance and ranking point chances for each alliance.'
 	},
 	'workspace.png': {
 		kicker: 'Team tools',
@@ -383,6 +393,33 @@ async function compareCardFor(numbers: number[], host: string, deps: OgDeps, bud
 	return { node: compareCard(columns, host), maxAge: rated ? HOUR_SECONDS : 300 };
 }
 
+export function simulationNote(simulation: Simulation): string {
+	const { red, blue, tie } = simulation.forecast;
+	const odds = `Predicted · ${colorName('red')} wins ${pct(red.win)}, ${colorName('blue')} ${pct(blue.win)}`;
+	return tie >= 0.005 ? `${odds}, tie ${pct(tie)}` : odds;
+}
+
+async function simulateCardFor(sides: Sides, host: string, deps: OgDeps, budget: number) {
+	const simulation = valueOf(await settle(deps.loadSimulation(sides), budget));
+	const title = `${sides.red.join(' & ')} vs ${sides.blue.join(' & ')}`;
+	if (!simulation) {
+		return { node: pageCard({ kicker: 'Match simulator', title }, host), maxAge: 300 };
+	}
+	const line = (color: 'red' | 'blue'): AllianceLine => ({
+		color,
+		teams: simulation[color].teams.map((team) => ({ number: team.number, name: team.name })),
+		score: Math.round(simulation[color].score),
+		won: false
+	});
+	const card = {
+		title,
+		event: 'Match simulator',
+		alliances: [line('red'), line('blue')] as [AllianceLine, AllianceLine],
+		note: simulationNote(simulation)
+	};
+	return { node: matchCard(card, host), maxAge: HOUR_SECONDS };
+}
+
 export async function cardFor(
 	path: string,
 	host: string,
@@ -405,6 +442,12 @@ export async function cardFor(
 	if (event) return eventCardFor(event[1], shownHost, deps, budget);
 	const match = MATCH_PATH.exec(path);
 	if (match) return matchCardFor(match[1], match[2], shownHost, deps, budget, now);
+	const simulate = SIMULATE_PATH.exec(path);
+	if (simulate) {
+		const [r1, r2, b1, b2] = simulate.slice(1).map(Number);
+		if (new Set([r1, r2, b1, b2]).size < 4) return null;
+		return simulateCardFor({ red: [r1, r2], blue: [b1, b2] }, shownHost, deps, budget);
+	}
 	const compare = COMPARE_PATH.exec(path);
 	if (compare) {
 		const numbers = [...new Set(compare[1].split('-').map(Number))];

@@ -5,7 +5,7 @@
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import Term from '#lib/ui/Term.svelte';
-	import type { Alliance, Fit, FitPart } from './fit.ts';
+	import { LEAD_SHARE, partLead, type Alliance, type Fit, type FitPart } from './fit.ts';
 
 	interface Props {
 		fit: Fit;
@@ -35,9 +35,6 @@
 			{ part: 'tips', label: PART_LABELS.tips, term: oprTerm(PART_LABELS.tips), count: true }
 		];
 
-	const LEAD_SHARE = 0.6;
-	const LEAD_MIN_SHARE = 0.05;
-
 	const best = $derived(fit.alliances[0] ?? null);
 	const pairName = (alliance: Alliance) => alliance.teams.join(' + ');
 	const averagePair = (part: FitPart) => fit.average[part] * 2;
@@ -45,13 +42,8 @@
 	const width = $derived(Math.max(640, 240 + 150 * (fit.alliances.length + 1)));
 
 	function leader(alliance: Alliance, part: FitPart): string | null {
-		const total = alliance.parts[part];
-		const floor = part === 'tips' ? 1 : Math.max(1, alliance.score * LEAD_MIN_SHARE);
-		if (!(total >= floor)) return null;
 		const members = fit.teams.filter((team) => alliance.teams.includes(team.number));
-		const top = members.reduce((a, b) => (b.parts[part] > a.parts[part] ? b : a));
-		const share = Math.max(top.parts[part], 0) / total;
-		return share >= LEAD_SHARE ? `${top.number} ${Math.round(Math.min(share, 1) * 100)}%` : null;
+		return partLead(members, part, alliance.score);
 	}
 </script>
 
