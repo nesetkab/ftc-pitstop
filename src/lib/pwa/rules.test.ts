@@ -1,17 +1,23 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
+	acceptPage,
 	dataCache,
 	dataKey,
+	fallbackDelay,
+	firstAnswer,
 	isCacheableResponse,
+	isPageFrom,
 	obsoleteCaches,
 	overflow,
-	PAGES_CACHE,
-	pageAssets,
-	pageFits,
+	PAGE_TIMEOUT,
+	pageCache,
+	pageVersion,
 	shellCache,
 	strategyFor,
 	type RouteInput
 } from './rules.ts';
+
+afterEach(() => vi.useRealTimers());
 
 const shell = new Set(['/_app/immutable/entry/start.abc.js', '/favicon.svg']);
 
@@ -72,6 +78,22 @@ describe('strategyFor', () => {
 		expect(route('/724', 'navigate', 'POST')).toBeNull();
 		expect(route('/favicon.svg', 'no-cors', 'HEAD')).toBeNull();
 	});
+
+	it('always sends build checks, remote calls and the worker itself to the network', () => {
+		const everything = new Set([
+			'/_app/version.json',
+			'/_app/remote/abc/pitAnalysis',
+			'/service-worker.js'
+		]);
+		for (const pathname of everything) {
+			for (const mode of ['cors', 'same-origin', 'no-cors', 'navigate']) {
+				expect(
+					strategyFor({ method: 'GET', mode, pathname, scope: '/', shell: everything })
+				).toBeNull();
+			}
+		}
+		expect(route('/pit/_app/version.json', 'cors', 'GET', '/pit/')).toBeNull();
+	});
 });
 
 describe('dataKey', () => {
@@ -114,24 +136,98 @@ describe('isCacheableResponse', () => {
 	});
 });
 
-describe('cached pages across deploys', () => {
-	const html = `<link rel="modulepreload" href="../_app/immutable/entry/start.abc.js">
-		<link href="../_app/immutable/assets/0.css" rel="stylesheet">
-		<script>import("https://cdn.test/_app/immutable/x.js")</script>`;
+function page(version: string) {
+	return `<!doctype html><script type="application/ld+json">{"version":"x"}</script>
+		<script>
+			{
+				__sveltekit_abc123 = {
+					base: new URL("..", location).pathname.slice(0, -1),
+					version: "${version}"
+				};
+				const element = document.currentScript.parentElement;
+			}
+		</script>`;
+}
 
-	it('finds the build files a page needs', () => {
-		expect(pageAssets(html, 'https://pitstop.test/724/tv')).toEqual([
-			'/_app/immutable/entry/start.abc.js',
-			'/_app/immutable/assets/0.css'
-		]);
+function htmlResponse(version: string) {
+	return new Response(page(version), {
+		status: 200,
+		headers: { 'content-type': 'text/html', 'cache-control': 'public' }
+	});
+}
+
+describe('cached pages across deploys', () => {
+	it('reads which build rendered a page', () => {
+		expect(pageVersion(page('1795434902727'))).toBe('1795434902727');
+		expect(pageVersion('<p>no app</p>')).toBeNull();
+		expect(isPageFrom(page('1'), '1')).toBe(true);
+		expect(isPageFrom(page('1'), '2')).toBe(false);
+		expect(isPageFrom('<p>no app</p>', '2')).toBe(false);
 	});
 
-	it('keeps a page only while the shell still holds its files', () => {
-		const page = 'https://pitstop.test/724/tv';
-		const current = new Set(['/_app/immutable/entry/start.abc.js', '/_app/immutable/assets/0.css']);
-		expect(pageFits(html, page, current)).toBe(true);
-		expect(pageFits(html, page, new Set(['/_app/immutable/entry/start.abc.js']))).toBe(false);
-		expect(pageFits('<p>no scripts</p>', page, current)).toBe(false);
+	it('keeps only pages from the running build', async () => {
+		expect(await acceptPage(htmlResponse('1'), '2')).toBeNull();
+		const kept = await acceptPage(htmlResponse('2'), '2');
+		expect(kept?.status).toBe(200);
+		expect(kept?.headers.get('content-type')).toBe('text/html');
+		expect(await kept?.text()).toBe(page('2'));
+	});
+
+	it('stores pages per build so a deploy starts clean', () => {
+		expect(pageCache('1')).not.toBe(pageCache('2'));
+		expect(
+			obsoleteCaches(['pitstop-pages', pageCache('1'), pageCache('2')], [pageCache('2')])
+		).toEqual(['pitstop-pages', pageCache('1')]);
+	});
+});
+
+describe('network first answers', () => {
+	const later = <T>(value: T, ms: number) =>
+		new Promise<T>((resolve) => setTimeout(() => resolve(value), ms));
+
+	it('waits for a slow network instead of serving a page from an older build', async () => {
+		vi.useFakeTimers();
+		const fresh = htmlResponse('2');
+		const fallback = async () => acceptPage(htmlResponse('1'), '2');
+		const answer = firstAnswer(later(fresh, PAGE_TIMEOUT * 3), fallback, PAGE_TIMEOUT);
+		await vi.advanceTimersByTimeAsync(PAGE_TIMEOUT * 3);
+		expect(await answer).toBe(fresh);
+	});
+
+	it('serves the same build from cache when the network is slow', async () => {
+		vi.useFakeTimers();
+		const fallback = async () => acceptPage(htmlResponse('2'), '2');
+		const answer = firstAnswer(later(htmlResponse('2'), PAGE_TIMEOUT * 3), fallback, PAGE_TIMEOUT);
+		await vi.advanceTimersByTimeAsync(PAGE_TIMEOUT);
+		expect(pageVersion(await (await answer).text())).toBe('2');
+	});
+
+	it('answers from cache at once when offline', async () => {
+		vi.useFakeTimers();
+		const cached = new Response('cached');
+		const never = new Promise<Response>(() => undefined);
+		const answer = firstAnswer(never, async () => cached, fallbackDelay(false, PAGE_TIMEOUT));
+		await vi.advanceTimersByTimeAsync(0);
+		expect(await answer).toBe(cached);
+		expect(fallbackDelay(true, PAGE_TIMEOUT)).toBe(PAGE_TIMEOUT);
+	});
+
+	it('falls back when the network fails and passes the error on with nothing cached', async () => {
+		const cached = new Response('cached');
+		const failure = new TypeError('Failed to fetch');
+		expect(await firstAnswer(Promise.reject(failure), async () => cached, PAGE_TIMEOUT)).toBe(
+			cached
+		);
+		await expect(firstAnswer(Promise.reject(failure), async () => null, PAGE_TIMEOUT)).rejects.toBe(
+			failure
+		);
+	});
+
+	it('prefers the network whenever it answers first', async () => {
+		const fresh = new Response('fresh');
+		const fallback = vi.fn(async () => new Response('cached'));
+		expect(await firstAnswer(Promise.resolve(fresh), fallback, PAGE_TIMEOUT)).toBe(fresh);
+		expect(fallback).not.toHaveBeenCalled();
 	});
 });
 
@@ -142,8 +238,8 @@ describe('cache housekeeping', () => {
 	});
 
 	it('removes old pitstop caches and leaves unrelated ones', () => {
-		const keys = ['pitstop-shell-1', 'pitstop-shell-2', 'pitstop-data', PAGES_CACHE, 'other'];
-		expect(obsoleteCaches(keys, ['pitstop-shell-2', PAGES_CACHE])).toEqual([
+		const keys = ['pitstop-shell-1', 'pitstop-shell-2', 'pitstop-data', pageCache('2'), 'other'];
+		expect(obsoleteCaches(keys, ['pitstop-shell-2', pageCache('2')])).toEqual([
 			'pitstop-shell-1',
 			'pitstop-data'
 		]);

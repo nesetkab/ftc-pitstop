@@ -1,9 +1,12 @@
 import { version } from '$app/env';
 import { assets, immutable } from '$app/manifest';
 import {
+	acceptPage,
 	DATA_TIMEOUT,
 	dataCache,
 	dataKey,
+	fallbackDelay,
+	firstAnswer,
 	isCacheableResponse,
 	isImmutable,
 	MAX_DATA_ENTRIES,
@@ -12,8 +15,7 @@ import {
 	OFFLINE_HEADER,
 	overflow,
 	PAGE_TIMEOUT,
-	PAGES_CACHE,
-	pageFits,
+	pageCache,
 	shellCache,
 	strategyFor
 } from '#lib/pwa/rules.ts';
@@ -52,6 +54,7 @@ interface WorkerScope {
 const worker = globalThis as unknown as WorkerScope;
 const SHELL = shellCache(version);
 const DATA = dataCache(version);
+const PAGES = pageCache(version);
 const scope = new URL(worker.registration.scope).pathname;
 const shellFiles = [...immutable, ...assets].map((file) => `${scope}${file.path}`);
 const shell = new Set(shellFiles);
@@ -74,18 +77,8 @@ async function install() {
 	await worker.skipWaiting();
 }
 
-async function prunePages() {
-	const cache = await caches.open(PAGES_CACHE);
-	for (const request of await cache.keys()) {
-		const response = await cache.match(request);
-		const html = response ? await response.text() : '';
-		if (!pageFits(html, request.url, shell)) await cache.delete(request);
-	}
-}
-
 async function activate() {
-	await prunePages().catch(() => caches.delete(PAGES_CACHE));
-	const stale = obsoleteCaches(await caches.keys(), [SHELL, DATA, PAGES_CACHE]);
+	const stale = obsoleteCaches(await caches.keys(), [SHELL, DATA, PAGES]);
 	await Promise.all(stale.map((key) => caches.delete(key)));
 	await worker.clients.claim();
 }
@@ -100,11 +93,39 @@ async function trim(cache: Cache, max: number) {
 	await Promise.all(overflow(keys, max).map((key) => cache.delete(key)));
 }
 
-async function store(cacheName: string, key: string, response: Response, max: number) {
-	const cache = await caches.open(cacheName);
+interface Store {
+	name: string;
+	max: number;
+	timeout: number;
+	accept(response: Response): Promise<Response | null>;
+}
+
+const dataStore: Store = {
+	name: DATA,
+	max: MAX_DATA_ENTRIES,
+	timeout: DATA_TIMEOUT,
+	accept: async (response) => response
+};
+
+const pageStore: Store = {
+	name: PAGES,
+	max: MAX_PAGE_ENTRIES,
+	timeout: PAGE_TIMEOUT,
+	accept: (response) => acceptPage(response, version)
+};
+
+async function store(target: Store, key: string, response: Response) {
+	const accepted = await target.accept(response);
+	if (!accepted) return;
+	const cache = await caches.open(target.name);
 	await cache.delete(key);
-	await cache.put(key, response);
-	await trim(cache, max);
+	await cache.put(key, accepted);
+	await trim(cache, target.max);
+}
+
+async function cachedCopy(target: Store, key: string): Promise<Response | null> {
+	const cached = await caches.match(key, { cacheName: target.name });
+	return cached ? target.accept(cached) : null;
 }
 
 function offline(cached: Response): Response {
@@ -117,47 +138,19 @@ function offline(cached: Response): Response {
 	});
 }
 
-function networkFirst(
-	event: FetchEvent,
-	cacheName: string,
-	key: string,
-	max: number,
-	timeout: number
-): Promise<Response> {
+function networkFirst(event: FetchEvent, target: Store, key: string): Promise<Response> {
 	const network = fetch(event.request).then((response) => {
 		if (isCacheableResponse(response)) {
-			event.waitUntil(store(cacheName, key, response.clone(), max).catch(() => undefined));
+			event.waitUntil(store(target, key, response.clone()).catch(() => undefined));
 		}
 		return response;
 	});
 	event.waitUntil(network.catch(() => undefined));
-	return new Promise<Response>((resolve, reject) => {
-		let settled = false;
-		const fallback = async (error: unknown) => {
-			const cached = await caches.match(key, { cacheName });
-			if (settled) return;
-			if (cached) {
-				settled = true;
-				resolve(offline(cached));
-			} else if (error !== null) {
-				settled = true;
-				reject(error);
-			}
-		};
-		const timer = setTimeout(() => void fallback(null), timeout);
-		network.then(
-			(response) => {
-				clearTimeout(timer);
-				if (settled) return;
-				settled = true;
-				resolve(response);
-			},
-			(error: unknown) => {
-				clearTimeout(timer);
-				void fallback(error);
-			}
-		);
-	});
+	const fallback = async () => {
+		const cached = await cachedCopy(target, key);
+		return cached ? offline(cached) : null;
+	};
+	return firstAnswer(network, fallback, fallbackDelay(navigator.onLine, target.timeout));
 }
 
 async function focusWindow() {
@@ -184,10 +177,9 @@ worker.addEventListener('fetch', (event) => {
 	if (strategy === 'shell') {
 		event.respondWith(fromShell(request));
 	} else if (strategy === 'page') {
-		event.respondWith(networkFirst(event, PAGES_CACHE, url.href, MAX_PAGE_ENTRIES, PAGE_TIMEOUT));
+		event.respondWith(networkFirst(event, pageStore, url.href));
 	} else if (strategy === 'data') {
-		const key = dataKey(request.url);
-		event.respondWith(networkFirst(event, DATA, key, MAX_DATA_ENTRIES, DATA_TIMEOUT));
+		event.respondWith(networkFirst(event, dataStore, dataKey(request.url)));
 	}
 });
 
