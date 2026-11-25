@@ -137,6 +137,8 @@
 
 	.teams {
 		display: grid;
+		width: max-content;
+		max-width: 260px;
 	}
 
 	.teams a {
@@ -222,6 +224,8 @@
 		.records .teams {
 			display: flex;
 			gap: 12px;
+			width: auto;
+			max-width: none;
 		}
 
 		.records .brief {
