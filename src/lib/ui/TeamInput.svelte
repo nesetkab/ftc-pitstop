@@ -240,13 +240,13 @@
 	}
 
 	.hit-name {
-		overflow-wrap: anywhere;
+		overflow-wrap: break-word;
 	}
 
 	.place {
 		font-size: 13px;
 		color: var(--text-3);
-		overflow-wrap: anywhere;
+		overflow-wrap: break-word;
 	}
 
 	.empty {
