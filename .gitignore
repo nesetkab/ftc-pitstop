@@ -25,4 +25,7 @@ vite.config.ts.timestamp-*
 
 .claude/worktrees/
 # Backtest cache
-.cache/
+.cache
+
+# Calibration lab dumps
+scripts/backtest/lab/calib/.records/
