@@ -15,7 +15,7 @@
 	<thead>
 		<tr>
 			<th class="l" scope="col"><span class="visually-hidden">Measure</span></th>
-			<th scope="col"><Term label="aOPR" /></th>
+			<th scope="col">OPR</th>
 			<th scope="col"><Term label="World rank" /></th>
 		</tr>
 	</thead>
