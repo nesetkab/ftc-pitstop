@@ -51,6 +51,7 @@
 
 	summary::before {
 		content: '';
+		flex: none;
 		width: 6px;
 		height: 6px;
 		margin: 0 2px;

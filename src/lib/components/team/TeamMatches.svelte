@@ -145,6 +145,7 @@
 
 	summary::before {
 		content: '';
+		flex: none;
 		align-self: center;
 		width: 6px;
 		height: 6px;

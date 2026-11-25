@@ -83,6 +83,7 @@
 
 	summary::after {
 		content: '';
+		flex: none;
 		width: 5px;
 		margin-left: 2px;
 		height: 5px;
