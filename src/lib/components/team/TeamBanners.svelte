@@ -95,11 +95,13 @@
 
 	@media (max-width: 600px) {
 		.banners {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
 			gap: 6px;
 		}
 
 		li {
-			width: 116px;
+			width: auto;
 		}
 
 		.banner {
