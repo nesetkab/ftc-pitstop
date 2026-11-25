@@ -1,10 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
-	import BatteryLog from '#lib/components/tools/BatteryLog.svelte';
-	import Checklist from '#lib/components/tools/Checklist.svelte';
-	import PickList from '#lib/components/tools/PickList.svelte';
-	import StrategyBoard from '#lib/components/tools/StrategyBoard.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -16,6 +12,13 @@
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
+
+	const VIEWS = {
+		picklist: () => import('#lib/components/tools/PickList.svelte'),
+		batteries: () => import('#lib/components/tools/BatteryLog.svelte'),
+		checklist: () => import('#lib/components/tools/Checklist.svelte'),
+		board: () => import('#lib/components/tools/StrategyBoard.svelte')
+	} satisfies Record<ShareTool, () => Promise<unknown>>;
 
 	const TITLES: Record<ShareTool, string> = {
 		picklist: 'Shared pick list',
@@ -30,6 +33,7 @@
 	let failure = $state('');
 
 	onMount(async () => {
+		VIEWS[data.tool]().catch(() => {});
 		const decoded = await decodeShare(location.hash);
 		if (decoded && decoded.tool === data.tool) {
 			payload = decoded;
@@ -86,15 +90,37 @@
 		<p class="failure" role="alert">{failure}</p>
 	{/if}
 	{#if payload.tool === 'picklist'}
-		<PickList list={payload.data} />
+		{#await VIEWS.picklist() then { default: PickList }}
+			<PickList list={payload.data} />
+		{:catch}
+			{@render failed()}
+		{/await}
 	{:else if payload.tool === 'batteries'}
-		<BatteryLog batteries={payload.data} />
+		{#await VIEWS.batteries() then { default: BatteryLog }}
+			<BatteryLog batteries={payload.data} />
+		{:catch}
+			{@render failed()}
+		{/await}
 	{:else if payload.tool === 'checklist'}
-		<Checklist checklist={payload.data} />
+		{#await VIEWS.checklist() then { default: Checklist }}
+			<Checklist checklist={payload.data} />
+		{:catch}
+			{@render failed()}
+		{/await}
 	{:else}
-		<StrategyBoard boards={{ plans: [payload.data] }} />
+		{#await VIEWS.board() then { default: StrategyBoard }}
+			<StrategyBoard boards={{ plans: [payload.data] }} />
+		{:catch}
+			{@render failed()}
+		{/await}
 	{/if}
 {/if}
+
+{#snippet failed()}
+	<EmptyState title="This shared copy couldn't load."
+		>Check your connection and try again.</EmptyState
+	>
+{/snippet}
 
 <style>
 	.failure {
