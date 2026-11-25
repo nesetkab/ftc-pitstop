@@ -5,7 +5,7 @@
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import Term from '#lib/ui/Term.svelte';
-	import { LEAD_SHARE, partLead, type Alliance, type Fit, type FitPart } from './fit.ts';
+	import { partLead, type Alliance, type Fit, type FitPart } from './fit.ts';
 	import Legend from '#lib/ui/Legend.svelte';
 
 	interface Props {
@@ -50,11 +50,9 @@
 {#if best}
 	<p class="lead">
 		{#if fit.alliances.length === 1}
-			Together, {pairName(best)} would be expected to score about
-			<b>{integer(best.score)}</b> points per match before penalties.
+			Together, {pairName(best)} would score about <b>{integer(best.score)}</b> points per match.
 		{:else}
-			{pairName(best)} is the strongest pair, at about <b>{integer(best.score)}</b> points per match before
-			penalties.
+			{pairName(best)} is the strongest pair, at about <b>{integer(best.score)}</b> points per match.
 		{/if}
 	</p>
 
@@ -140,8 +138,8 @@
 	<p class="note">No season rating yet for {fit.missing.join(', ')}.</p>
 {/if}
 <Legend>
-	As if these teams met at a new event today, before penalties. Chances are for one match. A team's
-	share shows when it brings {LEAD_SHARE * 100}% or more of a part.
+	Chances are for a single match. When one team brings most of a part, its share shows under the
+	value.
 </Legend>
 
 <style>
