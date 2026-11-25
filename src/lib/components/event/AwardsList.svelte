@@ -69,6 +69,7 @@
 
 	@media (max-width: 600px) {
 		th.award {
+			width: 30%;
 			padding-inline: 6px;
 			min-width: 0;
 		}
