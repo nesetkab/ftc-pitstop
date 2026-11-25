@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import type { DataSource, Event } from '#lib/types.ts';
+	import { fade } from '#lib/ui/motion.ts';
 	import Takeover from './Takeover.svelte';
 	import TvDone from './TvDone.svelte';
 	import TvFooter from './TvFooter.svelte';
@@ -50,6 +51,7 @@
 
 	const timeZone = $derived(event.timezone);
 	const absent = $derived(absentText(view));
+	const screen = $derived(!view.registered ? 'absent' : streaming ? 'stream' : view.phase);
 	const headline = $derived(
 		takeover && view.next
 			? heroText(view.next, takeover, now, timeZone, view.delaySeconds).headline
@@ -77,24 +79,28 @@
 		onstream={toggleStream}
 	/>
 	<main class="main">
-		{#if !view.registered}
-			<div class="message">
-				<p class="title">{absent.title}</p>
-				<p class="sub">{absent.detail}</p>
+		{#key screen}
+			<div class="screen" in:fade={{ duration: 400 }}>
+				{#if !view.registered}
+					<div class="message">
+						<p class="title">{absent.title}</p>
+						<p class="sub">{absent.detail}</p>
+					</div>
+				{:else if streaming}
+					<TvStream {view} {event} {call} {now} />
+				{:else if view.phase === 'upcoming'}
+					<TvUpcoming {view} {event} {now} {phoneUrl} />
+				{:else if view.phase === 'quals'}
+					<TvQuals {view} {call} {now} {timeZone} />
+				{:else if view.phase === 'selection'}
+					<TvSelection {view} />
+				{:else if view.phase === 'playoffs'}
+					<TvPlayoffs {view} {call} {now} {timeZone} />
+				{:else}
+					<TvDone {view} />
+				{/if}
 			</div>
-		{:else if streaming}
-			<TvStream {view} {event} {call} {now} />
-		{:else if view.phase === 'upcoming'}
-			<TvUpcoming {view} {event} {now} {phoneUrl} />
-		{:else if view.phase === 'quals'}
-			<TvQuals {view} {call} {now} {timeZone} />
-		{:else if view.phase === 'selection'}
-			<TvSelection {view} />
-		{:else if view.phase === 'playoffs'}
-			<TvPlayoffs {view} {call} {now} {timeZone} />
-		{:else}
-			<TvDone {view} />
-		{/if}
+		{/key}
 	</main>
 	<TvFooter
 		{connection}
@@ -150,6 +156,10 @@
 		position: relative;
 		min-height: 0;
 		overflow: hidden;
+	}
+
+	.screen {
+		height: 100%;
 	}
 
 	.tv :global(.cols) {

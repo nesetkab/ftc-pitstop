@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { AllianceColor } from '#lib/types.ts';
+	import { fade } from '#lib/ui/motion.ts';
 
 	interface Props {
 		headline: string;
@@ -19,7 +20,14 @@
 
 <svelte:window onkeydown={(event) => event.key === 'Escape' && ondismiss()} />
 
-<button bind:this={button} type="button" class="takeover" onclick={ondismiss}>
+<button
+	bind:this={button}
+	type="button"
+	class="takeover"
+	onclick={ondismiss}
+	in:fade={{ duration: 320 }}
+	out:fade={{ duration: 200 }}
+>
 	<b>{headline}</b>
 	<span>{label}, {alliance} alliance</span>
 	<small>Tap to close</small>

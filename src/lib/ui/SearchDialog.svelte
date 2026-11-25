@@ -364,6 +364,14 @@
 		background: rgba(0, 0, 0, 0.36);
 	}
 
+	.search[open] {
+		animation: ps-pop 160ms ease-out;
+	}
+
+	.search[open]::backdrop {
+		animation: ps-fade 160ms ease-out;
+	}
+
 	.box {
 		display: flex;
 		flex-direction: column;

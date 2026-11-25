@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { fixed } from '#lib/format/number.ts';
 	import { pct } from '#lib/format/pct.ts';
+	import { fade, move } from '#lib/ui/motion.ts';
+	import Swap from '#lib/ui/Swap.svelte';
 	import Facts from './Facts.svelte';
 	import RowFit from './RowFit.svelte';
 	import TeamTag from './TeamTag.svelte';
@@ -28,7 +30,7 @@
 <div class="cols" style:--cols="31em 23em minmax(0, 1fr)">
 	<section>
 		<h2 class="tv-label">Alliance selection</h2>
-		<p class={['status', { picked }]}>{roleText(view)}</p>
+		<p class={['status', { picked }]}><Swap value={roleText(view)} /></p>
 		{#if view.picking !== null}
 			<p class="sub">Alliance {view.picking} is picking.</p>
 		{/if}
@@ -92,7 +94,11 @@
 					</thead>
 					<tbody>
 						{#each available.slice(0, shown) as team (team.number)}
-							<tr class={{ me: team.number === view.team }}>
+							<tr
+								class={{ me: team.number === view.team }}
+								animate:move={{ duration: 360 }}
+								in:fade={{ duration: 300 }}
+							>
 								<td class="l">{team.rank ?? ''}</td>
 								<td class="l">{team.number}</td>
 								<td class="name">{team.name ?? ''}</td>
@@ -113,6 +119,10 @@
 		line-height: 1.1;
 		font-weight: 600;
 		letter-spacing: -0.02em;
+	}
+
+	.status {
+		transition: color 300ms ease-out;
 	}
 
 	.status.picked {

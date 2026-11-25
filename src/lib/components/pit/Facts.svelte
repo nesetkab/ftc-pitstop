@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Swap from '#lib/ui/Swap.svelte';
 	import type { Fact } from './copy.ts';
 
 	interface Props {
@@ -13,7 +14,7 @@
 		<div>
 			<dt>{fact.label}</dt>
 			<dd>
-				{fact.value}
+				<Swap value={fact.value} />
 				{#if fact.detail}<small>{fact.detail}</small>{/if}
 			</dd>
 		</div>

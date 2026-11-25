@@ -2,6 +2,7 @@
 	import { onMount, type Snippet } from 'svelte';
 	import { dismissHint, readHints, type HintId } from './hints.ts';
 	import Icon from './Icon.svelte';
+	import { fade } from './motion.ts';
 
 	interface Props {
 		id: HintId;
@@ -23,7 +24,7 @@
 </script>
 
 {#if visible}
-	<p class="hint">
+	<p class="hint" out:fade={{ duration: 160 }}>
 		<span>{@render children()}</span>
 		<button type="button" onclick={hide}><Icon name="close" size={12} />Hide</button>
 	</p>

@@ -73,4 +73,8 @@
 	:global(.term-tip[hidden]) {
 		display: none;
 	}
+
+	:global(.term-tip:not([hidden])) {
+		animation: ps-fade 120ms ease-out;
+	}
 </style>

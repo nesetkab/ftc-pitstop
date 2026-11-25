@@ -1,8 +1,10 @@
 <script lang="ts">
 	import { pct } from '#lib/format/pct.ts';
+	import Swap from '#lib/ui/Swap.svelte';
 	import MatchList from '#lib/ui/MatchList.svelte';
 	import Facts from './Facts.svelte';
 	import NextHero from './NextHero.svelte';
+	import Stage from './Stage.svelte';
 	import TeamTag from './TeamTag.svelte';
 	import { lastResultItem, matchItems, playoffResult, type Fact } from './copy.ts';
 	import type { QueueCall } from './queue.ts';
@@ -40,15 +42,17 @@
 <div class="cols" style:--cols="31em 23em minmax(0, 1fr)">
 	<section>
 		{#if next}
-			<NextHero
-				{next}
-				{call}
-				{now}
-				{timeZone}
-				delaySeconds={view.delaySeconds}
-				showRp={false}
-				label={playoff?.position ? `Next match · ${playoff.position}` : 'Next match'}
-			/>
+			<Stage key={next.key}>
+				<NextHero
+					{next}
+					{call}
+					{now}
+					{timeZone}
+					delaySeconds={view.delaySeconds}
+					showRp={false}
+					label={playoff?.position ? `Next match · ${playoff.position}` : 'Next match'}
+				/>
+			</Stage>
 		{:else}
 			<h2 class="tv-label">Playoffs</h2>
 			<p class={['status', { won: playoff?.state === 'won' }]}>
@@ -92,7 +96,13 @@
 						{/each}
 					</span>
 					<span class="record">
-						{standing.won ? 'Won' : standing.out ? 'Out' : `${standing.wins}-${standing.losses}`}
+						<Swap
+							value={standing.won
+								? 'Won'
+								: standing.out
+									? 'Out'
+									: `${standing.wins}-${standing.losses}`}
+						/>
 					</span>
 				</li>
 			{/each}
@@ -160,6 +170,7 @@
 		gap: 0.6em;
 		padding: 0.5em 0;
 		border-bottom: 1px solid var(--line);
+		transition: background-color 300ms ease-out;
 	}
 
 	.standings li.mine {

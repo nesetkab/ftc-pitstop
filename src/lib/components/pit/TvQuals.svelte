@@ -3,6 +3,7 @@
 	import Facts from './Facts.svelte';
 	import NextHero from './NextHero.svelte';
 	import RankTable from './RankTable.svelte';
+	import Stage from './Stage.svelte';
 	import { eventFacts, lastResultItem, matchItems, qualsDoneText } from './copy.ts';
 	import type { QueueCall } from './queue.ts';
 	import type { PitView } from './view.ts';
@@ -23,7 +24,9 @@
 <div class="cols" style:--cols="31em 23em minmax(0, 1fr)">
 	<section>
 		{#if view.next}
-			<NextHero next={view.next} {call} {now} {timeZone} delaySeconds={view.delaySeconds} />
+			<Stage key={view.next.key}>
+				<NextHero next={view.next} {call} {now} {timeZone} delaySeconds={view.delaySeconds} />
+			</Stage>
 		{:else}
 			<h2 class="tv-label">Next match</h2>
 			<p class="done">{done.headline}</p>

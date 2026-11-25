@@ -88,6 +88,10 @@
 		stroke-linejoin: round;
 	}
 
+	svg {
+		transition: transform 160ms ease-out;
+	}
+
 	.toggle[aria-expanded='true'] svg {
 		transform: rotate(180deg);
 	}
@@ -136,6 +140,10 @@
 
 		.panel:not(.open) {
 			display: none;
+		}
+
+		.panel.open > :global(*) {
+			animation: ps-pop 160ms ease-out;
 		}
 	}
 </style>

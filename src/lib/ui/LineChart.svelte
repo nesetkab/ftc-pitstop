@@ -6,6 +6,7 @@
 <script lang="ts">
 	import { fixed, integer } from '#lib/format/number.ts';
 	import { labelEvery, linearScale, niceTicks } from './chart.ts';
+	import { reveal } from './motion.ts';
 
 	interface Props {
 		points: LinePoint[];
@@ -95,7 +96,7 @@
 	}
 </script>
 
-<div class="chart" bind:clientWidth={measured}>
+<div class="chart" bind:clientWidth={measured} {@attach reveal}>
 	<svg
 		viewBox="0 0 {width} {height}"
 		width="100%"
@@ -121,7 +122,7 @@
 		{#if hovered}
 			<line class="cross" x1={hovered.x} x2={hovered.x} y1={plot.top} y2={plot.bottom} />
 		{/if}
-		<path class="line" d={path} />
+		<path class="line" d={path} pathLength="1" />
 		{#each coords as point, index (index)}
 			<circle class={['point', { active: index === active }]} cx={point.x} cy={point.y} r="3.5" />
 			{#if (points.length - 1 - index) % every === 0}
@@ -190,6 +191,26 @@
 
 	.point.active {
 		fill: var(--text);
+	}
+
+	.chart:global([data-reveal]) .line {
+		stroke-dasharray: 1;
+	}
+
+	.chart:global([data-reveal='draw']) .line {
+		transition: stroke-dashoffset 700ms cubic-bezier(0.33, 1, 0.68, 1);
+	}
+
+	.chart:global([data-reveal='draw']) .point {
+		transition: opacity 300ms ease-out 400ms;
+	}
+
+	.chart:global([data-reveal='wait']) .line {
+		stroke-dashoffset: 1;
+	}
+
+	.chart:global([data-reveal='wait']) .point {
+		opacity: 0;
 	}
 
 	text {

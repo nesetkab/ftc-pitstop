@@ -68,6 +68,9 @@
 		font-size: 0.72em;
 		color: var(--text-2);
 		white-space: nowrap;
+		transition:
+			background-color 400ms ease-out,
+			color 400ms ease-out;
 	}
 
 	.stale {
@@ -99,6 +102,9 @@
 		margin-right: 0.45em;
 		border-radius: 50%;
 		background: var(--ok);
+		transition:
+			background-color 400ms ease-out,
+			box-shadow 400ms ease-out;
 	}
 
 	.dot.retrying {

@@ -206,6 +206,10 @@
 		display: none;
 	}
 
+	.pop:not([hidden]) {
+		animation: ps-fade 120ms ease-out;
+	}
+
 	button {
 		display: grid;
 		grid-template-columns: auto minmax(0, 1fr);

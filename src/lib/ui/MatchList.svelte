@@ -10,6 +10,8 @@
 </script>
 
 <script lang="ts">
+	import { fade, move } from './motion.ts';
+
 	interface Props {
 		items: MatchListItem[];
 	}
@@ -19,7 +21,7 @@
 
 <ol class="ml">
 	{#each items as item (item.label)}
-		<li class={item.state}>
+		<li class={item.state} animate:move={{ duration: 300 }} in:fade={{ duration: 240 }}>
 			<svelte:element this={item.href ? 'a' : 'b'} class="label" href={item.href}>
 				{item.label}
 			</svelte:element>
@@ -49,6 +51,7 @@
 		padding: 0.42em 0;
 		border-bottom: 1px solid var(--line);
 		font-variant-numeric: tabular-nums;
+		transition: background-color 300ms ease-out;
 	}
 
 	.label {

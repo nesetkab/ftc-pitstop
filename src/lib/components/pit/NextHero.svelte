@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { pct } from '#lib/format/pct.ts';
+	import Swap from '#lib/ui/Swap.svelte';
+	import Ticker from '#lib/ui/Ticker.svelte';
 	import AllianceTag from './AllianceTag.svelte';
 	import Matchup from './Matchup.svelte';
 	import { heroText } from './copy.ts';
@@ -36,13 +38,13 @@
 	<AllianceTag alliance={next.alliance} />
 </div>
 <div class={['queue', { urgent: text.urgent }]}>
-	<b>{text.headline}</b>
+	<b><Swap value={text.headline} /></b>
 	{#if text.facts.length > 0}
 		<dl>
 			{#each text.facts as fact (fact.label)}
 				<div>
 					<dt>{fact.label}</dt>
-					<dd>{fact.value}</dd>
+					<dd><Swap value={fact.value} /></dd>
 				</div>
 			{/each}
 		</dl>
@@ -52,9 +54,9 @@
 {#if rp}
 	<h2 class="tv-label">Ranking point chances for {next.alliance}</h2>
 	<div class="rp">
-		<div><span>Swarm</span><b>{pct(rp.swarm)}</b></div>
-		<div><span>Pollinator 1</span><b>{pct(rp.pollinator1)}</b></div>
-		<div><span>Pollinator 2</span><b>{pct(rp.pollinator2)}</b></div>
+		<div><span>Swarm</span><b><Ticker value={rp.swarm} format={pct} /></b></div>
+		<div><span>Pollinator 1</span><b><Ticker value={rp.pollinator1} format={pct} /></b></div>
+		<div><span>Pollinator 2</span><b><Ticker value={rp.pollinator2} format={pct} /></b></div>
 	</div>
 {/if}
 
@@ -82,6 +84,10 @@
 		line-height: 1.05;
 		font-weight: 600;
 		letter-spacing: -0.02em;
+	}
+
+	.queue b {
+		transition: color 300ms ease-out;
 	}
 
 	.queue.urgent b {

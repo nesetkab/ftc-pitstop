@@ -109,6 +109,10 @@
 		stroke-linejoin: round;
 	}
 
+	.trigger svg {
+		transition: transform 160ms ease-out;
+	}
+
 	.trigger[aria-expanded='true'] svg {
 		transform: rotate(180deg);
 	}
@@ -128,6 +132,10 @@
 
 	.panel[hidden] {
 		display: none;
+	}
+
+	.panel:not([hidden]) {
+		animation: ps-pop 160ms ease-out;
 	}
 
 	@media (pointer: coarse) {
