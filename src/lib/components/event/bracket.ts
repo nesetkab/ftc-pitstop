@@ -58,6 +58,10 @@ function source(code: string): Source {
 	return { loserOf: number };
 }
 
+function winnerOf(from: Source): number | null {
+	return 'winnerOf' in from ? from.winnerOf : null;
+}
+
 function describe(from: Source): string {
 	if ('seed' in from) return `Alliance ${from.seed}`;
 	if ('winnerOf' in from) return `Winner of M${from.winnerOf}`;
@@ -70,6 +74,7 @@ export type SlotView = {
 	source: string;
 	score: number | null;
 	won: boolean;
+	winnerOf: number | null;
 };
 
 export type BracketMatchView = {
@@ -91,6 +96,7 @@ export type FinalsAlliance = {
 	source: string;
 	wins: number;
 	champion: boolean;
+	winnerOf: number | null;
 };
 
 export type FinalsGame = {
@@ -177,14 +183,16 @@ function finalsOnly(alliances: AllianceSelection[], matches: Match[], index: Map
 			teams: first ? teamNumbers(first, 'red') : membersOf(top, alliances),
 			source: `Alliance ${top}`,
 			wins: 0,
-			champion: false
+			champion: false,
+			winnerOf: null
 		},
 		{
 			seed: bottom,
 			teams: first ? teamNumbers(first, 'blue') : membersOf(bottom, alliances),
 			source: `Alliance ${bottom}`,
 			wins: 0,
-			champion: false
+			champion: false,
+			winnerOf: null
 		}
 	];
 	const views: FinalsGame[] = games.map((game) => {
@@ -274,14 +282,16 @@ export function buildBracket(alliances: AllianceSelection[], matches: Match[]): 
 					teams: redTeams.length > 0 ? redTeams : membersOf(redSeed, alliances),
 					source: describe(redFrom),
 					score: result ? result.red.total : null,
-					won: winner === 'red'
+					won: winner === 'red',
+					winnerOf: winnerOf(redFrom)
 				},
 				blue: {
 					seed: blueSeed,
 					teams: blueTeams.length > 0 ? blueTeams : membersOf(blueSeed, alliances),
 					source: describe(blueFrom),
 					score: result ? result.blue.total : null,
-					won: winner === 'blue'
+					won: winner === 'blue',
+					winnerOf: winnerOf(blueFrom)
 				},
 				played: result !== null,
 				winner,
@@ -304,13 +314,21 @@ export function buildBracket(alliances: AllianceSelection[], matches: Match[]): 
 	const top = first.red.seed;
 	const bottom = first.blue.seed;
 	const sides: [FinalsAlliance, FinalsAlliance] = [
-		{ seed: top, teams: first.red.teams, source: first.red.source, wins: 0, champion: false },
+		{
+			seed: top,
+			teams: first.red.teams,
+			source: first.red.source,
+			wins: 0,
+			champion: false,
+			winnerOf: first.red.winnerOf
+		},
 		{
 			seed: bottom,
 			teams: first.blue.teams,
 			source: first.blue.source,
 			wins: 0,
-			champion: false
+			champion: false,
+			winnerOf: first.blue.winnerOf
 		}
 	];
 	const toGame = (view: BracketMatchView, ifNeeded: boolean): FinalsGame => {
