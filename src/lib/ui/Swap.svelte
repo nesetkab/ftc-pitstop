@@ -10,8 +10,9 @@
 </script>
 
 <span class="swap"
-	>{#key value}<span in:rise={{ y: 5, duration }} out:rise={{ y: -5, duration: duration * 0.7 }}
-			>{value}</span
+	>{#key value}<span
+			in:rise={{ y: 5, duration, delay: duration * 0.25 }}
+			out:rise={{ y: -5, duration: duration * 0.5 }}>{value}</span
 		>{/key}</span
 >
 
