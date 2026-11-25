@@ -123,4 +123,17 @@
 	.csv {
 		font-size: 14px;
 	}
+
+	@media (max-width: 600px) {
+		.count {
+			flex-direction: column;
+			gap: 6px;
+		}
+
+		.links {
+			flex-wrap: wrap;
+			gap: 4px 16px;
+			margin-left: 0;
+		}
+	}
 </style>
