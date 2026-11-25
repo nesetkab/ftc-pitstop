@@ -141,7 +141,7 @@ describe('home page', () => {
 	it('has the pit display address with a team number field', () => {
 		show({ today, week });
 		expect(screen.getByRole('heading', { name: 'Pit display' })).toBeInTheDocument();
-		expect(screen.getByRole('textbox', { name: 'Team number' })).toBeInTheDocument();
+		expect(screen.getByRole('combobox', { name: 'Team number or name' })).toBeInTheDocument();
 		expect(screen.getByText('ftcpitstop.com/')).toBeInTheDocument();
 	});
 

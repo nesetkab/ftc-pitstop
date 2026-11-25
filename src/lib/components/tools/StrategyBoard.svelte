@@ -5,7 +5,9 @@
 	import Field from '#lib/components/tools/Field.svelte';
 	import ShareLink from '#lib/components/tools/ShareLink.svelte';
 	import Button from '#lib/ui/Button.svelte';
+	import type { SearchFn } from '#lib/ui/search.svelte.ts';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
+	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import {
 		addPlan,
 		applyOp,
@@ -46,9 +48,10 @@
 		team?: number | null;
 		update?: (change: (boards: Boards) => Boards) => void;
 		shareContext?: { from: string | null; team: number | null };
+		search?: SearchFn;
 	}
 
-	let { boards, team = null, update, shareContext }: Props = $props();
+	let { boards, team = null, update, shareContext, search }: Props = $props();
 
 	type Tool = 'pen' | 'arrow' | 'robot' | 'text' | 'erase';
 
@@ -104,7 +107,9 @@
 		return new Set<string>();
 	});
 	const visible = $derived(shapes.filter((shape) => !hidden.has(shape.id)));
-	const robotLabel = $derived(robotNumber.trim() || (team ? String(team) : ''));
+	const robotLabel = $derived(
+		/^\d{1,6}$/.test(robotNumber.trim()) ? robotNumber.trim() : team ? String(team) : ''
+	);
 
 	const preview = $derived.by((): Shape | null => {
 		if (!gesture) return null;
@@ -501,17 +506,12 @@
 				</div>
 				<div class="panel">
 					<label class="sec-title" for="{id}-robot">Robot number</label>
-					<input
+					<TeamInput
 						id="{id}-robot"
-						class="ctl-input"
-						inputmode="numeric"
-						maxlength="6"
-						placeholder={team ? String(team) : 'Team number'}
-						value={robotNumber}
-						oninput={(event) => {
-							robotNumber = event.currentTarget.value.replace(/\D/g, '').slice(0, 6);
-							event.currentTarget.value = robotNumber;
-						}}
+						placeholder={team ? String(team) : 'Number or name'}
+						listLabel="Teams"
+						{search}
+						bind:value={robotNumber}
 					/>
 				</div>
 				<div class="panel">
