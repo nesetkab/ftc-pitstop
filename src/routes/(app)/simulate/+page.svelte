@@ -4,7 +4,6 @@
 	import PartTable from '#lib/components/simulate/PartTable.svelte';
 	import SimulatePicker from '#lib/components/simulate/SimulatePicker.svelte';
 	import {
-		colorName,
 		COLORS,
 		headline,
 		isFull,
@@ -53,7 +52,7 @@
 
 	function range(color: Color): string {
 		const side = simulation![color];
-		return `${colorName(color)} ${integer(side.low)} to ${integer(side.high)}`;
+		return `${integer(side.low)} to ${integer(side.high)}`;
 	}
 
 	function teamText(number: number): string {
@@ -73,7 +72,7 @@
 
 <PageHeader
 	title="Match simulator"
-	meta="Any four teams in one match, predicted with the same model as PitStop's match predictions."
+	meta="See how a match between any four teams would likely go."
 />
 
 <SimulatePicker {sides} picked={data.picked} />
@@ -95,7 +94,7 @@
 					caption="Simulated match prediction"
 				/>
 				<p class="note">
-					Likely score range, 8 matches in 10: {range('red')}, {range('blue')}.
+					In 8 of 10 matches, Red scores {range('red')} and Blue scores {range('blue')}.
 				</p>
 			</div>
 
@@ -103,8 +102,8 @@
 				<h2 class="sec-title" id="parts-title">Part by part</h2>
 				<PartTable red={simulation.red} blue={simulation.blue} />
 				<Legend>
-					Expected points per match. A team's share shows when it brings most of its alliance's
-					points in a part. Tips are counts, not points.
+					When one team brings most of its alliance's points in a part, its share shows under the
+					value. Tips are counts, not points.
 				</Legend>
 			</section>
 		</div>
@@ -135,27 +134,20 @@
 			new team.
 		</p>
 	{/if}
-	<Legend>
-		Numbers are each team's current season rating. Chances are for one qualification match.
-	</Legend>
+	<Legend>Chances are for a single qualification match.</Legend>
 {:else if full && !data.ready}
-	<EmptyState title="Season ratings are still loading.">
-		Reload in a minute to see the prediction for {matchup}.
+	<EmptyState title="Season ratings are still loading. Try again in a minute." />
+{:else if suggestion}
+	<EmptyState title="Pick two teams for each alliance.">
+		Try the top four teams this season:
+		<a href={simulateHref(suggestion.sides)}>
+			{suggestion.sides.red.map(teamText).join(' and ')} vs {suggestion.sides.blue
+				.map(teamText)
+				.join(' and ')}</a
+		>.
 	</EmptyState>
 {:else}
-	<EmptyState title="Pick two teams for each alliance.">
-		Type a team number or name in each box. You can also start from a compare page, a match page or
-		alliance selection.
-		{#if suggestion}
-			<br />
-			Or try the top four teams this season:
-			<a href={simulateHref(suggestion.sides)}>
-				{suggestion.sides.red.map(teamText).join(' and ')} vs {suggestion.sides.blue
-					.map(teamText)
-					.join(' and ')}</a
-			>.
-		{/if}
-	</EmptyState>
+	<EmptyState title="Pick two teams for each alliance." />
 {/if}
 
 <style>

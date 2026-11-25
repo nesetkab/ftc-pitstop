@@ -103,9 +103,9 @@ describe('where the match is decided', () => {
 			30
 		);
 		expect(notes).toEqual([
-			"Auto is the biggest gap: Red is expected to score 30.0 auto points to Blue's 12.0.",
-			"Blue's way back is garden, where it is expected to lead by 6.0 points.",
-			"Pollinator 1 separates them: it needs 4 tips, Red averages 5.2 to Blue's 2.1, so Red gets it 75% of the time and Blue 20%."
+			"Auto is the biggest gap. Red should score 30.0 auto points to Blue's 12.0.",
+			"Blue's best chance is garden, where it should lead by 6.0 points.",
+			"Pollinator 1 separates them. It takes 4 tips, and Red averages 5.2 to Blue's 2.1."
 		]);
 	});
 
@@ -113,27 +113,29 @@ describe('where the match is decided', () => {
 		const even = side('blue', { auto: 29, teleop: 60, hive: 49, garden: 5, park: 6, tips: 5 });
 		const notes = decisionNotes(red, even, forecast(0.5, 0.48), 1, 30);
 		expect(notes[0]).toBe(
-			'This one is close to a coin flip: the expected margin of 1 points is small next to a normal swing of about 30.'
+			'This is close to a coin flip. The expected margin of 1 point is small next to a normal swing of about 30.'
 		);
-		expect(notes[1]).toBe('No single part separates them: every scoring part is within 3 points.');
+		expect(notes[1]).toBe(
+			'Every scoring part is within 3 points, so no single part separates them.'
+		);
 		expect(notes).toHaveLength(2);
 	});
 
 	it('says when the underdog leads nowhere', () => {
 		const weak = side('blue', { auto: 10, teleop: 20, hive: 15, garden: 2, park: 2 });
 		expect(decisionNotes(red, weak, forecast(0.95, 0.04), 60, 30)[1]).toBe(
-			'Blue is not 3 or more points ahead in any scoring part, so it needs Red to have an off match.'
+			"Blue doesn't clearly lead any scoring part, so it needs Red to have an off match."
 		);
 	});
 
 	it('sums the odds up in one line', () => {
 		expect(headline({ forecast: forecast(0.64, 0.34) })).toEqual({
 			lead: 'Red is favored.',
-			rest: 'It wins 64% of the time, Blue 34%, tie 2%.'
+			rest: 'It wins 64% of the time and Blue wins 34%. The chance of a tie is 2%.'
 		});
 		expect(headline({ forecast: forecast(0.45, 0.53) })).toEqual({
 			lead: 'Too close to call.',
-			rest: 'Red wins 45%, Blue 53%, tie 2%.'
+			rest: 'Red wins 45% of the time and Blue wins 53%. The chance of a tie is 2%.'
 		});
 	});
 });

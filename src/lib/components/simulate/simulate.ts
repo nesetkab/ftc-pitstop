@@ -124,16 +124,17 @@ function gaps(red: SimSide, blue: SimSide) {
 function gapNote(red: SimSide, blue: SimSide): string {
 	const [top] = gaps(red, blue);
 	if (Math.abs(top.gap) < EVEN_PART) {
-		return `No single part separates them: every scoring part is within ${EVEN_PART} points.`;
+		return `Every scoring part is within ${EVEN_PART} points, so no single part separates them.`;
 	}
 	const ahead = top.gap > 0 ? red : blue;
 	const behind = top.gap > 0 ? blue : red;
 	const word = partWord(top.part);
-	return `${PART_LABELS[top.part]} is the biggest gap: ${colorName(ahead.color)} is expected to score ${fixed(ahead.parts[top.part])} ${word} points to ${colorName(behind.color)}'s ${fixed(behind.parts[top.part])}.`;
+	return `${PART_LABELS[top.part]} is the biggest gap. ${colorName(ahead.color)} should score ${fixed(ahead.parts[top.part])} ${word} points to ${colorName(behind.color)}'s ${fixed(behind.parts[top.part])}.`;
 }
 
 function closeNote(margin: number, marginSd: number): string {
-	return `This one is close to a coin flip: the expected margin of ${integer(Math.abs(margin))} points is small next to a normal swing of about ${integer(marginSd)}.`;
+	const points = Math.round(Math.abs(margin)) === 1 ? 'point' : 'points';
+	return `This is close to a coin flip. The expected margin of ${integer(Math.abs(margin))} ${points} is small next to a normal swing of about ${integer(marginSd)}.`;
 }
 
 function underdogNote(underdog: SimSide, favorite: SimSide): string {
@@ -145,10 +146,10 @@ function underdogNote(underdog: SimSide, favorite: SimSide): string {
 		.sort((a, b) => b.gap - a.gap);
 	const name = colorName(underdog.color);
 	if (leads.length === 0) {
-		return `${name} is not ${EVEN_PART} or more points ahead in any scoring part, so it needs ${colorName(favorite.color)} to have an off match.`;
+		return `${name} doesn't clearly lead any scoring part, so it needs ${colorName(favorite.color)} to have an off match.`;
 	}
 	const [best] = leads;
-	return `${name}'s way back is ${partWord(best.part)}, where it is expected to lead by ${fixed(best.gap)} points.`;
+	return `${name}'s best chance is ${partWord(best.part)}, where it should lead by ${fixed(best.gap)} points.`;
 }
 
 function rpNote(red: SimSide, blue: SimSide, forecast: MatchForecast): string | null {
@@ -160,13 +161,12 @@ function rpNote(red: SimSide, blue: SimSide, forecast: MatchForecast): string | 
 	const { key, gap } = options[0];
 	const ahead = gap > 0 ? red : blue;
 	const behind = gap > 0 ? blue : red;
-	const odds = `${colorName(ahead.color)} gets it ${pct(forecast[ahead.color].rp[key])} of the time and ${colorName(behind.color)} ${pct(forecast[behind.color].rp[key])}`;
 	if (key === 'swarm') {
-		return `Swarm separates them: it needs ${RP_THRESHOLDS.swarm} leave and park points, ${colorName(ahead.color)} averages ${fixed(ahead.parts.leavePark)} to ${colorName(behind.color)}'s ${fixed(behind.parts.leavePark)}, so ${odds}.`;
+		return `Swarm separates them. It takes ${RP_THRESHOLDS.swarm} leave and park points, and ${colorName(ahead.color)} averages ${fixed(ahead.parts.leavePark)} to ${colorName(behind.color)}'s ${fixed(behind.parts.leavePark)}.`;
 	}
 	const label = key === 'pollinator1' ? 'Pollinator 1' : 'Pollinator 2';
 	const need = key === 'pollinator1' ? RP_THRESHOLDS.pollinator1 : RP_THRESHOLDS.pollinator2;
-	return `${label} separates them: it needs ${need} tips, ${colorName(ahead.color)} averages ${fixed(ahead.parts.tips)} to ${colorName(behind.color)}'s ${fixed(behind.parts.tips)}, so ${odds}.`;
+	return `${label} separates them. It takes ${need} tips, and ${colorName(ahead.color)} averages ${fixed(ahead.parts.tips)} to ${colorName(behind.color)}'s ${fixed(behind.parts.tips)}.`;
 }
 
 export function decisionNotes(
@@ -193,11 +193,11 @@ export function headline(simulation: Pick<Simulation, 'forecast'>): {
 	rest: string;
 } {
 	const { red, blue, tie } = simulation.forecast;
-	const tieText = tie >= 0.005 ? `, tie ${pct(tie)}` : '';
+	const tieText = tie >= 0.005 ? ` The chance of a tie is ${pct(tie)}.` : '';
 	if (Math.abs(red.win - blue.win) < CLOSE_WIN) {
 		return {
 			lead: 'Too close to call.',
-			rest: `Red wins ${pct(red.win)}, Blue ${pct(blue.win)}${tieText}.`
+			rest: `Red wins ${pct(red.win)} of the time and Blue wins ${pct(blue.win)}.${tieText}`
 		};
 	}
 	const favorite = red.win > blue.win ? 'Red' : 'Blue';
@@ -205,6 +205,6 @@ export function headline(simulation: Pick<Simulation, 'forecast'>): {
 	const other = favorite === 'Red' ? 'Blue' : 'Red';
 	return {
 		lead: `${favorite} is favored.`,
-		rest: `It wins ${pct(first.win)} of the time, ${other} ${pct(second.win)}${tieText}.`
+		rest: `It wins ${pct(first.win)} of the time and ${other} wins ${pct(second.win)}.${tieText}`
 	};
 }
