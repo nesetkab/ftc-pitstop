@@ -983,4 +983,9 @@
 			width: 40px;
 		}
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		.note-input {
+			font-size: 16px;
+		}
+	}
 </style>

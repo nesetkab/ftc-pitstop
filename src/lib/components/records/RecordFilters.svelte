@@ -182,4 +182,9 @@
 			min-height: 40px;
 		}
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		.team :global(.field) {
+			font-size: 16px;
+		}
+	}
 </style>

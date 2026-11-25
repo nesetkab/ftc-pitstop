@@ -208,4 +208,9 @@
 		font-size: 0.85em;
 		color: var(--text);
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		input {
+			font-size: 16px;
+		}
+	}
 </style>
