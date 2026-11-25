@@ -96,7 +96,7 @@ const base: Data = {
 	window: null,
 	types: [
 		{ value: 'official', label: 'Official events' },
-		{ value: 'LeagueMeet', label: 'League Meet' },
+		{ value: 'LeagueMeet', label: 'League meet' },
 		{ value: 'Qualifier', label: 'Qualifier' }
 	],
 	weeks: [
@@ -403,7 +403,7 @@ describe('leaderboard event filters', () => {
 			within(type)
 				.getAllByRole('option')
 				.map((option) => option.textContent)
-		).toEqual(['All events', 'Official events', 'League Meet', 'Qualifier']);
+		).toEqual(['All events', 'Official events', 'League meet', 'Qualifier']);
 		await fireEvent.change(type, { target: { value: 'Qualifier' } });
 		expect(navigation.goto).toHaveBeenCalledWith('?type=Qualifier', { reset: false });
 	});

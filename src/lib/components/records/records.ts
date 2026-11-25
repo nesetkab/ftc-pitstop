@@ -3,6 +3,7 @@ import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
 import { regionName } from '#lib/format/places.ts';
 import { search } from '#lib/format/url.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
+import { TYPE_LABELS } from '#lib/components/event/event-meta.ts';
 import { EVENT_TYPE_NAMES } from '#lib/game/event-types.ts';
 import { plausibleScore } from '#lib/model/types.ts';
 import type {
@@ -248,7 +249,7 @@ export function buildRecordDataset(matches: SeasonMatch[]): RecordDataset {
 	return {
 		rows,
 		regions: [...regions].map((value) => ({ value, label: regionName(value) })).sort(byLabel),
-		types: [...types].map((value) => ({ value, label: EVENT_TYPE_NAMES[value] })).sort(byLabel)
+		types: [...types].map((value) => ({ value, label: TYPE_LABELS[value] })).sort(byLabel)
 	};
 }
 
