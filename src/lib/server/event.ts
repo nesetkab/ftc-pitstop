@@ -782,9 +782,12 @@ export function createLoaders(deps: LoaderDeps) {
 			end < addDays(today, -7)
 				? { ttl: DAY_SECONDS, maxStale: 30 * DAY_SECONDS }
 				: { ttl: 600, maxStale: DAY_SECONDS };
+		const last = addDays(start, 6);
 		return cache.get(weekKey(start), policy, async () => ({
 			status: 'ok',
-			body: await fetchSeasonMatches({ season: SEASON, start, end }, scout)
+			body: (await fetchSeasonMatches({ season: SEASON, start, end }, scout)).filter(
+				(match) => match.date >= start && match.date <= last
+			)
 		}));
 	}
 
