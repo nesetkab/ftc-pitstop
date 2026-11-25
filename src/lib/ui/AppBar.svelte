@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import Icon from './Icon.svelte';
 	import Logo from './Logo.svelte';
 	import ThemeSwitch from './ThemeSwitch.svelte';
 
@@ -40,6 +41,7 @@
 			aria-keyshortcuts="/ Control+K Meta+K"
 			onclick={onsearch}
 		>
+			<Icon name="search" size={14} />
 			<span>Search teams and events</span>
 			<kbd aria-hidden="true">/</kbd>
 		</button>

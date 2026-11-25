@@ -40,23 +40,28 @@ function teamMeta(team: TeamHit): string | null {
 }
 
 function teamResult(team: TeamHit): SearchResult {
+	const place = placeName(team, 'short') || null;
 	return {
 		type: 'team',
 		label: `${team.number} ${team.name}`,
-		sublabel: placeName(team, 'short') || null,
+		sublabel: place,
 		meta: teamMeta(team),
+		aside: place,
 		href: `/teams/${team.number}`
 	};
 }
 
 function eventResult(event: EventSummary, now: number): SearchResult {
-	const parts = [event.code, placeName(event, 'short'), shortRange(event.start, event.end)];
+	const dates = shortRange(event.start, event.end);
+	const parts = [event.code, placeName(event, 'short'), dates];
 	const status = eventStatus(event, now);
+	const meta = statusLabel(event, status, now);
 	return {
 		type: 'event',
 		label: event.name,
 		sublabel: parts.filter(Boolean).join(' · '),
-		meta: statusLabel(event, status, now),
+		meta,
+		aside: status === 'live' ? meta : dates,
 		live: status === 'live',
 		href: `/events/${event.code}`
 	};

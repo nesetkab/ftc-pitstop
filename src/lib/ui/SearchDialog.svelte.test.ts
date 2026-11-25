@@ -196,13 +196,35 @@ describe('SearchDialog', () => {
 		expect(dialog).not.toHaveAttribute('open');
 	});
 
-	it('shows result details next to the name', async () => {
+	it('shows the place or dates next to the name and bolds the match', async () => {
 		setup(async () => [
-			{ type: 'team', label: '3747 The Hive', meta: '80.0 OPR · #3', href: '/teams/3747' },
-			{ type: 'event', label: 'Butte', meta: 'Live', live: true, href: '/events/USMTBUQ' }
+			{ type: 'team', label: '3747 The Hive', aside: 'Sandy, Utah', href: '/teams/3747' },
+			{ type: 'event', label: 'Butte', aside: 'Day 2 of 2', live: true, href: '/events/USMTBUQ' }
 		]);
 		await openAndType('hive');
-		expect(screen.getByText('80.0 OPR · #3')).toBeInTheDocument();
-		expect(screen.getByText('Live')).toHaveClass('live');
+		expect(screen.getByText('Sandy, Utah')).toBeInTheDocument();
+		expect(screen.getByText('Day 2 of 2')).toHaveClass('live');
+		expect(screen.getByText('Hive').tagName).toBe('MARK');
+	});
+
+	it('filters to teams or events with the buttons above the results', async () => {
+		setup();
+		const input = await openAndType('ca');
+		const events = screen.getByRole('button', { name: 'Events 1' });
+		expect(screen.getByRole('button', { name: 'All 3' })).toHaveAttribute('aria-pressed', 'true');
+		await fireEvent.click(events);
+		expect(events).toHaveAttribute('aria-pressed', 'true');
+		const options = screen.getAllByRole('option');
+		expect(options.map((option) => option.getAttribute('href'))).toEqual(['/events/USAZGIQ']);
+		expect(options[0]).toHaveAttribute('aria-selected', 'true');
+		expect(input).toHaveFocus();
+		await fireEvent.click(screen.getByRole('button', { name: 'Teams 2' }));
+		expect(screen.getAllByRole('option')).toHaveLength(2);
+	});
+
+	it('hides the filter buttons when only one kind of result comes back', async () => {
+		setup(async () => [results[0], results[2]]);
+		await openAndType('ca');
+		expect(screen.queryByRole('group', { name: 'Show' })).not.toBeInTheDocument();
 	});
 });
