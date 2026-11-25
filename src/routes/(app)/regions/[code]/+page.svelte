@@ -105,9 +105,7 @@
 		{/if}
 	</div>
 	{#if data.teams.length === 0}
-		<EmptyState title="No rated teams yet.">
-			Teams get a season aOPR once they play matches. It fills in as events finish.
-		</EmptyState>
+		<EmptyState title="No rated teams yet." />
 	{:else}
 		<div class="table-wrap">
 			<table class="t">
@@ -261,7 +259,6 @@
 				</tbody>
 			</table>
 		</div>
-		<p class="note">Scores leave out points from the other alliance's fouls.</p>
 	{/if}
 </section>
 
