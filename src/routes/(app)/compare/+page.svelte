@@ -66,7 +66,7 @@
 
 	{#if trended}
 		<section class="panel" style:max-width="{width}px" aria-labelledby="trend-title">
-			<h2 class="sec-title" id="trend-title">aOPR by event</h2>
+			<h2 class="sec-title" id="trend-title">Season aOPR over time</h2>
 			<SeasonChart teams={view.teams} lines={data.trend} />
 		</section>
 	{/if}

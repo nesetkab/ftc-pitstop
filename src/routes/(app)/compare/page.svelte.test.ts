@@ -107,7 +107,7 @@ function show(
 describe('compare page', () => {
 	it('charts the aOPR of each team after every event', () => {
 		show();
-		const section = screen.getByRole('region', { name: 'aOPR by event' });
+		const section = screen.getByRole('region', { name: 'Season aOPR over time' });
 		const rows = within(section).getAllByRole('row');
 		expect(rows.slice(1).map((row) => row.textContent)).toEqual([
 			'100Alpha QualifierNov 790.0',
@@ -118,7 +118,7 @@ describe('compare page', () => {
 
 	it('leaves the chart out when no team has an event yet', () => {
 		show({ trend: [{ number: 100, points: [] }] });
-		expect(screen.queryByRole('region', { name: 'aOPR by event' })).toBeNull();
+		expect(screen.queryByRole('region', { name: 'Season aOPR over time' })).toBeNull();
 	});
 
 	it('links to the simulator with the same teams from the tab row', () => {

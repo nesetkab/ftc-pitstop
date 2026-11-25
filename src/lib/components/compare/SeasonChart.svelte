@@ -61,18 +61,37 @@
 		})
 	);
 	const ends = $derived.by(() => {
-		const placed = drawn
-			.map((line) => {
-				const last = line.coords[line.coords.length - 1];
-				return { number: line.number, slot: line.slot, x: last.x + 8, y: last.y + 4 };
+		const marks = drawn.flatMap((line) =>
+			line.coords.flatMap((point, index) => {
+				const next = line.coords[index + 1];
+				if (!next) return [{ number: line.number, x: point.x, y: point.y }];
+				return Array.from({ length: 8 }, (_, step) => ({
+					number: line.number,
+					x: point.x + ((next.x - point.x) * step) / 8,
+					y: point.y + ((next.y - point.y) * step) / 8
+				}));
 			})
-			.sort((a, b) => a.y - b.y);
-		for (let index = 1; index < placed.length; index++) {
-			const before = placed[index - 1];
-			const here = placed[index];
-			if (Math.abs(here.x - before.x) < 40 && here.y - before.y < LABEL_GAP) {
-				here.y = before.y + LABEL_GAP;
-			}
+		);
+		const placed: { number: number; x: number; y: number }[] = [];
+		const clear = (number: number, x: number, y: number) =>
+			marks.every(
+				(mark) =>
+					mark.number === number ||
+					mark.x < x - 5 ||
+					mark.x > x + 36 ||
+					mark.y < y - 15 ||
+					mark.y > y + 5
+			) &&
+			placed.every((label) => Math.abs(label.x - x) >= 40 || Math.abs(label.y - y) >= LABEL_GAP);
+		const order = drawn
+			.map((line) => ({ number: line.number, last: line.coords[line.coords.length - 1] }))
+			.sort((a, b) => a.last.y - b.last.y);
+		for (const { number, last } of order) {
+			const x = last.x + 8;
+			const base = last.y + 4;
+			const offsets = [0, 1, -1, 2, -2, 3, -3].map((step) => base + step * LABEL_GAP);
+			const y = offsets.find((at) => clear(number, x, at)) ?? base;
+			placed.push({ number, x, y: Math.min(plot.bottom + 4, Math.max(plot.top + 4, y)) });
 		}
 		return placed;
 	});
@@ -200,7 +219,7 @@
 
 	<div class="visually-hidden">
 		<table>
-			<caption>aOPR after each event</caption>
+			<caption>Season aOPR after each event</caption>
 			<thead>
 				<tr>
 					<th scope="col">Team</th>
