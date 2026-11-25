@@ -13,14 +13,23 @@
 
 	let now = $state(Date.now());
 
-	$effect(() => {
-		now = Date.now();
-		const timer = setInterval(() => (now = Date.now()), 1000);
-		return () => clearInterval(timer);
-	});
-
 	const date = $derived(updated == null ? null : toDate(updated));
 	const seen = $derived(date && !Number.isNaN(date.getTime()) ? date : null);
+
+	$effect(() => {
+		const from = seen?.getTime() ?? null;
+		const fast = Math.max(60, staleAfter);
+		let timer: ReturnType<typeof setTimeout>;
+		const tick = () => {
+			const at = Date.now();
+			now = at;
+			const seconds = from === null ? 0 : (at - from) / 1000;
+			const delay = seconds <= fast ? 1000 : seconds < 3600 ? 15_000 : 60_000;
+			timer = setTimeout(tick, delay);
+		};
+		tick();
+		return () => clearTimeout(timer);
+	});
 	const age = $derived(seen ? Math.max(0, secondsBetween(seen, now)) : 0);
 	const stale = $derived(seen !== null && age > staleAfter);
 </script>

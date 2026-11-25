@@ -50,6 +50,16 @@ describe('StaleNotice', () => {
 		expect(notice).toHaveTextContent('Updated 1 minute ago');
 	});
 
+	it('ticks less often once the data is old', () => {
+		const timeout = vi.spyOn(globalThis, 'setTimeout');
+		const { container } = render(StaleNotice, { props: { updated: secondsAgo(600) } });
+		expect(timeout).toHaveBeenLastCalledWith(expect.any(Function), 15_000);
+		vi.advanceTimersByTime(60_000);
+		expect(timeout).toHaveBeenCalledTimes(5);
+		flushSync();
+		expect(container.querySelector('time')).toHaveTextContent('Updated 11 minutes ago');
+	});
+
 	it('uses a two minute threshold by default', () => {
 		const fresh = render(StaleNotice, { props: { updated: secondsAgo(119) } });
 		expect(fresh.container.querySelector('time')).not.toHaveClass('stale');
