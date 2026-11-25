@@ -81,7 +81,7 @@
 					</td>
 					<td class="l">
 						<a class="match" href="/events/{meeting.code}/matches/{meeting.key}">{meeting.label}</a>
-						<span class="phone">{shortDate(meeting.start)} · {meeting.event}</span>
+						<span class="phone">{shortDate(meeting.start)} at {meeting.event}</span>
 					</td>
 					{#each ['red', 'blue'] as const as color (color)}
 						<td class="l">

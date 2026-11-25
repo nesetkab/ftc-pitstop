@@ -28,4 +28,9 @@ describe('FilterPanel', () => {
 		expect(toggle).toHaveAttribute('aria-expanded', 'true');
 		expect(outside).toHaveFocus();
 	});
+
+	it('lists the chosen filters as plain words', () => {
+		render(FilterPanelExample, { summary: ['Utah', 'Qualifier', 'Last 4 weeks'] });
+		expect(screen.getByText('Utah, Qualifier, Last 4 weeks')).toBeInTheDocument();
+	});
 });

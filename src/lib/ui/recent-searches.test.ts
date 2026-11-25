@@ -46,7 +46,7 @@ describe('recent searches', () => {
 	});
 
 	it('stores only what it needs and leaves out live details', () => {
-		rememberRecent({ ...team(1), meta: '85.2 aOPR · #12', live: true });
+		rememberRecent({ ...team(1), meta: 'aOPR 85.2, 12th worldwide', live: true });
 		expect(JSON.parse(store.get(RECENT_KEY) ?? '[]')).toEqual([
 			{ type: 'team', label: '1 Team', sublabel: 'Gilbert, Arizona', href: '/teams/1' }
 		]);

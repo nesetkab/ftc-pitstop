@@ -222,7 +222,7 @@ describe('leaderboard page', () => {
 		expect(
 			within(screen.getByRole('columnheader', { name: /aOPR/ })).getByRole('link')
 		).toHaveAttribute('href', '/leaderboards?region=USAZ');
-		expect(screen.getByText('USAZ · By auto')).toBeInTheDocument();
+		expect(screen.getByText('USAZ, By auto')).toBeInTheDocument();
 	});
 
 	it('marks the team that was asked for and keeps it out of the pager and CSV links', () => {
@@ -415,7 +415,7 @@ describe('leaderboard filters', () => {
 		show({
 			filters: { ...base.filters, region: 'USAZ', type: 'Qualifier', min: 10, sort: 'auto' }
 		});
-		expect(screen.getByText('USAZ · Qualifier · 10+ matches · By auto')).toBeInTheDocument();
+		expect(screen.getByText('USAZ, Qualifier, 10+ matches, By auto')).toBeInTheDocument();
 		const toggle = screen.getByRole('button', { name: 'Filters' });
 		expect(toggle).toHaveAttribute('aria-expanded', 'false');
 		await fireEvent.click(toggle);
@@ -476,7 +476,7 @@ describe('leaderboard event filters', () => {
 		});
 		expect(screen.getByLabelText('Event type')).toHaveValue('Qualifier');
 		expect(screen.getByLabelText('Dates')).toHaveValue('2026-11-16');
-		expect(screen.getByText('Qualifier · Nov 16–22')).toBeInTheDocument();
+		expect(screen.getByText('Qualifier, Nov 16–22')).toBeInTheDocument();
 		expect(screen.getByText('Showing 1 to 2 of 120 teams')).toBeInTheDocument();
 		expect(screen.getByText(/as of its last event in this filter/)).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'Download CSV' })).toHaveAttribute(

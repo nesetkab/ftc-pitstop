@@ -41,7 +41,7 @@
 		</svg>
 	</button>
 	{#if summary.length > 0}
-		<span class="summary">{summary.join(' · ')}</span>
+		<span class="summary">{summary.join(', ')}</span>
 	{/if}
 </div>
 <div class={['panel', { open }]} {id} bind:this={panel}>

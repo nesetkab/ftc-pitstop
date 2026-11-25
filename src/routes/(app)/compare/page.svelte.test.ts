@@ -161,6 +161,7 @@ describe('compare page', () => {
 			'href',
 			'/events/BBB/matches/q2'
 		);
+		expect(within(matches).getByText('Nov 14 at Gilbert Qualifier')).toBeInTheDocument();
 		const shared = screen.getByRole('table', {
 			name: 'Events where two or more of these teams were entered'
 		});

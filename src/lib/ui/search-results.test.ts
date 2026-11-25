@@ -26,7 +26,7 @@ describe('toSearchResults', () => {
 			{
 				type: 'event',
 				label: 'Roadrunner - Gilbert Qualifier',
-				sublabel: 'USAZGIQ · Gilbert, AZ · Nov 14',
+				sublabel: 'USAZGIQ in Gilbert, AZ on Nov 14',
 				meta: 'Done',
 				aside: 'Nov 14',
 				live: false,
@@ -37,14 +37,14 @@ describe('toSearchResults', () => {
 
 	it('shows season aOPR and rank for a team that has played', () => {
 		const [result] = toSearchResults({ teams: [{ ...team, opr: 85.24, rank: 12 }] });
-		expect(result.meta).toBe('85.2 aOPR · #12');
+		expect(result.meta).toBe('aOPR 85.2, 12th worldwide');
 	});
 
 	it('marks events that are running now', () => {
 		const event = eventSummary({ start: '2026-11-20', end: '2026-11-21' });
 		const live = toSearchResults({ events: [event] }, Date.parse('2026-11-21T18:00:00Z'));
 		expect(live[0]).toMatchObject({ meta: 'Day 2 of 2', aside: 'Day 2 of 2', live: true });
-		expect(live[0].sublabel).toBe('USAZGIQ · Gilbert, AZ · Nov 20–21');
+		expect(live[0].sublabel).toBe('USAZGIQ in Gilbert, AZ on Nov 20–21');
 		const soon = toSearchResults({ events: [event] }, Date.parse('2026-11-10T18:00:00Z'));
 		expect(soon[0]).toMatchObject({ meta: 'Upcoming', aside: 'Nov 20–21', live: false });
 	});

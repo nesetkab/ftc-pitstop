@@ -1,5 +1,6 @@
 import { eventStatus, statusLabel } from '#lib/components/event/dates.ts';
 import { fixed } from '#lib/format/number.ts';
+import { ordinal } from '#lib/format/ordinal.ts';
 import { placeName } from '#lib/format/places.ts';
 import { shortRange } from '#lib/format/time.ts';
 import type { EventSummary, SearchTeam } from '#lib/types.ts';
@@ -36,7 +37,9 @@ function isEvent(value: unknown): value is EventSummary {
 
 function teamMeta(team: TeamHit): string | null {
 	if (typeof team.opr !== 'number' || typeof team.rank !== 'number') return null;
-	return `${fixed(team.opr)} aOPR · #${team.rank}`;
+	const place =
+		team.rank.toLocaleString('en-US') + ordinal(team.rank).slice(String(team.rank).length);
+	return `aOPR ${fixed(team.opr)}, ${place} worldwide`;
 }
 
 function teamResult(team: TeamHit): SearchResult {
@@ -53,13 +56,15 @@ function teamResult(team: TeamHit): SearchResult {
 
 function eventResult(event: EventSummary, now: number): SearchResult {
 	const dates = shortRange(event.start, event.end);
-	const parts = [event.code, placeName(event, 'short'), dates];
+	const where = placeName(event, 'short');
 	const status = eventStatus(event, now);
 	const meta = statusLabel(event, status, now);
 	return {
 		type: 'event',
 		label: event.name,
-		sublabel: parts.filter(Boolean).join(' · '),
+		sublabel: [event.code, where && `in ${where}`, dates && `on ${dates}`]
+			.filter(Boolean)
+			.join(' '),
 		meta,
 		aside: status === 'live' ? meta : dates,
 		live: status === 'live',
