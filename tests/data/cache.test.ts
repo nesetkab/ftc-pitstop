@@ -417,6 +417,18 @@ describe('cache lookup', () => {
 		const found = await cache.lookup(['a'], 60_000);
 		expect(found.get('a')?.body).toBe('old');
 	});
+
+	it('does not read the store for keys kept only in memory', async () => {
+		const time = clock();
+		const { store, get } = memoryStore({});
+		const cache = createCache({ now: time.now, store });
+		await cache.get('live', policy, counter(['local']));
+		get.mockClear();
+		time.advance(120);
+		const found = await cache.lookup(['live'], 60_000);
+		expect(found.get('live')?.body).toBe('local');
+		expect(get).not.toHaveBeenCalled();
+	});
 });
 
 describe('LruMap', () => {
