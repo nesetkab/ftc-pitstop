@@ -4,6 +4,7 @@
 	import ChampionshipTable from '#lib/components/advancement/ChampionshipTable.svelte';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
+	import RegionTeams from '#lib/components/region/RegionTeams.svelte';
 	import type { RegionEvent } from '#lib/components/region/regions.ts';
 	import { fixed, integer } from '#lib/format/number.ts';
 	import { shortDate, shortRange } from '#lib/format/time.ts';
@@ -14,7 +15,6 @@
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
-	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import '#lib/ui/score-table.css';
 	import type { PageProps } from './$types';
@@ -107,37 +107,11 @@
 	{#if data.teams.length === 0}
 		<EmptyState title="No rated teams yet." />
 	{:else}
-		<div class="table-wrap">
-			<table class="t">
-				<caption class="visually-hidden">Top teams in {region.name} by season aOPR</caption>
-				<thead>
-					<tr>
-						<th class="l" scope="col"><Term label="#" /></th>
-						<th class="l" scope="col">Team</th>
-						<th class="l place" scope="col">Location</th>
-						<th scope="col"><Term label="aOPR" /></th>
-						<th class="opt" scope="col"><Term label="Auto" term="Auto aOPR" /></th>
-						<th class="opt" scope="col"><Term label="Teleop" term="Teleop aOPR" /></th>
-						<th scope="col"><Term label="World rank" /></th>
-					</tr>
-				</thead>
-				<tbody>
-					{#each data.teams as team, at (team.team)}
-						<tr class={{ me: followed.has(team.team) }}>
-							<td class="l">{at + 1}</td>
-							<td class="team">
-								<TeamCell number={team.team} name={team.name} href="/teams/{team.team}" />
-							</td>
-							<td class="l place muted">{team.place ?? ''}</td>
-							<td class="strong">{fixed(team.opr)}</td>
-							<td class="opt">{fixed(team.auto)}</td>
-							<td class="opt">{fixed(team.teleop)}</td>
-							<td>{integer(team.rank)}</td>
-						</tr>
-					{/each}
-				</tbody>
-			</table>
-		</div>
+		<RegionTeams
+			teams={data.teams}
+			{followed}
+			caption="Top teams in {region.name} by season aOPR"
+		/>
 	{/if}
 </section>
 
@@ -325,10 +299,6 @@
 		color: var(--text-2);
 	}
 
-	td.strong {
-		font-weight: 600;
-	}
-
 	.empty,
 	.small {
 		font-size: 14px;
@@ -403,10 +373,6 @@
 	}
 
 	@media (max-width: 760px) {
-		.place {
-			display: none;
-		}
-
 		.name {
 			min-width: 0;
 		}

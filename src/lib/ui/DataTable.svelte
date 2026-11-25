@@ -50,6 +50,10 @@
 		];
 	}
 
+	function termOf(column: Column<T>) {
+		return typeof column.term === 'string' ? column.term : undefined;
+	}
+
 	function arrow(column: Column<T>) {
 		const next = nextSort(column, sort);
 		return sort?.key === column.key ? sort.dir : next.dir;
@@ -57,7 +61,11 @@
 </script>
 
 {#snippet label(column: Column<T>)}
-	{#if column.term}<Term label={column.label} nested />{:else}{column.label}{/if}
+	{#if column.term}<Term
+			label={column.label}
+			term={termOf(column)}
+			nested
+		/>{:else}{column.label}{/if}
 {/snippet}
 
 {#if shown.length === 0 && empty}
@@ -84,7 +92,7 @@
 								>
 							{/if}
 						{:else if column.term}
-							<Term label={column.label} />
+							<Term label={column.label} term={termOf(column)} />
 						{:else}
 							{column.label}
 						{/if}
