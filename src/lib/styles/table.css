@@ -157,12 +157,21 @@ table.t.sticky thead {
 		white-space: nowrap;
 	}
 
+	table.t .team-cell b {
+		vertical-align: middle;
+	}
+
 	table.t .team-cell .name {
-		display: inline-block;
+		display: -webkit-inline-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
 		max-width: min(9em, 28vw);
 		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		vertical-align: bottom;
+		overflow-wrap: anywhere;
+		font-size: 0.9em;
+		line-height: 1.25;
+		white-space: normal;
+		vertical-align: middle;
 	}
 }
