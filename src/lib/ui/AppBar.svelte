@@ -2,6 +2,7 @@
 	import { page } from '$app/state';
 	import Icon from './Icon.svelte';
 	import Logo from './Logo.svelte';
+	import { NAV_LINKS, navCurrent } from './nav.ts';
 	import ThemeSwitch from './ThemeSwitch.svelte';
 
 	interface Props {
@@ -9,28 +10,14 @@
 	}
 
 	let { onsearch }: Props = $props();
-
-	const links = [
-		{ href: '/events', label: 'Events', also: ['/advancement'] },
-		{ href: '/leaderboards', label: 'Leaderboards' },
-		{ href: '/records', label: 'Records' },
-		{ href: '/compare', label: 'Compare' }
-	];
-
-	function current(href: string, also: string[] = []) {
-		const path = page.url.pathname;
-		if (path === href) return 'page';
-		const within = (base: string) => path === base || path.startsWith(`${base}/`);
-		return within(href) || also.some(within) ? 'true' : undefined;
-	}
 </script>
 
 <header class="appbar">
 	<div class="inner">
 		<a class="home" href="/"><Logo height="15px" /></a>
 		<nav aria-label="Main">
-			{#each links as link (link.href)}
-				<a href={link.href} aria-current={current(link.href, link.also)}>{link.label}</a>
+			{#each NAV_LINKS as link (link.href)}
+				<a href={link.href} aria-current={navCurrent(page.url.pathname, link)}>{link.label}</a>
 			{/each}
 		</nav>
 		<button
@@ -154,27 +141,42 @@
 
 	@media (max-width: 600px) {
 		.inner {
-			grid-template-columns: minmax(0, 1fr);
+			grid-template-columns: auto minmax(0, 1fr);
 			grid-template-areas:
-				'home'
-				'nav'
-				'search';
+				'home search'
+				'nav nav';
+			row-gap: 4px;
+			column-gap: 16px;
+			padding-block: 10px 0;
+		}
+
+		.home {
+			margin-block: 0;
+			padding-block: 12px;
+		}
+
+		.search {
+			min-height: 40px;
 		}
 
 		nav {
-			flex-wrap: wrap;
-			justify-content: space-between;
-			gap: 0 12px;
+			gap: clamp(12px, 5vw, 24px);
+			margin-inline: calc(-1 * var(--gutter));
+			padding-inline: var(--gutter);
+			overflow-x: auto;
+			scrollbar-width: none;
+		}
+
+		nav a {
+			display: flex;
+			align-items: center;
+			min-height: 44px;
+			margin-block: 0;
+			padding-block: 0;
 		}
 
 		.theme {
 			display: none;
-		}
-	}
-
-	@media (max-width: 400px) {
-		nav {
-			gap: 0 8px;
 		}
 	}
 
@@ -191,7 +193,7 @@
 		}
 
 		.search {
-			min-height: 40px;
+			min-height: 44px;
 		}
 	}
 </style>
