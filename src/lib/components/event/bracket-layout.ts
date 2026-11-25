@@ -8,6 +8,7 @@ export const SIZES = {
 	finalsHead: 26,
 	notesHead: 42,
 	game: 56,
+	score: 40,
 	gapX: 32,
 	gapY: 16,
 	title: 30,
@@ -131,7 +132,7 @@ export function layoutBracket(bracket: BracketView): BracketLayout {
 	const head = games.some((game) => game.ifNeeded || (!game.played && game.time !== null))
 		? SIZES.notesHead
 		: SIZES.finalsHead;
-	const finalsWidth = box + (games.length - 1) * SIZES.game;
+	const finalsWidth = box - SIZES.score + games.length * SIZES.game;
 	const finalsX = columns * step;
 	const feeders = alliances.map((side) => placed.get(side.winnerOf ?? -1));
 	let finalsY: number;
