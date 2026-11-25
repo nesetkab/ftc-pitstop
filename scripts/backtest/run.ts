@@ -1,6 +1,7 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { blend, build, CANDIDATES, resolve, type Candidate } from './candidates.ts';
+import { OPR_PARAMS } from '../../src/lib/model/opr.ts';
+import { blend, build, CANDIDATES, resolve, type Candidate, type Params } from './candidates.ts';
 import { run, type Records } from './engine.ts';
 import { loadSeason } from './hist.ts';
 import {
@@ -15,6 +16,7 @@ import {
 	type Scores
 } from './metrics.ts';
 import type { EpaParams, Model, OprParams } from './models.ts';
+import { attach } from './lab/robot/data.ts';
 import { prepSeason, type PEvent } from './prep.ts';
 import { productionRecords } from './production.ts';
 
@@ -42,7 +44,7 @@ const PARAMS_PATH = join(import.meta.dirname, 'params.json');
 const OUT_PATH = join(import.meta.dirname, '..', '..', 'src', 'lib', 'model', 'accuracy.json');
 
 type Stored = {
-	candidates: Record<string, OprParams | EpaParams>;
+	candidates: Record<string, Params>;
 	blend?: { opr: string; epa: string; w: number };
 };
 
@@ -51,6 +53,7 @@ const round = (x: number, digits = 5) => Number(x.toFixed(digits));
 async function loadSeasons(seasons: number[]): Promise<PEvent[][]> {
 	const out: PEvent[][] = [];
 	for (const s of seasons) out.push(prepSeason(await loadSeason(s)));
+	attach(out);
 	return out;
 }
 
@@ -173,8 +176,17 @@ async function main(): Promise<void> {
 	const train = await loadSeasons(TRAIN);
 
 	for (const c of CANDIDATES) {
+		if (c.family === 'robot') {
+			stored.candidates[c.id] = OPR_PARAMS;
+			continue;
+		}
 		const wanted = tuneAll || tuneOnly?.includes(c.id) || !stored.candidates[c.id];
-		if (wanted) stored.candidates[c.id] = tune(c, train, stored.candidates[c.id] ?? c.base);
+		if (wanted)
+			stored.candidates[c.id] = tune(
+				c,
+				train,
+				(stored.candidates[c.id] ?? c.base) as OprParams | EpaParams
+			);
 	}
 
 	const trainLoss = (id: string) =>
@@ -200,14 +212,15 @@ async function main(): Promise<void> {
 	const b = stored.blend!;
 	const oprC = CANDIDATES.find((c) => c.id === b.opr)!;
 	const epaC = CANDIDATES.find((c) => c.id === b.epa)!;
-	models.push(
-		blend(
-			'blend',
-			build(oprC, stored.candidates[b.opr]),
-			build(epaC, stored.candidates[b.epa]),
-			b.w
-		)
-	);
+	if (b.w < 1)
+		models.push(
+			blend(
+				'blend',
+				build(oprC, stored.candidates[b.opr]),
+				build(epaC, stored.candidates[b.epa]),
+				b.w
+			)
+		);
 	const ids = models.map((m) => m.name);
 	const labels: Record<string, string> = Object.fromEntries(CANDIDATES.map((c) => [c.id, c.label]));
 	labels.blend = `Blend: ${Math.round(b.w * 100)}% ${b.opr} + ${Math.round((1 - b.w) * 100)}% ${b.epa}`;
@@ -232,7 +245,7 @@ async function main(): Promise<void> {
 	const chosen = ids[chosenIndex];
 
 	const familyOf = (id: string) => CANDIDATES.find((c) => c.id === id)?.family ?? 'blend';
-	const chosenFamily = familyOf(chosen) === 'epa' ? 'epa' : 'opr';
+	const chosenFamily = familyOf(chosen) === 'blend' ? 'opr' : familyOf(chosen);
 	const rivals = ids
 		.map((id, k) => [k, familyOf(id)] as const)
 		.filter(([, f]) => f !== 'blend' && f !== chosenFamily)
@@ -244,8 +257,21 @@ async function main(): Promise<void> {
 		`validation Brier gap ${ids[chosenIndex]} vs ${ids[runnerUp]}: ${gap.diff.toFixed(5)} +/- ${gap.se.toFixed(5)}`
 	);
 
+	const previousIndex = ids.indexOf('opr-map');
+	const testGap = pairedGap(
+		rec,
+		chosenIndex,
+		previousIndex,
+		maps[chosenIndex],
+		maps[previousIndex],
+		inTest
+	);
+	console.log(
+		`test Brier gap ${ids[chosenIndex]} vs opr-map: ${testGap.diff.toFixed(5)} +/- ${testGap.se.toFixed(5)}`
+	);
+
 	table(
-		'train 2021-2023',
+		'train 2021-2025',
 		pooled(inTrain).map((s, k) => [ids[k], s])
 	);
 	table(
@@ -302,8 +328,8 @@ async function main(): Promise<void> {
 		}));
 	let production: { brier: number; mae: number; maxDiff: number } | null = null;
 	const chosenCandidate = CANDIDATES.find((c) => c.id === chosen);
-	if (chosenCandidate?.family === 'opr') {
-		const prod = productionRecords(rec, seasons, stored.candidates[chosen] as OprParams, chosen);
+	if (chosenCandidate?.family === 'robot') {
+		const prod = productionRecords(rec, seasons, chosen);
 		const all = (r: number) => r >= 0;
 		const a = score(rec, chosenIndex, maps[chosenIndex], all);
 		const p = score(prod, 0, maps[chosenIndex], all);
@@ -357,6 +383,7 @@ async function main(): Promise<void> {
 		seasons: seasonRows,
 		calibration: { model: chosen, validation: calib(inValid), test: calib(inTest) },
 		validationGap: { against: ids[runnerUp], diff: round(gap.diff), se: round(gap.se) },
+		testGap: { against: 'opr-map', diff: round(testGap.diff), se: round(testGap.se) },
 		productionCheck: production,
 		rp: existing.rp ?? null,
 		schedule: existing.schedule ?? null

@@ -30,9 +30,9 @@ export const RP_CALIBRATION: {
 	pollinator1: Platt;
 	pollinator2: Platt;
 } = {
-	swarm: { a: 0.4822, robots: 0.6466, points: 0.6034, sd: 8 },
-	pollinator1: { a: 0.5819, b: 1.4889 },
-	pollinator2: { a: 0.0892, b: 1.1317 }
+	swarm: { a: 0.5118, robots: 0.6068, points: 0.6781, sd: 8 },
+	pollinator1: { a: 0.5687, b: 1.4597 },
+	pollinator2: { a: 0.0692, b: 1.101 }
 };
 
 export function logit(p: number): number {

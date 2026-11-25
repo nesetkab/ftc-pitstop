@@ -1,12 +1,22 @@
+import {
+	HISTORY,
+	OPR_PARAMS,
+	type CompParams,
+	type OprParams as RobotParams
+} from '../../src/lib/model/opr.ts';
+import { FinalOpr } from './lab/final/heads.ts';
+import type { CompParams as LabComp } from './lab/robot/comp.ts';
 import { Blend, Epa, KalmanOpr, type EpaParams, type Model, type OprParams } from './models.ts';
 
-export type Family = 'opr' | 'epa';
+export type Family = 'opr' | 'epa' | 'robot';
+
+export type Params = OprParams | EpaParams | RobotParams;
 
 export type Candidate = {
 	id: string;
 	label: string;
 	family: Family;
-	base: OprParams | EpaParams;
+	base: Params;
 	space: Record<string, number[]>;
 	scoreSpace?: Record<string, number[]>;
 	tie?: Record<string, string>;
@@ -104,8 +114,15 @@ export const CANDIDATES: Candidate[] = [
 		tie: { lamPrevSeason: 'lamNew', rhoPrev: 'rhoNew', rhoPrevScore: 'rhoNewScore' }
 	},
 	{
+		id: 'robot-opr',
+		label: 'OPR with robot credit, partner carry and no team below zero',
+		family: 'robot',
+		base: OPR_PARAMS,
+		space: {}
+	},
+	{
 		id: 'opr-map',
-		label: 'OPR with priors from earlier events (ridge / MAP OPR)',
+		label: 'OPR with priors from earlier events (shipped until December 2026)',
 		family: 'opr',
 		base: MAP_BASE,
 		space: {
@@ -163,14 +180,49 @@ export const CANDIDATES: Candidate[] = [
 	}
 ];
 
-export function resolve(c: Candidate, params: OprParams | EpaParams): OprParams | EpaParams {
+export function resolve<T extends Params>(c: Candidate, params: T): T {
 	const out: Record<string, unknown> = { ...params };
 	for (const [key, source] of Object.entries(c.tie ?? {})) out[key] = out[source];
-	return out as OprParams | EpaParams;
+	return out as T;
 }
 
-export function build(c: Candidate, params: OprParams | EpaParams): Model {
+function labComp(p: CompParams): LabComp {
+	return {
+		lamNew: p.lamNew,
+		lamPrev: p.lamReturning,
+		q: p.q,
+		qWeek: p.qWeek,
+		qMatch: 0,
+		carry: p.carry,
+		drift: p.drift,
+		beta: p.beta,
+		rhoNew: p.rhoNew,
+		rhoPrev: p.rhoReturning,
+		rhoNewScore: p.rhoNewScore,
+		rhoPrevScore: p.rhoReturningScore
+	};
+}
+
+export function robotModel(name: string, p: RobotParams): Model {
+	const floor = { floor: p.floor, width: p.width };
+	return new FinalOpr(
+		name,
+		{
+			rest: labComp(p.rest),
+			robot: labComp(p.robot),
+			rVar: p.robotVar,
+			hist: HISTORY.slice(1),
+			het: p.het
+		},
+		p.imbFit,
+		{ imb: p.imbPred, ...floor, floorScore: true },
+		floor
+	);
+}
+
+export function build(c: Candidate, params: Params): Model {
 	const p = resolve(c, params);
+	if (c.family === 'robot') return robotModel(c.id, p as RobotParams);
 	return c.family === 'opr' ? new KalmanOpr(c.id, p as OprParams) : new Epa(c.id, p as EpaParams);
 }
 

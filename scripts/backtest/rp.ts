@@ -1,6 +1,13 @@
 import { readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { orderEvents, orderMatches, rateSeason, type Forecast } from '../../src/lib/model/opr.ts';
+import {
+	orderEvents,
+	orderMatches,
+	rateSeason,
+	type Forecast,
+	type PriorRel,
+	type RobotBase
+} from '../../src/lib/model/opr.ts';
 import { marginScale, WIN_PARAMS } from '../../src/lib/model/predict.ts';
 import {
 	calibratedSwarm,
@@ -140,11 +147,12 @@ type Row = {
 
 function collect(
 	events: ModelEvent[],
-	previous: Map<number, number>,
+	previous: Map<number, PriorRel>,
+	base: RobotBase,
 	books: Record<string, SwarmBook>
 ): Row[] {
 	const forecasts = new Map<string, Forecast>();
-	rateSeason(events, { previous, onForecast: (_e, m, f) => forecasts.set(m.key, f) });
+	rateSeason(events, { previous, base, onForecast: (_e, m, f) => forecasts.set(m.key, f) });
 	const rows: Row[] = [];
 	for (const event of orderEvents(events)) {
 		const matches = orderMatches(event.matches);
@@ -165,13 +173,13 @@ function collect(
 }
 
 async function main(): Promise<void> {
-	const previous = await previousFor(2026);
+	const { previous, base } = await previousFor(2026);
 	const events = prepSeason(await loadSeason(2026)).map(toModelEvent);
 	const settings: Record<string, { prior: number; carry: number }> = {};
 	for (const p of [1, 1.5, 2, 3, 5])
 		for (const c of [0, 0.1, 0.2, 0.3, 0.4, 0.6]) settings[`${p}/${c}`] = { prior: p, carry: c };
 	const books = Object.fromEntries(Object.entries(settings).map(([k, v]) => [k, new SwarmBook(v)]));
-	const rows = collect(events, previous, books).filter((r) => r.match.level === 'qual');
+	const rows = collect(events, previous, base, books).filter((r) => r.match.level === 'qual');
 	const sides = rows.flatMap((r) =>
 		(['red', 'blue'] as const).map((own) => ({
 			row: r,

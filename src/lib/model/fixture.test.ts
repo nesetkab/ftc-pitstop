@@ -66,7 +66,7 @@ describe('Gilbert qualifier 2026 (USAZGIQ)', () => {
 		const step = ev.steps.find((s) => s.key === 'p10')!;
 		expect(step.swarm.red).toBeCloseTo(0.7729, 4);
 		const final = predictMatch(step.forecast, { swarm: step.swarm });
-		expect(final.redWin).toBeCloseTo(0.6478, 4);
+		expect(final.redWin).toBeCloseTo(0.6475, 4);
 		expect(final.red.score).toBeCloseTo(107.08, 2);
 	});
 

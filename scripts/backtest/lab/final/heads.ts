@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { Ctx, Model, Pred } from '../../models.ts';
 import type { PEvent, PMatch } from '../../prep.ts';
-import { softFloor } from '../calib/alliance.ts';
+import { softFloor } from '../../../../src/lib/model/opr.ts';
 import { ImbRobotOpr } from '../pooled/robotimb.ts';
 import type { RoprOpts } from '../robot/ropr.ts';
 

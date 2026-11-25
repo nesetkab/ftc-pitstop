@@ -25,7 +25,7 @@ export const WIN_PARAMS: WinParams = {
 	kappa: 0.35378,
 	eta: 0,
 	gamma: 0.5,
-	tie: 0.0243
+	tie: 0.025
 };
 
 export type AlliancePrediction = {

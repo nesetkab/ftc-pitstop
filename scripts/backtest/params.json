@@ -103,6 +103,49 @@
 			"clip": 4,
 			"rhoNewScore": 0.6,
 			"rhoPrevScore": 0.7
+		},
+		"robot-opr": {
+			"rest": {
+				"lamNew": 2.5,
+				"lamReturning": 2,
+				"rhoNew": 0.2,
+				"rhoReturning": 0.4,
+				"rhoNewScore": 0.5,
+				"rhoReturningScore": 0.7,
+				"beta": 0.5,
+				"q": 0.15,
+				"qWeek": 0.015,
+				"carry": 1,
+				"drift": 0.25
+			},
+			"robot": {
+				"lamNew": 0.432,
+				"lamReturning": 1.2,
+				"rhoNew": 0.125,
+				"rhoReturning": 0.4,
+				"rhoNewScore": 0.5,
+				"rhoReturningScore": 0.7,
+				"beta": 0.5,
+				"q": 0.375,
+				"qWeek": 0.025,
+				"carry": 1.1,
+				"drift": 0.25
+			},
+			"parts": {
+				"rhoNew": 0.5,
+				"rhoReturning": 0.7,
+				"beta": 0.5,
+				"carry": 1,
+				"drift": 0.25,
+				"scoreCommon": 0.1,
+				"scoreQ": 0.05
+			},
+			"het": 0.45,
+			"robotVar": 1,
+			"imbFit": 0.1,
+			"imbPred": 0.2,
+			"floor": 0,
+			"width": 0.25
 		}
 	},
 	"blend": {
