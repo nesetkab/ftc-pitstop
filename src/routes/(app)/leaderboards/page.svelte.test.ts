@@ -194,7 +194,8 @@ describe('leaderboard page', () => {
 			'href',
 			'/leaderboards?region=USAZ&min=10&page=3'
 		);
-		expect(screen.getByText('Page 2 of 3')).toBeInTheDocument();
+		expect(screen.getByRole('textbox', { name: 'Page' })).toHaveValue('2');
+		expect(screen.getByText('of 3')).toBeInTheDocument();
 	});
 
 	it('disables Previous on the first page and Next on the last', () => {
