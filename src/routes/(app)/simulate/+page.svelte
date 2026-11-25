@@ -14,6 +14,7 @@
 	import { integer } from '#lib/format/index.ts';
 	import { siteTitle } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import { missingTeams } from '#lib/ui/not-found.ts';
 	import Lede from '#lib/ui/Lede.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
@@ -78,7 +79,7 @@
 <SimulatePicker {sides} picked={data.picked} />
 
 {#if data.missing.length > 0}
-	<p class="missing" role="status">No team found for {data.missing.join(', ')}.</p>
+	<p class="missing" role="status">{missingTeams(data.missing)}</p>
 {/if}
 
 {#if simulation}

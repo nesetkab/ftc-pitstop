@@ -40,4 +40,18 @@ describe('EventPreview', () => {
 		expect(screen.queryByRole('columnheader', { name: 'Expected rank' })).toBeNull();
 		expect(screen.queryByText(/alliance captains/)).toBeNull();
 	});
+
+	it('says once that the teams and schedule are not out yet', () => {
+		render(EventPreview, { props: { ...props(), teams: [], matches: [] } });
+		expect(
+			screen.getByText("The team list and match schedule haven't been posted yet.")
+		).toBeInTheDocument();
+		expect(screen.queryByRole('table')).toBeNull();
+	});
+
+	it('keeps the team list for a finished event that posted no matches', () => {
+		render(EventPreview, { props: { ...props(), matches: [], phase: 'done' as const } });
+		expect(screen.getByText('No match schedule was posted for this event.')).toBeInTheDocument();
+		expect(screen.getByRole('table', { name: 'Teams at this event' })).toBeInTheDocument();
+	});
 });

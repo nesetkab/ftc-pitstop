@@ -47,3 +47,9 @@ export function missingTeam(input: string | number | undefined): string {
 		? `No team has the number ${number}.`
 		: 'There is no team at this address.';
 }
+
+export function missingTeams(numbers: readonly (string | number)[]): string {
+	if (numbers.length === 1) return `No team has the number ${numbers[0]}.`;
+	const list = `${numbers.slice(0, -1).join(', ')} and ${numbers.at(-1)}`;
+	return `No teams have the numbers ${list}.`;
+}
