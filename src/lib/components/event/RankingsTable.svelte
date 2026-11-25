@@ -206,6 +206,7 @@
 
 		td.team,
 		th.team {
+			min-width: calc(var(--team-digits) + 4px + min(8em, 24vw));
 			box-shadow: inset -1px 0 var(--line);
 		}
 

@@ -115,7 +115,7 @@ export const CANDIDATES: Candidate[] = [
 	},
 	{
 		id: 'robot-opr',
-		label: 'OPR with robot credit, partner carry and no team below zero',
+		label: 'aOPR: OPR with robot credit, partner carry and no team below zero',
 		family: 'robot',
 		base: OPR_PARAMS,
 		space: {}
