@@ -98,6 +98,7 @@
 	nav a[aria-current] {
 		color: var(--text);
 		font-weight: 500;
+		box-shadow: inset 0 -2px 0 var(--accent);
 	}
 
 	.search {

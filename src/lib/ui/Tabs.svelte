@@ -138,7 +138,7 @@
 	a[aria-current='page'] {
 		color: var(--text);
 		font-weight: 500;
-		box-shadow: inset 0 -2px 0 var(--text);
+		box-shadow: inset 0 -2px 0 var(--accent);
 	}
 
 	a:focus-visible {

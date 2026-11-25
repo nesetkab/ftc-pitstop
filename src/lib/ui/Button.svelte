@@ -38,18 +38,18 @@
 		gap: 6px;
 		min-height: var(--control-h);
 		padding: 8px 12px;
-		border: 1px solid var(--text);
+		border: 1px solid var(--accent);
 		border-radius: var(--radius-control);
-		background: var(--text);
-		color: var(--bg);
+		background: var(--accent);
+		color: var(--on-accent);
 		font: 500 13px/1 var(--font);
 		text-decoration: none;
 		white-space: nowrap;
 	}
 
 	.primary:hover {
-		border-color: var(--text-2);
-		background: var(--text-2);
+		border-color: var(--accent-hover);
+		background: var(--accent-hover);
 	}
 
 	.secondary {
@@ -68,8 +68,8 @@
 	}
 
 	.primary:disabled:hover {
-		border-color: var(--text);
-		background: var(--text);
+		border-color: var(--accent);
+		background: var(--accent);
 	}
 
 	.secondary:disabled:hover {
