@@ -8,65 +8,38 @@
 
 	let { highlights }: Props = $props();
 
-	const groups = $derived(
-		[
-			{ id: 'highest', title: 'Highest scores', items: highlights.highest },
-			{ id: 'closest', title: 'Closest games', items: highlights.closest },
-			{ id: 'upsets', title: 'Upsets', items: highlights.upsets }
-		].filter((group) => group.items.length > 0)
-	);
-
 	function eventName(item: Highlight): string {
 		return highlights.names.events[item.event] ?? item.event;
 	}
-
-	function note(id: string, item: Highlight): string {
-		if (id === 'upsets' && item.chance !== null) {
-			return `Won with a ${Math.max(1, Math.round(item.chance * 100))}% chance`;
-		}
-		if (id === 'closest') {
-			const margin = Math.abs(item.redScore - item.blueScore);
-			return margin === 0 ? 'Tie' : `Won by ${margin}`;
-		}
-		return '';
-	}
 </script>
 
-<section aria-labelledby="best-title">
-	<div class="head">
-		<h2 class="sec-title" id="best-title">
-			Best matches {highlights.range === 'today' ? 'today' : 'this week'}
-		</h2>
-		<a class="more" href="/records?range=7">More records</a>
-	</div>
-	<div class="groups">
-		{#each groups as group (group.id)}
-			<div class="group">
-				<h3 id="best-{group.id}">{group.title}</h3>
-				<ol aria-labelledby="best-{group.id}">
-					{#each group.items as item (item.event + item.key)}
-						<li>
-							<a class="match" href="/events/{item.event}/matches/{item.key}">
-								<span class="score">
-									<Score left={item.redScore} right={item.blueScore} winner={item.winner} />
-								</span>
-								<span class="where">{item.label} · {eventName(item)}</span>
-							</a>
-							<span class="teams">
-								<span class="red-team">{item.red.join(' ')}</span>
-								<span class="faint">vs</span>
-								<span class="blue-team">{item.blue.join(' ')}</span>
-							</span>
-							{#if note(group.id, item)}
-								<span class="note">{note(group.id, item)}</span>
-							{/if}
-						</li>
-					{/each}
-				</ol>
-			</div>
-		{/each}
-	</div>
-</section>
+{#if highlights.highest.length > 0}
+	<section aria-labelledby="best-title">
+		<div class="head">
+			<h2 class="sec-title" id="best-title">
+				Highest scores {highlights.range === 'today' ? 'today' : 'this week'}
+			</h2>
+			<a class="more" href="/records?range=7">More records</a>
+		</div>
+		<ol aria-labelledby="best-title">
+			{#each highlights.highest as item (item.event + item.key)}
+				<li>
+					<a class="match" href="/events/{item.event}/matches/{item.key}">
+						<span class="score">
+							<Score left={item.redScore} right={item.blueScore} winner={item.winner} />
+						</span>
+						<span class="where">{item.label} · {eventName(item)}</span>
+					</a>
+					<span class="teams">
+						<span class="red-team">{item.red.join(' ')}</span>
+						<span class="faint">vs</span>
+						<span class="blue-team">{item.blue.join(' ')}</span>
+					</span>
+				</li>
+			{/each}
+		</ol>
+	</section>
+{/if}
 
 <style>
 	section {
@@ -75,24 +48,14 @@
 		gap: 10px;
 	}
 
-	.groups {
+	ol {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-		gap: 16px 24px;
-	}
-
-	h3 {
-		padding-bottom: 6px;
-		border-bottom: 1px solid var(--line-2);
-		font-size: 12.5px;
-		font-weight: 500;
-		color: var(--text-3);
-	}
-
-	ol {
+		column-gap: 24px;
 		margin: 0;
 		padding: 0;
 		list-style: none;
+		border-top: 1px solid var(--line-2);
 	}
 
 	li {
@@ -144,10 +107,6 @@
 		color: var(--blue);
 	}
 
-	.note {
-		font-size: 12.5px;
-	}
-
 	.head {
 		display: flex;
 		flex-wrap: wrap;
@@ -163,12 +122,6 @@
 
 	.more:hover {
 		color: var(--text);
-	}
-
-	@media (max-width: 600px) {
-		li:nth-child(n + 3) {
-			display: none;
-		}
 	}
 
 	@media (pointer: coarse) {

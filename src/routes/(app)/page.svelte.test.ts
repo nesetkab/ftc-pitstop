@@ -209,12 +209,10 @@ describe('home page', () => {
 				names: { teams: {}, events: { USAZGIQ: 'Gilbert Qualifier' } }
 			}
 		});
-		expect(screen.getByRole('heading', { name: 'Best matches today' })).toBeInTheDocument();
-		const highest = screen.getByRole('list', { name: 'Highest scores' });
+		const highest = screen.getByRole('list', { name: 'Highest scores today' });
 		expect(within(highest).getByRole('link')).toHaveAttribute('href', '/events/USAZGIQ/matches/p7');
 		expect(within(highest).getByRole('link')).toHaveTextContent('288–155 M7 · Gilbert Qualifier');
-		expect(screen.getByText('Won by 2')).toBeInTheDocument();
-		expect(screen.getByText('Won with a 18% chance')).toBeInTheDocument();
+		expect(screen.queryByText(/Closest games|Upsets|Won by 2|18% chance/)).not.toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'More records' })).toHaveAttribute(
 			'href',
 			'/records?range=7'
@@ -223,7 +221,7 @@ describe('home page', () => {
 
 	it('leaves out the best matches until the season is loaded', () => {
 		show({ today, week, highlights: null });
-		expect(screen.queryByText(/Best matches/)).not.toBeInTheDocument();
+		expect(screen.queryByText(/Highest scores/)).not.toBeInTheDocument();
 	});
 
 	it('shows the world record without foul points and links to the match', () => {
