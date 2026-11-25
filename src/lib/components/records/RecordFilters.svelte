@@ -6,6 +6,7 @@
 	import type { SearchFn } from '#lib/ui/search.svelte.ts';
 	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import {
+		conditionParam,
 		RECORD_PARTS,
 		RECORD_RANGES,
 		recordSummary,
@@ -37,10 +38,11 @@
 		event.preventDefault();
 		const params = new SvelteURLSearchParams();
 		for (const [key, value] of new FormData(event.currentTarget as HTMLFormElement)) {
-			if (typeof value === 'string' && value.trim() !== '') params.set(key, value.trim());
+			if (typeof value === 'string' && value.trim() !== '') params.append(key, value.trim());
 		}
 		if (params.get('range') === 'all') params.delete('range');
 		if (params.get('part') === 'total') params.delete('part');
+		if (params.get('dir') === 'desc') params.delete('dir');
 		goto(params.size > 0 ? `?${params}` : '?', { reset: false });
 	}
 </script>
@@ -102,6 +104,18 @@
 				{/each}
 			</select>
 		</label>
+		<label class="sort">
+			<span>Order</span>
+			<select name="dir" value={filters.dir}>
+				<option value="desc">High to low</option>
+				<option value="asc">Low to high</option>
+			</select>
+		</label>
+		{#if filters.show}<input type="hidden" name="show" value={filters.show.join(',')} />{/if}
+		{#if filters.match === 'any'}<input type="hidden" name="match" value="any" />{/if}
+		{#each filters.where as condition, index (index)}
+			<input type="hidden" name="f" value={conditionParam(condition)} />
+		{/each}
 		<noscript><button type="submit">Apply</button></noscript>
 	</FilterPanel>
 </form>

@@ -5,6 +5,8 @@ import {
 	clearedRecords,
 	hasRecordFilters,
 	filterRecords,
+	parseCondition,
+	shownParts,
 	pageRecords,
 	parseRecordFilters,
 	recordQuery,
@@ -80,17 +82,60 @@ describe('parseRecordFilters', () => {
 	it('falls back to safe defaults for unknown values', () => {
 		expect(
 			parseRecordFilters(
-				new URLSearchParams('part=fouls&range=9&region=<x>&type=Bogus&level=x&team=abc&page=-3')
+				new URLSearchParams(
+					'part=bogus&dir=up&range=9&region=<x>&type=Bogus&level=x&team=abc&show=x&match=any&f=x&page=-3'
+				)
 			)
 		).toEqual({
 			part: 'total',
+			dir: 'desc',
 			range: 'all',
 			region: '',
 			type: '',
 			level: '',
 			team: null,
+			show: null,
+			match: 'all',
+			where: [],
 			page: 1
 		});
+	});
+
+	it('reads sort order, chosen statistics and custom filters and writes them back', () => {
+		const query =
+			'part=margin&dir=asc&show=total.hive&match=any&f=hive.gt.100&f=auto.lt.teleop&f=margin.lte.-5';
+		const parsed = parseRecordFilters(new URLSearchParams(query));
+		expect(parsed).toMatchObject({
+			part: 'margin',
+			dir: 'asc',
+			show: ['total', 'hive'],
+			match: 'any',
+			where: [
+				{ stat: 'hive', op: 'gt', value: 100 },
+				{ stat: 'auto', op: 'lt', value: 'teleop' },
+				{ stat: 'margin', op: 'lte', value: -5 }
+			]
+		});
+		expect(recordQuery(parsed)).toBe(`?${query}`);
+	});
+
+	it('drops broken conditions, a lone any, and the default statistics', () => {
+		for (const text of ['hive.gt.x', 'hive.gt.hive', 'bogus.gt.1', 'hive.zz.1', 'hive.gt.99999']) {
+			expect(parseCondition(text)).toBeNull();
+		}
+		const lone = parseRecordFilters(new URLSearchParams('match=any&f=hive.gt.1'));
+		expect(lone.match).toBe('all');
+		const plain = parseRecordFilters(
+			new URLSearchParams('show=total,auto,teleop,hive,flower,garden,park,opponent')
+		);
+		expect(plain.show).toBeNull();
+		const many = new URLSearchParams(Array.from({ length: 12 }, () => ['f', 'total.gt.1']));
+		expect(parseRecordFilters(many).where).toHaveLength(8);
+	});
+
+	it('always shows the sorted statistic', () => {
+		expect(shownParts({ show: ['total'], part: 'park' })).toEqual(['total', 'park']);
+		expect(shownParts({ show: null, part: 'total' })).toContain('opponent');
 	});
 
 	it('reads every filter and builds the same query back', () => {
@@ -116,7 +161,10 @@ describe('buildRecordDataset', () => {
 			opponents: [3, 4],
 			total: 150,
 			opponent: 120,
-			result: 'win'
+			result: 'win',
+			final: 160,
+			fouls: 0,
+			margin: 30
 		});
 		expect(rows[1]).toMatchObject({ alliance: 'blue', result: 'loss', label: 'Q1' });
 		expect(rows[2]).toMatchObject({ label: 'M2', result: 'tie', day: '2026-11-21' });
@@ -148,6 +196,33 @@ describe('filterRecords', () => {
 		const auto = filterRecords(rows, filters({ part: 'auto' }), '2026-11-22');
 		expect(auto[0]).toMatchObject({ auto: 50, teams: [1, 3] });
 		expect(auto.slice(1).map((row) => row.total)).toEqual([200, 150, 120]);
+	});
+
+	it('sorts low to high when asked', () => {
+		const low = filterRecords(rows, filters({ dir: 'asc' }), '2026-11-22');
+		expect(low.map((row) => row.total)).toEqual([120, 150, 200, 200]);
+		const margin = filterRecords(rows, filters({ part: 'margin', dir: 'asc' }), '2026-11-22');
+		expect(margin.map((row) => row.margin)).toEqual([-30, 0, 0, 30]);
+	});
+
+	it('keeps scores that meet all or any custom filters', () => {
+		const today = '2026-11-22';
+		const high = filters({ where: [{ stat: 'total', op: 'gte', value: 150 }] });
+		expect(filterRecords(rows, high, today)).toHaveLength(3);
+		const both = filters({
+			where: [
+				{ stat: 'total', op: 'lt', value: 130 },
+				{ stat: 'auto', op: 'gt', value: 40 }
+			]
+		});
+		expect(filterRecords(rows, both, today)).toHaveLength(0);
+		expect(filterRecords(rows, { ...both, match: 'any' }, today).map((row) => row.total)).toEqual([
+			200, 120
+		]);
+		const ahead = filters({ where: [{ stat: 'auto', op: 'eq', value: 'teleop' }] });
+		expect(filterRecords(rows, ahead, today)).toHaveLength(0);
+		const winning = filters({ where: [{ stat: 'margin', op: 'gt', value: 0 }] });
+		expect(filterRecords(rows, winning, today).map((row) => row.total)).toEqual([150]);
 	});
 
 	it('filters by dates, region, type, level and team', () => {
@@ -200,6 +275,17 @@ describe('recordSummary', () => {
 			)
 		).toEqual(['Last 7 days', 'Arizona', 'Qualifier', 'Playoffs only', 'Team 724', 'By auto']);
 	});
+
+	it('names custom filters and a low to high sort', () => {
+		expect(
+			recordSummary(
+				parseRecordFilters(
+					new URLSearchParams('dir=asc&match=any&f=hive.gte.100&f=auto.gt.teleop')
+				),
+				options
+			)
+		).toEqual(['Any of Hive ≥ 100, Auto > Teleop', 'By total, low to high']);
+	});
 });
 
 describe('clearing record filters', () => {
@@ -210,5 +296,13 @@ describe('clearing record filters', () => {
 		expect(hasRecordFilters(filtered)).toBe(true);
 		expect(clearedRecords(filtered)).toBe('/records?part=auto');
 		expect(clearedRecords(parseRecordFilters(new URLSearchParams('team=724')))).toBe('/records');
+	});
+
+	it('counts custom filters as filters and clears them but keeps the view', () => {
+		const custom = parseRecordFilters(
+			new URLSearchParams('part=hive&dir=asc&show=total.hive&f=auto.gt.10')
+		);
+		expect(hasRecordFilters(custom)).toBe(true);
+		expect(clearedRecords(custom)).toBe('/records?part=hive&dir=asc&show=total.hive');
 	});
 });

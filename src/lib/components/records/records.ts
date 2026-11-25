@@ -18,20 +18,67 @@ export const RECORDS_PAGE_SIZE = 50;
 
 export const RECORDS_CSV_LIMIT = 1000;
 
-export const RECORD_PARTS = [
-	{ key: 'total', label: PART_LABELS.total },
-	{ key: 'auto', label: PART_LABELS.auto },
-	{ key: 'teleop', label: PART_LABELS.teleop },
-	{ key: 'hive', label: PART_LABELS.hive },
-	{ key: 'flower', label: PART_LABELS.flower },
-	{ key: 'garden', label: PART_LABELS.garden },
-	{ key: 'park', label: PART_LABELS.park }
+export const RECORD_GROUPS = [
+	{ key: 'score', label: 'Match score' },
+	{ key: 'teleop', label: 'Teleop points' },
+	{ key: 'result', label: 'Result' },
+	{ key: 'count', label: 'Counts' }
 ] as const;
 
-export const RECORD_GROUPS = [
-	{ label: 'Match score', parts: ['total', 'auto', 'teleop'] },
-	{ label: 'Teleop points', parts: ['hive', 'flower', 'garden', 'park'] }
+export type RecordGroup = (typeof RECORD_GROUPS)[number]['key'];
+
+export const RECORD_PARTS = [
+	{ key: 'total', label: PART_LABELS.total, group: 'score', shown: true },
+	{ key: 'auto', label: PART_LABELS.auto, group: 'score', shown: true },
+	{ key: 'teleop', label: PART_LABELS.teleop, group: 'score', shown: true },
+	{ key: 'fouls', label: PART_LABELS.fouls, group: 'score', shown: false },
+	{ key: 'final', label: 'Final', group: 'score', shown: false },
+	{ key: 'hive', label: PART_LABELS.hive, group: 'teleop', shown: true },
+	{ key: 'flower', label: PART_LABELS.flower, group: 'teleop', shown: true },
+	{ key: 'garden', label: PART_LABELS.garden, group: 'teleop', shown: true },
+	{ key: 'park', label: PART_LABELS.park, group: 'teleop', shown: true },
+	{ key: 'opponent', label: 'Opponent', group: 'result', shown: true },
+	{ key: 'margin', label: 'Margin', group: 'result', shown: false },
+	{ key: 'tips', label: PART_LABELS.tips, group: 'count', shown: false }
 ] as const;
+
+export const RECORD_PART_NOTES: Record<RecordPart, string> = {
+	total: "Alliance score without points from the other alliance's fouls",
+	auto: 'Points scored in the autonomous period',
+	teleop: 'Points scored in the driver-controlled period',
+	fouls: "Points given by the other alliance's fouls",
+	final: 'Official alliance score with foul points',
+	hive: 'Teleop hive points',
+	flower: 'Teleop flower points',
+	garden: 'Teleop garden points',
+	park: 'Teleop park points',
+	opponent: "The other alliance's score without foul points",
+	margin: "Total minus the other alliance's total",
+	tips: 'Number of tips in the match'
+};
+
+export const DEFAULT_SHOWN: RecordPart[] = RECORD_PARTS.filter((part) => part.shown).map(
+	(part) => part.key
+);
+
+export const RECORD_OPS = [
+	{ key: 'gt', label: '>', name: 'more than' },
+	{ key: 'gte', label: '≥', name: 'at least' },
+	{ key: 'lt', label: '<', name: 'less than' },
+	{ key: 'lte', label: '≤', name: 'at most' },
+	{ key: 'eq', label: '=', name: 'equal to' },
+	{ key: 'ne', label: '≠', name: 'not equal to' }
+] as const;
+
+export type RecordOp = (typeof RECORD_OPS)[number]['key'];
+
+export interface RecordCondition {
+	stat: RecordPart;
+	op: RecordOp;
+	value: number | RecordPart;
+}
+
+export const RECORD_CONDITION_LIMIT = 8;
 
 export type RecordPart = (typeof RECORD_PARTS)[number]['key'];
 
@@ -64,6 +111,9 @@ export interface RecordRow {
 	garden: number;
 	park: number;
 	tips: number;
+	fouls: number;
+	final: number;
+	margin: number;
 }
 
 export interface RankedRecord extends RecordRow {
@@ -72,11 +122,15 @@ export interface RankedRecord extends RecordRow {
 
 export interface RecordFilters {
 	part: RecordPart;
+	dir: 'desc' | 'asc';
 	range: RecordRange;
 	region: string;
 	type: EventType | '';
 	level: TournamentLevel | '';
 	team: number | null;
+	show: RecordPart[] | null;
+	match: 'all' | 'any';
+	where: RecordCondition[];
 	page: number;
 }
 
@@ -105,6 +159,39 @@ function isPart(value: string | null): value is RecordPart {
 	return RECORD_PARTS.some((part) => part.key === value);
 }
 
+function isOp(value: string): value is RecordOp {
+	return RECORD_OPS.some((op) => op.key === value);
+}
+
+const CONDITION = /^([a-z]+)\.([a-z]+)\.(-?\d{1,4}|[a-z]+)$/;
+
+export function parseCondition(text: string): RecordCondition | null {
+	const found = CONDITION.exec(text.trim().toLowerCase());
+	if (!found) return null;
+	const [, stat, op, raw] = found;
+	if (!isPart(stat) || !isOp(op)) return null;
+	if (/^-?\d+$/.test(raw)) return { stat, op, value: Number(raw) };
+	return isPart(raw) && raw !== stat ? { stat, op, value: raw } : null;
+}
+
+export function conditionParam(condition: RecordCondition): string {
+	return `${condition.stat}.${condition.op}.${condition.value}`;
+}
+
+export function parseShown(value: string | null): RecordPart[] | null {
+	if (value === null) return null;
+	const picked = new Set(value.split(/[.,]/));
+	const shown = RECORD_PARTS.filter((part) => picked.has(part.key)).map((part) => part.key);
+	if (shown.length === 0) return null;
+	return shown.join(',') === DEFAULT_SHOWN.join(',') ? null : shown;
+}
+
+export function shownParts(filters: Pick<RecordFilters, 'show' | 'part'>): RecordPart[] {
+	const shown = new Set<RecordPart>(filters.show ?? DEFAULT_SHOWN);
+	shown.add(filters.part);
+	return RECORD_PARTS.filter((part) => shown.has(part.key)).map((part) => part.key);
+}
+
 function isRange(value: string | null): value is RecordRange {
 	return RECORD_RANGES.some((range) => range.key === value);
 }
@@ -125,13 +212,21 @@ export function parseRecordFilters(params: URLSearchParams): RecordFilters {
 	const level = params.get('level');
 	const region = params.get('region')?.trim() ?? '';
 	const team = whole(params.get('team'), 0, 0, 999_999);
+	const where = params
+		.getAll('f')
+		.slice(0, RECORD_CONDITION_LIMIT)
+		.flatMap((text) => parseCondition(text) ?? []);
 	return {
 		part: isPart(part) ? part : 'total',
+		dir: params.get('dir') === 'asc' ? 'asc' : 'desc',
 		range: isRange(range) ? range : 'all',
 		region: REGION.test(region) ? region.toUpperCase() : '',
 		type: isType(type) ? type : '',
 		level: level === 'qual' || level === 'playoff' ? level : '',
 		team: team > 0 ? team : null,
+		show: parseShown(params.get('show')),
+		match: where.length > 1 && params.get('match') === 'any' ? 'any' : 'all',
+		where,
 		page: whole(params.get('page'), 1, 1, 10_000)
 	};
 }
@@ -139,11 +234,15 @@ export function parseRecordFilters(params: URLSearchParams): RecordFilters {
 export function recordQuery(filters: Partial<RecordFilters>, page = filters.page ?? 1): string {
 	const params = new URLSearchParams();
 	if (filters.part && filters.part !== 'total') params.set('part', filters.part);
+	if (filters.dir === 'asc') params.set('dir', 'asc');
 	if (filters.range && filters.range !== 'all') params.set('range', filters.range);
 	if (filters.region) params.set('region', filters.region);
 	if (filters.type) params.set('type', filters.type);
 	if (filters.level) params.set('level', filters.level);
 	if (filters.team) params.set('team', String(filters.team));
+	if (filters.show) params.set('show', filters.show.join('.'));
+	if (filters.match === 'any' && (filters.where?.length ?? 0) > 1) params.set('match', 'any');
+	for (const condition of filters.where ?? []) params.append('f', conditionParam(condition));
 	if (page > 1) params.set('page', String(page));
 	return search(params);
 }
@@ -155,12 +254,28 @@ function keyLabel(key: string): string {
 
 export function hasRecordFilters(filters: RecordFilters): boolean {
 	return Boolean(
-		filters.range !== 'all' || filters.region || filters.type || filters.level || filters.team
+		filters.range !== 'all' ||
+		filters.region ||
+		filters.type ||
+		filters.level ||
+		filters.team ||
+		filters.where.length > 0
 	);
 }
 
 export function clearedRecords(filters: RecordFilters): string {
-	return filters.part === 'total' ? '/records' : `/records?part=${filters.part}`;
+	return `/records${recordQuery({ part: filters.part, dir: filters.dir, show: filters.show })}`;
+}
+
+export function partLabel(part: RecordPart): string {
+	return RECORD_PARTS.find((entry) => entry.key === part)?.label ?? part;
+}
+
+export function conditionText(condition: RecordCondition): string {
+	const op = RECORD_OPS.find((entry) => entry.key === condition.op)?.label ?? condition.op;
+	const value =
+		typeof condition.value === 'number' ? String(condition.value) : partLabel(condition.value);
+	return `${partLabel(condition.stat)} ${op} ${value}`;
 }
 
 const LEVEL_LABELS = { qual: 'Quals only', playoff: 'Playoffs only' } as const;
@@ -181,7 +296,12 @@ export function recordSummary(
 		optionLabel(options.types, filters.type),
 		filters.level ? LEVEL_LABELS[filters.level] : '',
 		filters.team ? `Team ${filters.team}` : '',
-		part && part.key !== 'total' ? `By ${part.label.toLowerCase()}` : ''
+		filters.where.length === 0
+			? ''
+			: `${filters.match === 'any' ? 'Any of ' : ''}${filters.where.map(conditionText).join(', ')}`,
+		part && (part.key !== 'total' || filters.dir === 'asc')
+			? `By ${part.label.toLowerCase()}${filters.dir === 'asc' ? ', low to high' : ''}`
+			: ''
 	].filter(Boolean);
 }
 
@@ -218,7 +338,10 @@ function side(
 		flower: own.flower,
 		garden: own.garden,
 		park: own.park,
-		tips: own.tips
+		tips: own.tips,
+		fouls: own.foulPoints,
+		final: own.total,
+		margin: own.preFoulTotal - other.preFoulTotal
 	};
 }
 
@@ -253,6 +376,25 @@ export function buildRecordDataset(matches: SeasonMatch[]): RecordDataset {
 	};
 }
 
+export function passes(row: RecordRow, condition: RecordCondition): boolean {
+	const left = row[condition.stat];
+	const right = typeof condition.value === 'number' ? condition.value : row[condition.value];
+	switch (condition.op) {
+		case 'gt':
+			return left > right;
+		case 'gte':
+			return left >= right;
+		case 'lt':
+			return left < right;
+		case 'lte':
+			return left <= right;
+		case 'eq':
+			return left === right;
+		case 'ne':
+			return left !== right;
+	}
+}
+
 export function filterRecords(
 	rows: RecordRow[],
 	filters: RecordFilters,
@@ -260,6 +402,13 @@ export function filterRecords(
 ): RecordRow[] {
 	const since = filters.range === 'all' ? '' : addDays(today, 1 - Number(filters.range));
 	const part = filters.part;
+	const sign = filters.dir === 'asc' ? -1 : 1;
+	const where = filters.where;
+	const fits = (row: RecordRow) =>
+		where.length === 0 ||
+		(filters.match === 'any'
+			? where.some((condition) => passes(row, condition))
+			: where.every((condition) => passes(row, condition)));
 	return rows
 		.filter(
 			(row) =>
@@ -267,11 +416,12 @@ export function filterRecords(
 				(!filters.region || row.region === filters.region) &&
 				(!filters.type || row.type === filters.type) &&
 				(!filters.level || row.level === filters.level) &&
-				(filters.team === null || row.teams.includes(filters.team))
+				(filters.team === null || row.teams.includes(filters.team)) &&
+				fits(row)
 		)
 		.sort(
 			(a, b) =>
-				b[part] - a[part] ||
+				sign * (b[part] - a[part]) ||
 				b.total - a.total ||
 				a.day.localeCompare(b.day) ||
 				a.event.localeCompare(b.event) ||
