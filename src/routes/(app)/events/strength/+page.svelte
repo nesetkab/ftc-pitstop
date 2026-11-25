@@ -140,9 +140,7 @@
 </PageHeader>
 
 {#if rows.length === 0}
-	<EmptyState title="Event strength isn’t ready yet.">
-		It is worked out from season ratings, which are still loading. Try again in a few minutes.
-	</EmptyState>
+	<EmptyState title="Event strength isn’t ready yet.">Try again in a few minutes.</EmptyState>
 {:else}
 	<form class="filters" onsubmit={(event) => event.preventDefault()}>
 		<FilterPanel {summary}>
