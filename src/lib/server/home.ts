@@ -2,6 +2,7 @@ import type { SeasonModel } from '#lib/analysis/season.ts';
 import type { SeasonRating, SeasonRatings } from '#lib/analysis/types.ts';
 import { followedTeam, type FollowedTeam } from '#lib/components/home/followed.ts';
 import { buildHighlights, type Highlights } from '#lib/components/home/highlights.ts';
+import { worldRecord, type WorldRecord } from '#lib/components/home/record.ts';
 import { eventProgress, seasonProgress, type EventProgress } from '#lib/components/home/today.ts';
 import { localDate } from '#lib/format/calendar.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
@@ -45,6 +46,7 @@ export function createHome(deps: HomeDeps) {
 	const now = deps.now ?? Date.now;
 	let progressMemo: { key: string; at: number; value: Record<string, EventProgress> } | null = null;
 	let highlightMemo: { key: string; value: Highlights | null } | null = null;
+	let recordMemo: { generatedAt: number; value: WorldRecord | null } | null = null;
 	let ratingIndex: { generatedAt: number; teams: Map<number, SeasonRating> } | null = null;
 
 	async function loadTodayProgress(events: EventSummary[]): Promise<Record<string, EventProgress>> {
@@ -120,6 +122,15 @@ export function createHome(deps: HomeDeps) {
 		return value;
 	}
 
+	async function loadWorldRecord(ms: number): Promise<WorldRecord | null> {
+		const model = await deps.loadSeasonModelWithin(ms);
+		if (!model) return null;
+		if (recordMemo?.generatedAt !== model.generatedAt) {
+			recordMemo = { generatedAt: model.generatedAt, value: worldRecord(model.matches) };
+		}
+		return recordMemo.value;
+	}
+
 	function ratingsFor(ratings: SeasonRatings | null) {
 		if (!ratings) return null;
 		if (ratingIndex?.generatedAt !== ratings.generatedAt) {
@@ -148,7 +159,7 @@ export function createHome(deps: HomeDeps) {
 		);
 	}
 
-	return { loadTodayProgress, loadHighlights, loadFollowed };
+	return { loadTodayProgress, loadHighlights, loadWorldRecord, loadFollowed };
 }
 
 export const home = createHome({
@@ -158,4 +169,4 @@ export const home = createHome({
 	loadSeasonModelWithin
 });
 
-export const { loadTodayProgress, loadHighlights, loadFollowed } = home;
+export const { loadTodayProgress, loadHighlights, loadWorldRecord, loadFollowed } = home;
