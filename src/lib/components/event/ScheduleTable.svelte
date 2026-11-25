@@ -5,6 +5,7 @@
 	import { longDate, time } from '#lib/format/time.ts';
 	import type { Match } from '#lib/types.ts';
 	import Table from '#lib/ui/Table.svelte';
+	import Score from '#lib/ui/Score.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import { localDate } from '#lib/format/calendar.ts';
 	import { matchHref } from './matches.ts';
@@ -121,15 +122,13 @@
 					</td>
 					<td class="score">
 						{#if result}
-							<span class:won={result.winner === 'red'}>{result.red.total}</span><span class="dash"
-								>–</span
-							><span class:won={result.winner === 'blue'}>{result.blue.total}</span>
+							<Score left={result.red.total} right={result.blue.total} winner={result.winner} />
 						{/if}
 					</td>
 					{#if showForecast}
 						<td class="muted opt">
 							{#if forecast}
-								{fixed(forecast.red.score, 0)}–{fixed(forecast.blue.score, 0)}
+								<Score left={fixed(forecast.red.score, 0)} right={fixed(forecast.blue.score, 0)} />
 							{/if}
 						</td>
 						<td>
@@ -171,20 +170,6 @@
 			flex-direction: column;
 			align-items: flex-start;
 		}
-	}
-
-	.score span {
-		color: var(--text-2);
-	}
-
-	.score .dash {
-		padding-inline: 1px;
-		color: var(--text-3);
-	}
-
-	.score .won {
-		color: var(--text);
-		font-weight: 600;
 	}
 
 	.red {

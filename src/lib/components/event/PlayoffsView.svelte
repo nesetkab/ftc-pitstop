@@ -65,7 +65,7 @@
 	.panel {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 12px;
+		gap: var(--space-title);
 		align-content: start;
 		min-width: 0;
 	}

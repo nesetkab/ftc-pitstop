@@ -12,6 +12,7 @@
 	import type { AllianceColor, EventBundle } from '#lib/types.ts';
 	import Arrow from '#lib/ui/Arrow.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
+	import Score from '#lib/ui/Score.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
@@ -263,7 +264,10 @@
 									<td class="l">{@render alliance(match.blue, 'blue', match.pending.blue)}</td>
 									<td class="muted opt">
 										{#if match.forecast}
-											{fixed(match.forecast.red.score, 0)}–{fixed(match.forecast.blue.score, 0)}
+											<Score
+												left={fixed(match.forecast.red.score, 0)}
+												right={fixed(match.forecast.blue.score, 0)}
+											/>
 										{/if}
 									</td>
 									<td>
@@ -410,9 +414,7 @@
 									</td>
 									<td class="l">{@render alliance(result.red, 'red', null)}</td>
 									<td class="score">
-										<span class:won={result.winner === 'red'}>{result.redScore}</span><span
-											class="dash">–</span
-										><span class:won={result.winner === 'blue'}>{result.blueScore}</span>
+										<Score left={result.redScore} right={result.blueScore} winner={result.winner} />
 									</td>
 									<td class="l">{@render alliance(result.blue, 'blue', null)}</td>
 								</tr>
@@ -532,21 +534,21 @@
 	.layout {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 32px;
+		gap: var(--space-columns);
 		align-items: start;
 	}
 
 	.column {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 28px;
+		gap: var(--space-stack);
 		min-width: 0;
 	}
 
 	.block {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 10px;
+		gap: var(--space-title);
 		min-width: 0;
 	}
 
@@ -643,20 +645,6 @@
 		color: var(--blue);
 	}
 
-	.score span {
-		color: var(--text-2);
-	}
-
-	.score .dash {
-		padding-inline: 1px;
-		color: var(--text-3);
-	}
-
-	.score .won {
-		color: var(--text);
-		font-weight: 600;
-	}
-
 	.move {
 		color: var(--text-2);
 	}
@@ -674,7 +662,7 @@
 	@media (max-width: 960px) {
 		.layout {
 			grid-template-columns: minmax(0, 1fr);
-			gap: 28px;
+			gap: var(--space-stack);
 		}
 	}
 

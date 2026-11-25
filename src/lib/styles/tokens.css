@@ -93,6 +93,11 @@
 	--shadow-pop: 0 8px 24px rgb(0 0 0 / 0.12);
 	--page-max: 1180px;
 	--gutter: clamp(16px, 3vw, 24px);
+	--space-title: 10px;
+	--space-stack: 24px;
+	--space-columns: 28px;
+	--space-section: 40px;
+	--team-digits: 5ch;
 }
 
 [data-theme],
@@ -120,6 +125,7 @@ body {
 	font-family: var(--font);
 	font-size: 16px;
 	line-height: 1.5;
+	font-variant-numeric: tabular-nums;
 }
 
 h1,

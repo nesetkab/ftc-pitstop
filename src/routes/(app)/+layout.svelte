@@ -102,7 +102,7 @@
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
 		align-content: start;
-		gap: 22px;
+		gap: var(--space-stack);
 		width: 100%;
 		max-width: var(--page-max);
 		margin-inline: auto;
@@ -120,7 +120,7 @@
 		gap: 8px 24px;
 		width: calc(100% - 2 * var(--gutter));
 		max-width: calc(var(--page-max) - 2 * var(--gutter));
-		margin: 24px auto 0;
+		margin: var(--space-stack) auto 0;
 		padding: 16px 0 40px;
 		border-top: 1px solid var(--line);
 		font-size: 13px;

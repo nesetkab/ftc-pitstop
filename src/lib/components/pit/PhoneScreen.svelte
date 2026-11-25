@@ -10,6 +10,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import MatchList from '#lib/ui/MatchList.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
+	import Score from '#lib/ui/Score.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Toggle from '#lib/ui/Toggle.svelte';
 	import { ALERT_OPTIONS, type AlertKey, type AlertSettings } from './alerts.ts';
@@ -444,7 +445,11 @@
 							<a class="label" href={href(match.key)}>{match.label}</a>
 							<span class="when">
 								{#if match.result}
-									{match.result.red.total}–{match.result.blue.total}
+									<Score
+										left={match.result.red.total}
+										right={match.result.blue.total}
+										winner={match.result.winner}
+									/>
 								{:else if match.actualTime !== null}
 									On field
 								{:else if match.scheduledTime !== null}

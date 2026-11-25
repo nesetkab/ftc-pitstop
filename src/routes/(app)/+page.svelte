@@ -92,20 +92,20 @@
 	.home {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 44px;
+		gap: var(--space-section);
 	}
 
 	.top {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 36px;
+		gap: var(--space-section);
 		align-items: start;
 	}
 
 	.start {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 32px;
+		gap: var(--space-section);
 	}
 
 	@media (min-width: 900px) {
@@ -118,7 +118,7 @@
 	section {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 10px;
+		gap: var(--space-title);
 		align-content: start;
 	}
 
@@ -146,12 +146,6 @@
 
 		.top > :global(#pit) {
 			order: 1;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.home {
-			gap: 36px;
 		}
 	}
 
