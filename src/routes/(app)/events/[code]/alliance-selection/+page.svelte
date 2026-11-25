@@ -2,6 +2,7 @@
 	import { invalidate } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import '#lib/components/tools/controls.css';
+	import { teamsAction } from '#lib/components/event/empty.ts';
 	import PickList from '#lib/components/tools/PickList.svelte';
 	import type { EventBundle } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -28,6 +29,7 @@
 	let { data }: PageProps = $props();
 
 	const id = $props.id();
+	const teams = $derived(teamsAction(data.selection.bundle));
 	let live = $state.raw<EventBundle | null>(null);
 	let refreshFailed = $state(false);
 	let access = $state.raw<BrowserWorkspaces | null>(null);
@@ -154,7 +156,7 @@
 	</div>
 
 	{#if !selection.started}
-		<EmptyState title="Alliances show here once qualification matches are done." />
+		<EmptyState title="Alliances show here once qualification matches are done." action={teams} />
 	{:else if picker}
 		<div class="picking" role="status">
 			<b>Alliance {picker.seed} is picking: {picker.team}{picker.name ? ` ${picker.name}` : ''}</b>

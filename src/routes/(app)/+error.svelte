@@ -18,6 +18,6 @@
 	{#snippet actions()}
 		<Button icon="search" onclick={() => (searchDialog.open = true)}>Search teams and events</Button
 		>
-		<Button variant="secondary" href="/events">Events</Button>
+		<Button variant="secondary" href="/">Home</Button>
 	{/snippet}
 </PageHeader>

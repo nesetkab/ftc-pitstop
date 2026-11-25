@@ -129,8 +129,9 @@
 		{/if}
 	</div>
 	{#if !ready || teams.length === 0}
-		<div class={{ pending: !ready }}>
+		<div class={['finder', { pending: !ready }]}>
 			<TeamFinder onfollow={(team) => (focusTeam = team)} />
+			<p class="empty">Teams you follow show here with their next match and rank.</p>
 		</div>
 		{#if !ready}
 			<ul class="teams ghost" aria-hidden="true">
@@ -264,6 +265,16 @@
 		align-items: baseline;
 		justify-content: space-between;
 		gap: 4px 16px;
+	}
+
+	.finder {
+		display: grid;
+		gap: 10px;
+	}
+
+	.empty {
+		font-size: 14px;
+		color: var(--text-2);
 	}
 
 	.more {

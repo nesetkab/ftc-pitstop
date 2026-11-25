@@ -6,6 +6,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import SkeletonRows from '#lib/ui/SkeletonRows.svelte';
+	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import Tabs, { type Tab } from '#lib/ui/Tabs.svelte';
 	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
 	import { setMatch } from '#lib/workspace/checklist.ts';
@@ -82,14 +83,12 @@
 {#if workspace.status === 'loading'}
 	<SkeletonRows label="Loading the workspace." header />
 {:else if workspace.status === 'missing'}
-	<EmptyState title="No workspace uses the code {formatCode(code)}.">
-		Check the code with your team, or make a new workspace.
-	</EmptyState>
+	<EmptyState title="No workspace uses the code {formatCode(code)}." />
 	<div>
 		<Button href="/w">Team workspaces</Button>
 	</div>
 {:else if workspace.status === 'error'}
-	<EmptyState title="The workspace could not be loaded.">Check your connection.</EmptyState>
+	<EmptyState title="The workspace couldn't be loaded." />
 	<div>
 		<Button icon="refresh" onclick={open}>Try again</Button>
 	</div>
@@ -132,11 +131,17 @@
 	<div class="sync" role="status">
 		{#if workspace.unsaved || workspace.offline}
 			<p class="trouble">
-				<span class="dot" aria-hidden="true"></span>
 				<span class="text">
-					{workspace.unsaved
-						? (workspace.message ?? 'Not saved yet.')
-						: 'Offline. Showing the last copy.'}
+					{#if workspace.unsaved}
+						{workspace.message ?? 'Not saved yet.'}
+					{:else}
+						You're offline.
+						<StaleNotice
+							updated={workspace.syncedAt}
+							prefix="Last updated"
+							staleAfter={Infinity}
+						/>{workspace.syncedAt === null ? '' : '.'}
+					{/if}
 				</span>
 				{#if workspace.sync === 'retrying'}
 					<button type="button" class="ctl-btn" onclick={() => workspace.retry()}>Retry now</button>
@@ -149,9 +154,6 @@
 
 <style>
 	.sync {
-		position: sticky;
-		top: 0;
-		z-index: 10;
 		margin-block: -8px;
 	}
 
@@ -163,19 +165,12 @@
 		display: flex;
 		align-items: center;
 		gap: 10px;
-		padding: 8px 8px 8px 12px;
-		border: 1px solid var(--line-2);
+		min-height: 40px;
+		padding: 4px 8px 4px 12px;
+		border: 1px solid var(--line);
 		border-radius: var(--radius-control);
-		background: var(--bg);
+		background: var(--surface);
 		font-size: 14px;
-	}
-
-	.dot {
-		flex: none;
-		width: 8px;
-		height: 8px;
-		border-radius: 50%;
-		background: var(--red);
 	}
 
 	.text {

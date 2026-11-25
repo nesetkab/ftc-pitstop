@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getEventView } from '#lib/components/event/context.ts';
+	import { resultsText, teamsAction } from '#lib/components/event/empty.ts';
 	import ResultsTable from '#lib/components/event/ResultsTable.svelte';
 	import { withBreakdowns } from '#lib/game/breakdowns.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -9,6 +10,7 @@
 
 	const view = getEventView();
 	const bundle = $derived(withBreakdowns(data.bundle, data.breakdowns));
+	const teams = $derived(teamsAction(data.bundle));
 	const played = $derived(bundle.matches.some((match) => match.result !== null));
 	const initialOrder = () => (data.bundle.phase === 'done' ? 'asc' : 'desc');
 	let order = $state<'asc' | 'desc'>(initialOrder());
@@ -22,5 +24,5 @@
 		bind:order
 	/>
 {:else}
-	<EmptyState title="No matches have been played yet." />
+	<EmptyState title={resultsText(data.bundle)} action={teams} />
 {/if}

@@ -428,6 +428,6 @@ describe('team page', () => {
 
 	it('says when the data is saved and may be old', () => {
 		show(view({ stale: true, updated: Date.now() - 20 * 60_000 }));
-		expect(screen.getByText(/Showing saved data/)).toBeInTheDocument();
+		expect(screen.getByText(/These stats couldn't be refreshed/)).toBeInTheDocument();
 	});
 });

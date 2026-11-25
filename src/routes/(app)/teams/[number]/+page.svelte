@@ -56,7 +56,10 @@
 	<PageHeader title="{view.team.number} {view.team.name}" meta={meta ? `${meta}.` : undefined}>
 		{#snippet status()}
 			{#if view.stale}
-				Showing saved data. <StaleNotice updated={view.updated} />.
+				These stats couldn't be refreshed. <StaleNotice
+					updated={view.updated}
+					prefix="Last updated"
+				/>.
 			{/if}
 		{/snippet}
 		{#snippet actions()}

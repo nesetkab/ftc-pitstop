@@ -112,7 +112,10 @@
 
 {#if data.state === 'no-events'}
 	<main class="message">
-		<EmptyState title="{data.team} has no events this season." />
+		<EmptyState
+			title="{data.team} has no events this season."
+			action={{ href: `/teams/${data.team}`, label: 'Team page' }}
+		/>
 	</main>
 {:else if data.state === 'unavailable'}
 	<main class="message">
@@ -142,7 +145,7 @@
 	/>
 {:else}
 	<main class="message">
-		<EmptyState title="Waiting for event data">FTC Events is not responding.</EmptyState>
+		<EmptyState title="FTC Events isn't responding right now." />
 	</main>
 {/if}
 

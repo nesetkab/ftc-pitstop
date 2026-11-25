@@ -1,14 +1,23 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import Logo from '#lib/ui/Logo.svelte';
+	import { missingEvent, missingTeam } from '#lib/ui/not-found.ts';
 
 	const missing = $derived(page.status === 404);
-	const title = $derived(missing ? 'Page not found' : 'Something went wrong');
-	const message = $derived(page.error?.message ?? '');
+	const pit = $derived(page.route.id?.startsWith('/(bare)/[team=team]') ?? false);
+	const event = $derived(pit && page.error?.message === 'Event not found');
+	const found = $derived(
+		event ? missingEvent('', { code: page.url.searchParams.get('event') ?? '' }) : null
+	);
+	const title = $derived.by(() => {
+		if (!missing) return 'Something went wrong';
+		if (found) return found.title;
+		return pit ? 'Team not found' : 'Page not found';
+	});
 	const detail = $derived.by(() => {
-		if (missing && message && message !== 'Not Found') return `${message}.`;
-		if (missing) return 'There is no page at this address.';
-		return 'This page could not be loaded. Try again in a moment.';
+		if (!missing) return 'This page could not be loaded. Try again in a moment.';
+		if (found) return found.meta;
+		return pit ? missingTeam(page.params.team) : 'There is no page at this address.';
 	});
 </script>
 

@@ -41,7 +41,7 @@
 	<span class="state"><span class={['dot', connection]}></span>{STATE[connection]}</span>
 	{#if updated !== null}
 		<span class="updated">
-			Updated {updatedClock(updated, now, timeZone)} from {from}{stale
+			Updated {updatedClock(updated, now, timeZone)} from {from}{stale || connection === 'offline'
 				? `, ${relative(updated, now)}`
 				: ''}
 		</span>

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { getEventView } from '#lib/components/event/context.ts';
+	import { teamsAction } from '#lib/components/event/empty.ts';
 	import InsightAverages from '#lib/components/event/InsightAverages.svelte';
 	import { insightQuery } from '#lib/components/event/insights.ts';
 	import InsightsTable from '#lib/components/event/InsightsTable.svelte';
@@ -15,6 +16,7 @@
 	const code = $derived(data.bundle.event.code);
 	const base = $derived(`/events/${code}/insights`);
 	const averages = $derived(data.averages);
+	const teams = $derived(teamsAction(data.bundle));
 	const levels = $derived(
 		(
 			[
@@ -34,7 +36,7 @@
 </script>
 
 {#if !averages.event}
-	<EmptyState title="Insights show here once matches are played." />
+	<EmptyState title="Insights show here once matches are played." action={teams} />
 {:else}
 	<section class="panel averages" aria-labelledby="averages-title">
 		<h2 class="sec-title" id="averages-title">Average alliance score</h2>

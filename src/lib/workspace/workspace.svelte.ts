@@ -56,6 +56,7 @@ export class Workspace {
 	kind = $state<WorkspaceKind>('device');
 	sync = $state<SyncState>('saved');
 	savedAt = $state<number | null>(null);
+	syncedAt = $state<number | null>(null);
 	offline = $state(false);
 	message = $state<string | null>(null);
 
@@ -218,15 +219,19 @@ export class Workspace {
 			this.#key = snapshot.key ?? this.#key;
 		}
 		let docs = this.docs;
+		let latest = 0;
 		for (const name of this.names) {
 			const stamped = snapshot.docs[name];
 			if (!stamped) continue;
+			latest = Math.max(latest, stamped.updatedAt);
 			if (confirmed && stamped.updatedAt < (this.#versions[name] ?? 0)) continue;
 			if (confirmed) this.#versions[name] = stamped.updatedAt;
 			this.#confirmed = { ...this.#confirmed, [name]: stamped.data };
 			docs = withDoc(docs, name, this.#rebase(name, stamped.data));
 		}
 		this.docs = docs;
+		if (confirmed) this.syncedAt = this.#now();
+		else if (latest > 0) this.syncedAt ??= latest;
 		if (confirmed) this.#mirror(snapshot);
 		this.#resume();
 	}
@@ -301,6 +306,7 @@ export class Workspace {
 					this.#confirmed = { ...this.#confirmed, [name]: result.stamped.data };
 					this.#pending[name] = (this.#pending[name] ?? []).slice(sent);
 					this.savedAt = this.#now();
+					this.syncedAt = this.savedAt;
 					this.offline = false;
 					this.#failures = 0;
 					this.#remember(name, result.stamped);
@@ -359,7 +365,7 @@ export class Workspace {
 			code === 'rate-limited'
 				? 'Too many changes at once. Saving again shortly.'
 				: this.offline
-					? 'Offline. Changes will save when the connection is back.'
+					? "You're offline. Changes will save when the connection is back."
 					: 'Not saved yet. Trying again.';
 		return true;
 	}

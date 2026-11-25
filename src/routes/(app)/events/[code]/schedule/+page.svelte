@@ -3,6 +3,7 @@
 	import { page } from '$app/state';
 	import { getEventView } from '#lib/components/event/context.ts';
 	import { isMultiDay } from '#lib/components/event/dates.ts';
+	import { scheduleText, teamsAction } from '#lib/components/event/empty.ts';
 	import ScheduleView from '#lib/components/event/ScheduleView.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import type { PageProps } from './$types';
@@ -11,6 +12,7 @@
 
 	const view = getEventView();
 	const bundle = $derived(data.bundle);
+	const teams = $derived(teamsAction(bundle));
 
 	let team = $state<number | null>(null);
 
@@ -28,7 +30,7 @@
 </script>
 
 {#if bundle.matches.length === 0}
-	<EmptyState title="The match schedule hasn't been posted yet." />
+	<EmptyState title={scheduleText(bundle)} action={teams} />
 {:else}
 	<ScheduleView
 		code={bundle.event.code}

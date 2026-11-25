@@ -5,12 +5,13 @@
 	import { fixed, integer } from '#lib/format/number.ts';
 	import { allianceCountFor } from '#lib/model/bracket.ts';
 	import { time } from '#lib/format/time.ts';
-	import type { Match, Team } from '#lib/types.ts';
+	import type { EventPhase, Match, Team } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import { weekday } from './dates.ts';
+	import { previewText } from './empty.ts';
 	import { placeName } from '#lib/format/places.ts';
 	import RangeBar from './RangeBar.svelte';
 
@@ -21,6 +22,7 @@
 		teams: Team[];
 		matches: Match[];
 		timezone: string;
+		phase?: EventPhase;
 		ratings?: TeamRating[] | null;
 		projections?: Projection[] | null;
 		followed?: ReadonlySet<number>;
@@ -31,6 +33,7 @@
 		teams,
 		matches,
 		timezone,
+		phase = 'upcoming',
 		ratings = null,
 		projections = null,
 		followed = new Set()
@@ -53,6 +56,7 @@
 			? `${integer(quals.length)} matches are scheduled.`
 			: `${integer(quals.length)} matches are scheduled, starting ${weekday(first, timezone)} at ${time(first, timezone)}.`
 	);
+	const notice = $derived(previewText({ phase, matches: quals, teams }));
 	const rated = $derived(
 		ratings && ratings.length > 0
 			? new Map(ratings.map((rating) => [rating.team, rating as RatingWithRange]))
@@ -108,17 +112,15 @@
 	}
 </script>
 
-{#if quals.length === 0}
-	<EmptyState title="The match schedule hasn't been posted yet." />
+{#if quals.length === 0 || phase === 'done'}
+	<EmptyState title={notice} />
 {:else}
-	<EmptyState title="Qualification matches haven't started yet.">
+	<EmptyState title={notice}>
 		{scheduleLine} <a href="/events/{code}/schedule">See the schedule</a>.
 	</EmptyState>
 {/if}
 
-{#if teams.length === 0}
-	<p class="muted">No teams have registered yet.</p>
-{:else}
+{#if teams.length > 0}
 	<Table>
 		<caption class="visually-hidden">Teams at this event</caption>
 		<thead>
