@@ -115,7 +115,17 @@ describe('search route', () => {
 	});
 
 	it('shares answers for an hour', async () => {
+		server.searchIndex.mockResolvedValueOnce({
+			teams: [{ number: 3747, name: 'The Hive', city: null, state: null, country: null }],
+			events: [{ code: 'USAZGIQ' }],
+			fetchedAt: 1
+		} as never);
 		const answer = await get('?q=valley');
 		expect(answer.headers.get('cache-control')).toContain('s-maxage=3600');
+	});
+
+	it('shares answers briefly when a list is missing', async () => {
+		const answer = await get('?q=valley');
+		expect(answer.headers.get('cache-control')).toBe('public, s-maxage=300, stale-while-revalidate=3600');
 	});
 });
