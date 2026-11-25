@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { Records } from '../../engine.ts';
@@ -5,7 +6,7 @@ import { FEATURES } from './probe.ts';
 
 export const DIR = join(import.meta.dirname, '.records');
 
-export type Dump = { rec: Records; feat: Float64Array; nf: number };
+export type Dump = { rec: Records; feat: Float64Array; nf: number; hilo: Float64Array | null };
 
 const ARRAYS = [
 	'season',
@@ -35,7 +36,12 @@ const CTORS = {
 	pred: Float64Array
 };
 
-export async function save(name: string, rec: Records, features: Map<string, Float64Array>) {
+export async function save(
+	name: string,
+	rec: Records,
+	features: Map<string, Float64Array>,
+	hilo?: Map<string, Float64Array>
+) {
 	const dir = join(DIR, name);
 	await mkdir(dir, { recursive: true });
 	const nf = FEATURES.length;
@@ -46,6 +52,11 @@ export async function save(name: string, rec: Records, features: Map<string, Flo
 		await writeFile(join(dir, `${key}.bin`), new Uint8Array(a.buffer, a.byteOffset, a.byteLength));
 	}
 	await writeFile(join(dir, 'feat.bin'), new Uint8Array(feat.buffer));
+	if (hilo) {
+		const h = new Float64Array(rec.n * 4);
+		for (let r = 0; r < rec.n; r++) h.set(hilo.get(rec.keys[r])!, r * 4);
+		await writeFile(join(dir, 'hilo.bin'), new Uint8Array(h.buffer));
+	}
 	await writeFile(
 		join(dir, 'meta.json'),
 		JSON.stringify({ n: rec.n, models: rec.models, features: FEATURES, keys: rec.keys })
@@ -70,5 +81,13 @@ export async function load(name: string): Promise<Dump> {
 	const fb = await readFile(join(dir, 'feat.bin'));
 	const fcopy = new Uint8Array(fb.byteLength);
 	fcopy.set(fb);
-	return { rec, feat: new Float64Array(fcopy.buffer), nf: meta.features.length };
+	const hpath = join(dir, 'hilo.bin');
+	let hilo: Float64Array | null = null;
+	if (existsSync(hpath)) {
+		const hb = await readFile(hpath);
+		const hcopy = new Uint8Array(hb.byteLength);
+		hcopy.set(hb);
+		hilo = new Float64Array(hcopy.buffer);
+	}
+	return { rec, feat: new Float64Array(fcopy.buffer), nf: meta.features.length, hilo };
 }
