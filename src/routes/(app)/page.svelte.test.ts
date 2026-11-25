@@ -61,6 +61,7 @@ function show(data: {
 	today: TodayEvent[] | null;
 	week: HomeEvent[] | null;
 	highlights?: unknown;
+	record?: unknown;
 }) {
 	return render(Page, { props: { data } as never });
 }
@@ -222,5 +223,49 @@ describe('home page', () => {
 	it('leaves out the best matches until the season is loaded', () => {
 		show({ today, week, highlights: null });
 		expect(screen.queryByText(/Best matches/)).not.toBeInTheDocument();
+	});
+
+	it('shows the world record without foul points and links to the match', () => {
+		show({
+			today,
+			week,
+			record: {
+				event: 'CNSHQ2',
+				key: 'p5',
+				label: 'M5',
+				day: '2026-11-15',
+				alliance: 'red',
+				red: [19666, 19641],
+				blue: [27648, 22406],
+				redScore: 288,
+				blueScore: 188,
+				ties: 1,
+				names: {
+					teams: { 19666: 'Forever Knight', 19641: 'APEX' },
+					events: { CNSHQ2: 'China Shanghai #2 Qualifier' }
+				}
+			}
+		});
+		const section = screen.getByRole('region', { name: 'World record' });
+		expect(within(section).getByRole('link', { name: '288' })).toHaveAttribute(
+			'href',
+			'/events/CNSHQ2/matches/p5'
+		);
+		expect(within(section).getByRole('link', { name: '19666 Forever Knight' })).toHaveAttribute(
+			'href',
+			'/teams/19666'
+		);
+		expect(within(section).getByRole('link', { name: 'M5 Red' })).toBeInTheDocument();
+		expect(section).toHaveTextContent('Against 27648 22406, who scored 188. Foul points left out.');
+		expect(section).toHaveTextContent('Tied by 1 other alliance.');
+		expect(within(section).getByRole('link', { name: 'All records' })).toHaveAttribute(
+			'href',
+			'/records'
+		);
+	});
+
+	it('leaves out the world record until the season is loaded', () => {
+		show({ today, week, record: null });
+		expect(screen.queryByText('World record')).not.toBeInTheDocument();
 	});
 });

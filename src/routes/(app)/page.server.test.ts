@@ -10,7 +10,8 @@ const server = vi.hoisted(() => ({
 
 const home = vi.hoisted(() => ({
 	loadTodayProgress: vi.fn(),
-	loadHighlights: vi.fn()
+	loadHighlights: vi.fn(),
+	loadWorldRecord: vi.fn()
 }));
 
 vi.mock('#lib/server/event.ts', () => server);
@@ -23,6 +24,7 @@ type Home = {
 	today: { code: string; status: string; state: string }[] | null;
 	week: { code: string }[] | null;
 	highlights: unknown;
+	record: unknown;
 };
 
 function call() {
@@ -48,6 +50,7 @@ beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
 	home.loadTodayProgress.mockReset().mockResolvedValue({});
 	home.loadHighlights.mockReset().mockResolvedValue(null);
+	home.loadWorldRecord.mockReset().mockResolvedValue(null);
 });
 
 describe('home load', () => {
@@ -74,7 +77,12 @@ describe('home load', () => {
 	it('still renders when neither list can be loaded', async () => {
 		server.loadEventsToday.mockRejectedValue(new Error('down'));
 		server.loadSeasonEvents.mockRejectedValue(new Error('down'));
-		expect(await call().result).toEqual({ today: null, week: null, highlights: null });
+		expect(await call().result).toEqual({
+			today: null,
+			week: null,
+			highlights: null,
+			record: null
+		});
 		expect(home.loadTodayProgress).not.toHaveBeenCalled();
 	});
 
@@ -120,6 +128,29 @@ describe('home load', () => {
 		const data = await call().result;
 		expect(data.highlights).toMatchObject({
 			range: 'week',
+			names: { teams: { 1: 'One' }, events: { NOW: 'Now Event' } }
+		});
+	});
+
+	it('adds the world record with its team and event names', async () => {
+		server.loadEventsToday.mockResolvedValue([]);
+		server.loadSeasonEvents.mockResolvedValue({ events: [], fetchedAt: 1, stale: false });
+		home.loadWorldRecord.mockResolvedValue({
+			event: 'NOW',
+			key: 'p5',
+			label: 'M5',
+			day: '2026-11-15',
+			alliance: 'red',
+			red: [1, 2],
+			blue: [3, 4],
+			redScore: 288,
+			blueScore: 188,
+			ties: 0
+		});
+		const data = await call().result;
+		expect(data.highlights).toBeNull();
+		expect(data.record).toMatchObject({
+			redScore: 288,
 			names: { teams: { 1: 'One' }, events: { NOW: 'Now Event' } }
 		});
 	});
