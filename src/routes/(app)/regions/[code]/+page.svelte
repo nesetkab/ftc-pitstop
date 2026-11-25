@@ -1,13 +1,11 @@
 <script lang="ts">
-	import Brand from '#lib/ui/Brand.svelte';
 	import { page } from '$app/state';
 	import ChampionshipTable from '#lib/components/advancement/ChampionshipTable.svelte';
-	import { typeLabel } from '#lib/components/event/event-meta.ts';
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
+	import RegionEvents from '#lib/components/region/RegionEvents.svelte';
 	import RegionTeams from '#lib/components/region/RegionTeams.svelte';
-	import type { RegionEvent } from '#lib/components/region/regions.ts';
-	import { fixed, integer } from '#lib/format/number.ts';
-	import { shortDate, shortRange } from '#lib/format/time.ts';
+	import { integer } from '#lib/format/number.ts';
+	import { shortDate } from '#lib/format/time.ts';
 	import { breadcrumbs, regionDescription, regionTitle } from '#lib/seo.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -15,7 +13,6 @@
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
-	import Term from '#lib/ui/Term.svelte';
 	import '#lib/ui/score-table.css';
 	import type { PageProps } from './$types';
 
@@ -52,37 +49,6 @@
 		]
 	});
 </script>
-
-{#snippet eventTable(events: RegionEvent[], caption: string)}
-	<div class="table-wrap">
-		<table class="t events">
-			<caption class="visually-hidden">{caption}</caption>
-			<thead>
-				<tr>
-					<th class="l" scope="col">Event</th>
-					<th class="l type" scope="col">Type</th>
-					<th class="l" scope="col">Dates</th>
-					<th class="opt" scope="col">Teams</th>
-					<th scope="col"><Term label="Strength" /></th>
-				</tr>
-			</thead>
-			<tbody>
-				{#each events as event (event.code)}
-					<tr>
-						<td class="l name">
-							<a href="/events/{event.code}"><Brand text={event.name} /></a>
-							<span class="sub">{event.place ?? ''}</span>
-						</td>
-						<td class="l type muted"><Brand text={typeLabel(event.type)} /></td>
-						<td class="l">{shortRange(event.start, event.end)}</td>
-						<td class="opt">{event.teams ?? '—'}</td>
-						<td>{fixed(event.strength)}</td>
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	</div>
-{/snippet}
 
 <Seo {...seo} />
 
@@ -122,7 +88,7 @@
 	</div>
 	{#if data.events.live.length > 0}
 		<h3 class="group">Today</h3>
-		{@render eventTable(data.events.live, `Events today in ${region.name}`)}
+		<RegionEvents events={data.events.live} caption="Events today in {region.name}" />
 	{/if}
 	{#if data.events.upcoming.length + data.events.done.length > 0}
 		<div class="pick">
@@ -138,12 +104,12 @@
 				{shown === 'upcoming' ? 'No more events this season.' : 'No events have finished yet.'}
 			</p>
 		{:else}
-			{@render eventTable(
-				listed,
-				shown === 'upcoming'
+			<RegionEvents
+				events={listed}
+				caption={shown === 'upcoming'
 					? `Upcoming events in ${region.name}`
-					: `Finished events in ${region.name}`
-			)}
+					: `Finished events in ${region.name}`}
+			/>
 		{/if}
 	{/if}
 </section>
@@ -276,29 +242,6 @@
 		font-weight: 600;
 	}
 
-	.table-wrap {
-		overflow-x: auto;
-	}
-
-	.events td {
-		padding-block: 8px;
-	}
-
-	.name {
-		white-space: normal;
-		min-width: 220px;
-	}
-
-	.name a {
-		font-weight: 500;
-	}
-
-	.sub {
-		display: block;
-		font-size: 13px;
-		color: var(--text-2);
-	}
-
 	.empty,
 	.small {
 		font-size: 14px;
@@ -366,17 +309,7 @@
 		background: var(--accent-wash);
 	}
 
-	@media (max-width: 900px) {
-		.type {
-			display: none;
-		}
-	}
-
 	@media (max-width: 760px) {
-		.name {
-			min-width: 0;
-		}
-
 		.best .event-col {
 			display: none;
 		}
