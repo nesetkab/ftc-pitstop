@@ -101,10 +101,6 @@
 			<section class="panel" aria-labelledby="parts-title">
 				<h2 class="sec-title" id="parts-title">Part by part</h2>
 				<PartTable red={simulation.red} blue={simulation.blue} />
-				<Legend>
-					When one team brings most of its alliance's points in a part, its share shows under the
-					value. Tips are counts, not points.
-				</Legend>
 			</section>
 		</div>
 
@@ -134,7 +130,10 @@
 			new team.
 		</p>
 	{/if}
-	<Legend>Chances are for a single qualification match.</Legend>
+	<Legend>
+		When one team brings most of its alliance's points in a part, its share shows under the value.
+		Tips are counts, not points. Chances are for a single qualification match.
+	</Legend>
 {:else if full && !data.ready}
 	<EmptyState title="Season ratings are still loading. Try again in a minute." />
 {:else if suggestion}
