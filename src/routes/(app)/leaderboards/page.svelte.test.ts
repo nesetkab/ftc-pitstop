@@ -264,7 +264,7 @@ describe('leaderboard page', () => {
 
 	it('explains the partial list when season ratings are missing', () => {
 		show({ source: 'scout', population: 480 });
-		expect(screen.getByText(/only the top 480 teams are listed/)).toBeInTheDocument();
+		expect(screen.getByText(/Only the top 480 teams are listed/)).toBeInTheDocument();
 		expect(screen.getByText(/best event OPR from FTCScout/)).toBeInTheDocument();
 	});
 });
