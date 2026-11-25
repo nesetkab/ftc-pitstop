@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
+import { cleanup, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { MISSING } from '#lib/format/index.ts';
 import { follows } from '#lib/components/follow/follow.svelte.ts';
@@ -320,37 +320,26 @@ describe('team page', () => {
 		expect(screen.queryByRole('heading', { name: 'Matches' })).not.toBeInTheDocument();
 	});
 
-	it('shows a banner for each award from every season, newest first', async () => {
-		const rows = Array.from({ length: 14 }, (_, index) => ({
-			code: null,
-			event: `Utah Qualifier ${index + 1}`,
-			name: 'Think Award',
-			win: false
-		}));
+	it('shows banners newest first and links current events', () => {
 		show(
 			view({
-				awards: [
-					{
-						season: 2026,
-						game: 'BIOBUZZ',
-						rows: [{ code: 'USAZGIQ', event: 'Gilbert', name: 'Winning alliance', win: true }]
-					},
-					{ season: 2025, game: 'DECODE', rows }
+				banners: [
+					{ season: '2026-27', award: 'Winner', event: 'Arizona Championship', code: 'USAZCMP' },
+					{ season: '2025-26', award: 'Inspire Award', event: 'Utah Championship', code: null }
 				]
 			})
 		);
-		const banners = screen.getAllByRole('listitem').filter((item) => item.matches('.banner'));
-		expect(banners).toHaveLength(12);
-		expect(banners[0]).toHaveTextContent('Winning alliance');
-		expect(banners[0]).toHaveTextContent('2026-27');
-		expect(within(banners[0]).getByRole('link', { name: 'Gilbert' })).toHaveAttribute(
-			'href',
-			'/events/USAZGIQ'
-		);
-		expect(banners[1]).toHaveTextContent(/2025-26\s*DECODE/);
+		const banners = within(screen.getByRole('list', { name: 'Banners' })).getAllByRole('listitem');
+		expect(banners).toHaveLength(2);
+		expect(banners[0]).toHaveTextContent(/2026-27\s*Winner\s*Arizona Championship/);
+		expect(within(banners[0]).getByRole('link')).toHaveAttribute('href', '/events/USAZCMP');
+		expect(banners[1]).toHaveTextContent('Inspire Award');
 		expect(within(banners[1]).queryByRole('link')).toBeNull();
-		await fireEvent.click(screen.getByRole('button', { name: 'Show all 15' }));
-		expect(document.querySelectorAll('.banner')).toHaveLength(15);
+	});
+
+	it('leaves out banners when a team has none', () => {
+		show(view({ banners: [] }));
+		expect(screen.queryByRole('list', { name: 'Banners' })).not.toBeInTheDocument();
 	});
 
 	it('leaves out the awards and last season sections when there is nothing to show', () => {

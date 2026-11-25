@@ -7,7 +7,7 @@ import { load } from './+page.server.ts';
 
 const server = vi.hoisted(() => ({
 	loadTeamSeason: vi.fn(),
-	loadAwardHistory: vi.fn(),
+	loadBannerHistory: vi.fn(),
 	loadEventBundle: vi.fn(),
 	loadSeasonRatingsWithin: vi.fn(),
 	loadEventAnalysis: vi.fn()
@@ -15,7 +15,7 @@ const server = vi.hoisted(() => ({
 
 vi.mock('#lib/server/event.ts', () => ({
 	loadTeamSeason: server.loadTeamSeason,
-	loadAwardHistory: server.loadAwardHistory,
+	loadBannerHistory: server.loadBannerHistory,
 	loadEventBundle: server.loadEventBundle
 }));
 
@@ -75,7 +75,7 @@ beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
 	server.loadSeasonRatingsWithin.mockResolvedValue(null);
 	server.loadEventAnalysis.mockResolvedValue(null);
-	server.loadAwardHistory.mockResolvedValue([]);
+	server.loadBannerHistory.mockResolvedValue([]);
 	server.loadEventBundle.mockRejectedValue(new DataError(503, 'down'));
 });
 
@@ -103,29 +103,29 @@ describe('team page load', () => {
 		});
 	});
 
-	it('asks for past awards with the rookie year and shows them', async () => {
+	it('asks for past banners with the rookie year and shows them', async () => {
 		server.loadTeamSeason.mockResolvedValue(season([played('AAA', '2026-11-07')]));
-		server.loadAwardHistory.mockResolvedValue([
+		server.loadBannerHistory.mockResolvedValue([
 			{
 				season: 2025,
 				code: 'OLD',
-				event: 'Old Qualifier',
-				start: '2025-11-01',
-				award: { id: 6, name: 'Design Award', placement: 1, team: 26670, person: null }
+				event: 'Old Championship',
+				start: '2026-02-21',
+				award: { id: 13, name: 'Winning Alliance', placement: 1, team: 26670, person: null }
 			}
 		]);
 		const { view } = (await call().result) as unknown as {
-			view: { awards: { season: number }[] };
+			view: { banners: { season: string; event: string }[] };
 		};
-		expect(server.loadAwardHistory).toHaveBeenCalledWith(26670, 2024);
-		expect(view.awards.map((entry) => entry.season)).toEqual([2025]);
+		expect(server.loadBannerHistory).toHaveBeenCalledWith(26670, 2024);
+		expect(view.banners).toMatchObject([{ season: '2025-26', event: 'Old Championship' }]);
 	});
 
-	it('still loads when past awards fail', async () => {
+	it('still loads when past banners fail', async () => {
 		server.loadTeamSeason.mockResolvedValue(season([played('AAA', '2026-11-07')]));
-		server.loadAwardHistory.mockRejectedValue(new DataError(503, 'down'));
-		const { view } = (await call().result) as unknown as { view: { awards: unknown[] } };
-		expect(view.awards).toEqual([]);
+		server.loadBannerHistory.mockRejectedValue(new DataError(503, 'down'));
+		const { view } = (await call().result) as unknown as { view: { banners: unknown[] } };
+		expect(view.banners).toEqual([]);
 	});
 
 	it('uses season ratings when they exist', async () => {

@@ -139,28 +139,36 @@ describe('buildTeamPage without season ratings', () => {
 		]);
 		expect(view.awards).toEqual([
 			{
-				season: 2026,
-				game: 'BIOBUZZ',
-				rows: [
-					{
-						code: 'USAZGIQ',
-						event: 'Roadrunner - Gilbert Qualifier',
-						name: 'Inspire Award 3rd place',
-						win: false
-					}
-				]
+				code: 'USAZGIQ',
+				event: 'Roadrunner - Gilbert Qualifier',
+				name: 'Inspire Award 3rd place'
 			}
 		]);
 	});
 
-	it('adds awards from past seasons, newest first', () => {
+	it('shows banners only for inspire and the winning alliance at championships', () => {
 		const award = (id: number, name: string, placement = 1) => ({
 			id,
 			name,
 			placement,
-			team: 3747,
+			team: 2844,
 			person: null
 		});
+		const withChampionship = {
+			...season,
+			events: [
+				...season.events,
+				{
+					...teamEvent({
+						code: 'USAZCMP',
+						name: 'Arizona Championship',
+						type: 'Championship',
+						start: '2027-02-20'
+					}),
+					awards: [award(13, 'Winning Alliance'), award(4, 'Control Award')]
+				}
+			]
+		};
 		const history = [
 			{
 				season: 2023,
@@ -171,44 +179,42 @@ describe('buildTeamPage without season ratings', () => {
 			},
 			{
 				season: 2025,
-				code: 'USUTQ2',
-				event: 'Utah Qualifier 2',
-				start: '2025-12-06',
-				award: award(6, 'Design Award', 2)
-			},
-			{
-				season: 2025,
-				code: 'USUTQ1',
-				event: 'Utah Qualifier 1',
-				start: '2025-11-15',
+				code: 'USUTCMP',
+				event: 'Utah Championship',
+				start: '2026-02-21',
 				award: award(11, 'Inspire Award')
 			},
 			{
 				season: 2026,
-				code: 'USAZGIQ',
+				code: 'USAZCMP',
 				event: 'Repeat',
-				start: '2026-11-14',
+				start: '2027-02-20',
 				award: award(11, 'Inspire Award')
 			}
 		];
 		const view = buildTeamPage({
-			season,
+			season: withChampionship,
 			history,
 			ratings: null,
 			analyses: {},
 			bundles: {},
 			now: NOW
 		});
-		expect(view.awards.map((entry) => [entry.season, entry.game])).toEqual([
-			[2026, 'BIOBUZZ'],
-			[2025, 'DECODE'],
-			[2023, 'CENTERSTAGE']
+		expect(view.banners).toEqual([
+			{
+				season: '2026-27',
+				award: 'Winner',
+				event: 'Arizona Championship',
+				code: 'USAZCMP'
+			},
+			{ season: '2025-26', award: 'Inspire Award', event: 'Utah Championship', code: null },
+			{ season: '2023-24', award: 'Winner', event: 'Utah Championship', code: null }
 		]);
-		expect(view.awards[1].rows).toEqual([
-			{ code: null, event: 'Utah Qualifier 2', name: 'Design Award 2nd place', win: false },
-			{ code: null, event: 'Utah Qualifier 1', name: 'Inspire Award', win: true }
+		expect(view.awards.map((entry) => entry.name)).toEqual([
+			'Inspire Award 3rd place',
+			'Winning alliance',
+			'Control Award'
 		]);
-		expect(view.awards[2].rows[0]).toMatchObject({ name: 'Winning alliance', win: true });
 	});
 
 	it('summarizes last season', () => {

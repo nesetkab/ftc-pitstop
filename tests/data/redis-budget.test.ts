@@ -30,7 +30,7 @@ const scoutFetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
 		operationName?: string;
 		variables?: { start?: string };
 	};
-	if (body.operationName === 'AwardHistory') {
+	if (body.operationName === 'BannerHistory') {
 		const empty = Object.fromEntries([2025, 2024, 2023].flatMap((year) => [[`e${year}`, []], [`a${year}`, []]]));
 		return Response.json({ data: { teamByNumber: empty } });
 	}
@@ -147,18 +147,18 @@ describe('redis commands for team scouting reports', () => {
 	});
 });
 
-describe('redis commands for past awards', () => {
-	it('reads past awards once per instance and keeps them for weeks', async () => {
+describe('redis commands for past banners', () => {
+	it('reads past banners once per instance and keeps them for weeks', async () => {
 		const redis = createFakeRedis(() => LIVE);
 		const clock = { now: LIVE };
 		const history = (page: ReturnType<typeof instance>) =>
-			page.loaders.loadAwardHistory(3747, 2023);
+			page.loaders.loadBannerHistory(3747, 2023);
 		const first = instance(redis, clock);
 		expect(await history(first)).toEqual([]);
 		clock.now += 20 * DAY_MS;
 		expect(await commands(redis, () => history(first))).toEqual([]);
 		expect(reads(await commands(redis, () => history(instance(redis, clock))))).toHaveLength(1);
-		expect(await commands(redis, () => first.loaders.loadAwardHistory(3747, 2026))).toEqual([]);
+		expect(await commands(redis, () => first.loaders.loadBannerHistory(3747, 2026))).toEqual([]);
 	});
 });
 

@@ -33,9 +33,9 @@ import {
 	type FtcScheduleMatch
 } from '#lib/server/ftc/index.ts';
 import {
-	awardSeasons,
+	bannerSeasons,
 	compareEvents,
-	fetchAwardHistory,
+	fetchBannerHistory,
 	fetchEventByCode,
 	fetchEventsOnDate,
 	fetchQuickStats,
@@ -56,7 +56,7 @@ import type {
 	EventPhase,
 	EventSummary,
 	Match,
-	PastAward,
+	PastBanner,
 	QueueStatusSnapshot,
 	QuickStats,
 	SearchIndex,
@@ -687,17 +687,17 @@ export function createLoaders(deps: LoaderDeps) {
 		throw unavailable('Team data is unavailable right now');
 	}
 
-	async function loadAwardHistory(
+	async function loadBannerHistory(
 		input: string | number,
 		rookieYear: number | null
-	): Promise<PastAward[]> {
+	): Promise<PastBanner[]> {
 		const number = normalizeTeamNumber(input);
-		const seasons = awardSeasons(rookieYear);
+		const seasons = bannerSeasons(rookieYear);
 		if (seasons.length === 0) return [];
 		const value = await cache.get(
-			`scout:${SEASON}:awards:${number}`,
+			`scout:${SEASON}:banners:${number}`,
 			{ ttl: 30 * DAY_SECONDS, maxStale: 90 * DAY_SECONDS },
-			async () => ({ status: 'ok', body: await fetchAwardHistory(number, seasons, scout) })
+			async () => ({ status: 'ok', body: await fetchBannerHistory(number, seasons, scout) })
 		);
 		return value.body;
 	}
@@ -866,7 +866,7 @@ export function createLoaders(deps: LoaderDeps) {
 		loadSeasonEvents,
 		loadEventsToday,
 		loadTeamSeason,
-		loadAwardHistory,
+		loadBannerHistory,
 		searchIndex,
 		loadQueueStatus,
 		loadPriorQuickStats,
@@ -889,7 +889,7 @@ export const {
 	loadSeasonEvents,
 	loadEventsToday,
 	loadTeamSeason,
-	loadAwardHistory,
+	loadBannerHistory,
 	searchIndex,
 	loadQueueStatus,
 	loadPriorQuickStats,

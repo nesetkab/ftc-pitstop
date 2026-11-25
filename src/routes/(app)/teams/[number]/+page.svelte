@@ -8,6 +8,7 @@
 	import TeamAllies from '#lib/components/team/TeamAllies.svelte';
 	import TeamAwards from '#lib/components/team/TeamAwards.svelte';
 	import TeamBadges from '#lib/components/team/TeamBadges.svelte';
+	import TeamBanners from '#lib/components/team/TeamBanners.svelte';
 	import TeamBreakdown from '#lib/components/team/TeamBreakdown.svelte';
 	import TeamEvents from '#lib/components/team/TeamEvents.svelte';
 	import TeamMatches from '#lib/components/team/TeamMatches.svelte';
@@ -88,6 +89,10 @@
 			team={view.source === 'ratings' ? view.team.number : undefined}
 		/>
 	{/if}
+
+	{#if view.banners.length > 0}
+		<TeamBanners banners={view.banners} />
+	{/if}
 </div>
 
 {#if pitEvent}
@@ -127,7 +132,7 @@
 {#if view.awards.length > 0}
 	<section class="panel" aria-labelledby="awards-title">
 		<h2 class="sec-title" id="awards-title">Awards</h2>
-		<TeamAwards seasons={view.awards} />
+		<TeamAwards rows={view.awards} />
 	</section>
 {/if}
 

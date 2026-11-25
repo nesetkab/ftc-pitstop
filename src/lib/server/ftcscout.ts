@@ -1,5 +1,6 @@
 import * as z from 'zod';
 import { SEASON } from '#lib/game/biobuzz.ts';
+import { isBanner } from '#lib/game/banners.ts';
 import { EVENT_TYPE_NAMES, eventTypeFromName } from '#lib/game/event-types.ts';
 import { httpUrl } from '#lib/format/url.ts';
 import { createBreaker, type Breaker } from '#lib/server/breaker.ts';
@@ -13,7 +14,7 @@ import type {
 	FlowerElement,
 	Match,
 	MatchTeam,
-	PastAward,
+	PastBanner,
 	QuickStats,
 	Ranking,
 	SeasonMatch,
@@ -901,26 +902,26 @@ export const FIRST_SCOUT_SEASON = 2019;
 
 const pastEvent = z.object({
 	eventCode: z.string(),
-	event: z.object({ name: z.string(), start: z.string() })
+	event: z.object({ name: z.string(), type: z.string().nullish(), start: z.string() })
 });
 
-export function awardSeasons(rookieYear: number | null, season = SEASON): number[] {
+export function bannerSeasons(rookieYear: number | null, season = SEASON): number[] {
 	const first = Math.max(FIRST_SCOUT_SEASON, rookieYear ?? FIRST_SCOUT_SEASON);
 	const seasons: number[] = [];
 	for (let year = season - 1; year >= first; year -= 1) seasons.push(year);
 	return seasons;
 }
 
-export async function fetchAwardHistory(
+export async function fetchBannerHistory(
 	number: number,
 	seasons: number[],
 	scout: FtcScoutClient = scoutClient
-): Promise<PastAward[]> {
+): Promise<PastBanner[]> {
 	if (seasons.length === 0) return [];
 	const fields = seasons
 		.map(
 			(year) =>
-				`e${year}: events(season: ${year}) { eventCode event { name start } }\n` +
+				`e${year}: events(season: ${year}) { eventCode event { name type start } }\n` +
 				`a${year}: awards(season: ${year}) { eventCode type placement teamNumber personName }`
 		)
 		.join('\n');
@@ -932,8 +933,8 @@ export async function fetchAwardHistory(
 	);
 	const schema = z.object({ teamByNumber: z.object(shape).nullish() });
 	const data = await scout.query(
-		'AwardHistory',
-		`query AwardHistory($number: Int!) {\n\tteamByNumber(number: $number) {\n${fields}\n\t}\n}`,
+		'BannerHistory',
+		`query BannerHistory($number: Int!) {\n\tteamByNumber(number: $number) {\n${fields}\n\t}\n}`,
 		{ number },
 		schema
 	);
@@ -953,7 +954,9 @@ export async function fetchAwardHistory(
 			const code = raw.eventCode?.toUpperCase();
 			const event = code ? events.get(code) : undefined;
 			if (!code || !event) return [];
-			return [{ season: year, code, event: event.name, start: event.start, award: mapAward(raw) }];
+			const award = mapAward(raw);
+			if (!isBanner(award, eventTypeFromName(event.type))) return [];
+			return [{ season: year, code, event: event.name, start: event.start, award }];
 		});
 	});
 }

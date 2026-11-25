@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { matchScoreCheck } from '#lib/game/biobuzz.ts';
 import {
-	awardSeasons,
+	bannerSeasons,
 	createFtcScoutClient,
-	fetchAwardHistory,
+	fetchBannerHistory,
 	fetchEventByCode,
 	fetchEventsOnDate,
 	fetchSeasonMatches,
@@ -116,23 +116,32 @@ describe('FTCScout client', () => {
 	});
 
 	it('asks for past seasons back to the rookie year', () => {
-		expect(awardSeasons(2022, 2026)).toEqual([2025, 2024, 2023, 2022]);
-		expect(awardSeasons(2005, 2026)).toEqual([2025, 2024, 2023, 2022, 2021, 2020, 2019]);
-		expect(awardSeasons(null, 2026)).toHaveLength(7);
-		expect(awardSeasons(2026, 2026)).toEqual([]);
+		expect(bannerSeasons(2022, 2026)).toEqual([2025, 2024, 2023, 2022]);
+		expect(bannerSeasons(2005, 2026)).toEqual([2025, 2024, 2023, 2022, 2021, 2020, 2019]);
+		expect(bannerSeasons(null, 2026)).toHaveLength(7);
+		expect(bannerSeasons(2026, 2026)).toEqual([]);
 	});
 
-	it('maps past awards to their event in one request', async () => {
+	it('keeps only championship banners from past seasons in one request', async () => {
 		const fake = scoutFetch({
-			AwardHistory: {
+			BannerHistory: {
 				data: {
 					teamByNumber: {
 						e2025: [
-							{ eventCode: 'USUTQ1', event: { name: 'Utah Qualifier 1', start: '2025-11-15' } }
+							{
+								eventCode: 'USUTCMP',
+								event: { name: 'Utah Championship', type: 'Championship', start: '2026-02-21' }
+							},
+							{
+								eventCode: 'USUTQ1',
+								event: { name: 'Utah Qualifier 1', type: 'Qualifier', start: '2025-11-15' }
+							}
 						],
 						a2025: [
-							{ eventCode: 'USUTQ1', type: 'Inspire', placement: 2, teamNumber: 3747, personName: null },
-							{ eventCode: 'GONE', type: 'Think', placement: 1, teamNumber: 3747, personName: null }
+							{ eventCode: 'USUTCMP', type: 'Winner', placement: 1, teamNumber: 3747, personName: null },
+							{ eventCode: 'USUTCMP', type: 'Inspire', placement: 2, teamNumber: 3747, personName: null },
+							{ eventCode: 'USUTQ1', type: 'Inspire', placement: 1, teamNumber: 3747, personName: null },
+							{ eventCode: 'GONE', type: 'Inspire', placement: 1, teamNumber: 3747, personName: null }
 						],
 						e2024: [],
 						a2024: []
@@ -140,7 +149,7 @@ describe('FTCScout client', () => {
 				}
 			}
 		});
-		const awards = await fetchAwardHistory(
+		const banners = await fetchBannerHistory(
 			3747,
 			[2025, 2024],
 			createFtcScoutClient({ fetch: fake.fetch })
@@ -148,16 +157,17 @@ describe('FTCScout client', () => {
 		expect(fake.bodies).toHaveLength(1);
 		expect(fake.bodies[0].variables).toEqual({ number: 3747 });
 		expect(fake.bodies[0].query).toContain('a2024: awards(season: 2024)');
-		expect(awards).toEqual([
+		expect(fake.bodies[0].query).toContain('event { name type start }');
+		expect(banners).toEqual([
 			{
 				season: 2025,
-				code: 'USUTQ1',
-				event: 'Utah Qualifier 1',
-				start: '2025-11-15',
-				award: { id: 11, name: 'Inspire Award', placement: 2, team: 3747, person: null }
+				code: 'USUTCMP',
+				event: 'Utah Championship',
+				start: '2026-02-21',
+				award: { id: 13, name: 'Winning Alliance', placement: 1, team: 3747, person: null }
 			}
 		]);
-		expect(await fetchAwardHistory(3747, [], createFtcScoutClient({ fetch: fake.fetch }))).toEqual(
+		expect(await fetchBannerHistory(3747, [], createFtcScoutClient({ fetch: fake.fetch }))).toEqual(
 			[]
 		);
 		expect(fake.bodies).toHaveLength(1);

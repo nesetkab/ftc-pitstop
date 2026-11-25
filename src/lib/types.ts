@@ -262,7 +262,7 @@ export interface TeamEventStats {
 	};
 }
 
-export interface PastAward {
+export interface PastBanner {
 	season: number;
 	code: string;
 	event: string;
