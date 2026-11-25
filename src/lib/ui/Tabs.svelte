@@ -36,12 +36,25 @@
 
 	const active = $derived(pathOf(current ?? page.url.pathname));
 
+	const EDGE = 32;
+
+	function reveal(view: HTMLElement, tab: HTMLElement) {
+		const room = view.clientWidth - EDGE;
+		const need = tab.offsetLeft + tab.offsetWidth - room;
+		if (need <= 0) {
+			view.scrollLeft = 0;
+			return;
+		}
+		const links = [...view.querySelectorAll<HTMLElement>('a')];
+		const before = links.slice(0, links.indexOf(tab) + 1);
+		const first = before.find((link) => link.offsetLeft - EDGE >= need) ?? tab;
+		view.scrollLeft = first.offsetLeft - EDGE;
+	}
+
 	$effect(() => {
 		if (!nav || !active) return;
 		const tab = nav.querySelector<HTMLElement>('[aria-current="page"]');
-		if (tab && nav.scrollWidth > nav.clientWidth) {
-			nav.scrollLeft = tab.offsetLeft - (nav.clientWidth - tab.offsetWidth) / 2;
-		}
+		if (tab && nav.scrollWidth > nav.clientWidth) reveal(nav, tab);
 		measure();
 	});
 </script>
@@ -85,11 +98,13 @@
 <style>
 	.tab-row {
 		--fade: 64px;
+		--fade-start: 32px;
 		position: relative;
 		border-bottom: 1px solid var(--line);
 	}
 
 	.tabs {
+		position: relative;
 		display: flex;
 		gap: 24px;
 		margin: -2px -2px 0;
@@ -109,14 +124,14 @@
 	}
 
 	.more-start .tabs {
-		mask-image: linear-gradient(to left, #000 calc(100% - var(--fade)), transparent);
+		mask-image: linear-gradient(to right, transparent, #000 var(--fade-start));
 	}
 
 	.more-start.more-end .tabs {
 		mask-image: linear-gradient(
 			to right,
 			transparent,
-			#000 var(--fade),
+			#000 var(--fade-start),
 			#000 calc(100% - var(--fade)),
 			transparent
 		);
