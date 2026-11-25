@@ -437,7 +437,7 @@
 					class={['surface', tool, { drawing: editable }]}
 					viewBox="0 0 480 480"
 					role="img"
-					aria-label="Simplified BIOBUZZ field{plan ? `, ${plan.name}` : ''}"
+					aria-label="BIOBUZZ field{plan ? `, ${plan.name}` : ''}"
 					onpointerdown={editable ? down : undefined}
 					onpointermove={editable ? move : undefined}
 					onpointerup={editable ? up : undefined}

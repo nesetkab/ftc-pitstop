@@ -319,6 +319,15 @@
 					<dt><a href="https://ftc.nexus">Nexus</a></dt>
 					<dd>Live queueing status, at events that use it.</dd>
 				</div>
+				<div>
+					<dt>
+						<a href="https://github.com/Pedro-Pathing/Visualizer">Pedro Pathing Visualizer</a>
+					</dt>
+					<dd>
+						The field map on the strategy board, drawn by FTC Team Juice 16236 and shared under the
+						<a href="/licenses/pedro-pathing-visualizer.txt">Apache License 2.0</a>.
+					</dd>
+				</div>
 			</dl>
 			<p>
 				During a live event, PitStop checks FIRST for new scores and rankings every 15 to 20

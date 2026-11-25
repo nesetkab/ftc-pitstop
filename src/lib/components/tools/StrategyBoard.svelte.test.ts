@@ -26,7 +26,7 @@ function setup(initial: Boards = { plans: [] }, extra: Record<string, unknown> =
 }
 
 function field() {
-	return screen.getByRole('img', { name: /Simplified BIOBUZZ field/ });
+	return screen.getByRole('img', { name: /BIOBUZZ field/ });
 }
 
 async function stroke(points: [number, number][]) {
@@ -54,14 +54,15 @@ async function stroke(points: [number, number][]) {
 const shapesOf = (boards: Boards) => boards.plans[0]?.shapes ?? [];
 
 describe('strategy board', () => {
-	it('draws a plain field and says it is simplified', () => {
+	it('draws the field map for light and dark themes', () => {
 		setup();
-		expect(screen.getByRole('img', { name: /Simplified BIOBUZZ field/ })).toBeInTheDocument();
-		expect(field().querySelectorAll('.tile')).toHaveLength(10);
-		expect(field().querySelectorAll('.flower')).toHaveLength(4);
-		expect(field().querySelectorAll('.zone')).toHaveLength(2);
-		expect(field().querySelector('.hive-r')).not.toBeNull();
-		expect(field().querySelector('.hive-b')).not.toBeNull();
+		expect(screen.getByRole('img', { name: /^BIOBUZZ field/ })).toBeInTheDocument();
+		const maps = field().querySelectorAll('image.map');
+		expect(maps).toHaveLength(2);
+		for (const map of maps) {
+			expect(map.getAttribute('href')).toMatch(/biobuzz-(light|dark).*\.webp/);
+			expect(map.getAttribute('width')).toBe('440');
+		}
 	});
 
 	it('starts with the pen and can switch tools', async () => {

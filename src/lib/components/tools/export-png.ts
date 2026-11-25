@@ -10,6 +10,7 @@ const PROPERTIES = [
 	'stroke-linecap',
 	'stroke-linejoin',
 	'opacity',
+	'display',
 	'font-size',
 	'font-weight',
 	'text-anchor',
@@ -25,6 +26,32 @@ function inlineStyles(source: Element, target: Element) {
 	for (let index = 0; index < source.children.length; index++) {
 		inlineStyles(source.children[index], target.children[index]);
 	}
+}
+
+function dataUrl(blob: Blob): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = () => resolve(String(reader.result));
+		reader.onerror = () => reject(new Error('The field could not be loaded'));
+		reader.readAsDataURL(blob);
+	});
+}
+
+async function embedImages(copy: SVGSVGElement) {
+	const images = Array.from(copy.querySelectorAll('image'));
+	await Promise.all(
+		images.map(async (image) => {
+			if (image.style.getPropertyValue('display') === 'none') {
+				image.remove();
+				return;
+			}
+			const href = image.getAttribute('href');
+			if (!href || href.startsWith('data:')) return;
+			const response = await fetch(href);
+			if (!response.ok) throw new Error('The field could not be loaded');
+			image.setAttribute('href', await dataUrl(await response.blob()));
+		})
+	);
 }
 
 function slug(name: string): string {
@@ -43,6 +70,7 @@ export function planFilename(name: string): string {
 export async function renderPng(svg: SVGSVGElement, background: string, size = 960): Promise<Blob> {
 	const copy = svg.cloneNode(true) as SVGSVGElement;
 	inlineStyles(svg, copy);
+	await embedImages(copy);
 	copy.setAttribute('xmlns', NAMESPACE);
 	copy.setAttribute('width', String(size));
 	copy.setAttribute('height', String(size));
