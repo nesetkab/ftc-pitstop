@@ -44,7 +44,10 @@ function row(total: number, auto: number, teams: number[]): RecordRow {
 		flower: 0,
 		garden: 0,
 		park: 0,
-		tips: 0
+		tips: 0,
+		fouls: 0,
+		final: total,
+		margin: total - 50
 	};
 }
 

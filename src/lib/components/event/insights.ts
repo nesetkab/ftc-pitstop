@@ -90,7 +90,10 @@ function side(event: InsightEvent, match: Match, alliance: AllianceColor): Recor
 		flower: parts.flower,
 		garden: parts.garden,
 		park: parts.park,
-		tips: own.breakdown ? tips(own.breakdown) : 0
+		tips: own.breakdown ? tips(own.breakdown) : 0,
+		fouls: own.foulPoints,
+		final: own.total,
+		margin: own.preFoulTotal - result[other].preFoulTotal
 	};
 }
 

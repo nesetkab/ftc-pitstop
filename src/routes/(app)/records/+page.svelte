@@ -1,8 +1,12 @@
 <script lang="ts">
+	import RecordConditions from '#lib/components/records/RecordConditions.svelte';
 	import RecordFilters from '#lib/components/records/RecordFilters.svelte';
+	import RecordMenu from '#lib/components/records/RecordMenu.svelte';
+	import RecordStats from '#lib/components/records/RecordStats.svelte';
 	import RecordsTable from '#lib/components/records/RecordsTable.svelte';
 	import {
 		clearedRecords,
+		conditionText,
 		hasRecordFilters,
 		RECORDS_CSV_LIMIT,
 		recordQuery
@@ -19,6 +23,11 @@
 
 	const first = $derived(data.start + 1);
 	const last = $derived(data.start + data.rows.length);
+
+	function without(index: number) {
+		const where = data.filters.where.filter((_, at) => at !== index);
+		return `/records${recordQuery({ ...data.filters, where }, 1)}`;
+	}
 </script>
 
 <Seo
@@ -38,14 +47,52 @@
 
 <RecordFilters filters={data.filters} regions={data.regions} types={data.types} />
 
-{#if data.total > 0}
+<div class="bar">
 	<p class="count" aria-live="polite">
-		<span>Showing {integer(first)} to {integer(last)} of {integer(data.total)} alliance scores</span
-		>
+		{#if data.total > 0}
+			Showing {integer(first)} to {integer(last)} of {integer(data.total)} alliance scores
+		{:else}
+			No alliance scores
+		{/if}
+	</p>
+	<div class="tools">
 		{#if hasRecordFilters(data.filters)}
 			<a class="clear" href={clearedRecords(data.filters)}>Clear filters</a>
 		{/if}
-	</p>
+		<RecordMenu
+			label="Custom filters"
+			count={data.filters.where.length}
+			panelLabel="Custom filters"
+			width={520}
+		>
+			{#snippet children(close)}
+				<RecordConditions filters={data.filters} ondone={close} />
+			{/snippet}
+		</RecordMenu>
+		<RecordMenu label="Statistics" panelLabel="Choose statistics" width={380}>
+			{#snippet children(close)}
+				<RecordStats filters={data.filters} ondone={() => close(true)} />
+			{/snippet}
+		</RecordMenu>
+	</div>
+</div>
+
+{#if data.filters.where.length > 0}
+	<ul class="conditions" aria-label="Custom filters">
+		{#each data.filters.where as condition, index (`${index}:${conditionText(condition)}`)}
+			{#if index > 0}
+				<li class="joiner" aria-hidden="true">{data.filters.match === 'any' ? 'or' : 'and'}</li>
+			{/if}
+			<li>
+				<a class="chip" href={without(index)} aria-label="Remove {conditionText(condition)}"
+					>{conditionText(condition)}
+					<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+						<path d="M2 2 8 8M8 2 2 8" />
+					</svg></a
+				>
+			</li>
+		{/each}
+	</ul>
 {/if}
 
 <RecordsTable rows={data.rows} filters={data.filters} names={data.names} />
@@ -77,17 +124,68 @@
 		font-size: 14px;
 	}
 
-	.count {
+	.bar {
 		display: flex;
 		flex-wrap: wrap;
-		align-items: baseline;
-		gap: 4px 16px;
+		align-items: center;
+		justify-content: space-between;
+		gap: 10px 16px;
+	}
+
+	.count {
+		margin: 0;
 		font-size: 14px;
 		color: var(--text-2);
 		font-variant-numeric: tabular-nums;
 	}
 
+	.tools {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px;
+	}
+
 	.clear {
-		margin-left: auto;
+		margin-right: 8px;
+		font-size: 14px;
+	}
+
+	.conditions {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 6px;
+		margin: -4px 0 0;
+		padding: 0;
+		list-style: none;
+		font-size: 13px;
+	}
+
+	.joiner {
+		color: var(--text-3);
+	}
+
+	.chip {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 8px 4px 10px;
+		border: 1px solid var(--line-2);
+		border-radius: 999px;
+		color: var(--text);
+		text-decoration: none;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.chip:hover {
+		background: var(--surface);
+	}
+
+	.chip svg {
+		fill: none;
+		stroke: var(--text-3);
+		stroke-width: 1.5;
+		stroke-linecap: round;
 	}
 </style>

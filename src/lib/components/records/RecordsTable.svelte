@@ -2,14 +2,16 @@
 	import Arrow from '#lib/ui/Arrow.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
-	import { integer, shortDate } from '#lib/format/index.ts';
+	import { integer, shortDate, signed } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import {
 		clearedRecords,
 		RECORD_GROUPS,
+		RECORD_PART_NOTES,
 		RECORD_PARTS,
 		recordQuery,
+		shownParts,
 		type RankedRecord,
 		type RecordFilters,
 		type RecordPart
@@ -25,18 +27,38 @@
 
 	const followed = $derived(new Set(follows.teams));
 
-	const columns = RECORD_GROUPS.flatMap((group) =>
-		group.parts.map((key, index) => ({
-			key,
-			label: RECORD_PARTS.find((part) => part.key === key)?.label ?? key,
-			first: index === 0 && group !== RECORD_GROUPS[0]
-		}))
+	const columns = $derived(
+		shownParts(filters).map((key, index, all) => {
+			const part = RECORD_PARTS.find((entry) => entry.key === key) ?? RECORD_PARTS[0];
+			const before = index > 0 ? RECORD_PARTS.find((entry) => entry.key === all[index - 1]) : null;
+			return {
+				key,
+				label: part.label,
+				group: part.group,
+				first: before !== null && before?.group !== part.group,
+				lone: key !== 'total' && key !== filters.part
+			};
+		})
 	);
+
+	const groups = $derived(
+		RECORD_GROUPS.map((group) => ({
+			...group,
+			span: columns.filter((column) => column.group === group.key).length
+		})).filter((group) => group.span > 0)
+	);
+
+	const custom = $derived(filters.show !== null);
 
 	$effect(() => syncFollows());
 
 	function sortHref(part: RecordPart) {
-		return `/records${recordQuery({ ...filters, part }, 1)}`;
+		const dir = part === filters.part && filters.dir === 'desc' ? 'asc' : 'desc';
+		return `/records${recordQuery({ ...filters, part, dir }, 1)}`;
+	}
+
+	function value(row: RankedRecord, key: RecordPart) {
+		return key === 'margin' ? signed(row.margin, 0) : integer(row[key]);
 	}
 </script>
 
@@ -45,34 +67,37 @@
 		<a href={clearedRecords(filters)}>Clear filters</a>
 	</EmptyState>
 {:else}
-	<Table class="records">
+	<Table class={custom ? 'records custom' : 'records'}>
 		<caption class="visually-hidden">Highest alliance scores this season</caption>
 		<thead>
 			<tr class="groups">
 				<td></td>
-				{#each RECORD_GROUPS as group, index (group.label)}
-					<th class={['group', { sep: index > 0 }]} scope="colgroup" colspan={group.parts.length}
+				{#each groups as group, index (group.key)}
+					<th class={['group', { sep: index > 0 }]} scope="colgroup" colspan={group.span}
 						>{group.label}</th
 					>
 				{/each}
-				<td colspan="4"></td>
+				<td colspan="3"></td>
 			</tr>
 			<tr>
-				<th class="l" scope="col">Rank</th>
+				<th class="l rank" scope="col">Rank</th>
 				{#each columns as column (column.key)}
 					{@const active = filters.part === column.key}
 					<th
 						scope="col"
-						class={{ extra: column.key !== 'total' && !active, sep: column.first, active }}
-						aria-sort={active ? 'descending' : undefined}
+						class={['num', { extra: column.lone, sep: column.first, active }]}
+						aria-sort={active ? (filters.dir === 'asc' ? 'ascending' : 'descending') : undefined}
+						title={RECORD_PART_NOTES[column.key]}
 					>
 						<a class="sort-link" href={sortHref(column.key)} data-sveltekit-reset="false"
-							><Term label={column.label} nested /><Arrow dir="down" class="sort-arrow" /></a
+							><Arrow
+								dir={active && filters.dir === 'asc' ? 'up' : 'down'}
+								class="sort-arrow"
+							/><Term label={column.label} nested /></a
 						>
 					</th>
 				{/each}
 				<th class="l" scope="col">Alliance</th>
-				<th class="optional" scope="col">Opponent</th>
 				<th class="l" scope="col">Event</th>
 				<th class="l opt" scope="col">Match</th>
 			</tr>
@@ -85,12 +110,16 @@
 					>
 					{#each columns as column (column.key)}
 						<td
-							class={{
-								extra: column.key !== 'total' && filters.part !== column.key,
-								sep: column.first,
-								active: filters.part === column.key,
-								total: column.key === 'total'
-							}}>{integer(row[column.key])}</td
+							class={[
+								'num',
+								{
+									extra: column.lone,
+									sep: column.first,
+									active: filters.part === column.key,
+									strong: column.key === 'total',
+									muted: column.key === 'opponent' && filters.part !== 'opponent'
+								}
+							]}>{value(row, column.key)}</td
 						>
 					{/each}
 					<td class={['l team', { bare: filters.part !== 'total' }]}>
@@ -103,7 +132,6 @@
 							{/each}
 						</span>
 					</td>
-					<td class="optional muted">{integer(row.opponent)}</td>
 					<td class="l event">
 						<a class="event-name" href="/events/{row.event}"
 							>{names.events[row.event] ?? row.event}</a
@@ -130,8 +158,33 @@
 		color: inherit;
 	}
 
+	th.num,
+	td.num {
+		width: 1%;
+		padding-inline: 12px;
+	}
+
+	thead tr:last-child th {
+		padding-top: 8px;
+	}
+
+	th.group {
+		padding: 0 12px 6px;
+	}
+
+	.sort-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 3px;
+	}
+
 	th :global(.sort-arrow) {
-		opacity: 0.35;
+		margin: 0;
+		opacity: 0.3;
+	}
+
+	th.num a:hover :global(.sort-arrow) {
+		opacity: 0.7;
 	}
 
 	th.active {
@@ -149,13 +202,19 @@
 	}
 
 	tbody td {
-		padding-block: 6px;
+		padding-block: 7px;
 		line-height: 1.3;
 	}
 
-	td.total,
+	td.strong,
 	td.active {
 		font-weight: 600;
+	}
+
+	th.rank,
+	td.rank {
+		width: 1%;
+		padding-right: 4px;
 	}
 
 	td.rank {
@@ -168,6 +227,14 @@
 
 	.muted {
 		color: var(--text-2);
+	}
+
+	td.team {
+		padding-left: 16px;
+	}
+
+	thead tr:last-child th.num + th.l {
+		padding-left: 16px;
 	}
 
 	.teams {
@@ -227,21 +294,17 @@
 	}
 
 	@media (max-width: 900px) {
-		.extra,
-		.groups {
+		:global(.records:not(.custom)) .extra,
+		:global(.records:not(.custom)) .groups {
 			display: none;
 		}
 
-		.sep {
+		:global(.records:not(.custom)) .sep {
 			border-left: 0;
 		}
 	}
 
 	@media (max-width: 760px) {
-		.optional {
-			display: none;
-		}
-
 		.teams a,
 		.event {
 			max-width: 180px;
@@ -249,6 +312,11 @@
 	}
 
 	@media (max-width: 600px) {
+		th.num,
+		td.num {
+			padding-inline: 6px;
+		}
+
 		.teams a {
 			max-width: 34vw;
 		}
