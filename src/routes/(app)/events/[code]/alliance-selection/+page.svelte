@@ -63,15 +63,10 @@
 				}
 			: null
 	);
-	const notes = $derived(
-		[
-			table.picks && table.pickAlliance !== null && selection.picking
-				? `Playoff chances are for alliance ${table.pickAlliance} (${selection.picking.captain}) if it picked that team.`
-				: '',
-			table.rated
-				? 'aOPR is a team’s estimated points per match, from the qualification scores so far.'
-				: 'RS is the average ranking points per match. TBP is the average match score without penalties.'
-		].filter(Boolean)
+	const note = $derived(
+		table.picks && table.pickAlliance !== null && selection.picking
+			? `Playoff chances assume alliance ${table.pickAlliance} (${selection.picking.captain}) picks that team.`
+			: null
 	);
 
 	onMount(() => {
@@ -158,9 +153,7 @@
 	</div>
 
 	{#if !selection.started}
-		<EmptyState title="No alliance selection yet.">
-			Alliances show here once qualification matches are done.
-		</EmptyState>
+		<EmptyState title="Alliances show here once qualification matches are done." />
 	{:else if picker}
 		<div class="picking" role="status">
 			<b>Alliance {picker.seed} is picking: {picker.team}{picker.name ? ` ${picker.name}` : ''}</b>
@@ -169,7 +162,6 @@
 	{:else}
 		<p class="done" role="status">
 			<b>Alliance selection is complete.</b>
-			{selection.alliances.length} alliances.
 		</p>
 	{/if}
 
@@ -232,8 +224,7 @@
 				<div class="panel">
 					<h3 class="sec-title">Our pick list</h3>
 					<EmptyState title="Make a shared pick list with your team.">
-						<a href="/w">Start a team workspace</a> and your list shows here next to the live picks. No
-						account needed.
+						<a href="/w">Start a team workspace</a> to see your list here next to the live picks.
 					</EmptyState>
 				</div>
 			{/if}
@@ -243,9 +234,9 @@
 			<div class="panel main">
 				<h3 class="sec-title">{selection.complete ? 'Teams' : 'Available teams'}</h3>
 				<AvailableTeams {table} {me} {marks} eventCode={bundle.event.code} />
-				{#each notes as note (note)}
+				{#if note}
 					<p class="note">{note}</p>
-				{/each}
+				{/if}
 			</div>
 		{/if}
 	</div>

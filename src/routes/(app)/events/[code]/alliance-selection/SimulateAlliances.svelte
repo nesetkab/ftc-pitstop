@@ -39,8 +39,7 @@
 	</div>
 	<Button variant="secondary" {href}>Simulate this match</Button>
 	<p class="note">
-		Uses each alliance's captain and first pick. Swap in any other team on the next page to try a
-		pick that hasn't happened.
+		Uses each alliance's captain and first pick.
 	</p>
 </div>
 
