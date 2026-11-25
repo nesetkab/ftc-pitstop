@@ -71,6 +71,29 @@
 		gap: 10px;
 	}
 
+	#pit :global(.btn:disabled) {
+		border-color: var(--line-2);
+		background: var(--surface);
+		color: var(--text-3);
+		opacity: 1;
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(:root:not([data-theme='light'])) #pit :global(.btn:disabled) {
+			border-color: var(--accent);
+			background: var(--accent);
+			color: var(--on-accent);
+			opacity: 0.45;
+		}
+	}
+
+	:global(:root[data-theme='dark']) #pit :global(.btn:disabled) {
+		border-color: var(--accent);
+		background: var(--accent);
+		color: var(--on-accent);
+		opacity: 0.45;
+	}
+
 	.address {
 		position: relative;
 		display: inline-flex;
