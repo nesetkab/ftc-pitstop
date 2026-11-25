@@ -105,11 +105,7 @@
 <section aria-labelledby="advanced-title">
 	<h2 class="sec-title" id="advanced-title">Advanced so far</h2>
 	{#if champ.teams.length === 0}
-		<EmptyState title="No teams yet.">
-			{played.length > 0
-				? 'Results from the events played so far have not loaded yet. It updates as events finish.'
-				: 'It fills in as qualifying events finish.'}
-		</EmptyState>
+		<EmptyState title="No teams have advanced yet." />
 	{:else}
 		<div class="table-wrap">
 			<table class="t">
@@ -215,11 +211,11 @@
 	</section>
 {/if}
 
-<p class="note">
-	Spots per event come from FIRST's advancement lists. A team that already advanced from an earlier
-	event passes its spot to the next team on points. "Expected" means the destination is inferred
-	from the event's region and isn't posted yet.
-</p>
+{#if champ.feeders.some((feeder) => !feeder.confirmed)}
+	<p class="note">
+		"Expected" means the event hasn't posted where it sends teams, so PitStop goes by its region.
+	</p>
+{/if}
 
 <style>
 	.crumb {
