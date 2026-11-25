@@ -19,11 +19,6 @@
 
 	const visible = $derived(open ? rows : rows.slice(0, SHOWN));
 	const hidden = $derived(rows.length - SHOWN);
-	const summary = $derived(
-		kind === 'partners'
-			? `${total} ${total === 1 ? 'partner' : 'partners'}, most matches together first.`
-			: `${total} ${total === 1 ? 'opponent' : 'opponents'}, toughest first by season aOPR.`
-	);
 </script>
 
 <Table>
@@ -71,17 +66,16 @@
 		{/each}
 	</tbody>
 </Table>
-<div class="foot">
-	<p class="note">
-		{summary}
-		{#if open && total > rows.length}Top {rows.length} shown.{/if}
-	</p>
-	{#if hidden > 0}
+{#if hidden > 0}
+	<div class="foot">
+		{#if open && total > rows.length}
+			<p class="note">Showing the top {rows.length} of {total}.</p>
+		{/if}
 		<button type="button" class="toggle" aria-expanded={open} onclick={() => (open = !open)}>
 			{open ? 'Show fewer' : `Show ${hidden} more`}
 		</button>
-	{/if}
-</div>
+	</div>
+{/if}
 
 <style>
 	.team {

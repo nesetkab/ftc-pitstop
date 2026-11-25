@@ -19,9 +19,7 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="This team has no events this season.">
-		Events show here as soon as the team is registered for one.
-	</EmptyState>
+	<EmptyState title="This team has no events this season." />
 {:else}
 	<Table>
 		<thead>
@@ -49,7 +47,6 @@
 			{/each}
 		</tbody>
 	</Table>
-	<p class="note">Rank and record are from qualification matches.</p>
 {/if}
 
 <style>

@@ -43,16 +43,16 @@ export const RECORD_PARTS = [
 ] as const;
 
 export const RECORD_PART_NOTES: Record<RecordPart, string> = {
-	total: "Alliance score without points from the other alliance's fouls",
+	total: 'Alliance score without foul points',
 	auto: 'Points scored in the autonomous period',
 	teleop: 'Points scored in the driver-controlled period',
-	fouls: "Points given by the other alliance's fouls",
-	final: 'Official alliance score with foul points',
+	fouls: "Points from the other alliance's fouls",
+	final: 'Official alliance score',
 	hive: 'Teleop hive points',
 	flower: 'Teleop flower points',
 	garden: 'Teleop garden points',
 	park: 'Teleop park points',
-	opponent: "The other alliance's score without foul points",
+	opponent: "The other alliance's total",
 	margin: "Total minus the other alliance's total",
 	tips: 'Number of tips in the match'
 };

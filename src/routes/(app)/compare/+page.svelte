@@ -49,19 +49,16 @@
 {/if}
 
 {#if view.teams.length === 0}
-	<EmptyState title="Pick two or more teams to compare.">
-		Type team numbers above, or use the Compare button on any team page.
-	</EmptyState>
+	<EmptyState title="Pick two or more teams to compare." />
 {:else}
 	<section class="panel" style:max-width="{width}px" aria-labelledby="season-title">
 		<h2 class="sec-title" id="season-title">This season</h2>
 		<CompareTable teams={view.teams} rows={view.rows} />
-		<p class="note">
-			{#if view.source === 'scout'}
-				Season ratings are not ready yet, so OPR is each team's best event from FTCScout.
-			{/if}
-			Record and ranks are from qualification matches.
-		</p>
+		{#if view.source === 'scout'}
+			<p class="note">
+				Season aOPR isn't ready yet, so OPR here is each team's best event on FTCScout.
+			</p>
+		{/if}
 	</section>
 
 	{#if view.teams.length >= 2}
@@ -71,7 +68,7 @@
 				<AllianceFit fit={view.fit} />
 			</section>
 		{:else if view.teams.length > MAX_FIT}
-			<p class="note">Remove a team to see how two or three of them would fit as an alliance.</p>
+			<p class="note">Alliance fit shows for two or three teams.</p>
 		{/if}
 
 		<section class="panel" style:max-width="{width}px" aria-labelledby="h2h-title">
@@ -79,20 +76,16 @@
 			{#if view.history}
 				<HeadToHead pairs={view.pairs} meetings={view.meetings} numbers={data.numbers} />
 			{:else}
-				<EmptyState title="Match history is still loading.">
-					Reload in a minute to see the matches these teams played together and against each other,
-					and how they would fit as an alliance.
-				</EmptyState>
+				<EmptyState title="Match history is still loading. Try again in a minute." />
 			{/if}
 		</section>
 
 		<section class="panel" style:max-width="{width}px" aria-labelledby="shared-title">
 			<h2 class="sec-title" id="shared-title">Shared events</h2>
 			{#if view.shared.length === 0}
-				<EmptyState title="These teams have not been entered in the same event this season." />
+				<EmptyState title="These teams have not been at the same event this season." />
 			{:else}
 				<SharedEvents teams={view.teams} events={view.shared} />
-				<p class="note">Rank and record are from qualification matches at that event.</p>
 			{/if}
 		</section>
 	{/if}

@@ -92,7 +92,6 @@
 		{#if data.updated}
 			<StaleNotice updated={data.updated} staleAfter={86400} prefix="Ratings updated" />.
 		{/if}
-		<a href="/events?region={code}">All events</a> ·
 		<a href="/events/strength?region={code}">Event strength</a>
 	{/snippet}
 </PageHeader>
@@ -105,9 +104,7 @@
 		{/if}
 	</div>
 	{#if data.teams.length === 0}
-		<EmptyState title="No rated teams yet.">
-			Teams get a season aOPR once they play matches. It fills in as events finish.
-		</EmptyState>
+		<EmptyState title="No rated teams yet." />
 	{:else}
 		<div class="table-wrap">
 			<table class="t">
@@ -146,7 +143,7 @@
 <section aria-labelledby="events-title">
 	<div class="head">
 		<h2 class="sec-title" id="events-title">Events</h2>
-		<a href="/events?region={code}">Open in the event list</a>
+		<a href="/events?region={code}">All events in {region.name}</a>
 	</div>
 	{#if data.events.live.length > 0}
 		<h3 class="group">Today</h3>
@@ -261,7 +258,6 @@
 				</tbody>
 			</table>
 		</div>
-		<p class="note">Scores leave out points from the other alliance's fouls.</p>
 	{/if}
 </section>
 

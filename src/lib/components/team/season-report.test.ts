@@ -365,10 +365,10 @@ describe('season takeaways', () => {
 			comparison: []
 		};
 		expect(seasonTakeaways(facts({ ...quiet, scores: [60, 62, 58, 61, 59, 90] }))).toContain(
-			'Consistent: 5 of 6 alliance scores within 10 points of the 65 average'
+			'Scores steadily, with 5 of 6 matches within 10 points of the 65 average'
 		);
 		expect(seasonTakeaways(facts({ ...quiet, scores: [20, 90, 30, 100, 25, 95] }))).toContain(
-			'Uneven scores: from 20 to 100 across 6 matches'
+			'Scores swing a lot, from 20 to 100 across 6 matches'
 		);
 	});
 

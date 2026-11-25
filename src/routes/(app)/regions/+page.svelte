@@ -59,7 +59,7 @@
 </PageHeader>
 
 {#if listed.length === 0}
-	<EmptyState title="No regions yet.">The event list is still loading. Try again soon.</EmptyState>
+	<EmptyState title="The event list is still loading. Try again soon." />
 {:else}
 	<div class="controls">
 		<Segmented
@@ -129,11 +129,6 @@
 		</section>
 	{/each}
 {/if}
-
-<p class="note">
-	Teams counts every team registered for an event in the region, including visitors. Played and left
-	count competitions only. A team belongs to the region where it has played the most matches.
-</p>
 
 <style>
 	.controls {

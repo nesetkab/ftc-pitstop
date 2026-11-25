@@ -16,7 +16,6 @@
 
 	const first = $derived(data.start + 1);
 	const last = $derived(data.start + data.rows.length);
-	const matchesShown = $derived(data.filters.sort === 'matches');
 	const scoped = $derived(data.filters.type !== '' || data.window !== null);
 	const missing = $derived(data.filters.team > 0 && !data.found);
 	const showing = $derived(
@@ -92,21 +91,11 @@
 
 {#if data.source === 'scout'}
 	<p class="note">
-		Season ratings are not available yet. Teams are ranked by their best event OPR from FTCScout,
-		and only the top {integer(data.population)} teams are listed.
-		<span class={{ 'phone-off': !matchesShown }}
-			>Matches are qualification matches at that event.</span
-		>
+		Season aOPR isn't ready yet, so teams are ranked by their best event OPR from FTCScout. Only the
+		top {integer(data.population)} teams are listed.
 	</p>
 {:else if data.total > 0 && scoped}
-	<p class="note">
-		Each team's rating is as of its last event in this filter.
-		<span class={{ 'phone-off': !matchesShown }}>Matches and events count only those events.</span>
-	</p>
-{:else if data.total > 0}
-	<p class={['note', { 'phone-off': !matchesShown }]}>
-		Matches is the number of matches behind each rating.
-	</p>
+	<p class="note">Each team's aOPR is as of its last event in this filter.</p>
 {/if}
 
 {#if data.total > 0}
@@ -133,11 +122,5 @@
 
 	.csv {
 		font-size: 14px;
-	}
-
-	@media (max-width: 600px) {
-		.phone-off {
-			display: none;
-		}
 	}
 </style>

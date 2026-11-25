@@ -79,10 +79,7 @@
 </form>
 
 {#if data.rows.length === 0}
-	<EmptyState title="Nothing to show yet.">
-		No championship has teams or upcoming qualifiers listed for this region. It updates as events
-		finish.
-	</EmptyState>
+	<EmptyState title="No championships are listed for this region yet." />
 {:else}
 	<section aria-labelledby="regional-title">
 		<h2 class="sec-title" id="regional-title">Regional championships</h2>
@@ -102,10 +99,7 @@
 		<section aria-labelledby="world-title">
 			<div class="head">
 				<h2 class="sec-title" id="world-title">FIRST Championship</h2>
-				<p class="muted summary">
-					Regional championships send teams on. FIRST posts each region's spots starting in early
-					December.
-				</p>
+				<p class="muted summary">FIRST posts each region's spots starting in early December.</p>
 			</div>
 			<ChampionshipTable
 				caption="FIRST Championship"
@@ -134,15 +128,6 @@
 		</ul>
 	</section>
 {/if}
-
-<p class="note">
-	Teams advance on advancement points from their first three qualifiers or league tournaments in
-	their home region. Points come from qualification rank, alliance selection, playoff finish and
-	judged awards, and an Inspire Award win is worth the most. Each region sets its own spots per
-	event and FIRST doesn't publish a total per championship, so spots left can't be counted. Lists
-	fill in as finished events load, and destinations for events that haven't played are inferred from
-	their region.
-</p>
 
 <style>
 	section {

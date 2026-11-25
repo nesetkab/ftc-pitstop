@@ -30,37 +30,37 @@
 	}
 </script>
 
-<Table>
-	<caption class="visually-hidden">Results between each pair of teams</caption>
-	<thead>
-		<tr>
-			<th class="l pin" scope="col">Teams</th>
-			<th class="l" scope="col">Against each other</th>
-			<th class="l" scope="col">As partners</th>
-		</tr>
-	</thead>
-	<tbody>
-		{#each pairs as pair (`${pair.a}-${pair.b}`)}
-			<tr>
-				<th class="l pair pin" scope="row">{pair.a} and {pair.b}</th>
-				<td class="l wrap" class:dim={count(pair.against) === 0}>{against(pair)}</td>
-				<td class="l wrap" class:dim={count(pair.together) === 0}>
-					{together(pair)}
-					{#if pair.best}
-						<span class="best"
-							>best score {pair.best.score} in
-							<a href="/events/{pair.best.code}/matches/{pair.best.key}">{pair.best.label}</a></span
-						>
-					{/if}
-				</td>
-			</tr>
-		{/each}
-	</tbody>
-</Table>
-
 {#if meetings.length === 0}
 	<EmptyState title="These teams have not played in the same match this season." />
 {:else}
+	<Table>
+		<caption class="visually-hidden">Results between each pair of teams</caption>
+		<thead>
+			<tr>
+				<th class="l pin" scope="col">Teams</th>
+				<th class="l" scope="col">Against each other</th>
+				<th class="l" scope="col">As partners</th>
+			</tr>
+		</thead>
+		<tbody>
+			{#each pairs as pair (`${pair.a}-${pair.b}`)}
+				<tr>
+					<th class="l pair pin" scope="row">{pair.a} and {pair.b}</th>
+					<td class="l wrap" class:dim={count(pair.against) === 0}>{against(pair)}</td>
+					<td class="l wrap" class:dim={count(pair.together) === 0}>
+						{together(pair)}
+						{#if pair.best}
+							<span class="best"
+								>best score {pair.best.score} in
+								<a href="/events/{pair.best.code}/matches/{pair.best.key}">{pair.best.label}</a
+								></span
+							>
+						{/if}
+					</td>
+				</tr>
+			{/each}
+		</tbody>
+	</Table>
 	<Table>
 		<caption class="visually-hidden">Matches with two or more of these teams</caption>
 		<thead>

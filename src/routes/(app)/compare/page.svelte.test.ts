@@ -132,8 +132,8 @@ describe('compare page', () => {
 
 	it('shows how the teams would fit as an alliance', () => {
 		show();
-		expect(screen.getByText(/would be expected to score about/)).toHaveTextContent(
-			'Together, 100 + 200 would be expected to score about 180 points per match before penalties.'
+		expect(screen.getByText(/would score about/)).toHaveTextContent(
+			'Together, 100 + 200 would score about 180 points per match.'
 		);
 		const chances = screen.getByRole('table', {
 			name: 'Predicted score and ranking point chances for each pair'
@@ -153,7 +153,9 @@ describe('compare page', () => {
 
 	it('says when match history has not loaded yet', () => {
 		show({ view: { ...view, fit: null, history: false, meetings: [] } });
-		expect(screen.getByText('Match history is still loading.')).toBeInTheDocument();
+		expect(
+			screen.getByText('Match history is still loading. Try again in a minute.')
+		).toBeInTheDocument();
 		expect(
 			screen.queryByRole('table', { name: 'Results between each pair of teams' })
 		).not.toBeInTheDocument();

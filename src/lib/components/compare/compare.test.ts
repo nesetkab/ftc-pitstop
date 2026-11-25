@@ -250,7 +250,7 @@ describe('buildComparison', () => {
 		const fallback = buildComparison({ seasons: [quick, bravo], ratings: null, matches: [] });
 		expect(fallback.source).toBe('scout');
 		expect(fallback.rows.find((row) => row.key === 'opr')).toMatchObject({
-			label: 'Best event aOPR',
+			label: 'Best event OPR',
 			values: ['110.0', '—'],
 			best: []
 		});
