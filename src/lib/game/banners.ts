@@ -15,7 +15,7 @@ export function isBanner(award: Pick<Award, 'id' | 'placement'>, type: EventType
 }
 
 export function bannerLabel(award: Pick<Award, 'id'>): string {
-	return award.id === WINNING_ALLIANCE ? 'Winner' : 'Inspire Award';
+	return award.id === WINNING_ALLIANCE ? 'Winner' : 'Inspire';
 }
 
 export function seasonYears(season: number): string {

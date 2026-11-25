@@ -22,7 +22,7 @@ describe('isBanner', () => {
 describe('bannerLabel', () => {
 	it('names the banner', () => {
 		expect(bannerLabel({ id: 13 })).toBe('Winner');
-		expect(bannerLabel({ id: 11 })).toBe('Inspire Award');
+		expect(bannerLabel({ id: 11 })).toBe('Inspire');
 	});
 });
 

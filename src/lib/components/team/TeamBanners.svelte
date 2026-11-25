@@ -17,9 +17,20 @@
 				class="banner"
 				href={banner.code ? `/events/${banner.code}` : undefined}
 			>
-				<span class="season">{banner.season}</span>
+				<svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+					<circle cx="16" cy="16" r="11" fill="none" stroke="currentColor" stroke-width="4" />
+					<circle
+						cx="16"
+						cy="16"
+						r="13.5"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="3"
+						stroke-dasharray="5.3 5.3"
+					/>
+				</svg>
 				<span class="award">{banner.award}</span>
-				<span class="event"><Brand text={banner.event} /></span>
+				<span class="event">{banner.season} <Brand text={banner.event} /></span>
 			</svelte:element>
 		</li>
 	{/each}
@@ -29,35 +40,33 @@
 	.banners {
 		--banner: #bf4f00;
 		--banner-hover: #a84500;
-		--notch: 18px;
 		display: flex;
 		flex-wrap: wrap;
-		gap: 8px;
+		gap: 4px;
 		margin: 0;
 		padding: 0;
 		list-style: none;
 	}
 
 	li {
-		width: 136px;
-		filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.22));
+		container-type: inline-size;
+		width: 150px;
+		filter: drop-shadow(0 4px 4px rgb(0 0 0 / 0.25));
 	}
 
 	.banner {
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		gap: 10px;
 		box-sizing: border-box;
-		height: 100%;
-		min-height: 184px;
-		padding: 18px 10px calc(var(--notch) + 16px);
+		aspect-ratio: 320 / 445;
+		padding: 12.5cqw 6cqw 0;
 		color: #ffffff;
 		text-align: center;
 		text-decoration: none;
 		text-transform: uppercase;
 		background: var(--banner);
-		clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - var(--notch)), 0 100%);
+		clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 90%, 0 100%);
 	}
 
 	a.banner:hover {
@@ -73,40 +82,28 @@
 		outline: none;
 	}
 
-	.season {
-		font-size: 13px;
-		font-weight: 600;
-		letter-spacing: 0.04em;
-		font-variant-numeric: tabular-nums;
+	.mark {
+		flex: none;
+		width: 31cqw;
+		height: 31cqw;
 	}
 
 	.award {
-		font-size: 15px;
+		margin-top: 17.5cqw;
+		font-size: 9cqw;
 		font-weight: 700;
 		font-style: italic;
-		line-height: 1.2;
+		line-height: 1.1;
 	}
 
 	.event {
-		font-size: 12px;
+		display: flex;
+		flex: 1;
+		align-items: center;
+		justify-content: center;
+		margin-bottom: 12cqw;
+		font-size: 7.5cqw;
 		line-height: 1.3;
 		overflow-wrap: anywhere;
-	}
-
-	@media (max-width: 600px) {
-		.banners {
-			display: grid;
-			grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
-			gap: 6px;
-		}
-
-		li {
-			width: auto;
-		}
-
-		.banner {
-			min-height: 168px;
-			padding-inline: 8px;
-		}
 	}
 </style>

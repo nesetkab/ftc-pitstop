@@ -325,15 +325,15 @@ describe('team page', () => {
 			view({
 				banners: [
 					{ season: '2026-27', award: 'Winner', event: 'Arizona Championship', code: 'USAZCMP' },
-					{ season: '2025-26', award: 'Inspire Award', event: 'Utah Championship', code: null }
+					{ season: '2025-26', award: 'Inspire', event: 'Utah Championship', code: null }
 				]
 			})
 		);
 		const banners = within(screen.getByRole('list', { name: 'Banners' })).getAllByRole('listitem');
 		expect(banners).toHaveLength(2);
-		expect(banners[0]).toHaveTextContent(/2026-27\s*Winner\s*Arizona Championship/);
+		expect(banners[0]).toHaveTextContent(/Winner\s*2026-27 Arizona Championship/);
 		expect(within(banners[0]).getByRole('link')).toHaveAttribute('href', '/events/USAZCMP');
-		expect(banners[1]).toHaveTextContent('Inspire Award');
+		expect(banners[1]).toHaveTextContent('Inspire');
 		expect(within(banners[1]).queryByRole('link')).toBeNull();
 	});
 

@@ -207,7 +207,7 @@ describe('buildTeamPage without season ratings', () => {
 				event: 'Arizona Championship',
 				code: 'USAZCMP'
 			},
-			{ season: '2025-26', award: 'Inspire Award', event: 'Utah Championship', code: null },
+			{ season: '2025-26', award: 'Inspire', event: 'Utah Championship', code: null },
 			{ season: '2023-24', award: 'Winner', event: 'Utah Championship', code: null }
 		]);
 		expect(view.awards.map((entry) => entry.name)).toEqual([
