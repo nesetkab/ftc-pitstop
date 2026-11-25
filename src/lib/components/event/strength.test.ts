@@ -10,7 +10,6 @@ import {
 	rankStrength,
 	rosterFor,
 	strengthDetail,
-	strengthLine,
 	strengthRows,
 	type StrengthFilters
 } from './strength.ts';
@@ -130,12 +129,6 @@ describe('the season index', () => {
 		expect(eventRank(ranked, 'TINY')).toBeNull();
 		expect(eventRank(ranked, 'NOPE')).toBeNull();
 		expect(eventRank(null, 'SOON')).toBeNull();
-	});
-
-	it('describes an event in one line', () => {
-		expect(strengthLine({ rank: 12, top: 64.24, total: 390 })).toBe(
-			'12th of 390 events this season, with a top-8 average aOPR of 64.2'
-		);
 	});
 
 	describe('filtering the ranking', () => {

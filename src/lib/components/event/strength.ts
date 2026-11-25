@@ -1,6 +1,4 @@
 import { localDate } from '#lib/format/calendar.ts';
-import { fixed, integer } from '#lib/format/number.ts';
-import { ordinal } from '#lib/format/ordinal.ts';
 import type { SeasonRatings } from '#lib/analysis/types.ts';
 import type { EventSummary } from '#lib/types.ts';
 import { eventStatus } from './dates.ts';
@@ -134,10 +132,6 @@ export function eventRank(ranked: RankedStrength | null, code: string): EventRan
 	const entry = ranked?.events.get(code);
 	if (!ranked || !entry || entry.rank === null || entry.top === null) return null;
 	return { rank: entry.rank, top: entry.top, total: ranked.total };
-}
-
-export function strengthLine({ rank, top, total }: EventRank): string {
-	return `${ordinal(rank)} of ${integer(total)} events this season, with a top-${TOP} average aOPR of ${fixed(top)}`;
 }
 
 export function strengthDetail(strength: EventStrength): StrengthDetail {
