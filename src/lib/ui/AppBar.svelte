@@ -12,7 +12,6 @@
 
 	const links = [
 		{ href: '/events', label: 'Events', also: ['/advancement'] },
-		{ href: '/teams', label: 'Teams' },
 		{ href: '/leaderboards', label: 'Leaderboards' },
 		{ href: '/records', label: 'Records' },
 		{ href: '/compare', label: 'Compare' }
