@@ -68,12 +68,6 @@
 {/snippet}
 
 <div class={['bracket', `size-${bracket.size}`]} aria-label="Playoff bracket" role="group">
-	{#if sections.length > 0}
-		<p class="key" aria-hidden="true">
-			<span class="side-name red">Red</span> is on top in every match and
-			<span class="side-name blue">Blue</span> below. A1 is the first seed.
-		</p>
-	{/if}
 	{#each sections as section (section.id)}
 		<section class={['part', section.id]} aria-label={section.title}>
 			<h3 class="part-title">{section.title}</h3>
@@ -169,7 +163,6 @@
 		display: grid;
 		grid-template-columns: max-content max-content;
 		grid-template-areas:
-			'key key'
 			'upper finals'
 			'lower finals';
 		gap: 28px 40px;
@@ -181,26 +174,6 @@
 	.size-2 {
 		grid-template-columns: minmax(0, max-content);
 		grid-template-areas: 'finals';
-	}
-
-	.key {
-		grid-area: key;
-		margin: 0 0 -12px;
-		font-size: 13px;
-		color: var(--text-3);
-	}
-
-	.side-name {
-		font-size: 12.5px;
-		font-weight: 500;
-	}
-
-	.side-name.red {
-		color: var(--red);
-	}
-
-	.side-name.blue {
-		color: var(--blue);
 	}
 
 	.part {
@@ -435,7 +408,6 @@
 		.bracket {
 			grid-template-columns: minmax(0, 1fr);
 			grid-template-areas:
-				'key'
 				'upper'
 				'lower'
 				'finals';

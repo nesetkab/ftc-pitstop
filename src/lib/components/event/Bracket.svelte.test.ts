@@ -202,7 +202,7 @@ describe('Bracket', () => {
 		expect(sides.filter((side) => side?.endsWith(', won'))).toHaveLength(1);
 		expect(m1.querySelector('.slot.red .seed')).toHaveTextContent('A4');
 		expect(m1.querySelector('.slot.blue .seed')).toHaveTextContent('A5');
-		expect(screen.getByText(/is on top in every match/)).toBeInTheDocument();
+		expect(screen.queryByText(/is on top in every match/)).toBeNull();
 		const finals = screen.getByRole('region', { name: 'Finals' });
 		const headers = within(finals).getAllByRole('rowheader');
 		expect(headers[0]).toHaveTextContent(/^Alliance 2/);
