@@ -190,6 +190,7 @@
 
 	.terms div {
 		display: grid;
+		align-content: start;
 		gap: 2px;
 	}
 
