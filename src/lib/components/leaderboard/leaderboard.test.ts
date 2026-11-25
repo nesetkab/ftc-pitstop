@@ -21,6 +21,7 @@ import {
 	normalizeText,
 	queryString,
 	teamPage,
+	withSelectedType,
 	type LeaderboardFilters,
 	type LeaderboardRow
 } from './leaderboard.ts';
@@ -387,6 +388,19 @@ describe('event types', () => {
 		expect(options.weeks).toEqual([
 			{ value: '2026-11-16', label: 'Nov 16–22' },
 			{ value: '2026-09-28', label: 'Sep 28–Oct 4' }
+		]);
+	});
+
+	it('keeps the type from the address in the options when no event of it has started', () => {
+		const types = [{ value: 'Qualifier', label: 'Qualifier' }];
+		expect(withSelectedType(types, '')).toBe(types);
+		expect(withSelectedType(types, 'Qualifier')).toBe(types);
+		expect(withSelectedType(types, 'Championship')).toEqual([
+			...types,
+			{ value: 'Championship', label: 'Championship' }
+		]);
+		expect(withSelectedType([], 'official')).toEqual([
+			{ value: 'official', label: 'Official events' }
 		]);
 	});
 

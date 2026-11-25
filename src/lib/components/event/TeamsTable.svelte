@@ -67,7 +67,7 @@
 					<TeamCell number={team.number} name={team.name} href={teamHref(team.number, eventCode)} />
 				</td>
 				<td class={['l muted', { opt: stats }]}>
-					{placeName(team)}
+					{placeName(team, 'short')}
 				</td>
 				<td class="opt">{team.rookieYear ?? '—'}</td>
 				{#if ranks.size > 0}

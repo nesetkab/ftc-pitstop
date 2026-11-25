@@ -72,7 +72,7 @@
 			[
 				{ value: 'standings', label: 'Standings', shown: true },
 				{ value: 'rp', label: 'Ranking points', shown: rp !== null },
-				{ value: 'schedule', label: 'Schedule', shown: strength.length > 0 }
+				{ value: 'schedule', label: 'Schedule strength', shown: strength.length > 0 }
 			] as const
 		)
 			.filter((option) => option.shown)

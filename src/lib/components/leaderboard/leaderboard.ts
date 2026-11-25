@@ -412,6 +412,13 @@ export function eventFilterOptions(
 	};
 }
 
+export function withSelectedType(types: FilterOption[], selected: string): FilterOption[] {
+	if (!selected || types.some((option) => option.value === selected)) return types;
+	const label =
+		selected === 'official' ? typeLabel('official') : TYPE_LABELS[selected as EventType];
+	return [...types, { value: selected, label }];
+}
+
 export function scopeRows(
 	rows: LeaderboardRow[],
 	table: SeasonEventRatings,

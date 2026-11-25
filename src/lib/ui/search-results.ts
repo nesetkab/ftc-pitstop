@@ -43,14 +43,14 @@ function teamResult(team: TeamHit): SearchResult {
 	return {
 		type: 'team',
 		label: `${team.number} ${team.name}`,
-		sublabel: placeName(team) || null,
+		sublabel: placeName(team, 'short') || null,
 		meta: teamMeta(team),
 		href: `/teams/${team.number}`
 	};
 }
 
 function eventResult(event: EventSummary, now: number): SearchResult {
-	const parts = [event.code, placeName(event), shortRange(event.start, event.end)];
+	const parts = [event.code, placeName(event, 'short'), shortRange(event.start, event.end)];
 	const status = eventStatus(event, now);
 	return {
 		type: 'event',

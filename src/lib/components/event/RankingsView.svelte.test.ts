@@ -68,7 +68,7 @@ describe('RankingsView', () => {
 		expect(first).toHaveTextContent('90%');
 		expect(first).toHaveTextContent('95%');
 		expect(screen.getByText(/12 remaining qualification matches/)).toBeInTheDocument();
-		expect(screen.getByRole('link', { name: 'Schedule' })).toHaveAttribute(
+		expect(screen.getByRole('link', { name: 'Schedule strength' })).toHaveAttribute(
 			'href',
 			'?view=schedule'
 		);
@@ -193,7 +193,7 @@ describe('RankingsView', () => {
 			'href',
 			'?sort=opr&view=rp'
 		);
-		expect(within(views).getByRole('link', { name: 'Schedule' })).toHaveAttribute(
+		expect(within(views).getByRole('link', { name: 'Schedule strength' })).toHaveAttribute(
 			'href',
 			'?sort=opr&view=schedule'
 		);
