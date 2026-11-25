@@ -1,11 +1,8 @@
 <script lang="ts">
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
-	import { RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
-	import { LEAGUE_MATCHES } from '#lib/game/rankings.ts';
 	import type { EventBundle } from '#lib/types.ts';
 	import DownloadLink from '#lib/ui/DownloadLink.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import Legend from '#lib/ui/Legend.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import ColumnMenu from './ColumnMenu.svelte';
 	import { quals } from './matches.ts';
@@ -17,9 +14,7 @@
 		rankingRows,
 		scoreStats,
 		sortRankingRows,
-		phoneHidden,
 		visibleColumns,
-		type ColumnKey,
 		type RankingChoice,
 		type RankingView
 	} from './ranking-columns.ts';
@@ -56,8 +51,6 @@
 		onchoose,
 		eventCode
 	}: Props = $props();
-
-	const NP_KEYS: ColumnKey[] = ['npavg', 'npmax', 'npmin', 'npsd'];
 
 	const qualMatches = $derived(quals(bundle.matches));
 	const remaining = $derived(qualMatches.filter((match) => !match.result).length);
@@ -109,10 +102,10 @@
 				? "These are league rankings, so they include teams that didn't play at this meet."
 				: null,
 			league
-				? `League rankings use each team's best ${league} league matches so far. RS, TBP and the record add up those matches, and RS and TBP are divided by ${league} even for teams that have played fewer.`
+				? `League rankings use each team's best ${league} league matches so far.`
 				: null,
 			meetOnly
-				? `FIRST's rankings aren't loading, so these count this event's matches only. FIRST's league rankings also add each team's best ${LEAGUE_MATCHES} matches from earlier meets.`
+				? "FIRST's rankings aren't loading, so these count this event's matches only."
 				: null
 		]
 			.filter(Boolean)
@@ -120,51 +113,10 @@
 	);
 
 	const projected = $derived(projections !== null && projections.length > 0);
-
-	function offPhone(keys: ColumnKey[]): boolean {
-		return keys.filter((key) => shown.has(key)).every((key) => phoneHidden(key, choice, projected));
-	}
-
-	const notes = $derived(
-		[
-			shown.has('rs') && !league
-				? { text: 'RS is the average ranking points per match.', phone: !offPhone(['rs']) }
-				: null,
-			shown.has('tbp') && !league
-				? {
-						text: 'TBP is the average match score without penalties. Matches a team was disqualified from or missed count as zero.',
-						phone: !offPhone(['tbp'])
-					}
-				: null,
-			shown.has('avgtips')
-				? { text: 'Avg tips is the average hive tips per match.', phone: !offPhone(['avgtips']) }
-				: null,
-			sources.has('score') && NP_KEYS.some((key) => shown.has(key))
-				? {
-						text: 'NP scores leave out points from opponent fouls and count qualification matches only.',
-						phone: !offPhone(NP_KEYS)
-					}
-				: null,
-			sources.has('score') && shown.has('npsd')
-				? { text: 'Spread is how much those scores vary.', phone: !offPhone(['npsd']) }
-				: null,
-			sources.has('rating')
-				? { text: "aOPR is each team's estimated share of its alliance's score.", phone: true }
-				: null,
-			projections
-				? {
-						text: `Projections play out the ${remaining} remaining qualification ${remaining === 1 ? 'match' : 'matches'}.`,
-						phone: true
-					}
-				: null
-		].filter((note) => note !== null)
-	);
 </script>
 
 {#if bundle.rankings.length === 0}
-	<EmptyState title="No rankings yet.">
-		Rankings show here after the first qualification match is played.
-	</EmptyState>
+	<EmptyState title="Rankings show here after the first qualification match." />
 {:else}
 	{#if views.length > 1 || (onchoose && active === 'standings')}
 		<div class="bar">
@@ -178,12 +130,6 @@
 	{/if}
 	{#if active === 'rp' && rp}
 		<RpSources {rp} rankings={bundle.rankings} teams={bundle.teams} {followed} {eventCode} />
-		<Legend>
-			Share of each team's qualification matches where its alliance won or earned each bonus ranking
-			point. Swarm takes {RP_THRESHOLDS.swarm} leave and park points, Pollinator 1 takes {RP_THRESHOLDS.pollinator1}
-			tips and Pollinator 2 takes {RP_THRESHOLDS.pollinator2}. Bonus RS is bonus ranking points per
-			match, the part of RS that doesn't depend on winning.
-		</Legend>
 	{:else if active === 'schedule'}
 		<StrengthTable
 			title={strengthTitle}
@@ -193,11 +139,7 @@
 			{followed}
 			{eventCode}
 		/>
-		<Legend>
-			Partners' and opponents' aOPR are averages over the matches each team has played{remaining > 0
-				? ' so far'
-				: ''}. Difference is partners minus opponents, so a team above zero had the easier schedule.
-		</Legend>
+		<p class="note">A team with a difference above zero had the easier schedule.</p>
 	{:else}
 		<RankingsTable
 			{rows}
@@ -212,15 +154,6 @@
 			{eventCode}
 		/>
 		{#if caveat}<p class="note">{caveat}</p>{/if}
-		{#if notes.length > 0}
-			<div class={{ 'phone-off': notes.every((item) => !item.phone) }}>
-				<Legend>
-					{#each notes as item (item.text)}
-						<span class={{ 'phone-off': !item.phone }}>{item.text}</span>
-					{/each}
-				</Legend>
-			</div>
-		{/if}
 		{#if csvHref}
 			<p class="csv"><DownloadLink href="{csvHref}{query}" /></p>
 		{/if}
@@ -255,10 +188,6 @@
 
 		:global(.table-wrap.rp .team-cell .name) {
 			max-width: min(6em, 19vw);
-		}
-
-		.phone-off {
-			display: none;
 		}
 	}
 

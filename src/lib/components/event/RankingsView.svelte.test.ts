@@ -22,26 +22,17 @@ function bodyRows(table: HTMLElement) {
 }
 
 describe('RankingsView', () => {
-	it('explains that league rankings divide by the counted matches', () => {
+	it('says how many matches league rankings count', () => {
 		render(RankingsView, { props: { bundle: fixtureBundle('USFLORM1') } });
 		expect(
-			screen.getByText(/League rankings use each team's best 10 league matches/)
-		).toHaveTextContent('RS and TBP are divided by 10 even for teams that have played fewer');
-		expect(screen.queryByText(/RS is the average ranking points per match/)).toBeNull();
+			screen.getByText("League rankings use each team's best 10 league matches so far.")
+		).toBeInTheDocument();
 	});
 
-	it('says disqualified and missed matches count as zero in TBP', () => {
+	it('leaves column definitions to the glossary', () => {
 		render(RankingsView, { props: { bundle: finished } });
-		expect(screen.getByText(/TBP is the average match score without penalties/)).toHaveTextContent(
-			'Matches a team was disqualified from or missed count as zero.'
-		);
-	});
-
-	it('hides notes for columns that phones hide', () => {
-		render(RankingsView, { props: { bundle: finished } });
-		expect(screen.getByText(/TBP is the average/)).toHaveClass('phone-off');
-		expect(screen.getByText(/Avg tips is the average/)).toHaveClass('phone-off');
-		expect(screen.getByText(/RS is the average/)).not.toHaveClass('phone-off');
+		expect(screen.queryByText(/TBP is the average/)).toBeNull();
+		expect(screen.queryByText(/RS is the average/)).toBeNull();
 	});
 
 	it('shows the FTC rankings without any analysis', () => {
@@ -74,7 +65,6 @@ describe('RankingsView', () => {
 		expect(within(first).getByRole('img')).toHaveAccessibleName('Most likely finish 1st, 60%');
 		expect(first).toHaveTextContent('90%');
 		expect(first).toHaveTextContent('95%');
-		expect(screen.getByText(/12 remaining qualification matches/)).toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'Schedule strength' })).toHaveAttribute(
 			'href',
 			'?view=schedule'
@@ -144,15 +134,14 @@ describe('RankingsView', () => {
 		const meet = fixtureBundle('USFLORM1');
 		const rankings = meet.rankings.map(({ counted: _, ...row }) => row);
 		render(RankingsView, { props: { bundle: { ...meet, rankings, source: 'ftcscout' } } });
-		expect(screen.getByText(/count this event's matches only/)).toHaveTextContent(
-			"FIRST's league rankings also add each team's best 10 matches from earlier meets."
-		);
-		expect(screen.getByText(/RS is the average ranking points per match/)).toBeInTheDocument();
+		expect(screen.getByText(/count this event's matches only/)).toBeInTheDocument();
 	});
 
 	it('says when there are no rankings yet', () => {
 		render(RankingsView, { props: { bundle: fixtureBundle('USMTBUQ') } });
-		expect(screen.getByText('No rankings yet.')).toBeInTheDocument();
+		expect(
+			screen.getByText('Rankings show here after the first qualification match.')
+		).toBeInTheDocument();
 		expect(screen.queryByRole('table')).toBeNull();
 	});
 
@@ -166,7 +155,6 @@ describe('RankingsView', () => {
 		expect(cells[0]).toBe('1');
 		expect(cells[3]).toBe('100%');
 		expect(cells.slice(4, 7).every((cell) => /^\d+%$/.test(cell ?? ''))).toBe(true);
-		expect(screen.getByText(/Swarm takes 16 leave and park points/)).toBeInTheDocument();
 	});
 
 	it('leaves the ranking point view out without match detail', () => {
@@ -248,7 +236,7 @@ describe('RankingsView', () => {
 			props: { bundle: midway, analysis: fakeAnalysis(midway), view: 'schedule' }
 		});
 		expect(screen.getByRole('table', { name: 'Schedule so far' })).toBeInTheDocument();
-		expect(screen.getByText(/each team has played so far/)).toBeInTheDocument();
+		expect(screen.getByText(/had the easier schedule/)).toBeInTheDocument();
 	});
 
 	it('shows the chosen columns sorted by the chosen one', () => {
