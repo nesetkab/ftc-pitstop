@@ -116,7 +116,7 @@
 
 	.section {
 		display: grid;
-		gap: 10px;
+		gap: var(--space-title);
 		min-width: 0;
 	}
 </style>
