@@ -199,7 +199,7 @@
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);
 		background: var(--bg);
-		box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+		box-shadow: var(--shadow-pop);
 	}
 
 	.pop[hidden] {

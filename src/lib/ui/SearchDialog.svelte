@@ -356,12 +356,12 @@
 		border-radius: var(--radius-panel);
 		background: var(--bg);
 		color: var(--text);
-		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+		box-shadow: var(--shadow-dialog);
 		overflow: hidden;
 	}
 
 	.search::backdrop {
-		background: rgba(0, 0, 0, 0.36);
+		background: var(--scrim, rgb(0 0 0 / 0.36));
 	}
 
 	.search[open] {
