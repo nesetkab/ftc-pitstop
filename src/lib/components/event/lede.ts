@@ -16,7 +16,7 @@ function champion(bundle: LedeSource): Lede | null {
 	const alliance = bundle.alliances.find((entry) => entry.seed === seed);
 	if (!alliance) return null;
 	const teams = [alliance.captain, ...alliance.picks].map(String);
-	return { lead: `${list(teams)} won the event`, rest: `as alliance ${alliance.seed}.` };
+	return { lead: `${list(teams)} won the event`, rest: `as alliance\u00a0${alliance.seed}.` };
 }
 
 export function eventLede(bundle: LedeSource): Lede | null {

@@ -9,7 +9,7 @@ describe('event lede', () => {
 		const lede = eventLede(bundle);
 		expect(lede?.lead).toContain(String(alliance?.captain));
 		expect(lede?.lead).toMatch(/ won the event$/);
-		expect(lede?.rest).toBe('as alliance 2.');
+		expect(lede?.rest).toBe('as alliance\u00a02.');
 	});
 
 	it('says nothing before the event is decided, since the rankings show the leader', () => {
