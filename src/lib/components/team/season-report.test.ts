@@ -367,6 +367,21 @@ describe('season takeaways', () => {
 		]);
 	});
 
+	it('only calls the trend steady when every event is close', () => {
+		const quiet = { stats: { ...facts().stats, rank: 900, region: null }, comparison: [] };
+		const trend = (values: number[]) =>
+			values.map((value, index) => ({ label: String(index), value }));
+		expect(seasonTakeaways(facts({ ...quiet, trend: trend([20.5, 22, 13.5]) }))).toContain(
+			'OPR peaked at 22.0 and ended at 13.5 over 3 events'
+		);
+		expect(seasonTakeaways(facts({ ...quiet, trend: trend([30, 18, 31]) }))).toContain(
+			'OPR dipped to 18.0 and ended at 31.0 over 3 events'
+		);
+		expect(seasonTakeaways(facts({ ...quiet, trend: trend([40, 44, 42]) }))).toContain(
+			'Steady OPR over 3 events, between 40.0 and 44.0'
+		);
+	});
+
 	it('notes consistent and uneven scoring', () => {
 		const quiet = {
 			stats: { ...facts().stats, rank: 900, region: null },

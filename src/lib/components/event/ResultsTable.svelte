@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Arrow from '#lib/ui/Arrow.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { breakdownParts, PART_LABELS } from '#lib/game/biobuzz.ts';
 	import type { AllianceColor, AllianceScore, Match } from '#lib/types.ts';
@@ -41,7 +42,7 @@
 		<tr>
 			<th class="l" scope="col" aria-sort={order === 'asc' ? 'ascending' : 'descending'}>
 				<button type="button" class="sort" onclick={flip}>
-					Match <span aria-hidden="true">{order === 'asc' ? '↑' : '↓'}</span>
+					Match <Arrow dir={order === 'asc' ? 'up' : 'down'} />
 					<span class="visually-hidden"
 						>, sorted {order === 'asc' ? 'first to last' : 'last to first'}</span
 					>
@@ -96,6 +97,7 @@
 <style>
 	.sort {
 		display: inline-flex;
+		align-items: center;
 		gap: 4px;
 		padding: 0;
 		border: 0;

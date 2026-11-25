@@ -3,6 +3,7 @@
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { MISSING, record } from '#lib/format/index.ts';
 	import { PART_LABELS } from '#lib/game/biobuzz.ts';
+	import Score from '#lib/ui/Score.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import { shortRange } from '#lib/format/time.ts';
@@ -92,7 +93,7 @@
 								<td>
 									{#if row.outcome && row.score !== null && row.against !== null}
 										<span class={['outcome', row.outcome]}>{OUTCOME[row.outcome]}</span>
-										<b>{row.score}</b><span class="faint">–{row.against}</span>
+										<Score left={row.score} right={row.against} winner="left" />
 									{:else}
 										<span class="faint">Not played</span>
 									{/if}

@@ -58,18 +58,22 @@ describe('pick list', () => {
 
 	it('adds a team by number', async () => {
 		const { state, refresh } = setup(list(1));
-		await fireEvent.input(screen.getByLabelText('Team number'), { target: { value: '14624' } });
+		await fireEvent.input(screen.getByLabelText('Team number or name'), {
+			target: { value: '14624' }
+		});
 		await fireEvent.click(screen.getByRole('button', { name: 'Add team' }));
 		expect(order(state.current)).toEqual([1, 14624]);
 		await refresh();
-		expect(screen.getByLabelText('Team number')).toHaveValue('');
+		expect(screen.getByLabelText('Team number or name')).toHaveValue('');
 		expect(screen.getAllByRole('listitem')).toHaveLength(2);
 	});
 
 	it('looks up the name of an added team', async () => {
 		const lookupName = vi.fn(async () => 'Cat-Astrophic Byte');
 		const { state } = setup(list(), { lookupName });
-		await fireEvent.input(screen.getByLabelText('Team number'), { target: { value: '14624' } });
+		await fireEvent.input(screen.getByLabelText('Team number or name'), {
+			target: { value: '14624' }
+		});
 		await fireEvent.click(screen.getByRole('button', { name: 'Add team' }));
 		await vi.waitFor(() => expect(state.current.entries[0]?.name).toBe('Cat-Astrophic Byte'));
 		expect(lookupName).toHaveBeenCalledWith(14624);
@@ -80,22 +84,52 @@ describe('pick list', () => {
 			throw new Error('offline');
 		});
 		const { state } = setup(list(), { lookupName });
-		await fireEvent.input(screen.getByLabelText('Team number'), { target: { value: '14624' } });
+		await fireEvent.input(screen.getByLabelText('Team number or name'), {
+			target: { value: '14624' }
+		});
 		await fireEvent.click(screen.getByRole('button', { name: 'Add team' }));
 		await vi.waitFor(() => expect(lookupName).toHaveBeenCalled());
 		expect(order(state.current)).toEqual([14624]);
 		expect(state.current.entries[0].name).toBeNull();
 	});
 
+	it('adds a team picked by name from the list', async () => {
+		const search = vi.fn(async () => [
+			{ type: 'team' as const, label: '14624 Cat-Astrophic Byte', href: '/teams/14624' },
+			{ type: 'team' as const, label: '3747 The Hive', href: '/teams/3747' }
+		]);
+		const { state } = setup(list(1), { search });
+		const input = screen.getByLabelText('Team number or name');
+		await fireEvent.input(input, { target: { value: 'cat astro' } });
+		await fireEvent.click(await screen.findByRole('option', { name: /14624 Cat-Astrophic Byte/ }));
+		expect(order(state.current)).toEqual([1, 14624]);
+		expect(search).toHaveBeenCalledWith('cat astro', expect.anything());
+	});
+
+	it('never adds a team from a name without a pick', async () => {
+		const search = vi.fn(async () => []);
+		const { update } = setup(list(1), { search });
+		await fireEvent.input(screen.getByLabelText('Team number or name'), {
+			target: { value: 'the hive' }
+		});
+		await fireEvent.click(screen.getByRole('button', { name: 'Add team' }));
+		expect(update).not.toHaveBeenCalled();
+	});
+
 	it('says when a team is already listed or the number is wrong', async () => {
 		const { update } = setup(list(2844));
-		const input = screen.getByLabelText('Team number');
+		const input = screen.getByLabelText('Team number or name');
 		await fireEvent.input(input, { target: { value: '2844' } });
 		await fireEvent.click(screen.getByRole('button', { name: 'Add team' }));
 		expect(screen.getByRole('alert')).toHaveTextContent('2844 is already on the list.');
-		await fireEvent.input(input, { target: { value: 'abc' } });
+		await fireEvent.input(input, { target: { value: '1234567' } });
 		await fireEvent.click(screen.getByRole('button', { name: 'Add team' }));
 		expect(screen.getByRole('alert')).toHaveTextContent('Enter a team number, 1 to 6 digits.');
+		await fireEvent.input(input, { target: { value: 'abc' } });
+		await fireEvent.click(screen.getByRole('button', { name: 'Add team' }));
+		expect(screen.getByRole('alert')).toHaveTextContent(
+			'Pick the team from the list, or enter its number.'
+		);
 		expect(update).not.toHaveBeenCalled();
 	});
 

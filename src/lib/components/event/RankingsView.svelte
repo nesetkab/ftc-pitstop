@@ -72,7 +72,7 @@
 			[
 				{ value: 'standings', label: 'Standings', shown: true },
 				{ value: 'rp', label: 'Ranking points', shown: rp !== null },
-				{ value: 'schedule', label: 'Schedule', shown: strength.length > 0 }
+				{ value: 'schedule', label: 'Schedule strength', shown: strength.length > 0 }
 			] as const
 		)
 			.filter((option) => option.shown)
@@ -112,9 +112,11 @@
 			shown.has('tbp') && !league
 				? 'TBP is the average match score without penalties. Matches a team was disqualified from or missed count as zero.'
 				: null,
+			shown.has('avgtips') ? 'Avg tips is the average hive tips per match.' : null,
 			sources.has('score') && ['npavg', 'npmax', 'npmin', 'npsd'].some((key) => shown.has(key))
-				? 'NP scores leave out points from opponent fouls and count qualification matches only. Spread is how much those scores vary.'
+				? 'NP scores leave out points from opponent fouls and count qualification matches only.'
 				: null,
+			sources.has('score') && shown.has('npsd') ? 'Spread is how much those scores vary.' : null,
 			sources.has('rating') ? "OPR is each team's estimated share of its alliance's score." : null,
 			projections
 				? `Projections play out the ${remaining} remaining qualification ${remaining === 1 ? 'match' : 'matches'}.`

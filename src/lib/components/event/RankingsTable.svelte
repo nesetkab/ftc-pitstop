@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import type { Team } from '#lib/types.ts';
+	import Arrow from '#lib/ui/Arrow.svelte';
 	import FinishSpark from '#lib/ui/FinishSpark.svelte';
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -67,14 +68,14 @@
 	<a
 		class="sort-link"
 		href={hrefFor(sortBy(choice, key))}
-		style:--sort-hint={defaultDir(key) === 'asc' ? "'↑'" : undefined}
 		onclick={(event) => choose(event, key)}
 		data-sveltekit-replacestate
 		data-sveltekit-reset="false"
 	>
-		<Term {label} nested />{#if choice.sort === key}<span aria-hidden="true"
-				>{choice.dir === 'asc' ? ' ↑' : ' ↓'}</span
-			>{/if}
+		<Term {label} nested />{#if choice.sort === key}<Arrow
+				dir={choice.dir === 'asc' ? 'up' : 'down'}
+				class="sort-arrow"
+			/>{:else}<Arrow dir={defaultDir(key) === 'asc' ? 'up' : 'down'} class="sort-hint" />{/if}
 	</a>
 {/snippet}
 

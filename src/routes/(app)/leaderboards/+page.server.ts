@@ -5,6 +5,7 @@ import {
 	paginate,
 	parseFilters,
 	teamPage,
+	withSelectedType,
 	type LeaderboardFilters
 } from '#lib/components/leaderboard/leaderboard.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
@@ -42,7 +43,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 		regions: dataset.regions,
 		countries: dataset.countries,
 		states: dataset.states[filters.country] ?? [],
-		types: source.options.types,
+		types: withSelectedType(source.options.types, filters.type),
 		weeks: source.options.weeks
 	};
 };

@@ -3,6 +3,7 @@ import { matchLabel, parseMatchKey } from '#lib/format/match.ts';
 import { regionName } from '#lib/format/places.ts';
 import { search } from '#lib/format/url.ts';
 import { PART_LABELS } from '#lib/game/biobuzz.ts';
+import { TYPE_LABELS } from '#lib/components/event/event-meta.ts';
 import { EVENT_TYPE_NAMES } from '#lib/game/event-types.ts';
 import { plausibleScore } from '#lib/model/types.ts';
 import type {
@@ -23,7 +24,13 @@ export const RECORD_PARTS = [
 	{ key: 'teleop', label: PART_LABELS.teleop },
 	{ key: 'hive', label: PART_LABELS.hive },
 	{ key: 'flower', label: PART_LABELS.flower },
-	{ key: 'garden', label: PART_LABELS.garden }
+	{ key: 'garden', label: PART_LABELS.garden },
+	{ key: 'park', label: PART_LABELS.park }
+] as const;
+
+export const RECORD_GROUPS = [
+	{ label: 'Match score', parts: ['total', 'auto', 'teleop'] },
+	{ label: 'Teleop points', parts: ['hive', 'flower', 'garden', 'park'] }
 ] as const;
 
 export type RecordPart = (typeof RECORD_PARTS)[number]['key'];
@@ -242,7 +249,7 @@ export function buildRecordDataset(matches: SeasonMatch[]): RecordDataset {
 	return {
 		rows,
 		regions: [...regions].map((value) => ({ value, label: regionName(value) })).sort(byLabel),
-		types: [...types].map((value) => ({ value, label: EVENT_TYPE_NAMES[value] })).sort(byLabel)
+		types: [...types].map((value) => ({ value, label: TYPE_LABELS[value] })).sort(byLabel)
 	};
 }
 

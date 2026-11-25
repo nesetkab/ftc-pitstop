@@ -18,15 +18,17 @@ describe('toSearchResults', () => {
 			{
 				type: 'team',
 				label: '26670 SCA Iron Eagles',
-				sublabel: 'Phoenix, Arizona',
+				sublabel: 'Phoenix, AZ',
 				meta: null,
+				aside: 'Phoenix, AZ',
 				href: '/teams/26670'
 			},
 			{
 				type: 'event',
 				label: 'Roadrunner - Gilbert Qualifier',
-				sublabel: 'USAZGIQ · Gilbert, Arizona · Nov 14',
+				sublabel: 'USAZGIQ · Gilbert, AZ · Nov 14',
 				meta: 'Done',
+				aside: 'Nov 14',
 				live: false,
 				href: '/events/USAZGIQ'
 			}
@@ -41,10 +43,10 @@ describe('toSearchResults', () => {
 	it('marks events that are running now', () => {
 		const event = eventSummary({ start: '2026-11-20', end: '2026-11-21' });
 		const live = toSearchResults({ events: [event] }, Date.parse('2026-11-21T18:00:00Z'));
-		expect(live[0]).toMatchObject({ meta: 'Day 2 of 2', live: true });
-		expect(live[0].sublabel).toBe('USAZGIQ · Gilbert, Arizona · Nov 20–21');
+		expect(live[0]).toMatchObject({ meta: 'Day 2 of 2', aside: 'Day 2 of 2', live: true });
+		expect(live[0].sublabel).toBe('USAZGIQ · Gilbert, AZ · Nov 20–21');
 		const soon = toSearchResults({ events: [event] }, Date.parse('2026-11-10T18:00:00Z'));
-		expect(soon[0]).toMatchObject({ meta: 'Upcoming', live: false });
+		expect(soon[0]).toMatchObject({ meta: 'Upcoming', aside: 'Nov 20–21', live: false });
 	});
 
 	it('leaves the place out for a team that has none', () => {

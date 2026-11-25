@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { oprTerm } from '#lib/format/glossary.ts';
+	import Arrow from '#lib/ui/Arrow.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { fixed, integer, MISSING } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -73,11 +74,10 @@
 					>
 						{#if filters}
 							<a class="sort-link" href={sortHref(column.key)} data-sveltekit-reset="false">
-								<Term label={column.label} term={oprTerm(column.label)} nested />{#if active}<span
-										aria-hidden="true"
-									>
-										↓</span
-									>{/if}
+								<Term label={column.label} term={oprTerm(column.label)} nested /><Arrow
+									dir="down"
+									class={active ? 'sort-arrow' : 'sort-hint'}
+								/>
 							</a>
 						{:else}
 							<Term label={column.label} term={oprTerm(column.label)} />

@@ -1,0 +1,141 @@
+engine 174377 rows in 26s
+model                          map             set         n brier  accO  accU  qN  qBrier  qAccO  pN pBrier  pAccO   mae
+shipped                        train           ours     8594 0.1708  72.7  73.8 8063 0.1731  72.4 531 0.1371  77.6  13.83
+shipped                        train           oddbot   8564 0.1709  72.8  73.8 8031 0.1731  72.5 533 0.1371  77.6  13.87
+shipped                        train simple    ours     8594 0.1715  72.7  73.8 8063 0.1737  72.4 531 0.1389  77.6  13.83
+shipped                        train simple    oddbot   8564 0.1716  72.8  73.8 8031 0.1737  72.5 533 0.1389  77.6  13.87
+shipped                        2026 in-sample  ours     8594 0.1705  72.7  73.8 8063 0.1727  72.4 531 0.1373  77.6  13.83
+shipped                        2026 in-sample  oddbot   8564 0.1705  72.8  73.8 8031 0.1727  72.5 533 0.1373  77.6  13.87
+opr-event                      train           ours     8594 0.1965  67.5  68.5 8063 0.2003  66.8 531 0.1374  78.7  17.71
+opr-event                      train           oddbot   8564 0.1965  67.6  68.5 8031 0.2005  66.9 533 0.1373  78.7  17.78
+opr-event                      train simple    ours     8594 0.1965  67.5  68.5 8063 0.2004  66.8 531 0.1378  78.7  17.71
+opr-event                      train simple    oddbot   8564 0.1966  67.6  68.5 8031 0.2005  66.9 533 0.1378  78.7  17.78
+opr-event                      2026 in-sample  ours     8594 0.1956  67.5  68.5 8063 0.1995  66.8 531 0.1367  78.7  17.71
+opr-event                      2026 in-sample  oddbot   8564 0.1957  67.6  68.5 8031 0.1996  66.9 533 0.1367  78.7  17.78
+opr-ridge-mean                 train           ours     8594 0.1871  68.1  69.1 8063 0.1906  67.4 531 0.1351  78.7  15.69
+opr-ridge-mean                 train           oddbot   8564 0.1870  68.2  69.1 8031 0.1905  67.5 533 0.1351  78.7  15.74
+opr-ridge-mean                 train simple    ours     8594 0.1878  68.1  69.1 8063 0.1912  67.4 531 0.1365  78.7  15.69
+opr-ridge-mean                 train simple    oddbot   8564 0.1877  68.2  69.1 8031 0.1911  67.5 533 0.1365  78.7  15.74
+opr-ridge-mean                 2026 in-sample  ours     8594 0.1865  68.1  69.1 8063 0.1900  67.4 531 0.1340  78.7  15.69
+opr-ridge-mean                 2026 in-sample  oddbot   8564 0.1864  68.2  69.1 8031 0.1899  67.5 533 0.1340  78.7  15.74
+live-opr mean                  train           ours     8594 0.1948  67.4  68.4 8063 0.1977  66.7 531 0.1505  77.4  18.00
+live-opr mean                  train           oddbot   8564 0.1948  67.5  68.4 8031 0.1977  66.8 533 0.1509  77.3  18.05
+live-opr mean                  train simple    ours     8594 0.1952  67.4  68.4 8063 0.1981  66.7 531 0.1517  77.4  18.00
+live-opr mean                  train simple    oddbot   8564 0.1952  67.5  68.4 8031 0.1981  66.8 533 0.1521  77.3  18.05
+live-opr mean                  2026 in-sample  ours     8594 0.1940  67.4  68.4 8063 0.1970  66.7 531 0.1479  77.4  18.00
+live-opr mean                  2026 in-sample  oddbot   8564 0.1940  67.5  68.4 8031 0.1970  66.8 533 0.1483  77.3  18.05
+live-opr last                  train           ours     8594 0.1906  68.9  69.9 8063 0.1933  68.4 531 0.1497  77.4  17.50
+live-opr last                  train           oddbot   8564 0.1906  69.0  69.9 8031 0.1933  68.4 533 0.1501  77.3  17.56
+live-opr last                  train simple    ours     8594 0.1909  68.9  69.9 8063 0.1935  68.4 531 0.1513  77.4  17.50
+live-opr last                  train simple    oddbot   8564 0.1909  69.0  69.9 8031 0.1935  68.4 533 0.1517  77.3  17.56
+live-opr last                  2026 in-sample  ours     8594 0.1899  68.9  69.9 8063 0.1927  68.4 531 0.1477  77.4  17.50
+live-opr last                  2026 in-sample  oddbot   8564 0.1899  69.0  69.9 8031 0.1926  68.4 533 0.1481  77.3  17.56
+live-opr best                  train           ours     8594 0.1904  69.0  70.0 8063 0.1931  68.4 531 0.1496  77.4  17.48
+live-opr best                  train           oddbot   8564 0.1904  69.1  70.0 8031 0.1931  68.5 533 0.1500  77.3  17.55
+live-opr best                  train simple    ours     8594 0.1908  69.0  70.0 8063 0.1934  68.4 531 0.1512  77.4  17.48
+live-opr best                  train simple    oddbot   8564 0.1907  69.1  70.0 8031 0.1933  68.5 533 0.1515  77.3  17.55
+live-opr best                  2026 in-sample  ours     8594 0.1898  69.0  70.0 8063 0.1926  68.4 531 0.1477  77.4  17.48
+live-opr best                  2026 in-sample  oddbot   8564 0.1898  69.1  70.0 8031 0.1925  68.5 533 0.1481  77.3  17.55
+live-opr avg                   train           ours     8594 0.1906  68.9  69.9 8063 0.1934  68.4 531 0.1496  77.4  17.55
+live-opr avg                   train           oddbot   8564 0.1906  69.0  69.9 8031 0.1933  68.5 533 0.1499  77.3  17.62
+live-opr avg                   train simple    ours     8594 0.1909  68.9  69.9 8063 0.1935  68.4 531 0.1510  77.4  17.55
+live-opr avg                   train simple    oddbot   8564 0.1909  69.0  69.9 8031 0.1935  68.5 533 0.1513  77.3  17.62
+live-opr avg                   2026 in-sample  ours     8594 0.1900  68.9  69.9 8063 0.1928  68.4 531 0.1477  77.4  17.55
+live-opr avg                   2026 in-sample  oddbot   8564 0.1900  69.0  69.9 8031 0.1928  68.5 533 0.1481  77.3  17.62
+live-opr zero                  train           ours     8594 0.1948  67.3  68.2 8063 0.1978  66.6 531 0.1507  77.4  22.05
+live-opr zero                  train           oddbot   8564 0.1948  67.4  68.3 8031 0.1977  66.7 533 0.1511  77.3  22.13
+live-opr zero                  train simple    ours     8594 0.1954  67.3  68.2 8063 0.1983  66.6 531 0.1520  77.4  22.05
+live-opr zero                  train simple    oddbot   8564 0.1954  67.4  68.3 8031 0.1983  66.7 533 0.1524  77.3  22.13
+live-opr zero                  2026 in-sample  ours     8594 0.1941  67.3  68.2 8063 0.1971  66.6 531 0.1480  77.4  22.05
+live-opr zero                  2026 in-sample  oddbot   8564 0.1941  67.4  68.3 8031 0.1971  66.7 533 0.1484  77.3  22.13
+live-opr mean +playoffs        train           ours     8594 0.1942  67.5  68.4 8063 0.1975  66.7 531 0.1428  78.7  17.90
+live-opr mean +playoffs        train           oddbot   8564 0.1941  67.6  68.5 8031 0.1975  66.8 533 0.1428  78.7  17.96
+live-opr mean +playoffs        train simple    ours     8594 0.1947  67.5  68.4 8063 0.1980  66.7 531 0.1446  78.7  17.90
+live-opr mean +playoffs        train simple    oddbot   8564 0.1946  67.6  68.5 8031 0.1980  66.8 533 0.1445  78.7  17.96
+live-opr mean +playoffs        2026 in-sample  ours     8594 0.1935  67.5  68.4 8063 0.1971  66.7 531 0.1388  78.7  17.90
+live-opr mean +playoffs        2026 in-sample  oddbot   8564 0.1934  67.6  68.5 8031 0.1970  66.8 533 0.1388  78.7  17.96
+live-opr best +playoffs        train           ours     8594 0.1898  69.0  70.0 8063 0.1930  68.4 531 0.1415  78.7  17.38
+live-opr best +playoffs        train           oddbot   8564 0.1898  69.1  70.1 8031 0.1930  68.5 533 0.1415  78.7  17.44
+live-opr best +playoffs        train simple    ours     8594 0.1902  69.0  70.0 8063 0.1932  68.4 531 0.1438  78.7  17.38
+live-opr best +playoffs        train simple    oddbot   8564 0.1901  69.1  70.1 8031 0.1932  68.5 533 0.1438  78.7  17.44
+live-opr best +playoffs        2026 in-sample  ours     8594 0.1892  69.0  70.0 8063 0.1926  68.4 531 0.1383  78.7  17.38
+live-opr best +playoffs        2026 in-sample  oddbot   8564 0.1892  69.1  70.1 8031 0.1925  68.5 533 0.1383  78.7  17.44
+live-opr best total            train           ours     8594 0.1961  68.1  69.1 8063 0.1989  67.6 531 0.1539  76.5  18.41
+live-opr best total            train           oddbot   8564 0.1962  68.1  69.1 8031 0.1989  67.6 533 0.1542  76.4  18.48
+live-opr best total            train simple    ours     8594 0.1964  68.1  69.1 8063 0.1991  67.6 531 0.1559  76.5  18.41
+live-opr best total            train simple    oddbot   8564 0.1964  68.1  69.1 8031 0.1991  67.6 533 0.1563  76.4  18.48
+live-opr best total            2026 in-sample  ours     8594 0.1949  68.1  69.1 8063 0.1979  67.6 531 0.1499  76.5  18.41
+live-opr best total            2026 in-sample  oddbot   8564 0.1949  68.1  69.1 8031 0.1979  67.6 533 0.1503  76.4  18.48
+avg score season               train           ours     8594 0.1940  68.0  69.0 8063 0.1961  67.5 531 0.1608  75.1  17.02
+avg score season               train           oddbot   8564 0.1940  68.0  69.0 8031 0.1963  67.6 533 0.1606  75.1  17.06
+avg score season               train simple    ours     8594 0.1949  68.0  69.0 8063 0.1970  67.5 531 0.1625  75.1  17.02
+avg score season               train simple    oddbot   8564 0.1950  68.0  69.0 8031 0.1971  67.6 533 0.1623  75.1  17.06
+avg score season               2026 in-sample  ours     8594 0.1938  68.0  69.0 8063 0.1960  67.5 531 0.1609  75.1  17.02
+avg score season               2026 in-sample  oddbot   8564 0.1939  68.0  69.0 8031 0.1961  67.6 533 0.1608  75.1  17.06
+avg score event                train           ours     8594 0.1998  66.4  67.4 8063 0.2031  65.8 531 0.1503  76.5  17.03
+avg score event                train           oddbot   8564 0.1997  66.5  67.4 8031 0.2030  65.8 533 0.1502  76.5  17.08
+avg score event                train simple    ours     8594 0.2010  66.4  67.4 8063 0.2043  65.8 531 0.1513  76.5  17.03
+avg score event                train simple    oddbot   8564 0.2009  66.5  67.4 8031 0.2042  65.8 533 0.1512  76.5  17.08
+avg score event                2026 in-sample  ours     8594 0.1995  66.4  67.4 8063 0.2029  65.8 531 0.1486  76.5  17.03
+avg score event                2026 in-sample  oddbot   8564 0.1994  66.5  67.4 8031 0.2028  65.8 533 0.1485  76.5  17.08
+elo k32 reset                  train           ours     8594 0.2153  63.4  64.3 8063 0.2166  62.9 531 0.1962  71.9  31.30
+elo k32 reset                  train           oddbot   8564 0.2155  63.5  64.3 8031 0.2168  62.9 533 0.1962  72.0  31.36
+elo k32 reset                  train simple    ours     8594 0.2153  63.4  64.3 8063 0.2165  62.9 531 0.1970  71.9  31.30
+elo k32 reset                  train simple    oddbot   8564 0.2155  63.5  64.3 8031 0.2167  62.9 533 0.1971  72.0  31.36
+elo k32 reset                  2026 in-sample  ours     8594 0.2134  63.4  64.3 8063 0.2149  62.9 531 0.1913  71.9  31.30
+elo k32 reset                  2026 in-sample  oddbot   8564 0.2136  63.5  64.3 8031 0.2151  62.9 533 0.1913  72.0  31.36
+elo k32 reset                  native          ours     8594 0.2204  63.4  64.3 8063 0.2213  62.9 531 0.2065  71.9  31.30
+elo k32 reset                  native          oddbot   8564 0.2206  63.5  64.3 8031 0.2215  62.9 533 0.2066  72.0  31.36
+elo k16 reset                  train           ours     8594 0.2171  63.1  64.0 8063 0.2182  62.7 531 0.1996  70.4  31.30
+elo k16 reset                  train           oddbot   8564 0.2173  63.2  64.0 8031 0.2185  62.7 533 0.1997  70.5  31.36
+elo k16 reset                  train simple    ours     8594 0.2171  63.1  64.0 8063 0.2182  62.7 531 0.2000  70.4  31.30
+elo k16 reset                  train simple    oddbot   8564 0.2173  63.2  64.0 8031 0.2184  62.7 533 0.2001  70.5  31.36
+elo k16 reset                  2026 in-sample  ours     8594 0.2144  63.1  64.0 8063 0.2157  62.7 531 0.1942  70.4  31.30
+elo k16 reset                  2026 in-sample  oddbot   8564 0.2145  63.2  64.0 8031 0.2159  62.7 533 0.1942  70.5  31.36
+elo k16 reset                  native          ours     8594 0.2297  63.1  64.0 8063 0.2303  62.7 531 0.2207  70.4  31.30
+elo k16 reset                  native          oddbot   8564 0.2299  63.2  64.0 8031 0.2305  62.7 533 0.2208  70.5  31.36
+elo k32 carry                  train           ours     8594 0.1982  67.7  68.6 8063 0.1995  67.2 531 0.1792  74.4  31.30
+elo k32 carry                  train           oddbot   8564 0.1985  67.6  68.5 8031 0.1998  67.2 533 0.1794  74.3  31.36
+elo k32 carry                  train simple    ours     8594 0.1982  67.7  68.6 8063 0.1994  67.2 531 0.1796  74.4  31.30
+elo k32 carry                  train simple    oddbot   8564 0.1985  67.6  68.5 8031 0.1998  67.2 533 0.1799  74.3  31.36
+elo k32 carry                  2026 in-sample  ours     8594 0.1977  67.6  68.6 8063 0.1990  67.2 531 0.1768  74.4  31.30
+elo k32 carry                  2026 in-sample  oddbot   8564 0.1980  67.6  68.5 8031 0.1994  67.1 533 0.1770  74.3  31.36
+elo k32 carry                  native          ours     8594 0.2024  67.7  68.6 8063 0.2033  67.2 531 0.1878  74.4  31.30
+elo k32 carry                  native          oddbot   8564 0.2026  67.6  68.5 8031 0.2036  67.2 533 0.1880  74.3  31.36
+oddbot EPA (published preds)   theirs          oddbot   8564 0.1645  74.2  75.2 8031 0.1662  73.9 533 0.1385  78.7  13.92
+
+paired brier vs oddbot on matched set (negative = ours better)
+shipped          all       0.00639 se 0.00086
+shipped          quals     0.00691 se 0.00090
+shipped          playoffs  -0.00146 se 0.00276
+live-opr best    all       0.02596 se 0.00154
+live-opr best    quals     0.02692 se 0.00162
+live-opr best    playoffs  0.01149 se 0.00379
+live-opr mean    all       0.03029 se 0.00157
+live-opr mean    quals     0.03148 se 0.00166
+live-opr mean    playoffs  0.01234 se 0.00377
+opr-event        all       0.03208 se 0.00153
+opr-event        quals     0.03429 se 0.00162
+opr-event        playoffs  -0.00122 se 0.00312
+
+outcome agreement on matched set
+8563 of 8564 outcomes agree
+
+by new teams in match (teams with no quals yet at the event), 2026 our set, train mapping
+0 new     6965 shipped 0.1639/ 74.0 | opr-event 0.1846/ 71.3 | live-opr mean 0.1831/ 71.1 | live-opr best 0.1827/ 71.1 | live-opr last 0.1827/ 71.1 | avg score season 0.1866/ 70.1
+1-2 new    181 shipped 0.1926/ 70.7 | opr-event 0.2462/ 62.7 | live-opr mean 0.2293/ 63.8 | live-opr best 0.2241/ 66.0 | live-opr last 0.2235/ 66.0 | avg score season 0.2167/ 66.3
+3-4 new   1448 shipped 0.2013/ 66.7 | opr-event 0.2472/ 50.1 | live-opr mean 0.2466/ 50.1 | live-opr best 0.2236/ 59.3 | live-opr last 0.2243/ 58.9 | avg score season 0.2266/ 58.3
+
+matches with every team already seen at the event: 6965 of 8594
+
+match set
+fetched 2026-11-25T03:42:11.954Z: events 399, played 8624, with scores 8624, after prep 8624, after warmup 8594
+oddbot 8614, ours (no warmup) 8624, both 8564, only oddbot 50, only ours 60
+only oddbot by event: USMICPM10(19,2026-11-23,ours:1) USCANOTCM1(18,2026-11-22,missing) USUTSAS1(13,2026-09-19,ours:2)
+only ours by event: USTXNOFMN2(21) USCALAESS3(18) USCALSWHN(11) USTXCECCN(5) USMANBN(4) KZASQ1(1)
+oddbot types {
+  Qualifier: 2114,
+  LeagueMeet: 5007,
+  'Non-Advancement': 1430,
+  NonAdvancement: 63
+} our types { NonAdvancement: 1539, LeagueMeet: 4970, Qualifier: 2115 }

@@ -1,0 +1,37 @@
+{
+	"rest": {
+		"lamNew": 2.5,
+		"lamPrev": 2,
+		"q": 0.15,
+		"qWeek": 0.01,
+		"qMatch": 0,
+		"carry": 1,
+		"drift": 0.15,
+		"beta": 0.5,
+		"rhoNew": 0.2,
+		"rhoPrev": 0.4,
+		"rhoNewScore": 0.5,
+		"rhoPrevScore": 0.7
+	},
+	"robot": {
+		"lamNew": 0.72,
+		"lamPrev": 1.2,
+		"q": 0.375,
+		"qWeek": 0.025,
+		"qMatch": 0,
+		"carry": 1.1,
+		"drift": 0.25,
+		"beta": 0.5,
+		"rhoNew": 0.2,
+		"rhoPrev": 0.4,
+		"rhoNewScore": 0.5,
+		"rhoPrevScore": 0.7
+	},
+	"rVar": 1,
+	"hist": [
+		0.45,
+		0.15
+	],
+	"het": 0.45,
+	"qLeague": 1
+}

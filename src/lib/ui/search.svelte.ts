@@ -3,6 +3,7 @@ export type SearchResult = {
 	label: string;
 	sublabel?: string | null;
 	meta?: string | null;
+	aside?: string | null;
 	live?: boolean;
 	href: string;
 };

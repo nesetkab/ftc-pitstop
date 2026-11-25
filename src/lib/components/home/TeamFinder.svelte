@@ -4,7 +4,7 @@
 	import Button from '#lib/ui/Button.svelte';
 	import { searchApi } from '#lib/ui/search-results.ts';
 	import type { SearchFn } from '#lib/ui/search.svelte.ts';
-	import { teamHits, type TeamHit } from './finder.ts';
+	import { teamLookup, type TeamHit } from '#lib/ui/team-lookup.ts';
 
 	interface Props {
 		search?: SearchFn;
@@ -21,7 +21,7 @@
 
 	$effect(() => {
 		const trimmed = query.trim();
-		const find = search;
+		const find = teamLookup(search);
 		if (!trimmed) {
 			hits = [];
 			status = 'idle';
@@ -33,7 +33,7 @@
 			try {
 				const found = await find(trimmed, controller.signal);
 				if (controller.signal.aborted) return;
-				hits = teamHits(found);
+				hits = found;
 				status = 'done';
 			} catch {
 				if (controller.signal.aborted) return;

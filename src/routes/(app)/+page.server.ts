@@ -2,7 +2,7 @@ import type { EventProgress } from '#lib/components/home/today.ts';
 import { buildHomeEvents, todayCompetitions } from '#lib/components/home/home.ts';
 import { keepAlive, settleWithin } from '#lib/server/cache.ts';
 import { loadEventsToday, loadSeasonEvents } from '#lib/server/event.ts';
-import { loadHighlights, loadTodayProgress } from '#lib/server/home.ts';
+import { loadHighlights, loadTodayProgress, loadWorldRecord } from '#lib/server/home.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import { recordNames } from '#lib/server/records.ts';
 import type { EventSummary } from '#lib/types.ts';
@@ -24,28 +24,39 @@ async function progressFor(events: EventSummary[] | null): Promise<Record<string
 	return result;
 }
 
-async function highlightsWithNames() {
-	const highlights = await loadHighlights(1000).catch(() => null);
-	if (!highlights) return null;
-	const all = [...highlights.highest, ...highlights.closest, ...highlights.upsets];
+async function standouts() {
+	const [highlights, record] = await Promise.all([
+		loadHighlights(1000).catch(() => null),
+		loadWorldRecord(1000).catch(() => null)
+	]);
+	if (!highlights && !record) return { highlights: null, record: null };
+	const all = [
+		...(highlights?.highest ?? []),
+		...(highlights?.closest ?? []),
+		...(highlights?.upsets ?? [])
+	];
+	const items = record ? [...all, record] : all;
 	const names = await recordNames(
-		all.flatMap((item) => [...item.red, ...item.blue]),
-		all.map((item) => item.event)
+		items.flatMap((item) => [...item.red, ...item.blue]),
+		items.map((item) => item.event)
 	).catch(() => ({ teams: {}, events: {} }));
-	return { ...highlights, names };
+	return {
+		highlights: highlights ? { ...highlights, names } : null,
+		record: record ? { ...record, names } : null
+	};
 }
 
 export const load: PageServerLoad = async ({ setHeaders }) => {
 	const todayTask = settleWithin(loadEventsToday(), LIST_WAIT_MS);
-	const [today, season, progress, highlights] = await Promise.all([
+	const [today, season, progress, { highlights, record }] = await Promise.all([
 		todayTask,
 		settleWithin(
 			loadSeasonEvents().then((list) => list.events),
 			LIST_WAIT_MS
 		),
 		todayTask.then(progressFor),
-		highlightsWithNames()
+		standouts()
 	]);
 	setHeaders({ 'cache-control': CACHE_CONTROL.live });
-	return { ...buildHomeEvents({ today, season, progress }, Date.now()), highlights };
+	return { ...buildHomeEvents({ today, season, progress }, Date.now()), highlights, record };
 };

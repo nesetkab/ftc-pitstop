@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { record, shortDate } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Score from '#lib/ui/Score.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import type { Meeting, PairRecord, Tally } from './compare.ts';
 
@@ -95,9 +96,7 @@
 						</td>
 					{/each}
 					<td class="score">
-						<span class:won={meeting.winner === 'red'}>{meeting.redScore}</span>
-						<span class="dash">–</span>
-						<span class:won={meeting.winner === 'blue'}>{meeting.blueScore}</span>
+						<Score left={meeting.redScore} right={meeting.blueScore} winner={meeting.winner} />
 					</td>
 				</tr>
 			{/each}
@@ -162,9 +161,12 @@
 	}
 
 	.chip {
-		padding: 2px 7px;
+		display: inline-block;
+		min-width: calc(var(--team-digits) + 12px);
+		padding: 2px 6px;
 		border-radius: var(--radius-chip);
 		font-weight: 600;
+		text-align: center;
 	}
 
 	.chip.red {
@@ -179,19 +181,6 @@
 		background: transparent;
 		color: var(--text-2);
 		font-weight: 400;
-	}
-
-	.score {
-		color: var(--text-2);
-	}
-
-	.won {
-		color: var(--text);
-		font-weight: 600;
-	}
-
-	.dash {
-		margin-inline: 2px;
 	}
 
 	@media (max-width: 600px) {
@@ -220,7 +209,8 @@
 		}
 
 		.chip {
-			padding-inline: 5px;
+			min-width: calc(var(--team-digits) + 8px);
+			padding-inline: 4px;
 		}
 	}
 </style>
