@@ -5,7 +5,7 @@
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
-	import Tabs from '#lib/ui/Tabs.svelte';
+	import Tabs, { type Tab } from '#lib/ui/Tabs.svelte';
 	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
 	import { setMatch } from '#lib/workspace/checklist.ts';
 	import { formatCode } from '#lib/workspace/code.ts';
@@ -30,11 +30,11 @@
 	let copied = $state(false);
 
 	const tabs = $derived([
-		{ href: `/w/${code}/picklist`, label: 'Pick list' },
-		{ href: `/w/${code}/batteries`, label: 'Batteries' },
-		{ href: `/w/${code}/checklist`, label: 'Checklist' },
-		{ href: `/w/${code}/board`, label: 'Strategy board' }
-	]);
+		{ href: `/w/${code}/picklist`, label: 'Pick list', icon: 'list' },
+		{ href: `/w/${code}/batteries`, label: 'Batteries', icon: 'battery' },
+		{ href: `/w/${code}/checklist`, label: 'Checklist', icon: 'check' },
+		{ href: `/w/${code}/board`, label: 'Strategy board', icon: 'board' }
+	] satisfies Tab[]);
 
 	const title = $derived(
 		workspace.meta?.teamNumber ? `Team ${workspace.meta.teamNumber}` : 'Team workspace'

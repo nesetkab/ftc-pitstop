@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import Button from '#lib/ui/Button.svelte';
+	import Icon, { type IconName } from '#lib/ui/Icon.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
@@ -106,20 +107,27 @@
 		}
 	}
 
-	const TOOLS = [
+	const TOOLS: { name: string; icon: IconName; text: string }[] = [
 		{
 			name: 'Pick list',
+			icon: 'list',
 			text: 'Rank the teams you want for alliance selection. Picked teams cross out live.'
 		},
 		{
 			name: 'Batteries',
+			icon: 'battery',
 			text: 'Track charge and voltage so the freshest battery goes in the robot.'
 		},
 		{
 			name: 'Checklist',
+			icon: 'check',
 			text: 'The steps your team runs before every match, ticked off with initials.'
 		},
-		{ name: 'Strategy board', text: 'Draw paths on the field and save a plan for each match.' }
+		{
+			name: 'Strategy board',
+			icon: 'board',
+			text: 'Draw paths on the field and save a plan for each match.'
+		}
 	];
 
 	function where(kind: Recent['kind']): string {
@@ -205,7 +213,7 @@
 	<dl>
 		{#each TOOLS as tool (tool.name)}
 			<div>
-				<dt>{tool.name}</dt>
+				<dt><Icon name={tool.icon} size={14} />{tool.name}</dt>
 				<dd>{tool.text}</dd>
 			</div>
 		{/each}
@@ -305,6 +313,9 @@
 	}
 
 	.tools dt {
+		display: flex;
+		align-items: center;
+		gap: 6px;
 		font-size: 14px;
 		font-weight: 600;
 	}
