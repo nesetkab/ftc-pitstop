@@ -125,6 +125,8 @@ export const OPR_PARAMS: OprParams = {
 	width: 0.25
 };
 
+export const MODEL_VERSION = 2;
+
 export const HISTORY = [1, 0.45, 0.15];
 
 export type RobotBase = { np: number; robot: number };

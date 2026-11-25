@@ -7,6 +7,7 @@ import {
 	type StrengthIndex
 } from '#lib/components/event/strength.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
+import { MODEL_VERSION } from '#lib/model/opr.ts';
 import { loadSeasonRatings } from '#lib/server/analysis.ts';
 import {
 	cache as sharedCache,
@@ -21,7 +22,7 @@ import type { EventSummary } from '#lib/types.ts';
 const DAY_SECONDS = 86_400;
 const WAIT_MS = 3_000;
 
-export const STRENGTH_KEY = `strength:${SEASON}:v1`;
+export const STRENGTH_KEY = `strength:${SEASON}:v${MODEL_VERSION}`;
 export const STRENGTH_POLICY: CachePolicy = { ttl: 3600, maxStale: 7 * DAY_SECONDS };
 
 export interface StrengthDeps {

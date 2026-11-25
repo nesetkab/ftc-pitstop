@@ -1,6 +1,7 @@
 import { SEASON } from '#lib/game/biobuzz.ts';
 import { detectPhase, lastPosted, WINNER_AWARD_ID } from '#lib/game/phase.ts';
 import { rankingsFromMatches } from '#lib/game/rankings.ts';
+import { MODEL_VERSION } from '#lib/model/opr.ts';
 import {
 	cache as defaultCache,
 	LruMap,
@@ -136,7 +137,7 @@ export function eventTier(
 }
 
 export function analysisKey(code: string): string {
-	return `analysis:${SEASON}:event:v1:${code}`;
+	return `analysis:${SEASON}:event:v${MODEL_VERSION}:${code}`;
 }
 
 export function isArchived(event: Pick<Event, 'start' | 'end' | 'timezone'>, now: number): boolean {

@@ -15,7 +15,7 @@ import type {
 	TeamRatingHistory
 } from '#lib/analysis/types.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { dayNumber, previousFrom, type PriorRel } from '#lib/model/opr.ts';
+import { dayNumber, MODEL_VERSION, previousFrom, type PriorRel } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import {
 	keepAlive,
@@ -228,7 +228,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 	async function loadSeasonRatings(): Promise<SeasonRatings | null> {
 		try {
 			const value = await cache.get<SeasonRatings>(
-				`analysis:${SEASON}:ratings:v1`,
+				`analysis:${SEASON}:ratings:v${MODEL_VERSION}`,
 				RATINGS_POLICY,
 				async () => {
 					const model = await loadSeasonModel();
@@ -246,7 +246,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 	async function loadSeasonEventRatings(): Promise<SeasonEventRatings | null> {
 		try {
 			const value = await cache.get<SeasonEventRatings>(
-				`analysis:${SEASON}:event-ratings:v1`,
+				`analysis:${SEASON}:event-ratings:v${MODEL_VERSION}`,
 				RATINGS_POLICY,
 				async () => {
 					const model = await loadSeasonModel();
