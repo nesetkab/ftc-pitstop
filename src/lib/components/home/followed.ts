@@ -34,12 +34,15 @@ export interface FollowedTeam {
 	rated: number | null;
 }
 
-export interface NextMatch {
+export interface PlannedMatch {
 	key: string;
 	label: string;
 	side: AllianceColor;
 	at: number | null;
 	estimated: boolean;
+}
+
+export interface NextMatch extends PlannedMatch {
 	when: string | null;
 }
 
@@ -51,13 +54,23 @@ export interface LastMatch {
 	other: number;
 }
 
-export interface LiveStatus {
+export interface TeamLive {
 	rank: number | null;
-	teams: number;
 	record: string | null;
-	next: NextMatch | null;
+	next: PlannedMatch | null;
 	note: string | null;
 	last: LastMatch | null;
+}
+
+export interface LiveStatus extends Omit<TeamLive, 'next'> {
+	teams: number;
+	next: NextMatch | null;
+}
+
+export interface LiveFeed {
+	teams: number;
+	scheduled: boolean;
+	status: Record<number, TeamLive>;
 }
 
 export type LiveBundle = Pick<EventBundle, 'matches' | 'rankings'> & {
@@ -132,19 +145,24 @@ export function followedTeam(
 	};
 }
 
-function estimateFor(matches: Match[], next: Match, now: number): number | null {
-	const level = matches.filter((match) => match.level === next.level);
-	const options = next.level === 'playoff' ? { ...PLAYOFF_SCHEDULE, now } : { now };
-	return (
-		estimateStarts(scheduleTimes(level), options).find((entry) => entry.key === next.key)?.start ??
-		null
-	);
+function estimatedStarts(matches: Match[], now: number): Map<string, number | null> {
+	const starts = new Map<string, number | null>();
+	for (const level of new Set(matches.map((match) => match.level))) {
+		const options = level === 'playoff' ? { ...PLAYOFF_SCHEDULE, now } : { now };
+		const times = scheduleTimes(matches.filter((match) => match.level === level));
+		for (const entry of estimateStarts(times, options)) starts.set(entry.key, entry.start);
+	}
+	return starts;
 }
 
-function nextMatch(bundle: LiveBundle, team: number, now: number): NextMatch | null {
+function nextMatch(
+	bundle: LiveBundle,
+	team: number,
+	starts: Map<string, number | null>
+): PlannedMatch | null {
 	const next = bundle.matches[nextMatchIndex(bundle.matches, team)];
 	if (!next) return null;
-	const estimate = next.scheduledTime === null ? null : estimateFor(bundle.matches, next, now);
+	const estimate = next.scheduledTime === null ? null : (starts.get(next.key) ?? null);
 	const at = estimate ?? next.scheduledTime;
 	return {
 		key: next.key,
@@ -152,8 +170,7 @@ function nextMatch(bundle: LiveBundle, team: number, now: number): NextMatch | n
 		side: sideOf(next, team)!,
 		at,
 		estimated:
-			at !== null && next.scheduledTime !== null && Math.abs(at - next.scheduledTime) > 60_000,
-		when: at === null ? null : dayTime(at, now, bundle.event.timezone)
+			at !== null && next.scheduledTime !== null && Math.abs(at - next.scheduledTime) > 60_000
 	};
 }
 
@@ -173,21 +190,60 @@ function lastMatch(bundle: LiveBundle, team: number): LastMatch | null {
 	};
 }
 
-export function liveStatus(bundle: LiveBundle, team: number, now: number): LiveStatus {
+function plays(bundle: LiveBundle, team: number): boolean {
+	return bundle.matches.some((match) => sideOf(match, team));
+}
+
+function missingNote(scheduled: boolean, playing: boolean): string {
+	if (!scheduled) return 'Schedule not posted';
+	return playing ? 'No matches left' : 'Not in the schedule';
+}
+
+function teamLive(bundle: LiveBundle, team: number, starts: Map<string, number | null>): TeamLive {
 	const ranking = bundle.rankings.find((entry) => entry.team === team && entry.played > 0);
-	const plays = bundle.matches.some((match) => sideOf(match, team));
-	const next = nextMatch(bundle, team, now);
-	let note: string | null = null;
-	if (!next) {
-		if (bundle.matches.length === 0) note = 'Schedule not posted';
-		else note = plays ? 'No matches left' : 'Not in the schedule';
-	}
+	const next = nextMatch(bundle, team, starts);
 	return {
 		rank: ranking?.rank ?? null,
-		teams: bundle.rankings.length,
 		record: ranking ? `${ranking.wins}-${ranking.losses}-${ranking.ties}` : null,
 		next,
-		note,
+		note: next ? null : missingNote(bundle.matches.length > 0, plays(bundle, team)),
 		last: lastMatch(bundle, team)
+	};
+}
+
+export function liveFeed(bundle: LiveBundle, now: number): LiveFeed {
+	const teams = new Set(bundle.rankings.map((entry) => entry.team));
+	for (const match of bundle.matches) {
+		for (const entry of [...match.red, ...match.blue]) teams.add(entry.team);
+	}
+	const starts = estimatedStarts(bundle.matches, now);
+	const status: Record<number, TeamLive> = {};
+	for (const team of [...teams].sort((a, b) => a - b)) {
+		status[team] = teamLive(bundle, team, starts);
+	}
+	return { teams: bundle.rankings.length, scheduled: bundle.matches.length > 0, status };
+}
+
+export function liveStatus(
+	feed: LiveFeed,
+	team: number,
+	now: number,
+	timeZone: string
+): LiveStatus {
+	const own = feed.status[team];
+	if (own) {
+		const next = own.next && {
+			...own.next,
+			when: own.next.at === null ? null : dayTime(own.next.at, now, timeZone)
+		};
+		return { ...own, teams: feed.teams, next };
+	}
+	return {
+		rank: null,
+		teams: feed.teams,
+		record: null,
+		next: null,
+		note: missingNote(feed.scheduled, false),
+		last: null
 	};
 }

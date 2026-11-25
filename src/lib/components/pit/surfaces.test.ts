@@ -5,7 +5,7 @@ import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { nowView } from '#lib/components/event/now.ts';
 import { createReporter } from '#lib/components/event/report.ts';
-import { liveStatus } from '#lib/components/home/followed.ts';
+import { liveFeed, liveStatus } from '#lib/components/home/followed.ts';
 import { replayBundle, revealTime } from '#lib/game/replay.ts';
 import type { EventBundle } from '#lib/types.ts';
 import { deriveSelection, takenLabels } from '#lib/workspace/selection.ts';
@@ -41,11 +41,12 @@ function disagreements(full: EventBundle, now: number): string[] {
 	const report = createReporter({ bundle, analysis, season: null, seasonCount: null });
 	const shown = [live.onField, ...live.upcoming].filter((match) => match !== null);
 	const crossed = takenLabels(deriveSelection(bundle.alliances));
+	const feed = liveFeed(bundle, now);
 	const problems: string[] = [];
 	for (const team of teamsOf(full)) {
 		const say = (text: string) => problems.push(`${full.event.code} ${team} ${text}`);
 		const pit = pitView({ bundle, analysis, queue: null, team });
-		const home = liveStatus(bundle, team, now);
+		const home = liveStatus(feed, team, now, bundle.event.timezone);
 		const card = report(team);
 		const row = bundle.rankings.find((entry) => entry.team === team) ?? null;
 		const standing = live.standings.find((entry) => entry.team === team);

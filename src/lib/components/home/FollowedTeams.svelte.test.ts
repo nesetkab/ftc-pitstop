@@ -1,9 +1,9 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { match, ranking } from '#lib/components/team/fixtures.ts';
+import { followedBundle, match, ranking } from '#lib/components/team/fixtures.ts';
 import { FOLLOW_KEY, follows } from '#lib/components/follow/follow.svelte.ts';
-import type { FollowedTeam } from './followed.ts';
+import { liveFeed, type FollowedTeam } from './followed.ts';
 import FollowedTeams from './FollowedTeams.svelte';
 
 const responses = new Map<string, unknown>();
@@ -59,11 +59,13 @@ beforeEach(() => {
 	responses.set('/api/following?teams=3747,26670', { teams: [quiet, live] });
 	responses.set('/api/following?teams=26670', { teams: [live] });
 	responses.set('/api/following?teams=3747', { teams: [quiet] });
-	responses.set('/api/events/USAZGIQ/lite', {
-		event: { timezone: 'America/Phoenix' },
-		matches: [match(26, [26670, 1], [2, 3], '2026-11-14T20:58:00Z', false)],
-		rankings
-	});
+	responses.set(
+		'/api/following/USAZGIQ',
+		liveFeed(
+			followedBundle([match(26, [26670, 1], [2, 3], '2026-11-14T20:58:00Z', false)], rankings),
+			Date.parse('2026-11-14T20:41:00Z')
+		)
+	);
 	vi.stubGlobal(
 		'fetch',
 		vi.fn(async (input: RequestInfo | URL) => {
@@ -131,7 +133,7 @@ describe('followed teams', () => {
 		localStorage.setItem(FOLLOW_KEY, '[3747,26670]');
 		render(FollowedTeams);
 		await screen.findByText('Q26');
-		expect(requested).toEqual(['/api/following?teams=3747,26670', '/api/events/USAZGIQ/lite']);
+		expect(requested).toEqual(['/api/following?teams=3747,26670', '/api/following/USAZGIQ']);
 		const cards = screen.getAllByRole('listitem');
 		expect(within(cards[0]).getByText('26670')).toBeInTheDocument();
 		expect(within(cards[1]).getByText('3747')).toBeInTheDocument();
@@ -173,7 +175,7 @@ describe('followed teams', () => {
 
 	it('falls back to the event rank when the live event cannot be loaded', async () => {
 		localStorage.setItem(FOLLOW_KEY, '[26670]');
-		responses.delete('/api/events/USAZGIQ/lite');
+		responses.delete('/api/following/USAZGIQ');
 		render(FollowedTeams);
 		expect(await screen.findByText('Unavailable')).toBeInTheDocument();
 		expect(within(cardFor(26670)).getByText('9th')).toBeInTheDocument();

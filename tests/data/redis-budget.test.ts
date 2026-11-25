@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { liveFeed } from '#lib/components/home/followed.ts';
 import { eventSummary, teamSeason } from '#lib/components/team/fixtures.ts';
 import { buildRecordDataset } from '#lib/components/records/records.ts';
 import { createAdvancement } from '#lib/server/advancement.ts';
@@ -253,6 +254,18 @@ describe('redis commands for the home page', () => {
 			[3747, 'The Hive', true]
 		]);
 		expect(await commands(redis, () => fresh.home.loadFollowed([26670, 3747]))).toEqual([]);
+	});
+
+	it('reads a live event for followed teams in two batches and nothing once warm', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		await instance(redis, clock).eventPage('USAZGIQ');
+		const fresh = instance(redis, clock);
+		const calls = await commands(redis, async () => {
+			liveFeed(await fresh.loaders.loadEventBundle('USAZGIQ'), clock.now);
+		});
+		expect(reads(calls)).toEqual(['mget', 'mget']);
+		expect(await commands(redis, () => fresh.loaders.loadEventBundle('USAZGIQ'))).toEqual([]);
 	});
 });
 

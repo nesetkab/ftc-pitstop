@@ -10,6 +10,7 @@ export const ENDPOINT_QUERY: Readonly<Record<string, readonly string[]>> = {
 	'/api/events/[code]': [],
 	'/api/events/[code]/lite': [],
 	'/api/events/[code]/analysis': ['v'],
+	'/api/following/[code]': [],
 	'/api/nexus/[code]': [],
 	'/api/teams/[number]': [],
 	'/api/teams/[number]/history': [],

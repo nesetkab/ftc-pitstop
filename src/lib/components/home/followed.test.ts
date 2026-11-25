@@ -10,6 +10,7 @@ import {
 import type { Match } from '#lib/types.ts';
 import {
 	followedTeam,
+	liveFeed,
 	liveStatus,
 	MAX_FOLLOWED,
 	parseTeamList,
@@ -17,6 +18,7 @@ import {
 } from './followed.ts';
 
 const NOW = Date.parse('2026-11-14T20:41:00Z');
+const ZONE = 'America/Phoenix';
 
 function rating(team: number, opr: number, rank: number): SeasonRating {
 	return {
@@ -154,7 +156,7 @@ describe('liveStatus', () => {
 			],
 			rankings
 		);
-		const status = liveStatus(bundle, 26670, NOW);
+		const status = liveStatus(liveFeed(bundle, NOW), 26670, NOW, ZONE);
 		expect(status).toMatchObject({
 			rank: 7,
 			teams: 27,
@@ -171,14 +173,14 @@ describe('liveStatus', () => {
 			[match(1, [26670, 1], [2, 3], '2026-11-15T16:00:00Z', false)],
 			rankings
 		);
-		const status = liveStatus(bundle, 26670, NOW);
+		const status = liveStatus(liveFeed(bundle, NOW), 26670, NOW, ZONE);
 		expect(status.next?.when).toMatch(/^Sun 9:00\sAM$/);
 		expect(status.next?.estimated).toBe(false);
 		expect(status.last).toBeNull();
 	});
 
 	it('explains when there is no next match', () => {
-		expect(liveStatus(followedBundle([], []), 26670, NOW)).toMatchObject({
+		expect(liveStatus(liveFeed(followedBundle([], []), NOW), 26670, NOW, ZONE)).toMatchObject({
 			rank: null,
 			note: 'Schedule not posted'
 		});
@@ -186,11 +188,31 @@ describe('liveStatus', () => {
 			[played(1, [2, 3], [26670, 4], '2026-11-14T17:00:00Z', 50, 50)],
 			rankings
 		);
-		expect(liveStatus(done, 26670, NOW)).toMatchObject({
+		expect(liveStatus(liveFeed(done, NOW), 26670, NOW, ZONE)).toMatchObject({
 			note: 'No matches left',
 			last: { outcome: 'T', own: 50, other: 50 }
 		});
 		const elsewhere = followedBundle([match(1, [2, 3], [4, 5], '2026-11-14T21:00:00Z', false)], []);
-		expect(liveStatus(elsewhere, 26670, NOW).note).toBe('Not in the schedule');
+		expect(liveStatus(liveFeed(elsewhere, NOW), 26670, NOW, ZONE).note).toBe('Not in the schedule');
+	});
+
+	it('sends each team at the event once and nothing about the rest of the event', () => {
+		const bundle = followedBundle(
+			[
+				played(20, [26670, 1], [2, 3], '2026-11-14T19:00:00Z', 145, 98),
+				match(26, [12, 13], [26670, 14], '2026-11-14T21:00:00Z', false)
+			],
+			rankings
+		);
+		const feed = liveFeed(bundle, NOW);
+		expect(Object.keys(feed).sort()).toEqual(['scheduled', 'status', 'teams']);
+		expect(Object.keys(feed.status).map(Number)).toEqual(
+			[...new Set([1, 2, 3, 12, 13, 14, 26670, ...rankings.map((entry) => entry.team)])].sort(
+				(a, b) => a - b
+			)
+		);
+		expect(feed.status[1]).toMatchObject({ next: null, note: 'No matches left' });
+		const wire = JSON.parse(JSON.stringify(feed));
+		expect(liveStatus(wire, 26670, NOW, ZONE)).toEqual(liveStatus(feed, 26670, NOW, ZONE));
 	});
 });

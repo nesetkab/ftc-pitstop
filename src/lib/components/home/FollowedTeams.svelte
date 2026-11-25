@@ -4,13 +4,12 @@
 	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { fixed, ordinal, shortDate } from '#lib/format/index.ts';
 	import Skeleton from '#lib/ui/Skeleton.svelte';
-	import type { EventBundle } from '#lib/types.ts';
 	import {
 		liveStatus,
 		MAX_FOLLOWED,
 		teamListQuery,
 		type FollowedTeam,
-		type LiveBundle
+		type LiveFeed
 	} from './followed.ts';
 	import TeamFinder from './TeamFinder.svelte';
 
@@ -20,7 +19,7 @@
 	let ready = $state(false);
 	let failed = $state(false);
 	let info = $state<Record<number, FollowedTeam>>({});
-	let bundles = $state.raw<Record<string, LiveBundle | null>>({});
+	let feeds = $state.raw<Record<string, LiveFeed | null>>({});
 	let now = $state(Date.now());
 	let list = $state<HTMLUListElement>();
 	let focusTeam = $state<number | null>(null);
@@ -79,13 +78,12 @@
 			if (document.visibilityState === 'hidden') return;
 			now = Date.now();
 			for (const code of codes) {
-				getJson<EventBundle>(`/api/events/${code}/lite`, controller.signal)
-					.then((bundle) => {
-						if (bundle || !(code in bundles)) bundles = { ...bundles, [code]: bundle };
+				getJson<LiveFeed>(`/api/following/${code}`, controller.signal)
+					.then((feed) => {
+						if (feed || !(code in feeds)) feeds = { ...feeds, [code]: feed };
 					})
 					.catch(() => {
-						if (!controller.signal.aborted && !(code in bundles))
-							bundles = { ...bundles, [code]: null };
+						if (!controller.signal.aborted && !(code in feeds)) feeds = { ...feeds, [code]: null };
 					});
 			}
 		};
@@ -149,8 +147,8 @@
 			{#each ordered as team (team)}
 				{@const row = info[team]}
 				{@const event = row?.event}
-				{@const bundle = event?.reason === 'today' ? bundles[event.code] : undefined}
-				{@const status = bundle ? liveStatus(bundle, team, now) : null}
+				{@const feed = event?.reason === 'today' ? feeds[event.code] : undefined}
+				{@const status = feed && event ? liveStatus(feed, team, now, event.timezone) : null}
 				<li>
 					<div class="head">
 						<a class="team" href="/teams/{team}">
@@ -198,7 +196,7 @@
 										{/if}
 									{:else if status}
 										<span class="faint">{status.note}</span>
-									{:else if bundle === null}
+									{:else if feed === null}
 										<span class="faint">Unavailable</span>
 									{:else}
 										<span class="sk-line"><Skeleton width="9em" height="13px" /></span>
