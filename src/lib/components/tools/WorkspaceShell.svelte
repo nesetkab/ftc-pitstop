@@ -88,9 +88,7 @@
 		<Button href="/w">Team workspaces</Button>
 	</div>
 {:else if workspace.status === 'error'}
-	<EmptyState title="The workspace could not be loaded.">
-		Check the connection and try again.
-	</EmptyState>
+	<EmptyState title="The workspace could not be loaded.">Check your connection.</EmptyState>
 	<div>
 		<Button icon="refresh" onclick={open}>Try again</Button>
 	</div>

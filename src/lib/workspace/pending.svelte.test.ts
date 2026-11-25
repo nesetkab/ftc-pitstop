@@ -111,7 +111,7 @@ describe('offline workspace edits', () => {
 		await vi.advanceTimersByTimeAsync(300);
 		expect(reloaded.sync).toBe('retrying');
 		expect(reloaded.message).toBe(
-			'Offline. Not saved yet, will retry when the connection is back.'
+			'Offline. Changes will save when the connection is back.'
 		);
 
 		up = true;

@@ -75,8 +75,7 @@
 		meta={payload.team ? `From team ${payload.team}.` : undefined}
 	>
 		{#snippet status()}
-			This copy came from a share link and is read only. Save it to this device to edit your own
-			copy.
+			This shared copy is read only. Save it to this device to edit it.
 		{/snippet}
 		{#snippet actions()}
 			<Button onclick={save} disabled={saving}>Save to this device</Button>

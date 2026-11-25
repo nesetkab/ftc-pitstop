@@ -494,8 +494,6 @@
 		{/if}
 		{#if eventHref}
 			<a href={eventHref}>Open alliance selection</a>
-		{:else if update}
-			<span class="faint">Shows aOPR, rank and live picks</span>
 		{/if}
 	</div>
 {/snippet}
@@ -538,11 +536,11 @@
 	{/if}
 
 	{#if list.entries.length === 0}
-		<EmptyState title="No teams yet.">
-			{update
-				? 'Add teams best first. During alliance selection this list shows beside the live picks.'
-				: 'This list is empty.'}
-		</EmptyState>
+		{#if update}
+			<EmptyState title="No teams yet.">Add teams in order, best first.</EmptyState>
+		{:else}
+			<EmptyState title="No teams yet." />
+		{/if}
 	{:else}
 		{#if picks.length > 0}
 			<ol class={['rows', { editable: Boolean(update) }]} bind:this={listElement}>

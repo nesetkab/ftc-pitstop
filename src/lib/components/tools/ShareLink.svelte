@@ -59,7 +59,7 @@
 	<button type="button" class="ctl-btn" onclick={share}>{label}</button>
 	<span class="status" role="status">
 		{#if result === 'copied'}
-			Link copied. It opens without an account.
+			Link copied.
 		{:else if result === 'failed'}
 			This is too large for a link.
 		{/if}

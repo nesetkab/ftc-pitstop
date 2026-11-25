@@ -143,7 +143,7 @@
 <PageHeader
 	title="Team workspace"
 	meta={data.shared
-		? 'Shared tools for your team, opened with a join code. No account needed.'
+		? 'Shared tools for your team. No account needed.'
 		: 'Tools for your team, saved in this browser. No account needed.'}
 />
 
@@ -154,7 +154,7 @@
 		<div class="row">
 			<TeamInput
 				id="{id}-team"
-				placeholder="Number or name, like 14624"
+				placeholder="14624"
 				listLabel="Teams"
 				bind:value={team}
 				invalid={Boolean(createError)}

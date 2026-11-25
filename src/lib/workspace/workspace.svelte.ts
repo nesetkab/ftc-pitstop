@@ -359,7 +359,7 @@ export class Workspace {
 			code === 'rate-limited'
 				? 'Too many changes at once. Saving again shortly.'
 				: this.offline
-					? 'Offline. Not saved yet, will retry when the connection is back.'
+					? 'Offline. Changes will save when the connection is back.'
 					: 'Not saved yet. Trying again.';
 		return true;
 	}

@@ -124,9 +124,11 @@
 	{/if}
 
 	{#if batteries.items.length === 0}
-		<EmptyState title="No batteries yet.">
-			{update ? 'Add the batteries your team brings.' : 'This log is empty.'}
-		</EmptyState>
+		{#if update}
+			<EmptyState title="No batteries yet.">Add the batteries your team brings.</EmptyState>
+		{:else}
+			<EmptyState title="No batteries yet." />
+		{/if}
 	{:else}
 		<div class="scroll">
 			<table class="t sheet">

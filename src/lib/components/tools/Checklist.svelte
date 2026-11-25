@@ -152,9 +152,11 @@
 	{/if}
 
 	{#if checklist.items.length === 0}
-		<EmptyState title="No items yet.">
-			{update ? 'Add the steps your team does before each match.' : 'This checklist is empty.'}
-		</EmptyState>
+		{#if update}
+			<EmptyState title="No items yet.">Add the steps your team does before each match.</EmptyState>
+		{:else}
+			<EmptyState title="No items yet." />
+		{/if}
 		{#if update}
 			{@render addForm('primary')}
 			<div class="ctl-row">

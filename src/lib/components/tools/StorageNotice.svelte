@@ -17,11 +17,9 @@
 	<b>Shared with your team.</b> Anyone with {code ? `join code ${code}` : 'the join code'} can see and
 	edit it.
 {:else if kind === 'memory'}
-	<b>Not saved.</b> This browser is blocking storage, so changes are lost when you close the page. Copy
-	a share link to keep a copy.
+	<b>Not saved.</b> This browser blocks storage, so changes are lost when you close the page.
 {:else}
-	<b>Saved on this device.</b> Teammates on other devices cannot see it. Copy a share link to send them
-	a tool.
+	<b>Saved on this device.</b> Teammates on other devices can't see it.
 {/if}
 {#if sync === 'saving'}
 	Saving.
