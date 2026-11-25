@@ -1,8 +1,9 @@
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { load as loadOdd } from '../audit/oddbot.ts';
-import { TYPES } from './probe.ts';
-import { load } from './data.ts';
+import { DIR, load } from './data.ts';
 import { Ctx, logistic, logit } from './lib.ts';
-import { carryFloor, CARRY_FLOOR } from './alliance.ts';
+import { TYPES } from './probe.ts';
 
 const dump = await load(process.argv[2] ?? 'main');
 const ctx = new Ctx(dump);
@@ -17,13 +18,20 @@ for (const [key, o] of odd) {
 	po[r] = o.pRed;
 }
 console.log(`matched ${rows.length} of ${odd.size} oddbot matches`);
-const v2 = carryFloor(ctx, CARRY_FLOOR);
 const y = ctx.rec.outcome;
-const models: [string, (r: number) => number][] = [
-	['shipped', (r) => ctx.base[r]],
-	['carry+floor', (r) => v2[r]],
-	['oddbot', (r) => po[r]]
-];
+const name = process.argv[2] ?? 'main';
+const labels = JSON.parse(await readFile(join(DIR, name, 'oof.json'), 'utf8')) as string[];
+const buf = await readFile(join(DIR, name, 'oof.bin'));
+const copy = new Uint8Array(buf.byteLength);
+copy.set(buf);
+const oof = new Float64Array(copy.buffer);
+const models: [string, (r: number) => number][] = [['shipped', (r) => ctx.base[r]]];
+for (const label of (process.argv[3] ?? '').split(',').filter(Boolean)) {
+	const i = labels.indexOf(label);
+	if (i < 0) throw new Error(label);
+	models.push([label, (r) => oof[i * ctx.rec.n + r]]);
+}
+models.push(['oddbot', (r) => po[r]]);
 
 function stats(sel: number[], p: (r: number) => number) {
 	let b = 0;
@@ -81,7 +89,7 @@ table('quals by min matches played', (r) =>
 	quals(r) ? String(Math.min(F(r, 'minPlayed'), 6)) : null
 );
 table('quals by teams new to season', (r) => (quals(r) ? String(F(r, 'firstEvent')) : null));
-table('quals by event type', (r) => (quals(r) ? TYPES[F(r, 'type')] : null));
+table('quals by event type', (r) => (quals(r) ? (TYPES[F(r, 'type')] ?? 'Other') : null));
 table('quals by week', (r) =>
 	quals(r) ? `w${String(Math.min(Math.floor(F(r, 'week') / 2) * 2, 12)).padStart(2, '0')}` : null
 );
