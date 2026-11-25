@@ -8,8 +8,8 @@
 	const title = $derived(missing ? 'Team not found' : 'Team data is unavailable');
 	const meta = $derived(
 		missing
-			? 'No team has this number. Check the number or search by name.'
-			: 'The team could not be loaded. Try again in a moment.'
+			? 'No team has this number.'
+			: 'Try again in a moment.'
 	);
 </script>
 

@@ -17,14 +17,12 @@
 
 	const DESCRIPTIONS: Record<string, string> = {
 		'robot-opr':
-			"PitStop predicts matches from aOPR, adjusted OPR, the points a team adds to its alliance's score, without penalty points. Points FIRST records per robot, like leaving and parking, go straight to that team, and the rest is solved from alliance scores. Each team's earlier events and last three seasons give a starting estimate that the matches at the current event soon replace. No team is rated below zero, and an alliance with one much stronger team is expected to score a little more. The win chance comes from the predicted score gap.",
-		'opr-map':
-			"PitStop predicts matches from OPR, the points a team adds to its alliance's score. OPR is solved from the scores of earlier matches, without penalty points. Each team's earlier events and last season give a starting estimate that the matches at the current event soon replace. The win chance comes from the predicted score gap."
+			'PitStop predicts each match from aOPR, its estimate of the points each team adds.',
+		'opr-map': 'PitStop predicts each match from OPR, its estimate of the points each team adds.'
 	};
 
 	const description = $derived(
-		DESCRIPTIONS[report.chosen.id] ??
-			`PitStop predicts matches with this model: ${report.chosen.label}.`
+		DESCRIPTIONS[report.chosen.id] ?? `PitStop predicts each match with ${report.chosen.label}.`
 	);
 	const headline = $derived(
 		[...report.seasons]
@@ -41,7 +39,7 @@
 	{#snippet lede()}
 		{#if headline && headlineMetrics}
 			<Lede
-				lead="Picked the winner in {pct(
+				lead="PitStop picked the winner in {pct(
 					headlineMetrics.accuracy
 				)} of {headline.season} matches it was not tuned on."
 				rest="Scores were off by {fixed(headlineMetrics.mae)} points per alliance on average."
@@ -55,44 +53,31 @@
 	<p class="sample">Sample numbers. The full backtest is not part of this build.</p>
 {/if}
 
-<section aria-labelledby="method-title">
-	<h2 class="sec-title" id="method-title">Method</h2>
-	<p>{description}</p>
-	<p>
-		Every match below was predicted using only matches played before it. Parameters were set on
-		{seasonRange(report.method.train)}, the model was chosen on
-		{seasonRange(report.method.validation)}, and {seasonRange(report.method.test)} was not used for either.
-		Matches with impossible scores are left out.
-	</p>
-</section>
-
 <section aria-labelledby="seasons-title">
 	<h2 class="sec-title" id="seasons-title">Results by season</h2>
 	<SeasonResults seasons={report.seasons} models={report.models} chosen={report.chosen.id} />
 	<dl class="terms">
 		<div>
 			<dt>Winner accuracy</dt>
-			<dd>How often the alliance with the higher win chance won. Ties are left out.</dd>
+			<dd>How often the alliance with the higher win chance won.</dd>
 		</div>
 		<div>
 			<dt>Brier score</dt>
 			<dd>
-				The average squared gap between the win chance and the result, where a win is 1, a loss is 0
-				and a tie is 0.5. Lower is better. Always predicting 50% scores 0.250.
+				How far the win chances were from the results. Lower is better, and always guessing 50%
+				scores 0.250.
 			</dd>
 		</div>
 		<div>
 			<dt>Log loss</dt>
 			<dd>
-				Like the Brier score, but it punishes confident misses more. Lower is better. Always
-				predicting 50% scores 0.693.
+				Like the Brier score, but confident misses cost more. Always guessing 50% scores 0.693.
 			</dd>
 		</div>
 		<div>
 			<dt>Score error</dt>
 			<dd>
-				The average gap in points between the predicted and real score of one alliance, without
-				penalty points. Lower is better.
+				How many points the predicted score of one alliance was off, on average. Lower is better.
 			</dd>
 		</div>
 	</dl>
@@ -102,9 +87,8 @@
 	<section aria-labelledby="calibration-title">
 		<h2 class="sec-title" id="calibration-title">Win chance calibration</h2>
 		<p>
-			Matches are grouped by the predicted chance that red wins. Each point shows how often red won
-			in that group, for the model used on this site. Points on the dashed line mean the predicted
-			chance matched the result. Larger points have more matches.
+			When red was given a 70% chance, red should have won about 70% of the time. Points on the
+			dashed line mean the chances matched the results.
 		</p>
 		<WinCalibration {report} />
 	</section>
@@ -114,9 +98,8 @@
 	<section aria-labelledby="rp-title">
 		<h2 class="sec-title" id="rp-title">Ranking point chances</h2>
 		<p>
-			Chances that an alliance earns each ranking point, checked against {report.rp.season} qualification
-			results. These chances were fitted on the same matches, so this shows how well they fit, not a held-out
-			test.
+			How well the ranking point chances matched {report.rp.season} qualification results. They were fitted
+			on these same matches, so this is not a held-out test.
 		</p>
 		<RpCalibration rp={report.rp} />
 	</section>
@@ -126,12 +109,21 @@
 	<section aria-labelledby="queue-title">
 		<h2 class="sec-title" id="queue-title">Queue time estimates</h2>
 		<p>
-			Each estimate is made when a match starts and predicts when a later match will start. The
-			columns show how many matches later that match is.
+			How many minutes the start time estimates were off, by how many matches ahead they looked.
 		</p>
 		<QueueEstimates schedule={report.schedule} />
 	</section>
 {/if}
+
+<section aria-labelledby="method-title">
+	<h2 class="sec-title" id="method-title">Method</h2>
+	<p>{description} <a href="/about">How the numbers work</a>.</p>
+	<p>
+		Every match was predicted using only the matches played before it. The model was tuned on
+		{seasonRange(report.method.train)}, chosen on {seasonRange(report.method.validation)}, and never
+		saw {seasonRange(report.method.test)} before this test.
+	</p>
+</section>
 
 <p class="note">Results generated {longDate(report.generatedAt, 'UTC')}.</p>
 

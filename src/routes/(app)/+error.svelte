@@ -8,8 +8,8 @@
 	const title = $derived(missing ? 'Page not found' : 'Something went wrong');
 	const meta = $derived(
 		missing
-			? 'There is no page at this address. Check the link or search for a team or event.'
-			: 'The page could not be loaded. Try again in a moment.'
+			? 'There is no page at this address.'
+			: 'Try again in a moment.'
 	);
 </script>
 

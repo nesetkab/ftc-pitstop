@@ -10,7 +10,7 @@
 
 <PageHeader
 	title="Leaderboards are unavailable"
-	meta="The rankings could not be loaded. Try again in a moment."
+	meta="Try again in a moment."
 >
 	{#snippet actions()}
 		<Button variant="secondary" icon="refresh" href="/leaderboards">Try again</Button>

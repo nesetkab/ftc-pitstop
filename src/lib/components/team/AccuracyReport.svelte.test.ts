@@ -31,36 +31,31 @@ describe('accuracy page', () => {
 	it('opens with how often the chosen model picked the winner on untuned matches', () => {
 		show();
 		expect(screen.getByLabelText('Summary')).toHaveTextContent(
-			'Picked the winner in 73% of 2026 matches it was not tuned on. Scores were off by 14.3 points per alliance on average.'
+			'PitStop picked the winner in 73% of 2026 matches it was not tuned on. Scores were off by 14.3 points per alliance on average.'
 		);
 	});
 
 	it('explains the method and how the data was split', () => {
 		show();
 		const method = section('Method');
-		expect(within(method).getByText(/predicts matches from OPR/)).toBeInTheDocument();
-		expect(
-			within(method).getByText(/Parameters were set on\s+2021 to 2023/, { exact: false })
-		).toHaveTextContent(
-			'Parameters were set on 2021 to 2023, the model was chosen on 2024 and 2025, and 2026 was not used for either.'
+		expect(within(method).getByText(/predicts each match from OPR/)).toBeInTheDocument();
+		expect(within(method).getByText(/tuned on\s+2021 to 2023/, { exact: false })).toHaveTextContent(
+			'The model was tuned on 2021 to 2023, chosen on 2024 and 2025, and never saw 2026 before this test.'
 		);
-		expect(within(method).getByText(/predicted using only matches played before it/)).toBeVisible();
 	});
 
-	it('explains robot credit and the zero floor for the robot OPR model', () => {
+	it('names aOPR for the robot OPR model', () => {
 		const report = load();
 		show({ ...report, chosen: { id: 'robot-opr', label: 'OPR with robot credit' } });
 		const method = section('Method');
-		expect(within(method).getByText(/predicts matches from aOPR/)).toBeInTheDocument();
-		expect(within(method).getByText(/go straight to that team/)).toBeInTheDocument();
-		expect(within(method).getByText(/No team is rated below zero/)).toBeInTheDocument();
+		expect(within(method).getByText(/predicts each match from aOPR/)).toBeInTheDocument();
 	});
 
 	it('uses the model label when it is not the OPR model', () => {
 		const report = load();
 		show({ ...report, chosen: { id: 'epa', label: 'EPA, sequential updates' } });
 		expect(
-			screen.getByText('PitStop predicts matches with this model: EPA, sequential updates.')
+			screen.getByText(/PitStop predicts each match with EPA, sequential updates\./)
 		).toBeInTheDocument();
 	});
 

@@ -11,12 +11,12 @@
 	const route = $derived(page.route.id ?? '');
 	const meta = $derived(
 		!missing
-			? 'The event could not be loaded. Try again in a moment.'
+			? 'Try again in a moment.'
 			: route.includes('/matches/')
-				? 'Check the match number in the address.'
+				? 'Check the match number.'
 				: route.includes('/teams/')
 					? 'This team is not on the list for this event.'
-					: 'Check the event code, or search for the event by name.'
+					: 'Check the event code.'
 	);
 </script>
 
