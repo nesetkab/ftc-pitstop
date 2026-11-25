@@ -21,10 +21,19 @@
 </script>
 
 <dl class="stats">
-	<div>
+	<div class="lead">
 		<dt>Season OPR</dt>
 		<dd>{fixed(stats.opr)}</dd>
 	</div>
+	{#if change !== null}
+		<div class="spark">
+			<dt>OPR by event</dt>
+			<dd class="trend">
+				<TrendSpark points={trend} width={150} height={44} />
+				<small>{signed(change)} since first</small>
+			</dd>
+		</div>
+	{/if}
 	<div>
 		<dt>World rank by OPR</dt>
 		<dd>
@@ -62,29 +71,21 @@
 			{/if}
 		</dd>
 	</div>
-	{#if change !== null}
-		<div>
-			<dt>OPR by event</dt>
-			<dd class="trend">
-				<TrendSpark points={trend} />
-				<small>{signed(change)} since first</small>
-			</dd>
-		</div>
-	{/if}
 </dl>
 
 <style>
 	.stats {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 12px 32px;
+		align-items: flex-end;
+		gap: 16px 36px;
 		margin: 0;
 	}
 
 	.stats div {
-		display: grid;
+		display: flex;
+		flex-direction: column-reverse;
 		gap: 2px;
-		align-content: start;
 	}
 
 	dt {
@@ -116,11 +117,23 @@
 		text-decoration-color: var(--line-2);
 	}
 
+	.lead dd {
+		font-size: 52px;
+		line-height: 1;
+		letter-spacing: -0.03em;
+	}
+
+	.lead dt {
+		font-size: 14px;
+	}
+
+	.spark dt {
+		color: var(--text-3);
+	}
+
 	.trend {
-		display: flex;
-		align-items: center;
-		gap: 10px;
-		min-height: 33px;
+		display: grid;
+		gap: 2px;
 	}
 
 	small {
@@ -134,6 +147,10 @@
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
 			gap: 14px 20px;
+		}
+
+		.lead dd {
+			font-size: 44px;
 		}
 
 		.stats > div:last-child:nth-child(odd) {

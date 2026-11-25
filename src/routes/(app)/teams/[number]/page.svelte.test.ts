@@ -348,13 +348,10 @@ describe('team page', () => {
 
 	it('opens with season takeaways', () => {
 		show();
-		const list = screen.getByRole('list', { name: 'Season takeaways' });
-		const lines = within(list)
-			.getAllByRole('listitem')
-			.map((item) => item.textContent);
-		expect(lines[0]).toBe('Top 7% worldwide by season OPR');
-		expect(lines.join(' ')).not.toMatch(/Award|Finalist/);
-		expect(lines.length).toBeLessThanOrEqual(4);
+		const lede = screen.getByLabelText('Season takeaways');
+		expect(lede.querySelector('mark')?.textContent).toBe('Top 7% worldwide by season OPR.');
+		expect(lede.textContent).not.toMatch(/Award|Finalist/);
+		expect(lede.textContent?.match(/\./g)?.length ?? 0).toBeLessThanOrEqual(5);
 	});
 
 	it('lists upcoming events with an outlook and a report link', () => {

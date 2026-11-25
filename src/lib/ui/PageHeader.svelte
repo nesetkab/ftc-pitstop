@@ -4,17 +4,21 @@
 	interface Props {
 		title: string;
 		meta?: string;
+		lede?: Snippet;
 		status?: Snippet;
 		actions?: Snippet;
 	}
 
-	let { title, meta, status, actions }: Props = $props();
+	let { title, meta, lede, status, actions }: Props = $props();
 </script>
 
 <header class="page-header">
 	<h1>{title}</h1>
 	{#if meta}
 		<p class="meta">{meta}</p>
+	{/if}
+	{#if lede}
+		<div class="lede">{@render lede()}</div>
 	{/if}
 	{#if status}
 		<p class="status">{@render status()}</p>
@@ -47,6 +51,10 @@
 	.meta {
 		font-size: 15px;
 		color: var(--text-2);
+	}
+
+	.lede {
+		margin-block: 6px 2px;
 	}
 
 	.status {

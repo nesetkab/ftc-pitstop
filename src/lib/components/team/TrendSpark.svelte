@@ -27,7 +27,7 @@
 <svg viewBox="0 0 {width} {height}" {width} {height} role="img" aria-label={label}>
 	<polyline points={line} />
 	{#each coords as [cx, cy], index (index)}
-		<circle cx={cx.toFixed(1)} cy={cy.toFixed(1)} r={index === coords.length - 1 ? 2.5 : 1.5}>
+		<circle cx={cx.toFixed(1)} cy={cy.toFixed(1)} r={index === coords.length - 1 ? 3.5 : 1.5}>
 			<title>{points[index].label}: {fixed(points[index].value)}</title>
 		</circle>
 	{/each}
@@ -41,13 +41,17 @@
 
 	polyline {
 		fill: none;
-		stroke: var(--text-2);
-		stroke-width: 1.5;
+		stroke: var(--text);
+		stroke-width: 1.6;
 		stroke-linejoin: round;
 		stroke-linecap: round;
 	}
 
 	circle {
-		fill: var(--text);
+		fill: var(--text-2);
+	}
+
+	circle:last-of-type {
+		fill: var(--accent);
 	}
 </style>

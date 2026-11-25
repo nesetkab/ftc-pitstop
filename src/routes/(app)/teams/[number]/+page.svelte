@@ -52,28 +52,40 @@
 	]}
 />
 
-<PageHeader title="{view.team.number} {view.team.name}" meta={meta ? `${meta}.` : undefined}>
-	{#snippet status()}
-		{#if view.stale}
-			Showing saved data. <StaleNotice updated={view.updated} />.
-		{/if}
-	{/snippet}
-	{#snippet actions()}
-		<div class="team-actions">
-			<FollowButton number={view.team.number} />
-			<Button variant="secondary" icon="compare" href="/compare?teams={view.team.number}"
-				>Compare</Button
-			>
-			<PitScreens number={view.team.number} />
-			<CalendarMenu
-				label="Calendar"
-				path="/teams/{view.team.number}/calendar.ics"
-				filename="{view.team.number}.ics"
-				note="This team's events and matches with estimated start times. Subscribed calendars update as schedules come out."
-			/>
-		</div>
-	{/snippet}
-</PageHeader>
+<div class="summary">
+	<PageHeader title="{view.team.number} {view.team.name}" meta={meta ? `${meta}.` : undefined}>
+		{#snippet status()}
+			{#if view.stale}
+				Showing saved data. <StaleNotice updated={view.updated} />.
+			{/if}
+		{/snippet}
+		{#snippet actions()}
+			<div class="team-actions">
+				<FollowButton number={view.team.number} />
+				<Button variant="secondary" icon="compare" href="/compare?teams={view.team.number}"
+					>Compare</Button
+				>
+				<PitScreens number={view.team.number} />
+				<CalendarMenu
+					label="Calendar"
+					path="/teams/{view.team.number}/calendar.ics"
+					filename="{view.team.number}.ics"
+					note="This team's events and matches with estimated start times. Subscribed calendars update as schedules come out."
+				/>
+			</div>
+		{/snippet}
+	</PageHeader>
+
+	<SeasonTakeaways lines={view.takeaways} />
+
+	{#if hasStats}
+		<TeamStats
+			stats={view.stats}
+			trend={view.trend}
+			team={view.source === 'ratings' ? view.team.number : undefined}
+		/>
+	{/if}
+</div>
 
 {#if pitEvent}
 	<Hint id={PIT_HINT}>
@@ -82,16 +94,6 @@
 		<a href="/{view.team.number}">phone view</a> on your phone.
 	</Hint>
 {/if}
-
-{#if hasStats}
-	<TeamStats
-		stats={view.stats}
-		trend={view.trend}
-		team={view.source === 'ratings' ? view.team.number : undefined}
-	/>
-{/if}
-
-<SeasonTakeaways lines={view.takeaways} />
 
 {#if view.upcoming.length > 0}
 	<section class="panel" aria-labelledby="upcoming-title">
@@ -163,6 +165,14 @@
 <TeamBadges number={view.team.number} name={view.team.name} />
 
 <style>
+	.summary {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 18px;
+		padding-bottom: 26px;
+		border-bottom: 1px solid var(--line);
+	}
+
 	.team-actions {
 		display: flex;
 		flex: 1 1 auto;
