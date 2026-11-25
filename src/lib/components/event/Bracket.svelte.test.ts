@@ -117,7 +117,7 @@ describe('playoff status', () => {
 		expect([3, 4, 5, 6].map((seed) => status.get(seed))).toEqual(
 			[3, 4, 5, 6].map(() => expect.stringMatching(/^Out after M\d+$/))
 		);
-		expect(finalsStatus(bracket)).toBe('Alliance 2 won the event.');
+		expect(finalsStatus(bracket)).toBeNull();
 	});
 
 	it('keeps alliances that are still alive in their bracket', () => {
@@ -181,7 +181,7 @@ describe('Bracket', () => {
 		const finals = screen.getByRole('region', { name: 'Finals' });
 		expect(within(finals).getByRole('link', { name: 'M10' })).toBeInTheDocument();
 		expect(within(finals).getAllByRole('row')[1]).toHaveTextContent('178');
-		expect(screen.getByText('Alliance 2 won the event.')).toBeInTheDocument();
+		expect(screen.queryByText(/won the event/)).toBeNull();
 	});
 
 	it('reads each match with its alliances and winner, not only by color', () => {
@@ -216,7 +216,7 @@ describe('Bracket', () => {
 		const lower = screen.getByRole('region', { name: 'Lower bracket' });
 		expect(within(upper).getAllByRole('link')).toHaveLength(3);
 		expect(within(lower).getAllByRole('link')).toHaveLength(2);
-		expect(screen.getByText('Alliance 1 won the event.')).toBeInTheDocument();
+		expect(screen.queryByText(/won the event/)).toBeNull();
 	});
 
 	it('draws only the finals for 2 alliances', () => {
@@ -229,7 +229,7 @@ describe('Bracket', () => {
 				.getAllByRole('columnheader')
 				.map((cell) => cell.textContent?.trim())
 		).toEqual(['Alliance', 'F1', 'F2']);
-		expect(screen.getByText('Alliance 1 won the event.')).toBeInTheDocument();
+		expect(screen.queryByText(/won the event/)).toBeNull();
 	});
 
 	it('marks an undecided third final as if needed', () => {

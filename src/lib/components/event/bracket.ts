@@ -408,7 +408,7 @@ function sideName(side: FinalsAlliance): string {
 }
 
 export function finalsStatus(bracket: BracketView): string | null {
-	if (bracket.champion !== null) return `Alliance ${bracket.champion} won the event.`;
+	if (bracket.champion !== null) return null;
 	const { alliances, games } = bracket.finals;
 	if (!games.some((game) => game.played)) return null;
 	const [top, bottom] = alliances;
