@@ -111,8 +111,7 @@
 	{/each}
 </div>
 <Legend>
-	Scores include points from fouls. The points columns are for this team's alliance. Hive, flower,
-	garden and park are teleop points.
+	Points columns are for this team's alliance. Hive, flower, garden and park are part of teleop.
 </Legend>
 
 <style>

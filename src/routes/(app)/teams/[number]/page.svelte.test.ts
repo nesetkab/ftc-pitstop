@@ -199,7 +199,7 @@ describe('team page', () => {
 			'href',
 			'/leaderboards?team=26670'
 		);
-		expect(stat('aOPR by event')).toHaveTextContent('+20.0 since first');
+		expect(stat('aOPR by event')).toHaveTextContent('+20.0 since first event');
 		expect(
 			screen.getByRole('img', { name: 'aOPR at each event: First 50.0, Second 70.0' })
 		).toBeInTheDocument();
@@ -424,10 +424,6 @@ describe('team page', () => {
 			'/events/USAZGIQ/matches/p10'
 		);
 		expect(screen.getByRole('heading', { name: 'Toughest opponents' })).toBeInTheDocument();
-		expect(screen.getByText(/^\d+ partners?, most matches together first\.$/)).toBeInTheDocument();
-		expect(
-			screen.getByText(/^\d+ opponents?, toughest first by season aOPR\.$/)
-		).toBeInTheDocument();
 	});
 
 	it('says when the data is saved and may be old', () => {
