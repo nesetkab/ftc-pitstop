@@ -36,9 +36,6 @@
 	<p class="muted">No teams have registered yet.</p>
 {:else}
 	<div class="bar">
-		<p class="lead">
-			One report per team. Prints {per === '1' ? 'one team' : 'two teams'} per page with room for notes.
-		</p>
 		<div class="controls">
 			<Segmented
 				label="Order"
@@ -83,11 +80,6 @@
 		align-items: center;
 		justify-content: space-between;
 		gap: 12px 20px;
-	}
-
-	.lead {
-		font-size: 14px;
-		color: var(--text-2);
 	}
 
 	.controls {

@@ -421,9 +421,6 @@
 							{/each}
 						</tbody>
 					</Table>
-					{#if view.results.some((result) => result.tags.includes('upset'))}
-						<p class="note">Upset means the winner had less than a 40% chance before the match.</p>
-					{/if}
 				{/if}
 			</section>
 
@@ -473,12 +470,7 @@
 						</tbody>
 					</Table>
 					{#if view.rankedAfter}
-						<p class="note">
-							Rankings after {view.rankedAfter}.
-							{#if view.phase === 'quals' && !view.since}
-								Moves show up after the next ranking update.
-							{/if}
-						</p>
+						<p class="note">Rankings after {view.rankedAfter}.</p>
 					{/if}
 				</section>
 			{/if}
