@@ -362,7 +362,7 @@ describe('event types', () => {
 		expect(matchesType('LeagueMeet', 'Qualifier')).toBe(false);
 		expect(matchesType('LeagueMeet', 'official')).toBe(true);
 		expect(matchesType('Scrimmage', 'official')).toBe(false);
-		expect(typeLabel('LeagueMeet')).toBe('League Meet events');
+		expect(typeLabel('LeagueMeet')).toBe('League meet events');
 		expect(typeLabel('official')).toBe('Official events');
 	});
 

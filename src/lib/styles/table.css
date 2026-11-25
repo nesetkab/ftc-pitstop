@@ -91,6 +91,7 @@ table.t th a.sort-link {
 
 	table.t th:not([aria-sort]) a.sort-link::before {
 		content: var(--sort-hint, '↓');
+		content: var(--sort-hint, '↓') / '';
 		position: absolute;
 		right: calc(100% + 3px);
 		opacity: 0;
