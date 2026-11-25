@@ -1,8 +1,9 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, render, screen, within } from '@testing-library/svelte';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 import type { Comparison } from '#lib/components/compare/compare.ts';
 import { emptyParts, type FitParts } from '#lib/components/compare/fit.ts';
+import type { TrendLine } from '#lib/components/compare/trend.ts';
 import Page from './+page.svelte';
 
 const fitParts = (parts: Partial<FitParts>): FitParts => ({ ...emptyParts(), ...parts });
@@ -77,12 +78,49 @@ const view: Comparison = {
 	source: 'ratings'
 };
 
-function show(overrides: Partial<{ view: Comparison; missing: number[] }> = {}) {
-	const data = { view, numbers: [100, 200], missing: [], suggestions: [], ...overrides };
+beforeAll(() => {
+	globalThis.ResizeObserver ??= class {
+		observe() {}
+		unobserve() {}
+		disconnect() {}
+	};
+});
+
+const trend: TrendLine[] = [
+	{
+		number: 100,
+		points: [
+			{ code: 'AAA', event: 'Alpha Qualifier', start: '2026-11-07', opr: 90 },
+			{ code: 'BBB', event: 'Beta Qualifier', start: '2026-11-14', opr: 120 }
+		]
+	},
+	{ number: 200, points: [{ code: 'BBB', event: 'Beta Qualifier', start: '2026-11-14', opr: 60 }] }
+];
+
+function show(
+	overrides: Partial<{ view: Comparison; missing: number[]; trend: TrendLine[] }> = {}
+) {
+	const data = { view, numbers: [100, 200], missing: [], suggestions: [], trend, ...overrides };
 	render(Page, { props: { data, params: {} } as never });
 }
 
 describe('compare page', () => {
+	it('charts the aOPR of each team after every event', () => {
+		show();
+		const section = screen.getByRole('region', { name: 'aOPR by event' });
+		const rows = within(section).getAllByRole('row');
+		expect(rows.slice(1).map((row) => row.textContent)).toEqual([
+			'100Alpha QualifierNov 790.0',
+			'100Beta QualifierNov 14120.0',
+			'200Beta QualifierNov 1460.0'
+		]);
+	});
+
+	it('leaves the chart out when no team has an event yet', () => {
+		show({ trend: [{ number: 100, points: [] }] });
+		expect(screen.queryByRole('region', { name: 'aOPR by event' })).toBeNull();
+	});
+
 	it('links to the simulator with the same teams from the tab row', () => {
 		show();
 		const tabs = screen.getByRole('navigation', { name: 'Team tools' });

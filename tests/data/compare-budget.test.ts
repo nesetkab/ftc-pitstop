@@ -73,6 +73,7 @@ describe('redis commands for a compare page', () => {
 		expect(result.view.history).toBe(true);
 		expect(result.view.meetings.length).toBeGreaterThan(0);
 		expect(result.view.fit?.alliances).toHaveLength(1);
+		expect(result.trend.map((line) => line.points.length)).toEqual([1, 1]);
 
 		const warm = redis.calls.length;
 		await compare([first, second]);

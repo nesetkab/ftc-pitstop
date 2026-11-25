@@ -14,6 +14,7 @@ import {
 	type FitParts,
 	type FitTeam
 } from '#lib/components/compare/fit.ts';
+import { seasonTrend } from '#lib/components/compare/trend.ts';
 import { dayNumber, previousFrom, type PriorRel } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import { fitParts, freshEvent, type FreshModel, type FreshOptions } from '#lib/server/fresh.ts';
@@ -82,6 +83,7 @@ export function createCompare(deps: CompareDeps) {
 			matches: model ? matchesInvolving(model.matches, present) : null,
 			fit
 		});
+		const trend = model && present.length >= MIN_FIT ? seasonTrend(model, seasons) : [];
 		const suggestions = present.length < MIN_FIT ? suggestNeighbors(ratings, present) : [];
 		const names =
 			suggestions.length > 0 ? (await deps.recordNames(suggestions, [])).teams : undefined;
@@ -89,6 +91,7 @@ export function createCompare(deps: CompareDeps) {
 			view,
 			numbers: present,
 			missing,
+			trend,
 			suggestions: suggestions.map((number) => ({ number, name: names?.[number] ?? null })),
 			cacheControl: !picking && !model ? CACHE_CONTROL.live : CACHE_CONTROL.short
 		};

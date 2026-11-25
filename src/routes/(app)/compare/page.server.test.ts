@@ -29,6 +29,7 @@ type Result = {
 		history: boolean;
 		fit: { alliances: { teams: number[] }[] } | null;
 	};
+	trend: { number: number; points: unknown[] }[];
 };
 
 function call(query: string) {
@@ -113,6 +114,7 @@ describe('compare load', () => {
 		server.loadSeasonModelWithin.mockResolvedValue({
 			generatedAt: 1,
 			ratings: { generatedAt: 1, teams: [] },
+			events: [],
 			matches: [
 				seasonMatch('q1', [100, 200], [1, 2]),
 				seasonMatch('q2', [100, 3], [4, 5]),
@@ -134,6 +136,10 @@ describe('compare load', () => {
 		expect(data.view.history).toBe(true);
 		expect(data.view.meetings.map((meeting) => meeting.key)).toEqual(['q1', 'q3']);
 		expect(data.view.fit?.alliances.map((entry) => entry.teams)).toEqual([[100, 200]]);
+		expect(data.trend).toEqual([
+			{ number: 100, points: [] },
+			{ number: 200, points: [] }
+		]);
 		expect(setHeaders).toHaveBeenCalledWith({
 			'cache-control': 'public, s-maxage=300, stale-while-revalidate=3600'
 		});

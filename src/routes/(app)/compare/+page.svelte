@@ -3,6 +3,7 @@
 	import CompareSections from '#lib/components/compare/CompareSections.svelte';
 	import CompareTable from '#lib/components/compare/CompareTable.svelte';
 	import HeadToHead from '#lib/components/compare/HeadToHead.svelte';
+	import SeasonChart from '#lib/components/compare/SeasonChart.svelte';
 	import SharedEvents from '#lib/components/compare/SharedEvents.svelte';
 	import TeamPicker from '#lib/components/compare/TeamPicker.svelte';
 	import { compareHref } from '#lib/components/compare/compare.ts';
@@ -29,6 +30,7 @@
 			? `Compare FTC teams ${names.slice(0, -1).join(', ')} and ${names.at(-1)} side by side: aOPR by part, records, head to head, alliance fit and shared events.`
 			: 'Compare up to four FTC teams side by side: aOPR by part, records, head to head, alliance fit and shared events.'
 	);
+	const trended = $derived(paired && data.trend.some((line) => line.points.length > 0));
 	const width = $derived(300 + 190 * Math.max(2, view.teams.length));
 	const canonical = $derived(
 		compareHref(view.teams.map((team) => team.number).toSorted((a, b) => a - b))
@@ -61,6 +63,13 @@
 			</p>
 		{/if}
 	</section>
+
+	{#if trended}
+		<section class="panel" style:max-width="{width}px" aria-labelledby="trend-title">
+			<h2 class="sec-title" id="trend-title">aOPR by event</h2>
+			<SeasonChart teams={view.teams} lines={data.trend} />
+		</section>
+	{/if}
 
 	{#if view.teams.length >= 2}
 		{#if view.fit}
