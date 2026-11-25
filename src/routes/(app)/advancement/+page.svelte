@@ -5,7 +5,6 @@
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
 	import EventSections from '#lib/components/event/EventSections.svelte';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
-	import { integer } from '#lib/format/number.ts';
 	import { regionName } from '#lib/format/places.ts';
 	import { shortRange } from '#lib/format/time.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
@@ -24,10 +23,6 @@
 
 	const regional = $derived(data.rows.filter((row) => row.level === 'regional'));
 	const world = $derived(data.rows.filter((row) => row.level === 'world'));
-	const advanced = $derived(regional.reduce((sum, row) => sum + row.advanced, 0));
-	const ahead = $derived(
-		regional.reduce((sum, row) => sum + row.feeders - row.played, 0) + data.unposted
-	);
 	const where = $derived(data.region ? regionName(data.region) : null);
 	const mine = $derived(
 		data.rows.flatMap((row) =>
@@ -90,14 +85,7 @@
 	</EmptyState>
 {:else}
 	<section aria-labelledby="regional-title">
-		<div class="head">
-			<h2 class="sec-title" id="regional-title">Regional championships</h2>
-			<p class="muted summary">
-				{integer(advanced)}
-				{advanced === 1 ? 'team' : 'teams'} advanced, {integer(ahead)}
-				{ahead === 1 ? 'event' : 'events'} still to play.
-			</p>
-		</div>
+		<h2 class="sec-title" id="regional-title">Regional championships</h2>
 		{#if regional.length > 0}
 			<ChampionshipTable
 				caption="Regional championships"

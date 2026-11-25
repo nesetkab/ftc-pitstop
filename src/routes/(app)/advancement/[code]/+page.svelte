@@ -74,19 +74,13 @@
 </PageHeader>
 
 <div class="summary">
-	<p>
-		<b>{integer(champ.teams.length)}</b>
-		{champ.teams.length === 1 ? 'team has' : 'teams have'} advanced from
-		<b>{integer(posted)}</b>
-		{posted === 1 ? 'event' : 'events'}.
-		<b>{integer(ahead.length)}</b>
-		{ahead.length === 1 ? 'event is' : 'events are'} still to play.
-		{#if played.length > posted}
+	{#if played.length > posted}
+		<p class="muted">
 			{integer(played.length - posted)} played {played.length - posted === 1
 				? 'event has'
 				: 'events have'} no results in yet.
-		{/if}
-	</p>
+		</p>
+	{/if}
 	{#if where}
 		<p class="muted">
 			Showing teams and events from {where}.
@@ -245,12 +239,7 @@
 	.summary {
 		display: grid;
 		gap: 4px;
-		font-size: 15px;
-	}
-
-	.summary b {
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
+		font-size: 14px;
 	}
 
 	section {
