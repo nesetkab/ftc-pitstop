@@ -93,11 +93,24 @@ export function seasonRange(years: number[]): string {
 	return `${sorted.slice(0, -1).join(', ')} and ${sorted[sorted.length - 1]}`;
 }
 
-export function splitNote(split: string): string {
-	if (split === 'train') return 'Used to set parameters';
-	if (split === 'validation') return 'Used to set parameters and choose the model';
-	if (split === 'test') return 'Not used for tuning';
-	return '';
+export type Metric = 'accuracy' | 'brier' | 'mae';
+
+const MODEL_NAMES: Record<string, { name: string; site?: string }> = {
+	'robot-opr': { name: 'aOPR', site: 'PitStop' },
+	'opr-map': { name: 'OPR with priors', site: 'Old PitStop' },
+	'opr-event': { name: 'Event OPR', site: 'FTCScout' },
+	'opr-event-last': { name: 'Event OPR, last event' },
+	'opr-ridge-mean': { name: 'Ridge OPR' },
+	epa: { name: 'EPA' },
+	'epa-reset': { name: 'EPA, event reset' }
+};
+
+export function modelName(model: ModelInfo): string {
+	return MODEL_NAMES[model.id]?.name ?? model.label;
+}
+
+export function modelSite(model: ModelInfo, chosen: string): string | undefined {
+	return model.id === chosen ? 'PitStop' : MODEL_NAMES[model.id]?.site;
 }
 
 export function baseRateBrier(rate: number): number {

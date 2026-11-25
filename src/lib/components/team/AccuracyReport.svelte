@@ -2,7 +2,8 @@
 	import { fixed, longDate, pct } from '#lib/format/index.ts';
 	import Lede from '#lib/ui/Lede.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
-	import { seasonRange, type AccuracyReport } from './accuracy.ts';
+	import Segmented from '#lib/ui/Segmented.svelte';
+	import { seasonRange, type AccuracyReport, type Metric } from './accuracy.ts';
 	import QueueEstimates from './QueueEstimates.svelte';
 	import RpCalibration from './RpCalibration.svelte';
 	import SeasonResults from './SeasonResults.svelte';
@@ -14,6 +15,14 @@
 	}
 
 	let { report, sample = false }: Props = $props();
+
+	const METRICS = [
+		{ value: 'accuracy', label: 'Winner accuracy' },
+		{ value: 'brier', label: 'Brier score' },
+		{ value: 'mae', label: 'Score error' }
+	] as const;
+
+	let metric = $state<Metric>('accuracy');
 
 	const DESCRIPTIONS: Record<string, string> = {
 		'robot-opr':
@@ -54,8 +63,23 @@
 {/if}
 
 <section aria-labelledby="seasons-title">
-	<h2 class="sec-title" id="seasons-title">Results by season</h2>
-	<SeasonResults seasons={report.seasons} models={report.models} chosen={report.chosen.id} />
+	<div class="fit">
+		<div class="head">
+			<h2 class="sec-title" id="seasons-title">Results by season</h2>
+			<Segmented
+				label="Measure"
+				options={METRICS}
+				value={metric}
+				onselect={(next) => (metric = next)}
+			/>
+		</div>
+		<SeasonResults
+			seasons={report.seasons}
+			models={report.models}
+			chosen={report.chosen.id}
+			{metric}
+		/>
+	</div>
 	<dl class="terms">
 		<div>
 			<dt>Winner accuracy</dt>
@@ -66,12 +90,6 @@
 			<dd>
 				How far the win chances were from the results. Lower is better, and always guessing 50%
 				scores 0.250.
-			</dd>
-		</div>
-		<div>
-			<dt>Log loss</dt>
-			<dd>
-				Like the Brier score, but confident misses cost more. Always guessing 50% scores 0.693.
 			</dd>
 		</div>
 		<div>
@@ -138,6 +156,21 @@
 	p {
 		max-width: 720px;
 		color: var(--text-2);
+	}
+
+	.fit {
+		display: grid;
+		gap: 12px;
+		width: fit-content;
+		max-width: 100%;
+	}
+
+	.head {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px 20px;
+		align-items: center;
+		justify-content: space-between;
 	}
 
 	.sample {

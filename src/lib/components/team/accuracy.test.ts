@@ -4,8 +4,9 @@ import {
 	baseRateBrier,
 	isAccuracyReport,
 	prepareReport,
+	modelName,
+	modelSite,
 	seasonRange,
-	splitNote,
 	type AccuracyReport
 } from './accuracy.ts';
 
@@ -33,12 +34,19 @@ describe('seasonRange', () => {
 	});
 });
 
-describe('splitNote', () => {
-	it('explains what each split was used for', () => {
-		expect(splitNote('train')).toBe('Used to set parameters');
-		expect(splitNote('validation')).toBe('Used to set parameters and choose the model');
-		expect(splitNote('test')).toBe('Not used for tuning');
-		expect(splitNote('other')).toBe('');
+describe('model names', () => {
+	it('uses short names and falls back to the label', () => {
+		expect(modelName({ id: 'robot-opr', label: 'long' })).toBe('aOPR');
+		expect(modelName({ id: 'epa-reset', label: 'long' })).toBe('EPA, event reset');
+		expect(modelName({ id: 'new', label: 'New model' })).toBe('New model');
+	});
+
+	it('names the site that uses each model', () => {
+		expect(modelSite({ id: 'robot-opr', label: '' }, 'robot-opr')).toBe('PitStop');
+		expect(modelSite({ id: 'opr-map', label: '' }, 'robot-opr')).toBe('Old PitStop');
+		expect(modelSite({ id: 'opr-map', label: '' }, 'opr-map')).toBe('PitStop');
+		expect(modelSite({ id: 'opr-event', label: '' }, 'robot-opr')).toBe('FTCScout');
+		expect(modelSite({ id: 'epa', label: '' }, 'robot-opr')).toBeUndefined();
 	});
 });
 

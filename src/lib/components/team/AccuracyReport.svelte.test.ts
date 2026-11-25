@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup, render, screen, within } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, describe, expect, it } from 'vitest';
 import sample from './accuracy-sample.json';
 import AccuracyReport from './AccuracyReport.svelte';
@@ -59,48 +59,58 @@ describe('accuracy page', () => {
 		).toBeInTheDocument();
 	});
 
-	it('has one group per season, newest first, with every model in it', () => {
-		show();
-		const table = within(section('Results by season')).getByRole('table');
-		const groups = within(table)
-			.getAllByRole('rowheader')
-			.map((header) => header.textContent?.replace(/\s+/g, ' ').trim());
-		expect(groups).toEqual([
-			'2026, BIOBUZZ 6,463 matches. Not used for tuning',
-			'2025, DECODE 45,230 matches. Used to set parameters and choose the model',
-			'2024, INTO THE DEEP 39,799 matches. Used to set parameters and choose the model'
-		]);
-		const modelRows = within(table)
-			.getAllByRole('row')
-			.filter((row) => row.querySelectorAll('td').length === 5);
-		expect(modelRows).toHaveLength(9);
-	});
-
-	it('shows accuracy, Brier score, log loss and score error for each model', () => {
+	it('has one row per model and one column per season, newest first', () => {
 		show();
 		const table = within(section('Results by season')).getByRole('table');
 		const headers = within(table)
 			.getAllByRole('columnheader')
-			.map((header) => header.textContent);
-		expect(headers).toEqual(['Model', 'Winner accuracy', 'Brier score', 'Log loss', 'Score error']);
-		const firstSeason = table.querySelector('tbody') as HTMLElement;
-		const rows = [...firstSeason.querySelectorAll('tr')].slice(1).map((row) => cells(row));
-		const chosen = rows.find((row) => row[0].startsWith('OPR with priors'));
-		expect(chosen?.slice(1)).toEqual(['73.4%', '0.174', '0.527', '14.3']);
-		const eventOnly = rows.find((row) => row[0].startsWith('OPR, this event only'));
-		expect(eventOnly?.slice(1)).toEqual(['68.2%', '0.199', '0.585', '17.6']);
+			.map((header) => header.textContent?.trim());
+		expect(headers).toEqual(['Who uses it', 'Model', '2026', '2025', '2024']);
+		const rows = [...table.querySelectorAll('tbody tr')].map((row) => cells(row as HTMLElement));
+		expect(rows.map((row) => row.slice(0, 2))).toEqual([
+			['PitStop', 'OPR with priors'],
+			['—', 'EPA'],
+			['FTCScout', 'Event OPR']
+		]);
+		expect(rows[0].slice(2)).toEqual(['73.4%', '74.8%', '76.3%']);
 	});
 
-	it('highlights the model the site uses in every season', () => {
+	it('switches every season between winner accuracy, Brier score and score error', async () => {
+		show();
+		const results = section('Results by season');
+		const table = within(results).getByRole('table');
+		const first = () => cells(table.querySelector('tbody tr') as HTMLElement);
+		await fireEvent.click(within(results).getByRole('button', { name: 'Brier score' }));
+		expect(within(results).getByRole('button', { name: 'Brier score' })).toHaveAttribute(
+			'aria-pressed',
+			'true'
+		);
+		expect(first().slice(1)).toEqual(['OPR with priors', '0.174', '0.168', '0.159']);
+		await fireEvent.click(within(results).getByRole('button', { name: 'Score error' }));
+		expect(first().slice(1)).toEqual(['EPA', '14.3', '21.6', '28.0']);
+	});
+
+	it('shows a dash when a model has no result for a season', () => {
+		const report = load();
+		const seasons = report.seasons.map((season) =>
+			season.season === 2026
+				? { ...season, models: { 'opr-map': season.models['opr-map'] } }
+				: season
+		);
+		show({ ...report, seasons });
+		const table = within(section('Results by season')).getByRole('table');
+		const epa = [...table.querySelectorAll('tbody tr')].find((row) =>
+			row.textContent?.includes('EPA')
+		) as HTMLElement;
+		expect(cells(epa).slice(2)).toEqual(['—', '74.5%', '76.1%']);
+	});
+
+	it('highlights the model the site uses', () => {
 		show();
 		const table = within(section('Results by season')).getByRole('table');
-		const highlighted = table.querySelectorAll('tr.chosen');
-		expect(highlighted).toHaveLength(3);
-		for (const row of highlighted) {
-			expect(row).toHaveTextContent('OPR with priors');
-			expect(row).toHaveTextContent('Used on this site');
-		}
-		expect(within(table).getAllByText('Used on this site')).toHaveLength(3);
+		const highlighted = table.querySelectorAll('tr.me');
+		expect(highlighted).toHaveLength(1);
+		expect(highlighted[0]).toHaveTextContent('OPR with priors');
 	});
 
 	it('defines the measures in plain words', () => {
@@ -109,7 +119,6 @@ describe('accuracy page', () => {
 		expect([...terms].map((term) => term.textContent)).toEqual([
 			'Winner accuracy',
 			'Brier score',
-			'Log loss',
 			'Score error'
 		]);
 	});
