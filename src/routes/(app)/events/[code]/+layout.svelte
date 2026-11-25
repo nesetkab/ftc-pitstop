@@ -4,6 +4,7 @@
 	import { setEventView } from '#lib/components/event/context.ts';
 	import { eventStatus } from '#lib/components/event/dates.ts';
 	import { eventMeta } from '#lib/components/event/event-meta.ts';
+	import { eventLede } from '#lib/components/event/lede.ts';
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { regionName } from '#lib/format/places.ts';
 	import { shortRange } from '#lib/format/time.ts';
@@ -13,6 +14,7 @@
 	import Button from '#lib/ui/Button.svelte';
 	import CalendarMenu from '#lib/ui/CalendarMenu.svelte';
 	import Hint from '#lib/ui/Hint.svelte';
+	import Lede from '#lib/ui/Lede.svelte';
 	import { PIT_HINT } from '#lib/ui/hints.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
@@ -41,6 +43,7 @@
 	const status = $derived(eventStatus(event, now));
 	const live = $derived(status === 'live');
 	const every = $derived(bundle.phase === 'done' ? DONE_REFRESH_MS : REFRESH_MS);
+	const lede = $derived(eventLede(bundle));
 	const showUpdated = $derived(bundle.phase !== 'done' || bundle.stale);
 	const source = $derived(bundle.source === 'ftcscout' ? ' from FTCScout' : '');
 
@@ -201,6 +204,10 @@
 	{/if}
 {/snippet}
 
+{#snippet ledeLine()}
+	{#if lede}<Lede lead={lede.lead} rest={lede.rest} />{/if}
+{/snippet}
+
 {#snippet headerActions()}
 	<CalendarMenu
 		path="{base}/calendar.ics"
@@ -233,6 +240,7 @@
 	<PageHeader
 		title={event.name}
 		meta={eventMeta(event, scheduled ? null : bundle.teams.length)}
+		lede={lede ? ledeLine : undefined}
 		status={scheduled || started ? statusLine : undefined}
 		actions={headerActions}
 	/>

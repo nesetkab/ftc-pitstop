@@ -127,7 +127,8 @@ describe('home page', () => {
 
 	it('says plainly when there is nothing to list', () => {
 		show({ today: [], week: [] });
-		expect(screen.getByText('No events are running today.')).toBeInTheDocument();
+		const todaySection = screen.getByRole('region', { name: 'Events today' });
+		expect(within(todaySection).getByText('No events are running today.')).toBeInTheDocument();
 		expect(screen.getByText('No events start in the next 7 days.')).toBeInTheDocument();
 		expect(screen.queryByRole('table')).not.toBeInTheDocument();
 	});

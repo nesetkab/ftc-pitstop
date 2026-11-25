@@ -56,9 +56,9 @@
 	}
 
 	.lead {
-		font-size: 26px;
+		font-size: 20px;
 		font-weight: 600;
-		line-height: 1.22;
+		line-height: 1.3;
 		letter-spacing: -0.015em;
 		text-wrap: balance;
 	}
@@ -101,7 +101,7 @@
 
 	@media (max-width: 600px) {
 		.lead {
-			font-size: 22px;
+			font-size: 18px;
 		}
 
 		.sub {
