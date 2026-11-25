@@ -17,7 +17,9 @@
 		rankingRows,
 		scoreStats,
 		sortRankingRows,
+		phoneHidden,
 		visibleColumns,
+		type ColumnKey,
 		type RankingChoice,
 		type RankingView
 	} from './ranking-columns.ts';
@@ -54,6 +56,8 @@
 		onchoose,
 		eventCode
 	}: Props = $props();
+
+	const NP_KEYS: ColumnKey[] = ['npavg', 'npmax', 'npmin', 'npsd'];
 
 	const qualMatches = $derived(quals(bundle.matches));
 	const remaining = $derived(qualMatches.filter((match) => !match.result).length);
@@ -115,24 +119,45 @@
 			.join(' ')
 	);
 
-	const note = $derived(
+	const projected = $derived(projections !== null && projections.length > 0);
+
+	function offPhone(keys: ColumnKey[]): boolean {
+		return keys.filter((key) => shown.has(key)).every((key) => phoneHidden(key, choice, projected));
+	}
+
+	const notes = $derived(
 		[
-			shown.has('rs') && !league ? 'RS is the average ranking points per match.' : null,
+			shown.has('rs') && !league
+				? { text: 'RS is the average ranking points per match.', phone: !offPhone(['rs']) }
+				: null,
 			shown.has('tbp') && !league
-				? 'TBP is the average match score without penalties. Matches a team was disqualified from or missed count as zero.'
+				? {
+						text: 'TBP is the average match score without penalties. Matches a team was disqualified from or missed count as zero.',
+						phone: !offPhone(['tbp'])
+					}
 				: null,
-			shown.has('avgtips') ? 'Avg tips is the average hive tips per match.' : null,
-			sources.has('score') && ['npavg', 'npmax', 'npmin', 'npsd'].some((key) => shown.has(key))
-				? 'NP scores leave out points from opponent fouls and count qualification matches only.'
+			shown.has('avgtips')
+				? { text: 'Avg tips is the average hive tips per match.', phone: !offPhone(['avgtips']) }
 				: null,
-			sources.has('score') && shown.has('npsd') ? 'Spread is how much those scores vary.' : null,
-			sources.has('rating') ? "OPR is each team's estimated share of its alliance's score." : null,
+			sources.has('score') && NP_KEYS.some((key) => shown.has(key))
+				? {
+						text: 'NP scores leave out points from opponent fouls and count qualification matches only.',
+						phone: !offPhone(NP_KEYS)
+					}
+				: null,
+			sources.has('score') && shown.has('npsd')
+				? { text: 'Spread is how much those scores vary.', phone: !offPhone(['npsd']) }
+				: null,
+			sources.has('rating')
+				? { text: "OPR is each team's estimated share of its alliance's score.", phone: true }
+				: null,
 			projections
-				? `Projections play out the ${remaining} remaining qualification ${remaining === 1 ? 'match' : 'matches'}.`
+				? {
+						text: `Projections play out the ${remaining} remaining qualification ${remaining === 1 ? 'match' : 'matches'}.`,
+						phone: true
+					}
 				: null
-		]
-			.filter(Boolean)
-			.join(' ')
+		].filter((note) => note !== null)
 	);
 </script>
 
@@ -179,7 +204,7 @@
 			teams={bundle.teams}
 			{columns}
 			{choice}
-			projected={projections !== null && projections.length > 0}
+			{projected}
 			qualCount={qualMatches.length}
 			hrefFor={(next) => link(rankingQuery(next))}
 			{onchoose}
@@ -187,7 +212,15 @@
 			{eventCode}
 		/>
 		{#if caveat}<p class="note">{caveat}</p>{/if}
-		{#if note}<Legend>{note}</Legend>{/if}
+		{#if notes.length > 0}
+			<div class={{ 'phone-off': notes.every((item) => !item.phone) }}>
+				<Legend>
+					{#each notes as item (item.text)}
+						<span class={{ 'phone-off': !item.phone }}>{item.text}</span>
+					{/each}
+				</Legend>
+			</div>
+		{/if}
 		{#if csvHref}
 			<p class="csv"><DownloadLink href="{csvHref}{query}" /></p>
 		{/if}
@@ -222,6 +255,10 @@
 
 		:global(.table-wrap.rp .team-cell .name) {
 			max-width: min(6em, 19vw);
+		}
+
+		.phone-off {
+			display: none;
 		}
 	}
 

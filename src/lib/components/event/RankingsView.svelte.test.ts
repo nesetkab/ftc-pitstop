@@ -37,6 +37,13 @@ describe('RankingsView', () => {
 		);
 	});
 
+	it('hides notes for columns that phones hide', () => {
+		render(RankingsView, { props: { bundle: finished } });
+		expect(screen.getByText(/TBP is the average/)).toHaveClass('phone-off');
+		expect(screen.getByText(/Avg tips is the average/)).toHaveClass('phone-off');
+		expect(screen.getByText(/RS is the average/)).not.toHaveClass('phone-off');
+	});
+
 	it('shows the FTC rankings without any analysis', () => {
 		render(RankingsView, { props: { bundle: finished } });
 		expect(headers()).toEqual(['Rank', 'Team', 'RS', 'Record', 'TBP', 'NP max', 'Avg tips']);
