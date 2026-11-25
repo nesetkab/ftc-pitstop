@@ -100,7 +100,9 @@ table.t th .sort-hint {
 	table.t th .sort-hint {
 		display: inline-block;
 		position: absolute;
+		top: 50%;
 		right: calc(100% + 3px);
+		translate: 0 -50%;
 		opacity: 0;
 		transition: opacity 0.12s;
 	}
