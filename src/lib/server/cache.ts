@@ -141,6 +141,7 @@ export function createCache(options: CacheOptions = {}) {
 	const failures = new LruMap<number>(500);
 	const errors = new LruMap<{ at: number; error: unknown }>(500);
 	const written = new LruMap<number>(1500);
+	const local = new LruMap<true>(1500);
 	const store = options.store ?? null;
 	const now = options.now ?? Date.now;
 	const onError = options.onError ?? logError;
@@ -242,6 +243,8 @@ export function createCache(options: CacheOptions = {}) {
 			failures.delete(key);
 			errors.delete(key);
 			const policy = choose(entry.body);
+			if (shared(policy)) local.delete(key);
+			else local.set(key, true);
 			if (result.status !== 'unchanged' || !previous || !storedRecently(key, policy)) {
 				await writeStore(key, entry, policy);
 			}
@@ -314,6 +317,7 @@ export function createCache(options: CacheOptions = {}) {
 			const entry = memory.get(key);
 			const missedAt = absent.get(key);
 			if (entry && now() - entry.fetchedAt < maxAgeMs) found.set(key, entry);
+			else if (entry && local.get(key)) found.set(key, entry);
 			else if (!entry && missedAt !== undefined && now() - missedAt < maxAgeMs) continue;
 			else missing.push(key);
 		}
@@ -349,6 +353,7 @@ export function createCache(options: CacheOptions = {}) {
 			failures.clear();
 			errors.clear();
 			written.clear();
+			local.clear();
 		},
 		pending: () => inflight.size
 	};
