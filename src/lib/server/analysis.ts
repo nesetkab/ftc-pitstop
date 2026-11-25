@@ -41,6 +41,7 @@ import type { EventBundle, EventPhase } from '#lib/types.ts';
 
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
+const RETRY = 10 * MINUTE;
 const DAY_SECONDS = 86_400;
 
 export const RATINGS_POLICY: CachePolicy = { ttl: 3600, maxStale: DAY_SECONDS };
@@ -158,10 +159,10 @@ export function createAnalysis(deps: AnalysisDeps) {
 				.then((model) => {
 					const kept = current?.model;
 					if (!model.complete && kept?.complete && now() < kept.generatedAt + DAY_SECONDS * 1000) {
-						current = { model: kept, expires: now() + 2 * MINUTE };
+						current = { model: kept, expires: now() + RETRY };
 						return kept;
 					}
-					current = { model, expires: now() + (model.complete ? HOUR : 2 * MINUTE) };
+					current = { model, expires: now() + (model.complete ? HOUR : RETRY) };
 					return model;
 				})
 				.finally(() => {
@@ -185,9 +186,7 @@ export function createAnalysis(deps: AnalysisDeps) {
 		input: string
 	): Promise<{ analysis: EventAnalysis; cacheControl: string }> {
 		const code = normalizeEventCode(input);
-		const model = loadSeasonModel();
-		model.catch(() => undefined);
-		const deadline = pending ? Math.max(now(), pendingSince + budget) : now() + budget;
+		let model: Promise<SeasonModel> | null = null;
 		const { cacheControl, ...bundle } = await loaders.loadEventBundle(code);
 		const teams = teamsOf(bundle);
 		const day = dayNumber(bundle.event.start);
@@ -199,6 +198,8 @@ export function createAnalysis(deps: AnalysisDeps) {
 				analysisKey(bundle.event.code),
 				policy,
 				async () => {
+					model = loadSeasonModel();
+					const deadline = pending ? Math.max(now(), pendingSince + budget) : now() + budget;
 					const season = await within(model, deadline - now()).catch(() => {
 						throw new ColdStart();
 					});
@@ -208,7 +209,8 @@ export function createAnalysis(deps: AnalysisDeps) {
 			return { analysis: value.body, cacheControl };
 		} catch (error) {
 			if (!(error instanceof ColdStart)) throw error;
-			background(model);
+			const running = model ?? pending;
+			if (running) background(running);
 			return {
 				analysis: analyzeOnce(bundle, null, teams, day),
 				cacheControl: CACHE_CONTROL.live

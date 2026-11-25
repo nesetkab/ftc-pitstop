@@ -134,7 +134,7 @@ describe('createAnalysis', () => {
 		await analysis.loadSeasonModel();
 		expect(season).toHaveBeenCalledTimes(2);
 		missing = [];
-		time += 2 * 60_000;
+		time += 10 * 60_000;
 		await analysis.loadSeasonModel();
 		await vi.waitFor(() => expect(season).toHaveBeenCalledTimes(3));
 		await new Promise((resolve) => setTimeout(resolve, 0));
