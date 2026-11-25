@@ -161,6 +161,7 @@
 						<p class="line faint">Could not load this team</p>
 					{:else if !row}
 						<span class="sk-line"><Skeleton width="75%" /></span>
+						<span class="sk-line"><Skeleton width="55%" /></span>
 					{:else if !row.found}
 						<p class="line faint">Team not found</p>
 					{:else if event?.reason === 'today'}
