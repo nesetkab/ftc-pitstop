@@ -1,0 +1,43 @@
+engine 53863 rows in 10s
+2025 mapping of event opr, reused for season opr { link: 'logit', kappa: 0.9257199366228666, eta: 0, gamma: 0 }
+event opr best         2025 fit        ours              8594 0.1905 69.0%
+event opr best         2025 fit        oddbot            8564 0.1905 69.1%
+event opr best         2025 fit        oddbot quals      8031 0.1931 68.5%
+event opr best         2025 fit        oddbot playoffs    533 0.1509 77.3%
+event opr best         2025 fit        oddbot Oct        1803 0.1949 67.1%
+event opr best         2025 fit        oddbot Nov        6704 0.1895 69.5%
+event opr best         2026 in-sample  ours              8594 0.1901 69.0%
+event opr best         2026 in-sample  oddbot            8564 0.1900 69.1%
+event opr best         2026 in-sample  oddbot quals      8031 0.1928 68.5%
+event opr best         2026 in-sample  oddbot playoffs    533 0.1488 77.3%
+event opr best         2026 in-sample  oddbot Oct        1803 0.1938 67.1%
+event opr best         2026 in-sample  oddbot Nov        6704 0.1892 69.5%
+season opr             2025 fit        ours              8594 0.1905 69.0%
+season opr             2025 fit        oddbot            8564 0.1907 69.0%
+season opr             2025 fit        oddbot quals      8031 0.1929 68.4%
+season opr             2025 fit        oddbot playoffs    533 0.1580 78.0%
+season opr             2025 fit        oddbot Oct        1803 0.1971 66.6%
+season opr             2025 fit        oddbot Nov        6704 0.1891 69.7%
+season opr             2026 in-sample  ours              8594 0.1892 69.0%
+season opr             2026 in-sample  oddbot            8564 0.1894 69.0%
+season opr             2026 in-sample  oddbot quals      8031 0.1917 68.4%
+season opr             2026 in-sample  oddbot playoffs    533 0.1556 78.0%
+season opr             2026 in-sample  oddbot Oct        1803 0.1958 66.6%
+season opr             2026 in-sample  oddbot Nov        6704 0.1879 69.7%
+season opr +playoffs   2025 fit        ours              8594 0.1903 69.0%
+season opr +playoffs   2025 fit        oddbot            8564 0.1905 69.0%
+season opr +playoffs   2025 fit        oddbot quals      8031 0.1929 68.4%
+season opr +playoffs   2025 fit        oddbot playoffs    533 0.1537 77.8%
+season opr +playoffs   2025 fit        oddbot Oct        1803 0.1969 66.7%
+season opr +playoffs   2025 fit        oddbot Nov        6704 0.1889 69.5%
+season opr +playoffs   2026 in-sample  ours              8594 0.1890 69.0%
+season opr +playoffs   2026 in-sample  oddbot            8564 0.1892 69.0%
+season opr +playoffs   2026 in-sample  oddbot quals      8031 0.1918 68.4%
+season opr +playoffs   2026 in-sample  oddbot playoffs    533 0.1499 77.8%
+season opr +playoffs   2026 in-sample  oddbot Oct        1803 0.1956 66.7%
+season opr +playoffs   2026 in-sample  oddbot Nov        6704 0.1877 69.5%
+oddbot EPA             theirs          oddbot            8564 0.1645 74.2%
+oddbot EPA             theirs          oddbot quals      8031 0.1662 73.9%
+oddbot EPA             theirs          oddbot playoffs    533 0.1385 78.7%
+oddbot EPA             theirs          oddbot Oct        1803 0.1760 71.5%
+oddbot EPA             theirs          oddbot Nov        6704 0.1615 74.8%

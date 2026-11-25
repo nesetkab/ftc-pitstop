@@ -1,4 +1,4 @@
-import type { Ctx, Model, Pred } from '../../models.ts';
+import type { Ctx, KalmanOpr, Model, Pred } from '../../models.ts';
 import type { PEvent, PMatch } from '../../prep.ts';
 
 export type OprFallback = 'mean' | 'last' | 'best' | 'avg' | 'zero';
@@ -248,5 +248,206 @@ export class Elo implements Model {
 
 	endSeason(): Map<number, number> {
 		return new Map();
+	}
+}
+
+type Row = { teams: number[]; y: number };
+
+export class SeasonOpr implements Model {
+	name: string;
+	seasons: Set<number>;
+	playoffs: boolean;
+	active = false;
+	x = new Map<number, number>();
+	parent = new Map<number, number>();
+	members = new Map<number, number[]>();
+	rows = new Map<number, Row[]>();
+	dirty = new Set<number>();
+	iterations = 0;
+
+	constructor(name: string, seasons: number[], opts: { playoffs?: boolean } = {}) {
+		this.name = name;
+		this.seasons = new Set(seasons);
+		this.playoffs = opts.playoffs ?? false;
+	}
+
+	startSeason(): void {
+		this.x = new Map();
+		this.parent = new Map();
+		this.members = new Map();
+		this.rows = new Map();
+		this.dirty = new Set();
+	}
+
+	startEvent(event: PEvent): void {
+		this.active = this.seasons.has(event.season);
+	}
+
+	find(t: number): number {
+		let r = t;
+		while (this.parent.get(r) !== r) r = this.parent.get(r)!;
+		let c = t;
+		while (c !== r) {
+			const n = this.parent.get(c)!;
+			this.parent.set(c, r);
+			c = n;
+		}
+		return r;
+	}
+
+	ensure(t: number): void {
+		if (this.parent.has(t)) return;
+		this.parent.set(t, t);
+		this.members.set(t, [t]);
+		this.rows.set(t, []);
+		this.x.set(t, 0);
+	}
+
+	union(a: number, b: number): number {
+		let ra = this.find(a);
+		let rb = this.find(b);
+		if (ra === rb) return ra;
+		if (this.members.get(ra)!.length < this.members.get(rb)!.length) [ra, rb] = [rb, ra];
+		this.parent.set(rb, ra);
+		const into = this.members.get(ra)!;
+		for (const t of this.members.get(rb)!) into.push(t);
+		const rowsInto = this.rows.get(ra)!;
+		for (const row of this.rows.get(rb)!) rowsInto.push(row);
+		this.members.delete(rb);
+		this.rows.delete(rb);
+		this.dirty.delete(rb);
+		return ra;
+	}
+
+	add(teams: number[], y: number): void {
+		if (!teams.length) return;
+		for (const t of teams) this.ensure(t);
+		let root = this.find(teams[0]);
+		for (const t of teams.slice(1)) root = this.union(root, t);
+		this.rows.get(root)!.push({ teams, y });
+		this.dirty.add(root);
+	}
+
+	solve(root: number): void {
+		const teams = this.members.get(root)!;
+		const rows = this.rows.get(root)!;
+		const idx = new Map(teams.map((t, i) => [t, i]));
+		const n = teams.length;
+		const m = rows.length;
+		const cols = rows.map((r) => r.teams.map((t) => idx.get(t)!));
+		const x = Float64Array.from(teams, (t) => this.x.get(t)!);
+		const r = new Float64Array(m);
+		for (let i = 0; i < m; i++) {
+			let s = 0;
+			for (const j of cols[i]) s += x[j];
+			r[i] = rows[i].y - s;
+		}
+		const atr = (v: Float64Array) => {
+			const out = new Float64Array(n);
+			for (let i = 0; i < m; i++) for (const j of cols[i]) out[j] += v[i];
+			return out;
+		};
+		let s = atr(r);
+		const p = Float64Array.from(s);
+		let gamma = s.reduce((a, v) => a + v * v, 0);
+		const norm = rows.reduce((a, row) => a + row.y * row.y, 0);
+		const q = new Float64Array(m);
+		for (let it = 0; it < 4 * n + 50 && gamma > 1e-20 * Math.max(norm, 1); it++) {
+			this.iterations++;
+			let qq = 0;
+			for (let i = 0; i < m; i++) {
+				let v = 0;
+				for (const j of cols[i]) v += p[j];
+				q[i] = v;
+				qq += v * v;
+			}
+			if (qq === 0) break;
+			const alpha = gamma / qq;
+			for (let j = 0; j < n; j++) x[j] += alpha * p[j];
+			for (let i = 0; i < m; i++) r[i] -= alpha * q[i];
+			s = atr(r);
+			const g = s.reduce((a, v) => a + v * v, 0);
+			const beta = g / gamma;
+			gamma = g;
+			for (let j = 0; j < n; j++) p[j] = s[j] + beta * p[j];
+		}
+		teams.forEach((t, i) => this.x.set(t, x[i]));
+		this.dirty.delete(root);
+	}
+
+	team(t: number, ctx: Ctx): number {
+		if (!this.parent.has(t)) return ctx.mean / 2;
+		const root = this.find(t);
+		if (this.dirty.has(root)) this.solve(root);
+		return this.x.get(t)!;
+	}
+
+	predict(m: PMatch, ctx: Ctx): Pred {
+		if (!this.active) return { red: ctx.mean, blue: ctx.mean, varFactor: 1, redScore: ctx.mean, blueScore: ctx.mean };
+		const red = m.red.reduce((a, t) => a + this.team(t, ctx), 0);
+		const blue = m.blue.reduce((a, t) => a + this.team(t, ctx), 0);
+		return { red, blue, varFactor: 1, redScore: red, blueScore: blue };
+	}
+
+	update(m: PMatch): void {
+		if (!this.active || (m.playoff && !this.playoffs)) return;
+		this.add(m.red, m.redNp);
+		this.add(m.blue, m.blueNp);
+	}
+
+	endEvent(): void {}
+
+	endSeason(): Map<number, number> {
+		return new Map();
+	}
+}
+
+export class PriorFallbackOpr implements Model {
+	name: string;
+	live: LiveOpr;
+	prior: KalmanOpr;
+	score: boolean;
+
+	constructor(name: string, prior: KalmanOpr, score: boolean) {
+		this.name = name;
+		this.live = new LiveOpr(`${name} live`, 'mean');
+		this.prior = prior;
+		this.score = score;
+	}
+
+	startSeason(prevRel: Map<number, number>): void {
+		this.live.startSeason();
+		this.prior.startSeason(prevRel);
+	}
+
+	startEvent(event: PEvent, ctx: Ctx): void {
+		this.live.startEvent(event);
+		this.prior.startEvent(event, ctx);
+	}
+
+	team(t: number, ctx: Ctx): number {
+		return this.live.value.get(t) ?? this.prior.value(t, ctx, this.score);
+	}
+
+	predict(m: PMatch, ctx: Ctx): Pred {
+		this.prior.predict(m, ctx);
+		if (this.live.dirty) this.live.solve();
+		const red = m.red.reduce((a, t) => a + this.team(t, ctx), 0);
+		const blue = m.blue.reduce((a, t) => a + this.team(t, ctx), 0);
+		return { red, blue, varFactor: 1, redScore: red, blueScore: blue };
+	}
+
+	update(m: PMatch, ctx: Ctx): void {
+		this.live.update(m);
+		this.prior.update(m, ctx);
+	}
+
+	endEvent(event: PEvent, ctx: Ctx): void {
+		this.live.endEvent();
+		this.prior.endEvent(event, ctx);
+	}
+
+	endSeason(): Map<number, number> {
+		return this.prior.endSeason();
 	}
 }

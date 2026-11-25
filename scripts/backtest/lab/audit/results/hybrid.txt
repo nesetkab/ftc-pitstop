@@ -1,0 +1,18 @@
+event opr best                   train fit       oddbot            8564 0.1907 69.1%
+event opr best                   train fit       oddbot quals      8031 0.1933 68.5%
+event opr best                   train fit       oddbot playoffs    533 0.1515 77.3%
+event opr best                   2026 in-sample  oddbot            8564 0.1900 69.1%
+event opr best                   2026 in-sample  oddbot quals      8031 0.1928 68.5%
+event opr best                   2026 in-sample  oddbot playoffs    533 0.1488 77.3%
+event opr, shipped win prior     train fit       oddbot            8564 0.1872 70.4%
+event opr, shipped win prior     train fit       oddbot quals      8031 0.1896 69.9%
+event opr, shipped win prior     train fit       oddbot playoffs    533 0.1506 77.4%
+event opr, shipped win prior     2026 in-sample  oddbot            8564 0.1865 70.4%
+event opr, shipped win prior     2026 in-sample  oddbot quals      8031 0.1891 69.9%
+event opr, shipped win prior     2026 in-sample  oddbot playoffs    533 0.1482 77.4%
+event opr, shipped points prior  train fit       oddbot            8564 0.1874 70.1%
+event opr, shipped points prior  train fit       oddbot quals      8031 0.1899 69.7%
+event opr, shipped points prior  train fit       oddbot playoffs    533 0.1507 77.4%
+event opr, shipped points prior  2026 in-sample  oddbot            8564 0.1867 70.1%
+event opr, shipped points prior  2026 in-sample  oddbot quals      8031 0.1893 69.7%
+event opr, shipped points prior  2026 in-sample  oddbot playoffs    533 0.1482 77.4%
