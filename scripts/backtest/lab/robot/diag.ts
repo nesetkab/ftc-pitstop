@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { run } from '../../engine.ts';
-import { fitMapping, probAt, rowsOf } from '../../metrics.ts';
+import { fitMapping, pairedGap, probAt, rowsOf } from '../../metrics.ts';
 import { ALL, ENGINE, FULL_FIT, shipped, TRAIN } from '../harness.ts';
 import { data } from './setup.ts';
 import { VARIANTS } from './variants.ts';
@@ -82,4 +82,10 @@ const cols = [...models.map((m) => m.name), 'oddbot'];
 console.log('group'.padEnd(30), 'n'.padStart(6), ...cols.map((c) => c.slice(0, 12).padStart(12)));
 for (const [g, a] of [...groups].sort((x, y) => x[0].localeCompare(y[0]))) {
 	console.log(g.padEnd(30), String(a.n).padStart(6), ...a.b.map((x) => (x / a.n).toFixed(4).padStart(12)));
+}
+
+for (let k = 2; k < models.length; k++) {
+	const g = pairedGap(rec, k, 1, maps[k], maps[1], (r) => rec.season[r] === 2026);
+	const q = pairedGap(rec, k, 1, maps[k], maps[1], (r) => rec.season[r] === 2026 && rec.playoff[r] === 0);
+	console.log(`${models[k].name} vs ${models[1].name}: 2026 ${g.diff.toFixed(5)} +/- ${g.se.toFixed(5)}, quals ${q.diff.toFixed(5)} +/- ${q.se.toFixed(5)}`);
 }

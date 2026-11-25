@@ -3,10 +3,10 @@
 		"lamNew": 2.5,
 		"lamPrev": 2,
 		"q": 0.15,
-		"qWeek": 0.01,
+		"qWeek": 0.015,
 		"qMatch": 0,
 		"carry": 1,
-		"drift": 0.15,
+		"drift": 0.25,
 		"beta": 0.5,
 		"rhoNew": 0.2,
 		"rhoPrev": 0.4,
@@ -14,7 +14,7 @@
 		"rhoPrevScore": 0.7
 	},
 	"robot": {
-		"lamNew": 0.72,
+		"lamNew": 0.432,
 		"lamPrev": 1.2,
 		"q": 0.375,
 		"qWeek": 0.025,
@@ -22,7 +22,7 @@
 		"carry": 1.1,
 		"drift": 0.25,
 		"beta": 0.5,
-		"rhoNew": 0.2,
+		"rhoNew": 0.125,
 		"rhoPrev": 0.4,
 		"rhoNewScore": 0.5,
 		"rhoPrevScore": 0.7
