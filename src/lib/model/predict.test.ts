@@ -20,7 +20,7 @@ function forecast(
 		blue: { strength: blue, score: blue + 5, variance: 1.2, components: components({}) },
 		marginVariance: 2.4,
 		uncertainty: 0.5,
-		stats: { mean: 100, sd: 40, parts: COMPONENTS.map(() => 0), matches: 500 }
+		stats: { mean: 100, sd: 40, robot: 20, parts: COMPONENTS.map(() => 0), matches: 500 }
 	};
 }
 

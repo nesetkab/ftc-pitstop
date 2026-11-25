@@ -24,16 +24,7 @@ import {
 	type Color,
 	type Source
 } from '#lib/model/bracket.ts';
-import {
-	COMPONENTS,
-	dayNumber,
-	OPR_PARAMS,
-	priorFor,
-	rateSeason,
-	SCORE_SIGMA,
-	type Priors,
-	type Track
-} from '#lib/model/opr.ts';
+import { rateSeason, SCORE_SIGMA, type Track } from '#lib/model/opr.ts';
 import {
 	predictMatch,
 	redChance,
@@ -68,12 +59,6 @@ function round(value: number, digits: number): number {
 
 const points = (value: number) => round(value, 2);
 const chance = (value: number) => round(value, 4);
-
-function trackIndex(track: Track): number {
-	if (track === 'strength') return 0;
-	if (track === 'opr') return 1;
-	return COMPONENTS.indexOf(track) + 2;
-}
 
 function numberMap<T>(record: Record<number, T>): Map<number, T> {
 	return new Map(Object.entries(record).map(([key, value]) => [Number(key), value]));
@@ -424,7 +409,6 @@ export function analyzeEvent(
 	const event = toModelEvent(bundle);
 	const states = numberMap(context.states);
 	const previous = numberMap(context.previous);
-	const priors: Priors = { params: OPR_PARAMS, states, previous };
 	const run = rateSeason([event], {
 		previous,
 		states,
@@ -434,12 +418,11 @@ export function analyzeEvent(
 	const rated = run.events.get(event.code)!;
 	const rater = rated.rater;
 	const book = run.swarm;
-	const day = dayNumber(event.start);
 
-	const value = (team: number, track: Track = 'opr') =>
-		rater.matchesPlayed(team) > 0
-			? rater.value(team, track)
-			: priorFor(team, priors, run.stats, day).values[trackIndex(track)];
+	const value = (team: number, track: Track = 'opr') => {
+		rater.include([team]);
+		return rater.value(team, track);
+	};
 	const current = new Map<string, MatchPrediction>();
 	const predictNow = (m: ModelMatch) => {
 		let p = current.get(m.key);
@@ -487,10 +470,10 @@ export function analyzeEvent(
 		tips: points(value(team, 'tips'))
 	});
 	const sigma = SCORE_SIGMA * run.stats.sd;
-	const spread = (team: number) =>
-		rater.has(team)
-			? rater.rating(team, sigma).sd
-			: sigma / Math.sqrt(priorFor(team, priors, run.stats, day).prec);
+	const spread = (team: number) => {
+		rater.include([team]);
+		return rater.rating(team, sigma).sd;
+	};
 	const ratings: TeamRating[] = order.map((team) => ({
 		team,
 		opr: points(opr.get(team)!),

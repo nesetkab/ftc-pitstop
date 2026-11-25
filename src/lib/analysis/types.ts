@@ -1,4 +1,4 @@
-import type { Sums, TeamState } from '#lib/model/opr.ts';
+import type { PriorRel, Sums, TeamState } from '#lib/model/opr.ts';
 import type { SwarmState } from '#lib/model/rp.ts';
 import type { EventType } from '#lib/types.ts';
 
@@ -155,7 +155,7 @@ export type SeasonEventRatings = {
 export type AnalysisContext = {
 	teams: number[];
 	states: Record<number, TeamState>;
-	previous: Record<number, number>;
+	previous: Record<number, PriorRel>;
 	sums: Sums;
 	swarm: SwarmState;
 };

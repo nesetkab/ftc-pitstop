@@ -15,7 +15,7 @@ import type {
 	TeamRatingHistory
 } from '#lib/analysis/types.ts';
 import { SEASON } from '#lib/game/biobuzz.ts';
-import { dayNumber, previousFrom } from '#lib/model/opr.ts';
+import { dayNumber, previousFrom, type PriorRel } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import {
 	keepAlive,
@@ -106,7 +106,7 @@ function teamsOf(bundle: EventBundle): number[] {
 export interface AnalysisDeps {
 	loaders: Pick<Loaders, 'loadEventBundle' | 'loadSeasonMatches'>;
 	cache: Cache;
-	previous?: Map<number, number>;
+	previous?: Map<number, PriorRel>;
 	now?: () => number;
 	budgetMs?: number;
 	background?: (task: Promise<unknown>) => void;
@@ -115,7 +115,7 @@ export interface AnalysisDeps {
 export function createAnalysis(deps: AnalysisDeps) {
 	const { loaders, cache } = deps;
 	const now = deps.now ?? Date.now;
-	const previous = deps.previous ?? previousFrom(previousSeason.teams);
+	const previous = deps.previous ?? previousFrom(previousSeason);
 	const budget = deps.budgetMs ?? 2500;
 	const background = deps.background ?? keepAlive;
 	let current: { model: SeasonModel; expires: number } | null = null;

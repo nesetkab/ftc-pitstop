@@ -12,7 +12,7 @@ import {
 	type Sides,
 	type Simulation
 } from '#lib/components/simulate/simulate.ts';
-import { dayNumber, previousFrom } from '#lib/model/opr.ts';
+import { dayNumber, previousFrom, type PriorRel } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import { freshEvent, type FreshModel, type FreshOptions } from '#lib/server/fresh.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
@@ -34,7 +34,7 @@ export interface SimulateDeps {
 		teams: number[],
 		events: string[]
 	) => Promise<{ teams: Record<number, string>; events: Record<string, string> }>;
-	previous?: Map<number, number>;
+	previous?: Map<number, PriorRel>;
 	now?: () => number;
 }
 
@@ -88,7 +88,7 @@ export function topFour(model: Pick<SeasonModel, 'ratings'>): Sides | null {
 }
 
 export function createSimulate(deps: SimulateDeps) {
-	const previous = deps.previous ?? previousFrom(previousSeason.teams);
+	const previous = deps.previous ?? previousFrom(previousSeason);
 	const now = deps.now ?? Date.now;
 
 	return async function loadSimulation(sides: Sides) {

@@ -18,6 +18,7 @@ import {
 	orderEvents,
 	orderMatches,
 	rateSeason,
+	type PriorRel,
 	type SeasonRatings as SeasonRun,
 	type Sums,
 	type TeamState
@@ -42,7 +43,7 @@ const points = (value: number) => Math.round(value * 100) / 100 || 0;
 
 export function buildSeason(
 	matches: SeasonMatch[],
-	options: { previous: Map<number, number>; now: number; complete?: boolean }
+	options: { previous: Map<number, PriorRel>; now: number; complete?: boolean }
 ): SeasonModel {
 	const events = orderEvents(seasonEvents(matches));
 	const run = rateSeason(events, { previous: options.previous });
@@ -115,8 +116,8 @@ export function buildSeason(
 	};
 }
 
-function pickPrevious(teams: number[], previous: Map<number, number>): Record<number, number> {
-	const out: Record<number, number> = {};
+function pickPrevious(teams: number[], previous: Map<number, PriorRel>): Record<number, PriorRel> {
+	const out: Record<number, PriorRel> = {};
 	for (const team of teams) {
 		const rel = previous.get(team);
 		if (rel !== undefined) out[team] = rel;
@@ -124,7 +125,7 @@ function pickPrevious(teams: number[], previous: Map<number, number>): Record<nu
 	return out;
 }
 
-export function baseContext(teams: number[], previous: Map<number, number>): AnalysisContext {
+export function baseContext(teams: number[], previous: Map<number, PriorRel>): AnalysisContext {
 	return {
 		teams,
 		states: {},
@@ -138,7 +139,7 @@ export function contextFor(
 	model: SeasonModel | null,
 	teams: number[],
 	day: number,
-	previous: Map<number, number>
+	previous: Map<number, PriorRel>
 ): AnalysisContext {
 	if (!model) return baseContext(teams, previous);
 	const states: Record<number, TeamState> = {};

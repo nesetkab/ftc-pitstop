@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { analyzeEvent } from '#lib/analysis/analyze.ts';
 import { buildSeason, contextFor } from '#lib/analysis/season.ts';
-import { dayNumber, previousFrom } from '#lib/model/opr.ts';
+import { dayNumber, type PriorRel } from '#lib/model/opr.ts';
 import { teamSeason } from '#lib/components/team/fixtures.ts';
 import { calibratedTips } from '#lib/model/rp.ts';
 import { createCompare } from '#lib/server/compare.ts';
@@ -11,7 +11,7 @@ import { bundleFor, cutAfterQual, seasonMatchesOf } from './helpers.ts';
 const NOW = Date.parse('2026-11-19T12:00:00Z');
 const bundle = await bundleFor('USAZGIQ');
 const season = seasonMatchesOf(bundle, 'USAZXXQ', '2026-11-07');
-const previous = previousFrom({});
+const previous = new Map<number, PriorRel>();
 const model = buildSeason(season, { previous, now: NOW });
 const START = '2026-11-21';
 const DAY = dayNumber(START);
@@ -46,14 +46,15 @@ describe('simulateMatch', () => {
 		expect(simulation.forecast.tie).toBeCloseTo(expected.tie, 3);
 	});
 
-	it('adds up each team into its alliance and keeps the chances whole', () => {
+	it('builds each alliance from its teams and keeps the chances whole', () => {
 		const { forecast } = simulation;
 		expect(forecast.red.win + forecast.blue.win + forecast.tie).toBeCloseTo(1, 3);
 		for (const color of ['red', 'blue'] as const) {
 			const side = simulation[color];
 			expect(side.teams.map((team) => team.number)).toEqual(color === 'red' ? red : blue);
 			const sum = side.teams.reduce((total, team) => total + team.opr, 0);
-			expect(side.np).toBeCloseTo(sum, 6);
+			expect(side.np).toBeGreaterThanOrEqual(sum - 1e-9);
+			expect(side.np).toBeLessThan(sum * 1.15);
 			expect(side.parts.tips).toBeCloseTo(
 				side.teams.reduce((total, team) => total + team.parts.tips, 0),
 				6

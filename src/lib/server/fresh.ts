@@ -5,6 +5,7 @@ import {
 	EventRater,
 	OPR_PARAMS,
 	type Component,
+	type PriorRel,
 	type Priors,
 	type Rating
 } from '#lib/model/opr.ts';
@@ -14,7 +15,7 @@ import { SwarmBook } from '#lib/model/rp.ts';
 export type FreshModel = Pick<SeasonModel, 'run'>;
 
 export interface FreshOptions {
-	previous: Map<number, number>;
+	previous: Map<number, PriorRel>;
 	day: number;
 }
 

@@ -14,7 +14,7 @@ import {
 	type FitParts,
 	type FitTeam
 } from '#lib/components/compare/fit.ts';
-import { dayNumber, previousFrom } from '#lib/model/opr.ts';
+import { dayNumber, previousFrom, type PriorRel } from '#lib/model/opr.ts';
 import previousSeason from '#lib/model/previous-2025.json';
 import { fitParts, freshEvent, type FreshModel, type FreshOptions } from '#lib/server/fresh.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
@@ -28,7 +28,7 @@ export interface CompareDeps {
 		teams: number[],
 		events: string[]
 	) => Promise<{ teams: Record<number, string>; events: Record<string, string> }>;
-	previous?: Map<number, number>;
+	previous?: Map<number, PriorRel>;
 	now?: () => number;
 }
 
@@ -45,7 +45,7 @@ export function fitFromModel(
 }
 
 export function createCompare(deps: CompareDeps) {
-	const previous = deps.previous ?? previousFrom(previousSeason.teams);
+	const previous = deps.previous ?? previousFrom(previousSeason);
 	const now = deps.now ?? Date.now;
 	let averages: { generatedAt: number; parts: FitParts } | null = null;
 

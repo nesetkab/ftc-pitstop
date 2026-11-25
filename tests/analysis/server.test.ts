@@ -13,7 +13,7 @@ import { bundleFor, fixtureLoaders, seasonMatchesOf } from './helpers.ts';
 import { ceiling } from '../timing.ts';
 
 const NOW = Date.parse('2026-11-19T12:00:00Z');
-const previous = previousFrom(previous2025.teams);
+const previous = previousFrom(previous2025);
 const gilbert = await bundleFor('USAZGIQ');
 const earlier = seasonMatchesOf(gilbert, 'USAZXXQ', '2026-11-07');
 

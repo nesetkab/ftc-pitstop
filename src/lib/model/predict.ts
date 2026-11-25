@@ -22,9 +22,9 @@ export type WinParams = {
 
 export const WIN_PARAMS: WinParams = {
 	link: 'logit',
-	kappa: 0.40445,
-	eta: 0.2,
-	gamma: 0.375,
+	kappa: 0.35378,
+	eta: 0,
+	gamma: 0.5,
 	tie: 0.0243
 };
 

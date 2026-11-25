@@ -1,31 +1,17 @@
 import {
+	blendPrevious,
 	rateSeason,
 	type Forecast,
-	type OprParams as ProdParams
+	type PriorRel,
+	type RobotBase
 } from '../../src/lib/model/opr.ts';
 import type { AllianceDetail, ModelEvent, ModelMatch } from '../../src/lib/model/types.ts';
 import { STRIDE, type Records } from './engine.ts';
-import type { OprParams } from './models.ts';
 import { loadSeason } from './hist.ts';
+import { attach, type RMatch, type Side } from './lab/robot/data.ts';
 import { prepSeason, type PEvent, type PMatch } from './prep.ts';
 
-export function toProdParams(p: OprParams): ProdParams {
-	return {
-		lamNew: p.lamNew,
-		lamReturning: p.lamPrevSeason,
-		rhoNew: p.rhoNew,
-		rhoReturning: p.rhoPrev,
-		rhoNewScore: p.rhoNewScore ?? p.rhoNew,
-		rhoReturningScore: p.rhoPrevScore ?? p.rhoPrev,
-		beta: p.beta,
-		q: p.q,
-		qWeek: p.qWeek,
-		carry: p.carry,
-		drift: p.drift,
-		scoreCommon: p.scoreCommon ?? 0,
-		scoreQ: p.scoreQ ?? 0
-	};
-}
+export const FIRST_BASE: RobotBase = { np: 100, robot: 20 };
 
 export function detailOf(
 	s: Record<string, number>,
@@ -48,7 +34,17 @@ export function detailOf(
 	};
 }
 
+function withRobots(
+	detail: AllianceDetail | undefined,
+	side: Side | null | undefined
+): AllianceDetail | undefined {
+	if (side === undefined) return detail;
+	if (side === null) return detail && { ...detail, robotSwarm: undefined };
+	return { ...detail, robotSwarm: side.ra.map((a, k) => a + side.re[k]) };
+}
+
 export function toModelMatch(code: string, m: PMatch, position: number): ModelMatch {
+	const r = m as RMatch;
 	const noShows = [
 		...m.red.filter((t) => !m.redUpd.includes(t)),
 		...m.blue.filter((t) => !m.blueUpd.includes(t))
@@ -67,8 +63,8 @@ export function toModelMatch(code: string, m: PMatch, position: number): ModelMa
 		blueScore: m.blueTotal,
 		redNp: m.redNp,
 		blueNp: m.blueNp,
-		redDetail: detailOf(m.rs, m.redSt),
-		blueDetail: detailOf(m.bs, m.blueSt),
+		redDetail: withRobots(detailOf(m.rs, m.redSt), r.red2),
+		blueDetail: withRobots(detailOf(m.bs, m.blueSt), r.blue2),
 		surrogates: [...m.redSur, ...m.blueSur],
 		noShows,
 		dqs: m.dq
@@ -85,28 +81,39 @@ export function toModelEvent(e: PEvent): ModelEvent {
 	};
 }
 
-export function productionForecasts(seasons: PEvent[][], params: OprParams): Map<string, Forecast> {
+export type History = {
+	seasons: Map<number, PriorRel>[];
+	base: RobotBase;
+};
+
+export function productionForecasts(seasons: PEvent[][]): Map<string, Forecast> {
+	attach(seasons);
 	const out = new Map<string, Forecast>();
-	let previous = new Map<number, number>();
+	let history: History = { seasons: [], base: FIRST_BASE };
 	for (const events of seasons) {
 		const season = events[0]?.season;
-		const result = rateSeason(events.map(toModelEvent), {
-			previous,
-			params: toProdParams(params),
-			onForecast: (_event, match, forecast) => out.set(`${season}:${match.key}`, forecast)
-		});
-		previous = result.relative;
+		history = rateHistory(history, events.map(toModelEvent), (match, forecast) =>
+			out.set(`${season}:${match.key}`, forecast)
+		);
 	}
 	return out;
 }
 
-export function productionRecords(
-	rec: Records,
-	seasons: PEvent[][],
-	params: OprParams,
-	name: string
-): Records {
-	const forecasts = productionForecasts(seasons, params);
+function rateHistory(
+	history: History,
+	events: ModelEvent[],
+	onForecast?: (match: ModelMatch, forecast: Forecast) => void
+): History {
+	const result = rateSeason(events, {
+		previous: blendPrevious(history.seasons),
+		base: history.base,
+		onForecast: onForecast && ((_event, match, forecast) => onForecast(match, forecast))
+	});
+	return { seasons: [result.relative, ...history.seasons], base: result.base };
+}
+
+export function productionRecords(rec: Records, seasons: PEvent[][], name: string): Records {
+	const forecasts = productionForecasts(seasons);
 	const pred = new Float64Array(rec.n * STRIDE);
 	for (let r = 0; r < rec.n; r++) {
 		const f = forecasts.get(rec.keys[r]);
@@ -121,10 +128,20 @@ export function productionRecords(
 	return { ...rec, models: [name], pred };
 }
 
-export async function previousFor(season: number, first = 2021): Promise<Map<number, number>> {
-	let previous = new Map<number, number>();
+export async function historyFor(season: number, first = 2021): Promise<History> {
+	let history: History = { seasons: [], base: FIRST_BASE };
 	for (let s = first; s < season; s++) {
-		previous = rateSeason(prepSeason(await loadSeason(s)).map(toModelEvent), { previous }).relative;
+		const events = prepSeason(await loadSeason(s));
+		attach([events]);
+		history = rateHistory(history, events.map(toModelEvent));
 	}
-	return previous;
+	return history;
+}
+
+export async function previousFor(
+	season: number,
+	first = 2021
+): Promise<{ previous: Map<number, PriorRel>; base: RobotBase }> {
+	const history = await historyFor(season, first);
+	return { previous: blendPrevious(history.seasons), base: history.base };
 }

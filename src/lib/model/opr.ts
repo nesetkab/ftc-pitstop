@@ -35,21 +35,17 @@ const DETAIL_KEY: Record<Component, keyof AllianceDetail> = {
 	fouls: 'fouls'
 };
 
-const STRENGTH = 0;
-const OPR = 1;
-const SIZE = COMPONENTS.length + 2;
-const OWN_SCALE = new Set<number>([
-	COMPONENTS.indexOf('tips') + 2,
-	COMPONENTS.indexOf('fouls') + 2
-]);
+const OWN_SCALE = new Set<number>([COMPONENTS.indexOf('tips'), COMPONENTS.indexOf('fouls')]);
+const SPLIT = (['auto', 'hive', 'flower', 'garden', 'park'] as const).map((c) =>
+	COMPONENTS.indexOf(c)
+);
+const POINT_PARTS = new Set<number>(
+	(['auto', 'teleop', 'hive', 'leave', 'park', 'garden', 'flower'] as const).map((c) =>
+		COMPONENTS.indexOf(c)
+	)
+);
 
-function trackIndex(track: Track): number {
-	if (track === 'strength') return STRENGTH;
-	if (track === 'opr') return OPR;
-	return COMPONENTS.indexOf(track) + 2;
-}
-
-export type OprParams = {
+export type CompParams = {
 	lamNew: number;
 	lamReturning: number;
 	rhoNew: number;
@@ -61,33 +57,100 @@ export type OprParams = {
 	qWeek: number;
 	carry: number;
 	drift: number;
+};
+
+export type PartParams = {
+	rhoNew: number;
+	rhoReturning: number;
+	beta: number;
+	carry: number;
+	drift: number;
 	scoreCommon: number;
 	scoreQ: number;
 };
 
-export const OPR_PARAMS: OprParams = {
-	lamNew: 2,
-	lamReturning: 2,
-	rhoNew: 0.2,
-	rhoReturning: 0.4,
-	rhoNewScore: 0.5,
-	rhoReturningScore: 0.7,
-	beta: 0.5,
-	q: 0.15,
-	qWeek: 0.01,
-	carry: 1,
-	drift: 0.25,
-	scoreCommon: 0.1,
-	scoreQ: 0.05
+export type OprParams = {
+	rest: CompParams;
+	robot: CompParams;
+	parts: PartParams;
+	het: number;
+	robotVar: number;
+	imbFit: number;
+	imbPred: number;
+	floor: number;
+	width: number;
 };
+
+export const OPR_PARAMS: OprParams = {
+	rest: {
+		lamNew: 2.5,
+		lamReturning: 2,
+		rhoNew: 0.2,
+		rhoReturning: 0.4,
+		rhoNewScore: 0.5,
+		rhoReturningScore: 0.7,
+		beta: 0.5,
+		q: 0.15,
+		qWeek: 0.015,
+		carry: 1,
+		drift: 0.25
+	},
+	robot: {
+		lamNew: 0.432,
+		lamReturning: 1.2,
+		rhoNew: 0.125,
+		rhoReturning: 0.4,
+		rhoNewScore: 0.5,
+		rhoReturningScore: 0.7,
+		beta: 0.5,
+		q: 0.375,
+		qWeek: 0.025,
+		carry: 1.1,
+		drift: 0.25
+	},
+	parts: {
+		rhoNew: 0.5,
+		rhoReturning: 0.7,
+		beta: 0.5,
+		carry: 1,
+		drift: 0.25,
+		scoreCommon: 0.1,
+		scoreQ: 0.05
+	},
+	het: 0.45,
+	robotVar: 1,
+	imbFit: 0.1,
+	imbPred: 0.2,
+	floor: 0,
+	width: 0.25
+};
+
+export const HISTORY = [1, 0.45, 0.15];
+
+export type RobotBase = { np: number; robot: number };
+
+export const ROBOT_BASE: RobotBase = { np: 88.05730998031801, robot: 15.613071938786794 };
+
+const BASE_WEIGHT = 20;
 
 export const SCORE_SIGMA = 0.49;
 
-export type SeasonStats = { mean: number; sd: number; parts: number[]; matches: number };
+export type PriorRel = [rest: number, robot: number];
+
+export type SeasonStats = {
+	mean: number;
+	sd: number;
+	robot: number;
+	parts: number[];
+	matches: number;
+};
+
+export type CompState = { mu: number; nu: number; prec: number; ref: number };
 
 export type TeamState = {
-	values: number[];
-	prec: number;
+	rest: CompState;
+	robot: CompState;
+	parts: number[];
 	refs: number[];
 	day: number;
 };
@@ -134,15 +197,61 @@ export type EventRatings = {
 export type Priors = {
 	params: OprParams;
 	states: Map<number, TeamState>;
-	previous: Map<number, number>;
+	previous: Map<number, PriorRel>;
 };
 
-export function previousFrom(teams: Record<string, number>): Map<number, number> {
-	return new Map(Object.entries(teams).map(([team, rel]) => [Number(team), rel]));
+export type PackedPrevious = { scale: number; teams: number[]; rest: number[]; robot: number[] };
+
+export function packPrevious(previous: Map<number, PriorRel>, scale = 1000): PackedPrevious {
+	const sorted = [...previous].sort((a, b) => a[0] - b[0]);
+	return {
+		scale,
+		teams: sorted.map(([team], k) => team - (k > 0 ? sorted[k - 1][0] : 0)),
+		rest: sorted.map(([, rel]) => Math.round(rel[0] * scale)),
+		robot: sorted.map(([, rel]) => Math.round(rel[1] * scale))
+	};
+}
+
+export function previousFrom(packed: PackedPrevious): Map<number, PriorRel> {
+	const out = new Map<number, PriorRel>();
+	let team = 0;
+	packed.teams.forEach((step, k) => {
+		team += step;
+		out.set(team, [packed.rest[k] / packed.scale, packed.robot[k] / packed.scale]);
+	});
+	return out;
+}
+
+export function blendPrevious(
+	seasons: Map<number, PriorRel>[],
+	weights: number[] = HISTORY
+): Map<number, PriorRel> {
+	const sums = new Map<number, PriorRel>();
+	const totals = new Map<number, number>();
+	for (let j = 0; j < weights.length && j < seasons.length; j++) {
+		const w = weights[j];
+		if (w <= 0) continue;
+		for (const [team, [rest, robot]] of seasons[j]) {
+			const sum = sums.get(team) ?? [0, 0];
+			sums.set(team, [sum[0] + w * rest, sum[1] + w * robot]);
+			totals.set(team, (totals.get(team) ?? 0) + w);
+		}
+	}
+	const out = new Map<number, PriorRel>();
+	for (const [team, total] of totals) {
+		const [rest, robot] = sums.get(team)!;
+		out.set(team, [rest / total, robot / total]);
+	}
+	return out;
 }
 
 export function dayNumber(date: string): number {
 	return Math.round(Date.parse(`${date.slice(0, 10)}T00:00:00Z`) / 86_400_000);
+}
+
+export function softFloor(v: number, floor: number, width: number): number {
+	const t = (v - floor) / width;
+	return floor + width * (t > 30 ? t : Math.log1p(Math.exp(t)));
 }
 
 function detailValue(detail: AllianceDetail | undefined, c: Component): number | undefined {
@@ -150,48 +259,88 @@ function detailValue(detail: AllianceDetail | undefined, c: Component): number |
 	return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
 }
 
-function means(stats: SeasonStats): number[] {
-	return [stats.mean, stats.mean, ...stats.parts];
+export function robotPoints(
+	teams: number[],
+	np: number,
+	detail: AllianceDetail | undefined
+): number[] | null {
+	const robots = detail?.robotSwarm;
+	if (!robots || robots.length !== teams.length) return null;
+	let total = 0;
+	for (const r of robots) {
+		if (!Number.isFinite(r)) return null;
+		total += r;
+	}
+	return total > np ? null : robots;
 }
 
-export function priorFor(
-	team: number,
-	priors: Priors,
-	stats: SeasonStats,
-	day: number
-): { values: number[]; prec: number } {
-	const p = priors.params;
-	const m = means(stats);
-	const state = priors.states.get(team);
+type CompPrior = { mu: number; nu: number; prec: number };
+
+function compPrior(
+	p: CompParams,
+	state: CompState | undefined,
+	prev: number | undefined,
+	mean: number,
+	weeks: number
+): CompPrior {
 	if (!state) {
-		const prev = priors.previous.get(team);
-		const lift = prev === undefined ? 0 : p.beta * (prev - 1);
-		const rel = (prev === undefined ? p.rhoNew : p.rhoReturning) + lift;
-		const relScore = (prev === undefined ? p.rhoNewScore : p.rhoReturningScore) + lift;
+		if (prev === undefined)
+			return { mu: (mean / 2) * p.rhoNew, nu: (mean / 2) * p.rhoNewScore, prec: p.lamNew };
+		const b = p.beta * (prev - 1);
 		return {
-			values: m.map((v, c) => (v / 2) * (c === STRENGTH ? rel : relScore)),
-			prec: prev === undefined ? p.lamNew : p.lamReturning
+			mu: (mean / 2) * (p.rhoReturning + b),
+			nu: (mean / 2) * (p.rhoReturningScore + b),
+			prec: p.lamReturning
 		};
 	}
-	const ratio = (c: number) =>
-		state.refs[c] > 0 && m[c] > 0 ? (m[c] / state.refs[c]) ** p.drift : 1;
-	const values = state.values.map((v, c) => {
-		const scale = OWN_SCALE.has(c) ? ratio(c) : ratio(STRENGTH);
-		return (p.carry * v + (1 - p.carry) * (state.refs[c] / 2)) * scale;
-	});
-	const weeks = Math.max(0, day - state.day) / 7;
-	return { values, prec: 1 / (1 / state.prec + p.q + p.qWeek * weeks) };
+	const ref = state.ref;
+	const scale = ref > 0 && mean > 0 ? (mean / ref) ** p.drift : 1;
+	const carried = (x: number) => {
+		const rel = ref > 0 ? x / (ref / 2) : 1;
+		return (1 + p.carry * (rel - 1)) * (ref / 2) * scale;
+	};
+	return {
+		mu: carried(state.mu),
+		nu: carried(state.nu),
+		prec: 1 / (1 / state.prec + p.q + p.qWeek * weeks)
+	};
 }
 
-function rowSums(M: Float64Array, out: Float64Array, n: number, idx: number[]): number {
-	out.fill(0);
-	for (const i of idx) {
-		const row = i * n;
-		for (let k = 0; k < n; k++) out[k] += M[row + k];
+export type TeamPrior = { rest: CompPrior; robot: CompPrior; parts: number[] };
+
+export function priorFor(team: number, priors: Priors, stats: SeasonStats, day: number): TeamPrior {
+	const p = priors.params;
+	const state = priors.states.get(team);
+	const restMean = stats.mean - stats.robot;
+	if (!state) {
+		const prev = priors.previous.get(team);
+		const total =
+			prev === undefined
+				? undefined
+				: stats.mean > 0
+					? (prev[0] * restMean + prev[1] * stats.robot) / stats.mean
+					: prev[0];
+		const pp = p.parts;
+		const rel = total === undefined ? pp.rhoNew : pp.rhoReturning + pp.beta * (total - 1);
+		return {
+			rest: compPrior(p.rest, undefined, prev?.[0], restMean, 0),
+			robot: compPrior(p.robot, undefined, prev?.[1], stats.robot, 0),
+			parts: stats.parts.map((m) => (m / 2) * rel)
+		};
 	}
-	let total = 0;
-	for (const i of idx) total += out[i];
-	return total;
+	const weeks = Math.max(0, day - state.day) / 7;
+	const pp = p.parts;
+	const ratio = (now: number, ref: number) => (ref > 0 && now > 0 ? (now / ref) ** pp.drift : 1);
+	return {
+		rest: compPrior(p.rest, state.rest, undefined, restMean, weeks),
+		robot: compPrior(p.robot, state.robot, undefined, stats.robot, weeks),
+		parts: state.parts.map((v, c) => {
+			const scale = OWN_SCALE.has(c)
+				? ratio(stats.parts[c], state.refs[c + 1])
+				: ratio(stats.mean, state.refs[0]);
+			return (pp.carry * v + (1 - pp.carry) * (state.refs[c + 1] / 2)) * scale;
+		})
+	};
 }
 
 function support(ph: Float64Array, nz: Int32Array): number {
@@ -216,18 +365,40 @@ function downdate(
 	}
 }
 
+function grown(old: Float64Array, n: number): Float64Array<ArrayBuffer> {
+	const next = new Float64Array(n);
+	next.set(old);
+	return next;
+}
+
+function grownMatrix(old: Float64Array, from: number, n: number): Float64Array<ArrayBuffer> {
+	const next = new Float64Array(n * n);
+	for (let i = 0; i < from; i++) next.set(old.subarray(i * from, (i + 1) * from), i * n);
+	return next;
+}
+
+const PART_COUNT = COMPONENTS.length;
+
 export class EventRater {
 	readonly code: string;
 	readonly teams: number[] = [];
 	private index = new Map<number, number>();
 	private n = 0;
 	private P = new Float64Array(0);
+	private V = new Float64Array(0);
 	private S = new Float64Array(0);
+	private restMu = new Float64Array(0);
+	private restNu = new Float64Array(0);
+	private restBase = new Float64Array(0);
+	private restBaseNu = new Float64Array(0);
+	private robotMu = new Float64Array(0);
+	private robotNu = new Float64Array(0);
+	private robotBase = new Float64Array(0);
+	private robotBaseNu = new Float64Array(0);
 	private mu: Float64Array[] = [];
 	private base: Float64Array[] = [];
 	private played = new Int32Array(0);
 	private ph = new Float64Array(0);
-	private sh = new Float64Array(0);
 	private nz = new Int32Array(0);
 	private priors: Priors;
 	private stats: () => SeasonStats;
@@ -247,49 +418,67 @@ export class EventRater {
 		this.grow(teams);
 	}
 
+	private get params(): OprParams {
+		return this.priors.params;
+	}
+
 	private grow(teams: number[]): void {
 		const fresh = [...new Set(teams)].filter((t) => !this.index.has(t));
 		if (!fresh.length) return;
 		const old = this.n;
 		const n = old + fresh.length;
-		const P = new Float64Array(n * n);
-		const S = new Float64Array(n * n);
-		for (let i = 0; i < old; i++) {
-			P.set(this.P.subarray(i * old, (i + 1) * old), i * n);
-			S.set(this.S.subarray(i * old, (i + 1) * old), i * n);
-		}
-		const common = this.priors.params.scoreCommon;
-		const mu = Array.from({ length: SIZE }, (_, c) => {
-			const next = new Float64Array(n);
-			if (this.mu[c]) next.set(this.mu[c]);
-			return next;
-		});
-		const base = Array.from({ length: SIZE }, (_, c) => {
-			const next = new Float64Array(n);
-			if (this.base[c]) next.set(this.base[c]);
-			return next;
-		});
+		const P = grownMatrix(this.P, old, n);
+		const S = grownMatrix(this.S, old, n);
+		const V = grown(this.V, n);
+		const restMu = grown(this.restMu, n);
+		const restNu = grown(this.restNu, n);
+		const restBase = grown(this.restBase, n);
+		const restBaseNu = grown(this.restBaseNu, n);
+		const robotMu = grown(this.robotMu, n);
+		const robotNu = grown(this.robotNu, n);
+		const robotBase = grown(this.robotBase, n);
+		const robotBaseNu = grown(this.robotBaseNu, n);
+		const mu = Array.from({ length: PART_COUNT }, (_, c) =>
+			grown(this.mu[c] ?? new Float64Array(0), n)
+		);
+		const base = Array.from({ length: PART_COUNT }, (_, c) =>
+			grown(this.base[c] ?? new Float64Array(0), n)
+		);
 		const played = new Int32Array(n);
 		played.set(this.played);
+		const common = this.params.parts.scoreCommon;
 		const stats = this.stats();
 		fresh.forEach((team, k) => {
 			const i = old + k;
 			this.index.set(team, i);
 			this.teams.push(team);
 			const prior = priorFor(team, this.priors, stats, this.day);
-			for (let c = 0; c < SIZE; c++) mu[c][i] = base[c][i] = prior.values[c];
-			P[i * n + i] = 1 / prior.prec;
+			restMu[i] = restBase[i] = prior.rest.mu;
+			restNu[i] = restBaseNu[i] = prior.rest.nu;
+			robotMu[i] = robotBase[i] = prior.robot.mu;
+			robotNu[i] = robotBaseNu[i] = prior.robot.nu;
+			for (let c = 0; c < PART_COUNT; c++) mu[c][i] = base[c][i] = prior.parts[c];
+			P[i * n + i] = 1 / prior.rest.prec;
+			V[i] = 1 / prior.robot.prec;
 			for (let j = old; j < n; j++) S[i * n + j] = common;
-			S[i * n + i] += 1 / prior.prec;
+			S[i * n + i] += 1 / prior.rest.prec;
 		});
 		this.n = n;
 		this.P = P;
 		this.S = S;
+		this.V = V;
+		this.restMu = restMu;
+		this.restNu = restNu;
+		this.restBase = restBase;
+		this.restBaseNu = restBaseNu;
+		this.robotMu = robotMu;
+		this.robotNu = robotNu;
+		this.robotBase = robotBase;
+		this.robotBaseNu = robotBaseNu;
 		this.mu = mu;
 		this.base = base;
 		this.played = played;
 		this.ph = new Float64Array(n);
-		this.sh = new Float64Array(n);
 		this.nz = new Int32Array(n);
 	}
 
@@ -297,88 +486,200 @@ export class EventRater {
 		const i = this.index.get(team)!;
 		if (this.played[i] > 0) return;
 		const prior = priorFor(team, this.priors, this.stats(), this.day);
-		for (let c = 0; c < SIZE; c++) {
-			this.mu[c][i] += prior.values[c] - this.base[c][i];
-			this.base[c][i] = prior.values[c];
+		this.restMu[i] += prior.rest.mu - this.restBase[i];
+		this.restNu[i] += prior.rest.nu - this.restBaseNu[i];
+		this.restBase[i] = prior.rest.mu;
+		this.restBaseNu[i] = prior.rest.nu;
+		this.robotMu[i] += prior.robot.mu - this.robotBase[i];
+		this.robotNu[i] += prior.robot.nu - this.robotBaseNu[i];
+		this.robotBase[i] = prior.robot.mu;
+		this.robotBaseNu[i] = prior.robot.nu;
+		for (let c = 0; c < PART_COUNT; c++) {
+			this.mu[c][i] += prior.parts[c] - this.base[c][i];
+			this.base[c][i] = prior.parts[c];
 		}
 	}
 
-	private sum(teams: number[], c: number): number {
-		let s = 0;
-		for (const t of teams) s += this.mu[c][this.index.get(t)!];
-		return s;
+	include(teams: number[]): void {
+		this.grow(teams);
+		for (const t of teams) this.refresh(t);
 	}
 
-	private quad(weights: Map<number, number>, M = this.P): number {
+	private half(): number {
+		return this.stats().mean / 2 || 1;
+	}
+
+	private floored(total: number, half: number): number {
+		const p = this.params;
+		return softFloor(total / half, p.floor, p.width) * half;
+	}
+
+	private strengthOf(teams: number[], score: boolean): number {
+		const half = this.half();
+		const rest = score ? this.restNu : this.restMu;
+		const robot = score ? this.robotNu : this.robotMu;
+		const idx = teams.map((t) => this.index.get(t)!);
+		let x = 0;
+		for (const i of idx) x += this.floored(rest[i] + robot[i], half);
+		if (idx.length === 2) x += this.params.imbPred * Math.abs(rest[idx[0]] - rest[idx[1]]);
+		return x;
+	}
+
+	private quad(idx: number[], sign: number[], M: Float64Array): number {
 		const n = this.n;
 		let v = 0;
-		for (const [a, wa] of weights) for (const [b, wb] of weights) v += wa * wb * M[a * n + b];
+		for (let a = 0; a < idx.length; a++) {
+			const row = idx[a] * n;
+			for (let b = 0; b < idx.length; b++) v += sign[a] * sign[b] * M[row + idx[b]];
+		}
 		return v;
 	}
 
-	private weights(red: number[], blue: number[] = []): Map<number, number> {
-		const w = new Map<number, number>();
-		for (const t of red) w.set(this.index.get(t)!, (w.get(this.index.get(t)!) ?? 0) + 1);
-		for (const t of blue) w.set(this.index.get(t)!, (w.get(this.index.get(t)!) ?? 0) - 1);
-		return w;
-	}
-
 	forecast(red: number[], blue: number[]): Forecast {
-		this.grow([...red, ...blue]);
-		for (const t of [...red, ...blue]) this.refresh(t);
-		const side = (teams: number[]): AllianceForecast => ({
-			strength: this.sum(teams, STRENGTH),
-			score: this.sum(teams, OPR),
-			variance: this.quad(this.weights(teams), this.S) + 1,
-			components: Object.fromEntries(
-				COMPONENTS.map((c, k) => [c, this.sum(teams, k + 2)])
-			) as Record<Component, number>
-		});
+		this.include([...red, ...blue]);
+		const side = (teams: number[]): AllianceForecast => {
+			const idx = teams.map((t) => this.index.get(t)!);
+			return {
+				strength: this.strengthOf(teams, false),
+				score: this.strengthOf(teams, true),
+				variance:
+					this.quad(
+						idx,
+						idx.map(() => 1),
+						this.S
+					) + 1,
+				components: Object.fromEntries(
+					COMPONENTS.map((c, k) => {
+						let s = 0;
+						for (const i of idx) s += this.mu[k][i];
+						return [c, s];
+					})
+				) as Record<Component, number>
+			};
+		};
+		const idx = [...red, ...blue].map((t) => this.index.get(t)!);
+		const sign = [...red.map(() => 1), ...blue.map(() => -1)];
+		let v = this.quad(idx, sign, this.P);
+		let robot = 0;
+		for (let a = 0; a < idx.length; a++) robot += sign[a] * sign[a] * this.V[idx[a]];
+		v += this.params.robotVar * robot;
 		let uncertainty = 0;
-		for (const t of [...red, ...blue]) uncertainty += 1 / (1 + this.played[this.index.get(t)!]);
+		for (const i of idx) uncertainty += 1 / (1 + this.played[i]);
 		return {
 			red: side(red),
 			blue: side(blue),
-			marginVariance: this.quad(this.weights(red, blue)) + 2,
+			marginVariance: v + 2,
 			uncertainty,
 			stats: this.stats()
 		};
 	}
 
-	private observe(teams: number[], values: (number | undefined)[]): void {
-		const idx = teams.map((t) => this.index.get(t)!);
-		this.step(this.P, this.ph, idx, values, STRENGTH, STRENGTH + 1);
-		this.step(this.S, this.sh, idx, values, STRENGTH + 1, SIZE);
+	private observeRobot(i: number, y: number): void {
+		const pii = this.V[i];
+		const s = pii + 1;
+		const g = pii / s;
+		this.robotMu[i] += g * (y - this.robotMu[i]);
+		this.robotNu[i] += g * (y - this.robotNu[i]);
+		this.V[i] = pii - g * pii;
 	}
 
-	private step(
-		M: Float64Array,
-		ph: Float64Array,
-		idx: number[],
-		values: (number | undefined)[],
-		from: number,
-		to: number
-	): void {
+	private observeRest(idx: number[], h: number[], y: number, r: number): void {
 		const n = this.n;
-		const nz = this.nz;
-		const s = rowSums(M, ph, n, idx) + 1;
-		const count = support(ph, nz);
-		for (let c = from; c < to; c++) {
-			const y = values[c];
-			if (y === undefined) continue;
-			const mu = this.mu[c];
+		const P = this.P;
+		const ph = this.ph;
+		ph.fill(0);
+		for (let a = 0; a < idx.length; a++) {
+			const w = h[a];
+			if (w === 0) continue;
+			const row = idx[a] * n;
+			for (let k = 0; k < n; k++) ph[k] += w * P[row + k];
+		}
+		let hph = 0;
+		let pred = 0;
+		let predNu = 0;
+		for (let a = 0; a < idx.length; a++) {
+			hph += h[a] * ph[idx[a]];
+			pred += h[a] * this.restMu[idx[a]];
+			predNu += h[a] * this.restNu[idx[a]];
+		}
+		const s = hph + r;
+		const resid = y - pred;
+		const residNu = y - predNu;
+		const count = support(ph, this.nz);
+		for (let x = 0; x < count; x++) {
+			const k = this.nz[x];
+			const g = ph[k] / s;
+			this.restMu[k] += g * resid;
+			this.restNu[k] += g * residNu;
+		}
+		downdate(P, ph, this.nz, count, n, s);
+	}
+
+	private observeSide(all: number[], present: number[], y: number, robots: number[] | null): void {
+		const p = this.params;
+		const stats = this.stats();
+		const idx = present.map((t) => this.index.get(t)!);
+		let target = y;
+		if (robots) {
+			present.forEach((t, k) => this.observeRobot(idx[k], robots[all.indexOf(t)]));
+			let total = 0;
+			for (const r of robots) total += r;
+			target -= total;
+		} else {
+			for (const i of idx) target -= this.robotMu[i];
+		}
+		let r = 1;
+		const restMean = stats.mean - stats.robot;
+		if (p.het !== 0 && restMean > 0) {
+			let pred = 0;
+			for (const i of idx) pred += this.restMu[i];
+			r = Math.min(Math.max(pred / restMean, 0.25), 4) ** p.het;
+		}
+		const half = stats.mean / 2 || 1;
+		let adj = 0;
+		const h = idx.map((i) => {
+			const total = this.restMu[i] + this.robotMu[i];
+			const slope = 1 / (1 + Math.exp(-((total / half - p.floor) / p.width)));
+			adj += softFloor(total / half, p.floor, p.width) * half - total;
+			adj += (1 - slope) * this.restMu[i];
+			return slope;
+		});
+		if (p.imbFit !== 0 && idx.length === 2) {
+			const sgn = Math.sign(this.restNu[idx[0]] - this.restNu[idx[1]]);
+			h[0] *= 1 + p.imbFit * sgn;
+			h[1] *= 1 - p.imbFit * sgn;
+		}
+		this.observeRest(idx, h, target - adj, r);
+	}
+
+	private observeParts(teams: number[], detail: AllianceDetail | undefined): void {
+		const n = this.n;
+		const idx = teams.map((t) => this.index.get(t)!);
+		const ph = this.ph;
+		ph.fill(0);
+		for (const i of idx) {
+			const row = i * n;
+			for (let k = 0; k < n; k++) ph[k] += this.S[row + k];
+		}
+		let total = 0;
+		for (const i of idx) total += ph[i];
+		const s = total + 1;
+		const count = support(ph, this.nz);
+		COMPONENTS.forEach((c, k) => {
+			const y = detailValue(detail, c);
+			if (y === undefined) return;
+			const mu = this.mu[k];
 			let pred = 0;
 			for (const i of idx) pred += mu[i];
 			const resid = y - pred;
-			for (let x = 0; x < count; x++) mu[nz[x]] += (ph[nz[x]] / s) * resid;
-		}
-		downdate(M, ph, nz, count, n, s);
+			for (let x = 0; x < count; x++) mu[this.nz[x]] += (ph[this.nz[x]] / s) * resid;
+		});
+		downdate(this.S, ph, this.nz, count, n, s);
 	}
 
 	update(m: ModelMatch): void {
 		if (m.redNp === null || m.blueNp === null) return;
-		this.grow([...m.red, ...m.blue]);
-		for (const t of [...m.red, ...m.blue]) this.refresh(t);
+		this.include([...m.red, ...m.blue]);
 		const absent = new Set(m.noShows ?? []);
 		const dq = new Set(m.dqs ?? []);
 		const sides: [number[], number, AllianceDetail | undefined][] = [
@@ -386,7 +687,7 @@ export class EventRater {
 			[m.blue, m.blueNp, m.blueDetail]
 		];
 		const credited = [...m.red, ...m.blue].filter((t) => !absent.has(t));
-		const q = this.priors.params.scoreQ;
+		const q = this.params.parts.scoreQ;
 		for (const t of credited) {
 			const i = this.index.get(t)!;
 			this.S[i * this.n + i] += q;
@@ -395,7 +696,8 @@ export class EventRater {
 			const present = teams.filter((t) => !absent.has(t));
 			const disqualified = m.level === 'playoff' && teams.some((t) => dq.has(t));
 			if (!present.length || disqualified) continue;
-			this.observe(present, [np, np, ...COMPONENTS.map((c) => detailValue(detail, c))]);
+			this.observeSide(teams, present, np, robotPoints(teams, np, detail));
+			this.observeParts(present, detail);
 		}
 		for (const t of credited) this.played[this.index.get(t)!]++;
 	}
@@ -409,21 +711,35 @@ export class EventRater {
 		return i === undefined ? 0 : this.played[i];
 	}
 
+	private opr(i: number): number {
+		return this.floored(this.restNu[i] + this.robotNu[i], this.half());
+	}
+
+	private part(i: number, k: number): number {
+		const v = this.mu[k][i];
+		if (!POINT_PARTS.has(k)) return v;
+		let total = 0;
+		for (const c of SPLIT) total += this.mu[c][i];
+		return total > 0 ? v * (this.opr(i) / total) : v;
+	}
+
 	value(team: number, track: Track = 'opr'): number {
 		const i = this.index.get(team);
 		if (i === undefined) return NaN;
-		return this.mu[trackIndex(track)][i];
+		if (track === 'strength') return this.floored(this.restMu[i] + this.robotMu[i], this.half());
+		if (track === 'opr') return this.opr(i);
+		return this.part(i, COMPONENTS.indexOf(track));
 	}
 
 	rating(team: number, sigma: number): Rating {
 		const i = this.index.get(team)!;
 		return {
 			team,
-			opr: this.mu[OPR][i],
-			strength: this.mu[STRENGTH][i],
-			sd: sigma * Math.sqrt(Math.max(this.P[i * this.n + i], 0)),
+			opr: this.value(team, 'opr'),
+			strength: this.value(team, 'strength'),
+			sd: sigma * Math.sqrt(Math.max(this.P[i * this.n + i] + this.V[i], 0)),
 			matches: this.played[i],
-			components: Object.fromEntries(COMPONENTS.map((c, k) => [c, this.mu[k + 2][i]])) as Record<
+			components: Object.fromEntries(COMPONENTS.map((c, k) => [c, this.part(i, k)])) as Record<
 				Component,
 				number
 			>
@@ -432,12 +748,25 @@ export class EventRater {
 
 	carry(): Map<number, TeamState> {
 		const out = new Map<number, TeamState>();
-		const refs = means(this.stats());
+		const stats = this.stats();
+		const refs = [stats.mean, ...stats.parts];
+		const restRef = stats.mean - stats.robot;
 		for (const [team, i] of this.index) {
 			if (this.played[i] === 0) continue;
 			out.set(team, {
-				values: this.mu.map((m) => m[i]),
-				prec: 1 / Math.max(this.P[i * this.n + i], 1e-9),
+				rest: {
+					mu: this.restMu[i],
+					nu: this.restNu[i],
+					prec: 1 / Math.max(this.P[i * this.n + i], 1e-9),
+					ref: restRef
+				},
+				robot: {
+					mu: this.robotMu[i],
+					nu: this.robotNu[i],
+					prec: 1 / Math.max(this.V[i], 1e-9),
+					ref: stats.robot
+				},
+				parts: this.mu.map((m) => m[i]),
 				refs,
 				day: this.day
 			});
@@ -446,18 +775,38 @@ export class EventRater {
 	}
 }
 
-export type Sums = { w: number; s: number; ss: number; parts: number[] };
+export type Sums = {
+	w: number;
+	s: number;
+	ss: number;
+	parts: number[];
+	rw: number;
+	rnp: number;
+	robot: number;
+};
 
-export const emptySums = (): Sums => ({ w: 0, s: 0, ss: 0, parts: COMPONENTS.map(() => 0) });
+export const emptySums = (): Sums => ({
+	w: 0,
+	s: 0,
+	ss: 0,
+	parts: COMPONENTS.map(() => 0),
+	rw: 0,
+	rnp: 0,
+	robot: 0
+});
 
-export function statsOf(a: Sums, b: Sums = emptySums()): SeasonStats {
+export function statsOf(a: Sums, b: Sums = emptySums(), base: RobotBase = ROBOT_BASE): SeasonStats {
 	const w = a.w + b.w;
-	if (w <= 0) return { mean: 0, sd: 1, parts: COMPONENTS.map(() => 0), matches: 0 };
+	if (w <= 0) return { mean: 0, sd: 1, robot: 0, parts: COMPONENTS.map(() => 0), matches: 0 };
 	const mean = (a.s + b.s) / w;
 	const variance = Math.max((a.ss + b.ss) / w - mean * mean, 1e-6);
+	const rw = a.rw + b.rw + BASE_WEIGHT;
+	const np = Math.max((a.rnp + b.rnp + BASE_WEIGHT * base.np) / rw, 1e-6);
+	const robot = (a.robot + b.robot + BASE_WEIGHT * base.robot) / rw;
 	return {
 		mean,
 		sd: Math.sqrt(variance),
+		robot: (mean * robot) / np,
 		parts: a.parts.map((p, k) => (p + b.parts[k]) / w),
 		matches: w
 	};
@@ -468,15 +817,29 @@ export function addSums(into: Sums, from: Sums): void {
 	into.s += from.s;
 	into.ss += from.ss;
 	from.parts.forEach((p, k) => (into.parts[k] += p));
+	into.rw += from.rw;
+	into.rnp += from.rnp;
+	into.robot += from.robot;
 }
 
-function addSide(sums: Sums, np: number, detail: AllianceDetail | undefined): void {
+function addSide(
+	sums: Sums,
+	np: number,
+	detail: AllianceDetail | undefined,
+	robots: number[] | null
+): void {
 	sums.w += 1;
 	sums.s += np;
 	sums.ss += np * np;
 	COMPONENTS.forEach((c, k) => {
 		sums.parts[k] += detailValue(detail, c) ?? 0;
 	});
+	if (!robots) return;
+	let total = 0;
+	for (const r of robots) total += r;
+	sums.rw += 1;
+	sums.rnp += np;
+	sums.robot += total;
 }
 
 export function orderMatches(matches: ModelMatch[]): ModelMatch[] {
@@ -507,40 +870,46 @@ export type SeasonRatings = {
 	states: Map<number, TeamState>;
 	stats: SeasonStats;
 	latest: Map<number, Rating>;
-	relative: Map<number, number>;
+	relative: Map<number, PriorRel>;
+	base: RobotBase;
 	swarm: SwarmBook;
 };
 
 export type SeasonOptions = {
-	previous?: Map<number, number>;
+	previous?: Map<number, PriorRel>;
 	states?: Map<number, TeamState>;
 	sums?: Sums;
 	swarm?: SwarmBook;
 	params?: OprParams;
+	base?: RobotBase;
 	sigma?: number;
 	onForecast?: (event: ModelEvent, match: ModelMatch, forecast: Forecast) => void;
 };
 
-function credits(m: ModelMatch): [number, AllianceDetail | undefined][] {
+function credits(m: ModelMatch): [number, AllianceDetail | undefined, number[] | null][] {
 	if (!plausibleMatch(m)) return [];
 	const absent = new Set(m.noShows ?? []);
 	const dq = new Set(m.dqs ?? []);
-	const out: [number, AllianceDetail | undefined][] = [];
+	const out: [number, AllianceDetail | undefined, number[] | null][] = [];
 	for (const [teams, np, detail] of [
 		[m.red, m.redNp, m.redDetail],
 		[m.blue, m.blueNp, m.blueDetail]
 	] as const) {
 		if (np === null || !teams.some((t) => !absent.has(t))) continue;
 		if (m.level === 'playoff' && teams.some((t) => dq.has(t))) continue;
-		out.push([np, detail]);
+		out.push([np, detail, robotPoints(teams, np, detail)]);
 	}
 	return out;
 }
 
 export function matchSums(matches: ModelMatch[]): Sums {
 	const sums = emptySums();
-	for (const m of matches) for (const [np, detail] of credits(m)) addSide(sums, np, detail);
+	for (const m of matches) for (const side of credits(m)) addSide(sums, ...side);
 	return sums;
+}
+
+function relOf(state: CompState): number {
+	return state.ref > 0 ? state.mu / (state.ref / 2) : 1;
 }
 
 export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): SeasonRatings {
@@ -549,12 +918,13 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 		states: new Map(options.states ?? []),
 		previous: options.previous ?? new Map()
 	};
+	const base = options.base ?? ROBOT_BASE;
 	const sigmaRel = options.sigma ?? SCORE_SIGMA;
 	const global = emptySums();
 	if (options.sums) addSums(global, options.sums);
 	const out = new Map<string, EventRatings>();
 	const latest = new Map<number, Rating>();
-	const relative = new Map<number, number>();
+	const relative = new Map<number, PriorRel>();
 	const ordered = orderEvents(events);
 	const swarm = options.swarm ?? new SwarmBook();
 	let i = 0;
@@ -565,7 +935,7 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 		while (i < ordered.length && dayNumber(ordered[i].start) === day) {
 			const event = ordered[i++];
 			const local = emptySums();
-			const stats = () => statsOf(snapshot, local);
+			const stats = () => statsOf(snapshot, local, base);
 			const matches = orderMatches(event.matches);
 			const teams = [...new Set(matches.flatMap((m) => [...m.red, ...m.blue]))];
 			const rater = new EventRater(event.code, teams, priors, stats, day);
@@ -587,7 +957,7 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 					swarm: chances,
 					ratings: members.map((team, k) => ({ team, before: before[k], after: rater.value(team) }))
 				});
-				for (const [np, detail] of credits(m)) addSide(local, np, detail);
+				for (const side of credits(m)) addSide(local, ...side);
 			}
 			const end = stats();
 			const ratings = rater.teams
@@ -595,7 +965,7 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 				.map((t) => rater.rating(t, sigmaRel * end.sd));
 			for (const [team, state] of rater.carry()) {
 				priors.states.set(team, state);
-				relative.set(team, end.mean > 0 ? state.values[STRENGTH] / (end.mean / 2) : 1);
+				relative.set(team, [relOf(state.rest), relOf(state.robot)]);
 			}
 			for (const r of ratings) latest.set(r.team, r);
 			out.set(event.code, { code: event.code, rater, steps, ratings });
@@ -606,9 +976,10 @@ export function rateSeason(events: ModelEvent[], options: SeasonOptions = {}): S
 	return {
 		events: out,
 		states: priors.states,
-		stats: statsOf(global, emptySums()),
+		stats: statsOf(global, emptySums(), base),
 		latest,
 		relative,
+		base: global.rw > 0 ? { np: global.rnp / global.rw, robot: global.robot / global.rw } : base,
 		swarm
 	};
 }
