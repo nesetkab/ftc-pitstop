@@ -9,7 +9,7 @@
 	import { TOP } from '#lib/components/event/strength.ts';
 	import { BUNDLE_INTERVAL } from '#lib/components/pit/poll.ts';
 	import { QUEUE_EARLIEST, QUEUE_MATCHES_AHEAD } from '#lib/components/pit/queue.ts';
-	import { GLOSSARY, termId } from '#lib/format/glossary.ts';
+	import { GLOSSARY, oldTermId, termId } from '#lib/format/glossary.ts';
 	import { fixed, integer } from '#lib/format/number.ts';
 	import { GAME_NAME, RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
 	import { WIN_PARAMS } from '#lib/model/predict.ts';
@@ -358,7 +358,7 @@
 			<dl class="glossary">
 				{#each glossary as [term, text] (term)}
 					<div id={termId(term)}>
-						<dt>{term}</dt>
+						<dt id={oldTermId(term)}>{term}</dt>
 						<dd>{text}</dd>
 					</div>
 				{/each}
@@ -499,7 +499,11 @@
 		scroll-margin-top: 24px;
 	}
 
-	.glossary div:target {
+	.glossary dt {
+		scroll-margin-top: 34px;
+	}
+
+	.glossary div:is(:target, :has(> dt:target)) {
 		background: var(--surface);
 		box-shadow:
 			-8px 0 0 var(--surface),

@@ -71,6 +71,10 @@ export function termId(term: string): string {
 	return `term-${slug}`;
 }
 
+export function oldTermId(term: string): string | undefined {
+	return term.includes('aOPR') ? termId(term.replace('aOPR', 'OPR')) : undefined;
+}
+
 export function termHref(term: string): string | null {
 	return explain(term) === null ? null : `${ABOUT_PATH}#${termId(term)}`;
 }

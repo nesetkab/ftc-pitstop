@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { RANKING_COLUMNS } from '#lib/components/event/ranking-columns.ts';
 import { PART_LABELS, RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
-import { explain, GLOSSARY, oprTerm, termHref, termId } from './glossary.ts';
+import { explain, GLOSSARY, oldTermId, oprTerm, termHref, termId } from './glossary.ts';
 
 describe('glossary', () => {
 	it('explains the common abbreviations', () => {
@@ -46,6 +46,14 @@ describe('glossary', () => {
 		expect(termId('#')).toBe('term-rank');
 		expect(termHref('RS')).toBe('/about#term-rs');
 		expect(termHref('Team')).toBeNull();
+	});
+
+	it('keeps the anchors from before aOPR was named', () => {
+		const terms = Object.keys(GLOSSARY);
+		const old = terms.map(oldTermId).filter((id) => id !== undefined);
+		expect(old).toEqual(expect.arrayContaining(['term-opr', 'term-season-opr', 'term-auto-opr']));
+		expect(new Set([...terms.map(termId), ...old]).size).toBe(terms.length + old.length);
+		expect(oldTermId('RS')).toBeUndefined();
 	});
 
 	it('writes every entry as one plain sentence fragment', () => {
