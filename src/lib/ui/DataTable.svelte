@@ -162,6 +162,7 @@
 	}
 
 	th :global(.sort-arrow) {
+		max-width: none;
 		margin: 0 3px 0 0;
 		opacity: 0;
 		transition: opacity 0.12s;
