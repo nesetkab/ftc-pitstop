@@ -8,6 +8,7 @@
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Icon from '#lib/ui/Icon.svelte';
 	import MatchList from '#lib/ui/MatchList.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
 	import Score from '#lib/ui/Score.svelte';
@@ -482,12 +483,14 @@
 	</main>
 
 	<nav class="tabs" aria-label="Sections">
-		<button type="button" aria-pressed={tab === 'team'} onclick={() => (tab = 'team')}>Team</button>
-		<a href="/events/{event.code}">Event</a>
-		<button type="button" aria-pressed={tab === 'matches'} onclick={() => (tab = 'matches')}
-			>Matches</button
+		<button type="button" aria-pressed={tab === 'team'} onclick={() => (tab = 'team')}
+			><Icon name="team" size={20} />Team</button
 		>
-		<a href="/w">Tools</a>
+		<a href="/events/{event.code}"><Icon name="event" size={20} />Event</a>
+		<button type="button" aria-pressed={tab === 'matches'} onclick={() => (tab = 'matches')}
+			><Icon name="list" size={20} />Matches</button
+		>
+		<a href="/w"><Icon name="tools" size={20} />Tools</a>
 	</nav>
 </div>
 
@@ -862,7 +865,11 @@
 
 	.tabs a,
 	.tabs button {
-		padding: 12px 0 14px;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		align-items: center;
+		padding: 8px 0 10px;
 		border: 0;
 		background: none;
 		color: var(--text-3);

@@ -25,7 +25,8 @@
 		| 'list'
 		| 'battery'
 		| 'check'
-		| 'board';
+		| 'board'
+		| 'tools';
 </script>
 
 <script lang="ts">
@@ -123,6 +124,11 @@
 	{:else if name === 'board'}
 		<rect x="2.25" y="2.25" width="11.5" height="11.5" rx="1.5" />
 		<path d="M5 11c1.5-4 4.5-2 6-6M9.5 5H11v1.5" />
+	{:else if name === 'tools'}
+		<rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1" />
+		<rect x="9" y="2.5" width="4.5" height="4.5" rx="1" />
+		<rect x="2.5" y="9" width="4.5" height="4.5" rx="1" />
+		<rect x="9" y="9" width="4.5" height="4.5" rx="1" />
 	{/if}
 </svg>
 
