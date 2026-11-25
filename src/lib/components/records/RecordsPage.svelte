@@ -31,10 +31,9 @@
 			types: RecordOption[];
 			names: { teams: Record<number, string>; events: Record<string, string> };
 		};
-		swipe?: boolean;
 	}
 
-	let { data, swipe = false }: Props = $props();
+	let { data }: Props = $props();
 
 	function without(index: number) {
 		const where = data.filters.where.filter((_, at) => at !== index);
@@ -85,7 +84,7 @@
 	</p>
 {/if}
 
-<RecordTable rows={data.rows} filters={data.filters} names={data.names} {swipe} />
+<RecordTable rows={data.rows} filters={data.filters} names={data.names} />
 
 <Pagination
 	page={data.page}

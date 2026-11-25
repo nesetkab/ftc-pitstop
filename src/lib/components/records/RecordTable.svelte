@@ -20,10 +20,9 @@
 		rows: RankedRecord[];
 		filters: RecordFilters;
 		names: { teams: Record<number, string>; events: Record<string, string> };
-		swipe?: boolean;
 	}
 
-	let { rows, filters, names, swipe = false }: Props = $props();
+	let { rows, filters, names }: Props = $props();
 
 	const followed = $derived(new Set(follows.teams));
 	const sort = $derived<SortState>({ key: filters.part, dir: filters.dir });
@@ -38,7 +37,7 @@
 			numeric: true,
 			sort: (row) => row[key],
 			text: (row) => (key === 'margin' ? signed(row.margin, 0) : integer(row[key])),
-			hide: swipe ? undefined : 'tablet',
+			hide: 'tablet',
 			class: 'stat'
 		};
 	}
@@ -46,9 +45,9 @@
 	const columns = $derived<Column<RankedRecord>[]>([
 		{ key: 'rank', label: 'Rank', numeric: true, text: (row) => integer(row.rank), class: 'rank' },
 		...recordColumns(filters.part).map(statColumn),
-		{ key: 'alliance', label: 'Alliance', cell: alliance, fill: !swipe, class: 'who' },
-		{ key: 'event', label: 'Event', cell: event, hide: swipe ? undefined : 'phone' },
-		{ key: 'match', label: 'Match', cell: match, hide: swipe ? undefined : 'phone' }
+		{ key: 'alliance', label: 'Alliance', cell: alliance, fill: true, class: 'who' },
+		{ key: 'event', label: 'Event', cell: event, hide: 'phone' },
+		{ key: 'match', label: 'Match', cell: match, hide: 'phone' }
 	]);
 
 	function href(next: SortState) {
@@ -72,13 +71,14 @@
 	<span class="teams">
 		{#each row.teams as team (team)}
 			<a href="/teams/{team}"
-				><b>{team}</b>{#if names.teams[team]}<span class="name"> {names.teams[team]}</span>{/if}</a
+				><b>{team}</b>{#if names.teams[team]}{' '}<span class="name">{names.teams[team]}</span
+					>{/if}</a
 			>
 		{/each}
 	</span>
 	<span class="brief">
 		<a href="/events/{row.event}/matches/{row.key}"
-			><Brand text={names.events[row.event] ?? row.event} /><span class="at">
+			><Brand text={names.events[row.event] ?? row.event} />{' '}<span class="at">
 				{row.label} <span class={row.alliance}>{side(row)}</span></span
 			></a
 		>
@@ -103,7 +103,7 @@
 	</EmptyState>
 {/snippet}
 
-<div class={['records', swipe ? 'swipe' : 'stack']}>
+<div class="records">
 	<DataTable
 		{rows}
 		{columns}
@@ -189,37 +189,37 @@
 	}
 
 	@media (max-width: 1080px) {
-		.stack .name {
+		.records .name {
 			display: none;
 		}
 	}
 
 	@media (max-width: 600px) {
-		.stack {
+		.records {
 			margin-inline: calc(var(--gutter) * -1);
 			padding-inline: var(--gutter);
 		}
 
-		.stack :global(td) {
+		.records :global(td) {
 			vertical-align: top;
 		}
 
-		.stack :global(td.num.active) {
+		.records :global(td.num.active) {
 			font-size: 16px;
 		}
 
-		.stack :global(:is(td, th).who) {
+		.records :global(:is(td, th).who) {
 			max-width: 0;
 			padding-left: 10px;
 			padding-right: 0;
 		}
 
-		.stack .teams {
+		.records .teams {
 			display: flex;
 			gap: 12px;
 		}
 
-		.stack .brief {
+		.records .brief {
 			display: block;
 			overflow: hidden;
 			text-overflow: ellipsis;
@@ -227,18 +227,14 @@
 			color: var(--text-2);
 		}
 
-		.stack .brief a {
+		.records .brief a {
 			color: inherit;
 		}
 
-		.stack .at {
+		.records .at {
 			margin-left: 6px;
 			font-weight: 600;
 			color: var(--text);
-		}
-
-		.swipe .name {
-			display: none;
 		}
 	}
 </style>
