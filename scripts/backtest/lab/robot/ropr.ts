@@ -15,6 +15,10 @@ export type RoprOpts = {
 	aVar?: number;
 	robotNoise?: number;
 	het?: number;
+	qLeague?: number;
+	xc?: number;
+	huber?: number;
+	dead?: number;
 	moveNoise?: number;
 	hist?: number[];
 };
@@ -47,6 +51,7 @@ export class RobotOpr implements Model {
 	past: Map<number, number>[][] = [];
 	day = 0;
 	restMean = 0;
+	sd = 1;
 
 	constructor(name: string, o: RoprOpts) {
 		this.name = name;
@@ -99,7 +104,11 @@ export class RobotOpr implements Model {
 		this.track.startEvent(ctx.day);
 		const teams = eventTeams(event);
 		const means = this.means(ctx);
-		this.comps.forEach((c, k) => c.startEvent(teams, means[k], ctx.day));
+		const qMul = event.type === 'LeagueMeet' ? (this.o.qLeague ?? 1) : 1;
+		this.comps.forEach((c, k) => {
+			c.qMul = qMul;
+			c.startEvent(teams, means[k], ctx.day);
+		});
 	}
 
 	gateOf(team: number): number {
@@ -156,6 +165,14 @@ export class RobotOpr implements Model {
 				for (let k = 0; k < upd.length; k++) {
 					const p = pos[k];
 					const yr = this.robotEnd ? sd.ra[p] : sd.ra[p] + sd.re[p];
+					const xc = this.o.xc ?? 0;
+					if (xc !== 0) {
+						const i = idx[k];
+						const pii = this.robot.P[i * this.robot.n + i];
+						const g = (xc * pii) / (pii + rn);
+						this.rest.mu[i] += g * (yr - this.robot.mu[i]);
+						this.rest.nu[i] += g * (yr - this.robot.nu[i]);
+					}
 					this.robot.observe([idx[k]], [1], yr, rn);
 					if (this.robotEnd) this.robotEnd.observe([idx[k]], [1], sd.re[p], rn);
 				}
@@ -184,12 +201,22 @@ export class RobotOpr implements Model {
 			const pred = idx.reduce((a, i) => a + this.rest.mu[i], 0);
 			r = Math.min(Math.max(pred / this.restMean, 0.25), 4) ** het;
 		}
-		this.rest.observe(idx, ones, rest, r);
+		const huber = this.o.huber ?? 0;
+		if (huber > 0) {
+			const v = this.rest.variance(idx, ones);
+			const pred = idx.reduce((a, i) => a + this.rest.mu[i], 0);
+			const z = Math.abs(rest - pred) / (0.8 * this.sd * Math.sqrt(v + r));
+			if (z > huber) r = (v + r) * (z / huber) - v;
+		}
+		const dead = this.o.dead ?? 1;
+		const h = sd && dead < 1 ? pos.map((p) => (sd.mv[p] || sd.re[p] > 0 ? 1 : dead)) : ones;
+		this.rest.observe(idx, h, rest, r);
 	}
 
 	update(m: PMatch, ctx: Ctx): void {
 		const r = m as RMatch;
 		this.restMean = this.means(ctx)[0];
+		this.sd = ctx.sd;
 		const upd = [...m.redUpd, ...m.blueUpd];
 		const idx = upd.map((t) => this.rest.at(t));
 		for (const c of this.comps) c.bump(idx, c.p.qMatch);

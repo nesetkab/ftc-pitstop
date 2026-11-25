@@ -29,7 +29,10 @@ function grid(path: string, x: number): number[] {
 	const add = (ds: number[], lo = -Infinity, hi = Infinity) =>
 		ds.map((d) => r(Math.min(hi, Math.max(lo, x + d))));
 	let vals: number[];
-	if (['lamNew', 'lamPrev', 'robotNoise', 'k0', 'kMin', 'tau', 'clip', 'kNew'].includes(name))
+	if (name === 'huber') vals = [0, 1.5, 2, 2.5, 3, 4];
+	else if (name === 'dead') vals = [0.25, 0.5, 0.75, 1];
+	else if (name === 'qLeague') vals = [0.25, 0.5, 0.75, 1, 1.5, 2.5].map((f) => r(Math.max(x, 0.25) * f));
+	else if (['lamNew', 'lamPrev', 'robotNoise', 'k0', 'kMin', 'tau', 'clip', 'kNew'].includes(name))
 		vals = mult([0.6, 0.8, 1, 1.25, 1.6]);
 	else if (['q', 'qWeek', 'qMatch', 'wk', 'scoreCommon', 'scoreQ'].includes(name))
 		vals = x > 0 ? mult([0, 0.5, 1, 1.5, 2.5]) : [0, 0.005, 0.01, 0.03, 0.1];

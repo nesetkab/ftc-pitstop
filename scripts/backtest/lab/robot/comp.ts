@@ -47,6 +47,7 @@ export class Comp {
 	ph = new Float64Array(0);
 
 	diag: boolean;
+	qMul = 1;
 
 	constructor(p: CompParams, diag = false) {
 		this.p = p;
@@ -81,7 +82,7 @@ export class Comp {
 		return {
 			mu: carried(state.mu),
 			nu: carried(state.nu),
-			prec: 1 / (1 / state.prec + p.q + p.qWeek * weeks)
+			prec: 1 / (1 / state.prec + this.qMul * p.q + p.qWeek * weeks)
 		};
 	}
 
