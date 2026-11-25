@@ -3,6 +3,7 @@
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { fixed, integer, MISSING, ordinal, pct, record, time } from '#lib/format/index.ts';
 	import Button from '#lib/ui/Button.svelte';
+	import Lede from '#lib/ui/Lede.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Term from '#lib/ui/Term.svelte';
@@ -35,6 +36,12 @@
 	const expected = $derived(report.rated === 'expected');
 	const valueLabel = $derived(expected ? 'Expected' : 'Here');
 	const hasSeason = $derived(report.parts?.some((row) => row.season !== null) ?? false);
+	const moreTakeaways = $derived(
+		report.takeaways
+			.slice(1)
+			.map((line) => `${line}.`)
+			.join(' ')
+	);
 	const upcoming = $derived(compact ? report.upcoming.slice(0, 4) : report.upcoming);
 	const qualCount = $derived(report.played.filter((match) => match.level === 'qual').length);
 
@@ -105,7 +112,9 @@
 		{/if}
 	</header>
 
-	{#if report.takeaways.length > 0}
+	{#if report.takeaways.length > 0 && !compact}
+		<Lede lead="{report.takeaways[0]}." rest={moreTakeaways} aria-label="Takeaways" />
+	{:else if report.takeaways.length > 0}
 		<ul class="takeaways" aria-label="Takeaways">
 			{#each report.takeaways as line (line)}
 				<li>{line}</li>

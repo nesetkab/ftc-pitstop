@@ -32,9 +32,7 @@ describe('TeamReport', () => {
 			props: { report, code: event.event.code, timeZone: event.event.timezone }
 		});
 		expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(String(team));
-		expect(
-			within(screen.getByRole('list', { name: 'Takeaways' })).getAllByRole('listitem').length
-		).toBe(report.takeaways.length);
+		expect(screen.getByLabelText('Takeaways')).toHaveTextContent(`${report.takeaways[0]}.`);
 		expect(screen.getByRole('img', { name: /Alliance score by match/ })).toBeInTheDocument();
 		const next = screen.getByRole('heading', { name: 'Remaining matches' }).closest('section')!;
 		const first = report.upcoming[0];
@@ -57,5 +55,8 @@ describe('TeamReport', () => {
 		expect(screen.queryByRole('button', { name: 'Print' })).not.toBeInTheDocument();
 		expect(screen.getByRole('rowheader', { name: 'Event avg' })).toBeInTheDocument();
 		expect(container.querySelector('.notes')).not.toBeNull();
+		expect(
+			within(screen.getByRole('list', { name: 'Takeaways' })).getAllByRole('listitem').length
+		).toBe(report.takeaways.length);
 	});
 });
