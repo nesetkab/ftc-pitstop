@@ -30,7 +30,11 @@ export const GET: RequestHandler = async ({ url }) => {
 	try {
 		const [index, ranked] = await Promise.all([searchIndex(), standings()]);
 		const found = search(index, query, limit, { standings: ranked });
-		return jsonResponse({ ...found, events: found.events.map(shown) }, CACHE_CONTROL.list);
+		const partial = index.teams.length === 0 || index.events.length === 0;
+		return jsonResponse(
+			{ ...found, events: found.events.map(shown) },
+			partial ? CACHE_CONTROL.short : CACHE_CONTROL.list
+		);
 	} catch (error) {
 		return errorResponse(error, 'Search is unavailable right now');
 	}
