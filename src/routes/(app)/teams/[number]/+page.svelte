@@ -52,16 +52,16 @@
 	]}
 />
 
+{#snippet staleLine()}
+	These stats couldn't be refreshed. <StaleNotice updated={view.updated} prefix="Last updated" />.
+{/snippet}
+
 <div class="summary">
-	<PageHeader title="{view.team.number} {view.team.name}" meta={meta ? `${meta}.` : undefined}>
-		{#snippet status()}
-			{#if view.stale}
-				These stats couldn't be refreshed. <StaleNotice
-					updated={view.updated}
-					prefix="Last updated"
-				/>.
-			{/if}
-		{/snippet}
+	<PageHeader
+		title="{view.team.number} {view.team.name}"
+		meta={meta ? `${meta}.` : undefined}
+		status={view.stale ? staleLine : undefined}
+	>
 		{#snippet actions()}
 			<div class="team-actions">
 				<FollowButton number={view.team.number} />
@@ -125,7 +125,7 @@
 {/if}
 
 {#if view.awards.length > 0}
-	<section class="panel awards" aria-labelledby="awards-title">
+	<section class="panel" aria-labelledby="awards-title">
 		<h2 class="sec-title" id="awards-title">Awards</h2>
 		<TeamAwards rows={view.awards} />
 	</section>
@@ -221,10 +221,6 @@
 
 	.previous {
 		max-width: 520px;
-	}
-
-	.awards {
-		max-width: 720px;
 	}
 
 	@media (max-width: 1060px) {

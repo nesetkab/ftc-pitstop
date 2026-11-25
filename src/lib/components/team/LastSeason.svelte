@@ -29,4 +29,3 @@
 		{/each}
 	</tbody>
 </Table>
-<p class="note">Each value is the team's best event that season.</p>
