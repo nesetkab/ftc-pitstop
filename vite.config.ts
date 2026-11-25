@@ -17,6 +17,7 @@ export default defineConfig({
 			adapter: adapter({ runtime: 'nodejs24.x' }),
 			csp: { mode: 'hash', directives: cspDirectives(appHtml) },
 			csrf: { trustedOrigins: [] },
+			serviceWorker: { register: false },
 			experimental: { remoteFunctions: true }
 		})
 	],

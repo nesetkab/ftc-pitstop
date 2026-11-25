@@ -7,11 +7,19 @@
 	import { onMount } from 'svelte';
 	import { version } from '$app/env';
 	import { scheduleRecovery } from '#lib/pwa/recover.ts';
+	import { scheduleRetire } from '#lib/pwa/register.ts';
 	import type { LayoutProps } from './$types';
 
 	let { children }: LayoutProps = $props();
 
-	onMount(() => scheduleRecovery(version));
+	onMount(() => {
+		const stopRecovery = scheduleRecovery(version);
+		const stopRetire = scheduleRetire();
+		return () => {
+			stopRecovery();
+			stopRetire();
+		};
+	});
 </script>
 
 <svelte:head>

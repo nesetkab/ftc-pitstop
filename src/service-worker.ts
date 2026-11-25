@@ -16,6 +16,7 @@ import {
 	overflow,
 	PAGE_TIMEOUT,
 	pageCache,
+	pageToKeep,
 	shellCache,
 	strategyFor
 } from '#lib/pwa/rules.ts';
@@ -31,6 +32,10 @@ interface FetchEvent extends ExtendableEvent {
 
 interface NotificationEvent extends ExtendableEvent {
 	readonly notification: Notification;
+}
+
+interface ExtendableMessageEvent extends ExtendableEvent {
+	readonly data: unknown;
 }
 
 interface WindowClient {
@@ -49,6 +54,7 @@ interface WorkerScope {
 	addEventListener(type: 'install' | 'activate', listener: (event: ExtendableEvent) => void): void;
 	addEventListener(type: 'fetch', listener: (event: FetchEvent) => void): void;
 	addEventListener(type: 'notificationclick', listener: (event: NotificationEvent) => void): void;
+	addEventListener(type: 'message', listener: (event: ExtendableMessageEvent) => void): void;
 }
 
 const worker = globalThis as unknown as WorkerScope;
@@ -153,6 +159,12 @@ function networkFirst(event: FetchEvent, target: Store, key: string): Promise<Re
 	return firstAnswer(network, fallback, fallbackDelay(navigator.onLine, target.timeout));
 }
 
+async function keepPage(href: string) {
+	if (await cachedCopy(pageStore, href)) return;
+	const response = await fetch(href, { headers: { accept: 'text/html' } });
+	if (isCacheableResponse(response)) await store(pageStore, href, response);
+}
+
 async function focusWindow() {
 	const windows = await worker.clients.matchAll({ type: 'window', includeUncontrolled: true });
 	if (windows[0]) await windows[0].focus();
@@ -181,6 +193,11 @@ worker.addEventListener('fetch', (event) => {
 	} else if (strategy === 'data') {
 		event.respondWith(networkFirst(event, dataStore, dataKey(request.url)));
 	}
+});
+
+worker.addEventListener('message', (event) => {
+	const href = pageToKeep(event.data, location.origin, scope);
+	if (href) event.waitUntil(keepPage(href).catch(() => undefined));
 });
 
 worker.addEventListener('notificationclick', (event) => {

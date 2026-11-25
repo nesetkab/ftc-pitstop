@@ -9,6 +9,7 @@ export interface RouteInput {
 }
 
 export const OFFLINE_HEADER = 'x-pitstop-offline';
+export const CACHE_PAGE = 'cache-page';
 export const CACHE_PREFIX = 'pitstop-';
 export const MAX_DATA_ENTRIES = 40;
 export const MAX_PAGE_ENTRIES = 20;
@@ -48,13 +49,27 @@ export function isWorkspacePage(path: string): boolean {
 	return WORKSPACE_PAGE.test(path) && !path.startsWith('w/share');
 }
 
+export function isOfflinePage(path: string): boolean {
+	return isPitPage(path) || isWorkspacePage(path);
+}
+
+export function pageToKeep(message: unknown, origin: string, scope: string): string | null {
+	if (typeof message !== 'object' || message === null) return null;
+	const { type, url } = message as Record<string, unknown>;
+	if (type !== CACHE_PAGE || typeof url !== 'string' || !URL.canParse(url)) return null;
+	const parsed = new URL(url);
+	if (parsed.origin !== origin || !isOfflinePage(relative(parsed.pathname, scope))) return null;
+	parsed.hash = '';
+	return parsed.href;
+}
+
 export function strategyFor(input: RouteInput): Strategy | null {
 	if (input.method !== 'GET') return null;
 	const path = relative(input.pathname, input.scope);
 	if (NETWORK_ONLY.test(path)) return null;
 	if (input.shell.has(input.pathname)) return 'shell';
 	if (input.mode === 'navigate') {
-		return isPitPage(path) || isWorkspacePage(path) ? 'page' : null;
+		return isOfflinePage(path) ? 'page' : null;
 	}
 	return EVENT_DATA.test(path) || PIT_DATA.test(path) ? 'data' : null;
 }

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
 	acceptPage,
+	CACHE_PAGE,
 	dataCache,
 	dataKey,
 	fallbackDelay,
@@ -11,6 +12,7 @@ import {
 	overflow,
 	PAGE_TIMEOUT,
 	pageCache,
+	pageToKeep,
 	pageVersion,
 	shellCache,
 	strategyFor,
@@ -25,6 +27,29 @@ function route(pathname: string, mode = 'cors', method = 'GET', scope = '/') {
 	const input: RouteInput = { method, mode, pathname, scope, shell };
 	return strategyFor(input);
 }
+
+describe('pageToKeep', () => {
+	const keep = (url: unknown, type: unknown = CACHE_PAGE, scope = '/') =>
+		pageToKeep({ type, url }, 'https://pit.test', scope);
+
+	it('accepts pit and workspace pages on this site', () => {
+		expect(keep('https://pit.test/724')).toBe('https://pit.test/724');
+		expect(keep('https://pit.test/724/tv?replay=1#q')).toBe('https://pit.test/724/tv?replay=1');
+		expect(keep('https://pit.test/w/ABC234/board')).toBe('https://pit.test/w/ABC234/board');
+		expect(keep('https://pit.test/pit/724', CACHE_PAGE, '/pit/')).toBe('https://pit.test/pit/724');
+	});
+
+	it('refuses other pages, other sites and odd messages', () => {
+		expect(keep('https://pit.test/events/USMTBUQ')).toBeNull();
+		expect(keep('https://pit.test/w/share/picklist')).toBeNull();
+		expect(keep('https://other.test/724')).toBeNull();
+		expect(keep('/724')).toBeNull();
+		expect(keep(724)).toBeNull();
+		expect(keep('https://pit.test/724', 'skip-waiting')).toBeNull();
+		expect(pageToKeep(null, 'https://pit.test', '/')).toBeNull();
+		expect(pageToKeep('cache-page', 'https://pit.test', '/')).toBeNull();
+	});
+});
 
 describe('strategyFor', () => {
 	it('serves build files and static assets from the shell', () => {

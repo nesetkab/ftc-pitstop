@@ -1,8 +1,12 @@
 <script lang="ts">
 	import { invalidateAll } from '$app/navigation';
+	import { page } from '$app/state';
+	import { keepOffline } from '#lib/pwa/register.ts';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
+
+	$effect(() => void keepOffline(page.url.href));
 
 	$effect(() => {
 		if (data.state !== 'unavailable') return;
