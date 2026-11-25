@@ -6,7 +6,8 @@ import {
 	hasRecordFilters,
 	filterRecords,
 	parseCondition,
-	shownParts,
+	recordColumns,
+	RECORD_COLUMNS,
 	pageRecords,
 	parseRecordFilters,
 	recordQuery,
@@ -94,21 +95,18 @@ describe('parseRecordFilters', () => {
 			type: '',
 			level: '',
 			team: null,
-			show: null,
 			match: 'all',
 			where: [],
 			page: 1
 		});
 	});
 
-	it('reads sort order, chosen statistics and custom filters and writes them back', () => {
-		const query =
-			'part=margin&dir=asc&show=total.hive&match=any&f=hive.gt.100&f=auto.lt.teleop&f=margin.lte.-5';
+	it('reads sort order and custom filters and writes them back', () => {
+		const query = 'part=margin&dir=asc&match=any&f=hive.gt.100&f=auto.lt.teleop&f=margin.lte.-5';
 		const parsed = parseRecordFilters(new URLSearchParams(query));
 		expect(parsed).toMatchObject({
 			part: 'margin',
 			dir: 'asc',
-			show: ['total', 'hive'],
 			match: 'any',
 			where: [
 				{ stat: 'hive', op: 'gt', value: 100 },
@@ -119,23 +117,19 @@ describe('parseRecordFilters', () => {
 		expect(recordQuery(parsed)).toBe(`?${query}`);
 	});
 
-	it('drops broken conditions, a lone any, and the default statistics', () => {
+	it('drops broken conditions and a lone any', () => {
 		for (const text of ['hive.gt.x', 'hive.gt.hive', 'bogus.gt.1', 'hive.zz.1', 'hive.gt.99999']) {
 			expect(parseCondition(text)).toBeNull();
 		}
 		const lone = parseRecordFilters(new URLSearchParams('match=any&f=hive.gt.1'));
 		expect(lone.match).toBe('all');
-		const plain = parseRecordFilters(
-			new URLSearchParams('show=total,auto,teleop,hive,flower,garden,park,opponent')
-		);
-		expect(plain.show).toBeNull();
 		const many = new URLSearchParams(Array.from({ length: 12 }, () => ['f', 'total.gt.1']));
 		expect(parseRecordFilters(many).where).toHaveLength(8);
 	});
 
 	it('always shows the sorted statistic', () => {
-		expect(shownParts({ show: ['total'], part: 'park' })).toEqual(['total', 'park']);
-		expect(shownParts({ show: null, part: 'total' })).toContain('opponent');
+		expect(recordColumns('park')).toEqual(RECORD_COLUMNS);
+		expect(recordColumns('margin')).toEqual(['margin', ...RECORD_COLUMNS]);
 	});
 
 	it('reads every filter and builds the same query back', () => {
@@ -299,10 +293,8 @@ describe('clearing record filters', () => {
 	});
 
 	it('counts custom filters as filters and clears them but keeps the view', () => {
-		const custom = parseRecordFilters(
-			new URLSearchParams('part=hive&dir=asc&show=total.hive&f=auto.gt.10')
-		);
+		const custom = parseRecordFilters(new URLSearchParams('part=hive&dir=asc&f=auto.gt.10'));
 		expect(hasRecordFilters(custom)).toBe(true);
-		expect(clearedRecords(custom)).toBe('/records?part=hive&dir=asc&show=total.hive');
+		expect(clearedRecords(custom)).toBe('/records?part=hive&dir=asc');
 	});
 });

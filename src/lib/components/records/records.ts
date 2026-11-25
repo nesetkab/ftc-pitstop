@@ -28,18 +28,18 @@ export const RECORD_GROUPS = [
 export type RecordGroup = (typeof RECORD_GROUPS)[number]['key'];
 
 export const RECORD_PARTS = [
-	{ key: 'total', label: PART_LABELS.total, group: 'score', shown: true },
-	{ key: 'auto', label: PART_LABELS.auto, group: 'score', shown: true },
-	{ key: 'teleop', label: PART_LABELS.teleop, group: 'score', shown: true },
-	{ key: 'fouls', label: PART_LABELS.fouls, group: 'score', shown: false },
-	{ key: 'final', label: 'Final', group: 'score', shown: false },
-	{ key: 'hive', label: PART_LABELS.hive, group: 'teleop', shown: true },
-	{ key: 'flower', label: PART_LABELS.flower, group: 'teleop', shown: true },
-	{ key: 'garden', label: PART_LABELS.garden, group: 'teleop', shown: true },
-	{ key: 'park', label: PART_LABELS.park, group: 'teleop', shown: true },
-	{ key: 'opponent', label: 'Opponent', group: 'result', shown: true },
-	{ key: 'margin', label: 'Margin', group: 'result', shown: false },
-	{ key: 'tips', label: PART_LABELS.tips, group: 'count', shown: false }
+	{ key: 'total', label: PART_LABELS.total, group: 'score' },
+	{ key: 'auto', label: PART_LABELS.auto, group: 'score' },
+	{ key: 'teleop', label: PART_LABELS.teleop, group: 'score' },
+	{ key: 'fouls', label: PART_LABELS.fouls, group: 'score' },
+	{ key: 'final', label: 'Final', group: 'score' },
+	{ key: 'hive', label: PART_LABELS.hive, group: 'teleop' },
+	{ key: 'flower', label: PART_LABELS.flower, group: 'teleop' },
+	{ key: 'garden', label: PART_LABELS.garden, group: 'teleop' },
+	{ key: 'park', label: PART_LABELS.park, group: 'teleop' },
+	{ key: 'opponent', label: 'Opponent', group: 'result' },
+	{ key: 'margin', label: 'Margin', group: 'result' },
+	{ key: 'tips', label: PART_LABELS.tips, group: 'count' }
 ] as const;
 
 export const RECORD_PART_NOTES: Record<RecordPart, string> = {
@@ -57,9 +57,15 @@ export const RECORD_PART_NOTES: Record<RecordPart, string> = {
 	tips: 'Number of tips in the match'
 };
 
-export const DEFAULT_SHOWN: RecordPart[] = RECORD_PARTS.filter((part) => part.shown).map(
-	(part) => part.key
-);
+export const RECORD_COLUMNS: RecordPart[] = [
+	'total',
+	'auto',
+	'teleop',
+	'hive',
+	'flower',
+	'garden',
+	'park'
+];
 
 export const RECORD_OPS = [
 	{ key: 'gt', label: '>', name: 'more than' },
@@ -128,7 +134,6 @@ export interface RecordFilters {
 	type: EventType | '';
 	level: TournamentLevel | '';
 	team: number | null;
-	show: RecordPart[] | null;
 	match: 'all' | 'any';
 	where: RecordCondition[];
 	page: number;
@@ -178,18 +183,8 @@ export function conditionParam(condition: RecordCondition): string {
 	return `${condition.stat}.${condition.op}.${condition.value}`;
 }
 
-export function parseShown(value: string | null): RecordPart[] | null {
-	if (value === null) return null;
-	const picked = new Set(value.split(/[.,]/));
-	const shown = RECORD_PARTS.filter((part) => picked.has(part.key)).map((part) => part.key);
-	if (shown.length === 0) return null;
-	return shown.join(',') === DEFAULT_SHOWN.join(',') ? null : shown;
-}
-
-export function shownParts(filters: Pick<RecordFilters, 'show' | 'part'>): RecordPart[] {
-	const shown = new Set<RecordPart>(filters.show ?? DEFAULT_SHOWN);
-	shown.add(filters.part);
-	return RECORD_PARTS.filter((part) => shown.has(part.key)).map((part) => part.key);
+export function recordColumns(part: RecordPart): RecordPart[] {
+	return RECORD_COLUMNS.includes(part) ? RECORD_COLUMNS : [part, ...RECORD_COLUMNS];
 }
 
 function isRange(value: string | null): value is RecordRange {
@@ -224,7 +219,6 @@ export function parseRecordFilters(params: URLSearchParams): RecordFilters {
 		type: isType(type) ? type : '',
 		level: level === 'qual' || level === 'playoff' ? level : '',
 		team: team > 0 ? team : null,
-		show: parseShown(params.get('show')),
 		match: where.length > 1 && params.get('match') === 'any' ? 'any' : 'all',
 		where,
 		page: whole(params.get('page'), 1, 1, 10_000)
@@ -240,7 +234,6 @@ export function recordQuery(filters: Partial<RecordFilters>, page = filters.page
 	if (filters.type) params.set('type', filters.type);
 	if (filters.level) params.set('level', filters.level);
 	if (filters.team) params.set('team', String(filters.team));
-	if (filters.show) params.set('show', filters.show.join('.'));
 	if (filters.match === 'any' && (filters.where?.length ?? 0) > 1) params.set('match', 'any');
 	for (const condition of filters.where ?? []) params.append('f', conditionParam(condition));
 	if (page > 1) params.set('page', String(page));
@@ -264,7 +257,7 @@ export function hasRecordFilters(filters: RecordFilters): boolean {
 }
 
 export function clearedRecords(filters: RecordFilters): string {
-	return `/records${recordQuery({ part: filters.part, dir: filters.dir, show: filters.show })}`;
+	return `/records${recordQuery({ part: filters.part, dir: filters.dir })}`;
 }
 
 export function partLabel(part: RecordPart): string {

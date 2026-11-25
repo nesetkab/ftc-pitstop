@@ -111,7 +111,6 @@
 				<option value="asc">Low to high</option>
 			</select>
 		</label>
-		{#if filters.show}<input type="hidden" name="show" value={filters.show.join(',')} />{/if}
 		{#if filters.match === 'any'}<input type="hidden" name="match" value="any" />{/if}
 		{#each filters.where as condition, index (index)}
 			<input type="hidden" name="f" value={conditionParam(condition)} />

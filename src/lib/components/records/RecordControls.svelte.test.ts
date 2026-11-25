@@ -2,8 +2,7 @@ import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/svelte';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import RecordConditions from './RecordConditions.svelte';
-import RecordStats from './RecordStats.svelte';
-import RecordsTable from './RecordsTable.svelte';
+import RecordTable from './RecordTable.svelte';
 import { parseRecordFilters, type RankedRecord } from './records.ts';
 
 const navigation = vi.hoisted(() => ({ goto: vi.fn() }));
@@ -53,7 +52,7 @@ function headerLink(name: string) {
 
 describe('records table sorting', () => {
 	it('sorts a new column high to low, then flips the sorted column', () => {
-		render(RecordsTable, {
+		render(RecordTable, {
 			props: { rows: [row], filters: filters(), names: { teams: {}, events: {} } }
 		});
 		expect(headerLink('Total')).toHaveAttribute('href', '/records?dir=asc');
@@ -64,11 +63,11 @@ describe('records table sorting', () => {
 		);
 	});
 
-	it('marks a low to high sort and shows only the chosen statistics', () => {
-		render(RecordsTable, {
+	it('marks a low to high sort and adds the sorted statistic', () => {
+		render(RecordTable, {
 			props: {
 				rows: [row],
-				filters: filters('part=margin&dir=asc&show=total.margin'),
+				filters: filters('part=margin&dir=asc'),
 				names: { teams: {}, events: {} }
 			}
 		});
@@ -76,20 +75,30 @@ describe('records table sorting', () => {
 			'aria-sort',
 			'ascending'
 		);
-		expect(headerLink('Margin')).toHaveAttribute('href', '/records?part=margin&show=total.margin');
-		expect(screen.queryByRole('columnheader', { name: 'Hive' })).toBeNull();
+		expect(headerLink('Margin')).toHaveAttribute('href', '/records?part=margin');
+		expect(screen.queryByRole('columnheader', { name: 'Opponent' })).toBeNull();
 		expect(screen.getByRole('cell', { name: '+30' })).toBeInTheDocument();
 	});
-});
 
-describe('choosing statistics', () => {
-	it('adds a statistic and keeps the sorted one locked', async () => {
-		render(RecordStats, { props: { filters: filters('part=hive'), ondone: vi.fn() } });
-		expect(screen.getByRole('checkbox', { name: /Hive/ })).toBeDisabled();
-		await fireEvent.click(screen.getByRole('checkbox', { name: 'Margin' }));
-		expect(navigation.goto).toHaveBeenCalledWith(
-			'/records?part=hive&show=total.auto.teleop.hive.flower.garden.park.opponent.margin',
-			{ replace: true, reset: false }
+	it('shows the rank on every row, ties included', () => {
+		render(RecordTable, {
+			props: {
+				rows: [row, { ...row, key: 'q2', label: 'Q2' }],
+				filters: filters(),
+				names: { teams: {}, events: {} }
+			}
+		});
+		expect(screen.getAllByRole('cell', { name: '1' })).toHaveLength(2);
+	});
+
+	it('says when nothing matches', () => {
+		render(RecordTable, {
+			props: { rows: [], filters: filters('part=hive&team=3747'), names: { teams: {}, events: {} } }
+		});
+		expect(screen.getByText('No scores match these filters.')).toBeInTheDocument();
+		expect(screen.getByRole('link', { name: 'Clear filters' })).toHaveAttribute(
+			'href',
+			'/records?part=hive'
 		);
 	});
 });
