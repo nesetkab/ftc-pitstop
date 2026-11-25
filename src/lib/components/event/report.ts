@@ -31,13 +31,13 @@ export const REPORT_PART_LABELS: Record<ReportPart, string> = {
 
 const PHRASES: Record<ReportPart, string> = {
 	opr: 'overall scoring',
-	auto: 'autonomous',
-	teleop: 'teleop',
+	auto: 'auto scoring',
+	teleop: 'teleop scoring',
 	hive: 'hive scoring',
 	flower: 'flower scoring',
 	garden: 'garden scoring',
 	park: 'parking',
-	tips: 'hive tips'
+	tips: 'hive tipping'
 };
 
 const MEANINGFUL: Record<ReportPart, number> = {
@@ -430,7 +430,7 @@ function partTakeaways(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 		.slice(0, 2)
 		.map((row) => ({
 			weight: 90 - row.rank,
-			text: `${row.rank === 1 ? 'Best' : `${ordinal(row.rank)}-best`} ${PHRASES[row.key]} ${where}`
+			text: `Has the ${row.rank === 1 ? 'best' : `${ordinal(row.rank)}-best`} ${PHRASES[row.key]} ${where}`
 		}));
 	if (expected) return strong;
 	const weak = rows
@@ -445,7 +445,7 @@ function partTakeaways(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 		.slice(0, 1)
 		.map((row) => ({
 			weight: 60,
-			text: `Weak ${PHRASES[row.key]}: ${ordinal(row.rank)} of ${row.of} ${where}`
+			text: `Ranks ${ordinal(row.rank)} of ${row.of} in ${PHRASES[row.key]} ${where}`
 		}));
 	return [...strong, ...weak];
 }
@@ -455,6 +455,8 @@ export function rpTakeaways(rp: RpHabits | null): Candidate[] {
 	const habit = (key: RpKey) => rp.habits.find((entry) => entry.key === key) as RpHabit;
 	const share = (entry: RpHabit) => entry.earned / rp.played;
 	const of = `${rp.played} matches`;
+	const rarely = (name: string, earned: number) =>
+		earned === 0 ? `Hasn't earned ${name} in ${of}` : `Earns ${name} in only ${earned} of ${of}`;
 	const out: Candidate[] = [];
 	const swarm = habit('swarm');
 	const p1 = habit('pollinator1');
@@ -462,14 +464,14 @@ export function rpTakeaways(rp: RpHabits | null): Candidate[] {
 	if (share(swarm) >= 0.75 && swarm.event < 0.6) {
 		out.push({ weight: 58, text: `Earns Swarm in ${swarm.earned} of ${of}` });
 	} else if (share(swarm) <= 0.2 && swarm.event >= 0.3) {
-		out.push({ weight: 74, text: `Rarely earns Swarm: ${swarm.earned} of ${of}` });
+		out.push({ weight: 74, text: rarely('Swarm', swarm.earned) });
 	}
 	if (share(p2) >= 0.5 && p2.event < 0.5) {
 		out.push({ weight: 70, text: `Earns Pollinator 2 in ${p2.earned} of ${of}` });
 	} else if (share(p1) >= 0.75 && p1.event < 0.6) {
 		out.push({ weight: 56, text: `Earns Pollinator 1 in ${p1.earned} of ${of}` });
 	} else if (share(p1) <= 0.2 && p1.event >= 0.25) {
-		out.push({ weight: 75, text: `Rarely earns Pollinator: ${p1.earned} of ${of}` });
+		out.push({ weight: 75, text: rarely('Pollinator', p1.earned) });
 	}
 	return out;
 }
@@ -486,7 +488,7 @@ function trendTakeaways(trend: Trend | null): Candidate[] {
 		return [
 			{
 				weight: 80,
-				text: `Scores ${word} in the last 3 matches: ${integer(recent.average)} average vs ${integer(recent.before)} before`
+				text: `Scores ${word} to an average of ${integer(recent.average)} in the last 3 matches, from ${integer(recent.before)} before`
 			}
 		];
 	}
@@ -495,7 +497,7 @@ function trendTakeaways(trend: Trend | null): Candidate[] {
 		return [
 			{
 				weight: 66,
-				text: `Scores ${word} through the event: ${integer(trend.first)} average early, ${integer(trend.second)} later`
+				text: `Scores ${word} from an average of ${integer(trend.first)} early in the event to ${integer(trend.second)} later`
 			}
 		];
 	}
@@ -508,7 +510,7 @@ function spreadTakeaways(spread: Spread | null): Candidate[] {
 		return [
 			{
 				weight: 50,
-				text: `Consistent scores: ${spread.rank === 1 ? '' : `${ordinal(spread.rank)}-`}smallest spread of ${spread.of} teams`
+				text: `Has the ${spread.rank === 1 ? '' : `${ordinal(spread.rank)}-`}most consistent scores of ${spread.of} teams`
 			}
 		];
 	}
@@ -517,7 +519,7 @@ function spreadTakeaways(spread: Spread | null): Candidate[] {
 		return [
 			{
 				weight: 52,
-				text: `Uneven scores: ${widest === 1 ? '' : `${ordinal(widest)}-`}widest spread of ${spread.of} teams`
+				text: `Has the ${widest === 1 ? '' : `${ordinal(widest)}-`}most uneven scores of ${spread.of} teams`
 			}
 		];
 	}
@@ -531,11 +533,11 @@ function seasonTakeaways(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 	}
 	const change = opr.value - report.season.opr;
 	if (Math.abs(change) < Math.max(8, report.season.opr * 0.15)) return [];
-	const word = change > 0 ? 'Above' : 'Below';
+	const word = change > 0 ? 'above' : 'below';
 	return [
 		{
 			weight: 55,
-			text: `${word} season form: ${fixed(opr.value)} aOPR here vs ${fixed(report.season.opr)} for the season`
+			text: `Has ${fixed(opr.value)} aOPR here, ${word} its season aOPR of ${fixed(report.season.opr)}`
 		}
 	];
 }
@@ -560,7 +562,7 @@ function fallbacks(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 		const match = played[0];
 		out.push({
 			weight: 20,
-			text: `One match played so far: alliance scored ${integer(match.score)} in ${match.label}`
+			text: `Has played one match so far, scoring ${integer(match.score)} with its alliance in ${match.label}`
 		});
 	}
 	const best = (report.parts ?? [])
@@ -575,7 +577,7 @@ function fallbacks(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 	if (best && report.rated === 'here' && played.length > 1) {
 		out.push({
 			weight: 18,
-			text: `Best part: ${PHRASES[best.key]}, ${ordinal(best.rank)} of ${best.of} at this event`
+			text: `Ranks ${ordinal(best.rank)} of ${best.of} in ${PHRASES[best.key]} at this event`
 		});
 	}
 	return out.sort((a, b) => b.weight - a.weight);
@@ -585,7 +587,7 @@ export function takeaways(report: Omit<TeamReport, 'takeaways'>): string[] {
 	if (report.eventStarted && report.played.length === 0) {
 		const next = report.upcoming[0];
 		const first = next
-			? `No matches played here yet; first is ${next.label}`
+			? `Plays its first match in ${next.label}`
 			: 'Did not play a match at this event';
 		return [first, ...fallbacks(report).map((entry) => entry.text)].slice(0, 2);
 	}

@@ -43,7 +43,6 @@
 			.join(' ')
 	);
 	const upcoming = $derived(compact ? report.upcoming.slice(0, 4) : report.upcoming);
-	const qualCount = $derived(report.played.filter((match) => match.level === 'qual').length);
 
 	const facts = $derived.by(() => {
 		const list: string[] = [];
@@ -123,7 +122,7 @@
 	{/if}
 
 	{#if report.league}
-		<p class="note">League meet: rankings, record and aOPR include earlier meets in the league.</p>
+		<p class="note">Rankings, record and aOPR include earlier meets in the league.</p>
 	{/if}
 
 	<div class="grid">
@@ -197,11 +196,11 @@
 						</tbody>
 					</Table>
 				{/if}
-				<p class={['note', { 'screen-only': compact }]}>
-					{expected
-						? 'Expected values come from season form before this event.'
-						: 'aOPR estimates points per match. Rank is among teams that played here.'}
-				</p>
+				{#if expected}
+					<p class={['note', { 'screen-only': compact }]}>
+						Expected values come from season form before this event.
+					</p>
+				{/if}
 			</section>
 		{/if}
 
@@ -239,8 +238,7 @@
 					average={report.eventAverage}
 				/>
 				<p class={['note', { 'screen-only': compact }]}>
-					Alliance score without opponent fouls. Faded bars are losses; the dashed line is the event
-					average of {integer(report.eventAverage)}.
+					Faded bars are losses. The dashed line is the event average.
 				</p>
 			{:else}
 				<p class="muted">
@@ -282,9 +280,6 @@
 							{/each}
 						</tbody>
 					</table>
-					<p class={['note', { 'screen-only': compact }]}>
-						Qualification matches only, not counting surrogate matches.
-					</p>
 				{/if}
 				{#if report.trend && !compact}
 					<h3 class="sec-title trend-title">Trend</h3>
@@ -304,7 +299,7 @@
 							</div>
 						{/if}
 					</dl>
-					<p class="note">Average alliance score over {qualCount} qualification matches.</p>
+					<p class="note">Each number is an average alliance score.</p>
 				{/if}
 			</section>
 		{/if}

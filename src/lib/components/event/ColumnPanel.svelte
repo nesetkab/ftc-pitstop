@@ -48,13 +48,10 @@
 					{column.name}
 				</label>
 			{/each}
-			{#if group.source === 'score' && group.available}
-				<p class="note">Without points from opponent fouls.</p>
-			{/if}
 			{#if !group.available}
 				<p class="note">
 					{group.source === 'rating'
-						? 'Shows once the model has rated this event.'
+						? 'Shows once this event has aOPR.'
 						: 'Shows once qualification matches have scores.'}
 				</p>
 			{/if}
