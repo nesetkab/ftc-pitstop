@@ -46,7 +46,7 @@
 		{ key: 'rank', label: 'Rank', numeric: true, text: (row) => integer(row.rank), class: 'rank' },
 		...recordColumns(filters.part).map(statColumn),
 		{ key: 'alliance', label: 'Alliance', cell: alliance, class: 'who' },
-		{ key: 'match', label: 'Match', cell: match, hide: 'phone', class: 'when' },
+		{ key: 'match', label: 'Match', cell: match, hide: 'phone' },
 		{ key: 'event', label: 'Event', cell: event, hide: 'phone', fill: true }
 	]);
 
@@ -124,15 +124,6 @@
 
 	.records :global(:is(th, td).rank) {
 		padding-left: 0;
-		padding-right: 6px;
-	}
-
-	.records :global(:is(th, td).who) {
-		padding-left: 20px;
-	}
-
-	.records :global(:is(th, td).when) {
-		padding-inline: 16px;
 	}
 
 	.teams {
@@ -207,7 +198,8 @@
 		}
 
 		.records :global(td) {
-			padding-block: 9px;
+			padding-block: 6px;
+			line-height: 1.25;
 			vertical-align: baseline;
 		}
 
@@ -217,7 +209,7 @@
 
 		.records :global(:is(td, th).who) {
 			max-width: 0;
-			padding-left: 10px;
+			padding-left: 8px;
 			padding-right: 0;
 		}
 
@@ -230,10 +222,10 @@
 
 		.records .brief {
 			display: block;
-			margin-top: 2px;
+			margin-top: 1px;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			font-size: 13px;
+			font-size: 12.5px;
 			color: var(--text-2);
 		}
 

@@ -124,9 +124,8 @@
 	}
 
 	.sort {
-		display: inline-flex;
-		align-items: center;
-		gap: 3px;
+		position: relative;
+		display: inline-block;
 		padding: 0;
 		border: 0;
 		background: none;
@@ -142,7 +141,11 @@
 	}
 
 	th :global(.sort-arrow) {
+		position: absolute;
+		top: 50%;
+		right: calc(100% + 2px);
 		margin: 0;
+		translate: 0 -50%;
 		opacity: 0;
 		transition: opacity 0.12s;
 	}
@@ -159,15 +162,6 @@
 
 	th.active :global(.sort-arrow) {
 		opacity: 1;
-	}
-
-	thead th.active,
-	tbody td.active {
-		background: var(--surface);
-	}
-
-	:global(tr.me) td.active {
-		background: none;
 	}
 
 	td.active,

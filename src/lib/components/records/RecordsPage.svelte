@@ -43,48 +43,50 @@
 
 <PageHeader title="Season records" />
 
-<div class="controls">
-	<RecordFilters filters={data.filters} regions={data.regions} types={data.types} />
-	<RecordMenu
-		label="Score conditions"
-		count={data.filters.where.length}
-		panelLabel="Score conditions"
-		width={520}
-	>
-		{#snippet children(close)}
-			<RecordConditions filters={data.filters} ondone={close} />
-		{/snippet}
-	</RecordMenu>
-</div>
+<div class="body">
+	<div class="controls">
+		<RecordFilters filters={data.filters} regions={data.regions} types={data.types} />
+		<RecordMenu
+			label="Score conditions"
+			count={data.filters.where.length}
+			panelLabel="Score conditions"
+			width={520}
+		>
+			{#snippet children(close)}
+				<RecordConditions filters={data.filters} ondone={close} />
+			{/snippet}
+		</RecordMenu>
+	</div>
 
-{#if data.filters.where.length > 0}
-	<ul class="conditions" aria-label="Score conditions">
-		{#each data.filters.where as condition, index (`${index}:${conditionText(condition)}`)}
-			{#if index > 0}
-				<li class="joiner" aria-hidden="true">{data.filters.match === 'any' ? 'or' : 'and'}</li>
-			{/if}
-			<li>
-				<a class="chip" href={without(index)} aria-label="Remove {conditionText(condition)}"
-					>{conditionText(condition)}
-					<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
-						<path d="M2 2 8 8M8 2 2 8" />
-					</svg></a
-				>
-			</li>
-		{/each}
-	</ul>
-{/if}
-
-<div class="results">
-	{#if data.total > 0}
-		<p class="count" aria-live="polite">
-			{integer(data.total)} alliance scores
-			{#if hasRecordFilters(data.filters)}
-				<a href={clearedRecords(data.filters)}>Clear filters</a>
-			{/if}
-		</p>
+	{#if data.filters.where.length > 0}
+		<ul class="conditions" aria-label="Score conditions">
+			{#each data.filters.where as condition, index (`${index}:${conditionText(condition)}`)}
+				{#if index > 0}
+					<li class="joiner" aria-hidden="true">{data.filters.match === 'any' ? 'or' : 'and'}</li>
+				{/if}
+				<li>
+					<a class="chip" href={without(index)} aria-label="Remove {conditionText(condition)}"
+						>{conditionText(condition)}
+						<svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+							<path d="M2 2 8 8M8 2 2 8" />
+						</svg></a
+					>
+				</li>
+			{/each}
+		</ul>
 	{/if}
-	<RecordTable rows={data.rows} filters={data.filters} names={data.names} />
+
+	<div class="results">
+		{#if data.total > 0}
+			<p class="count" aria-live="polite">
+				{integer(data.total)} alliance scores
+				{#if hasRecordFilters(data.filters)}
+					<a href={clearedRecords(data.filters)}>Clear filters</a>
+				{/if}
+			</p>
+		{/if}
+		<RecordTable rows={data.rows} filters={data.filters} names={data.names} />
+	</div>
 </div>
 
 <Pagination
@@ -104,6 +106,11 @@
 {/if}
 
 <style>
+	.body {
+		display: grid;
+		gap: 14px;
+	}
+
 	.controls {
 		display: flex;
 		flex-wrap: wrap;
@@ -135,7 +142,7 @@
 		flex-wrap: wrap;
 		align-items: center;
 		gap: 6px;
-		margin: -4px 0 0;
+		margin: 0;
 		padding: 0;
 		list-style: none;
 		font-size: 13px;
