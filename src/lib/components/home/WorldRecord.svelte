@@ -10,9 +10,7 @@
 	let { record }: Props = $props();
 
 	const own = $derived(record.alliance === 'red' ? record.red : record.blue);
-	const opponents = $derived(record.alliance === 'red' ? record.blue : record.red);
 	const score = $derived(record.alliance === 'red' ? record.redScore : record.blueScore);
-	const opponentScore = $derived(record.alliance === 'red' ? record.blueScore : record.redScore);
 	const side = $derived(record.alliance === 'red' ? 'Red' : 'Blue');
 	const eventName = $derived(record.names.events[record.event] ?? record.event);
 </script>
@@ -36,12 +34,6 @@
 			<span class="where">
 				<a href="/events/{record.event}/matches/{record.key}">{record.label} {side}</a>
 				at <a href="/events/{record.event}">{eventName}</a>, {shortDate(record.day)}
-			</span>
-			<span class="note">
-				Against {opponents.join(' ')}, who scored {opponentScore}. Foul points left out.
-				{#if record.ties > 0}
-					Tied by {record.ties} other {record.ties === 1 ? 'alliance' : 'alliances'}.
-				{/if}
 			</span>
 		</div>
 	</div>
@@ -135,10 +127,6 @@
 
 	.where a:hover {
 		color: var(--text);
-	}
-
-	.note {
-		font-size: 12.5px;
 	}
 
 	@media (pointer: coarse) {

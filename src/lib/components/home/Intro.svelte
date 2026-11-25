@@ -36,8 +36,8 @@
 		<p class="sub">
 			Plus a <a href="#pit">pit display</a> for your TV, a shared
 			<a href="/w">team workspace</a> with a pick list, an
-			<a href="/advancement">advancement tracker</a> and
-			<a href="/events/strength">event strength</a> for every event.
+			<a href="/advancement">advancement tracker</a> and a
+			<a href="/events/strength">strength rating</a> for every event.
 		</p>
 		<button type="button" class="hide" onclick={hide}><Icon name="close" size={12} />Hide</button>
 	</section>

@@ -255,8 +255,7 @@ describe('home page', () => {
 			'/teams/19666'
 		);
 		expect(within(section).getByRole('link', { name: 'M5 Red' })).toBeInTheDocument();
-		expect(section).toHaveTextContent('Against 27648 22406, who scored 188. Foul points left out.');
-		expect(section).toHaveTextContent('Tied by 1 other alliance.');
+		expect(section).not.toHaveTextContent('Against');
 		expect(within(section).getByRole('link', { name: 'All records' })).toHaveAttribute(
 			'href',
 			'/records'

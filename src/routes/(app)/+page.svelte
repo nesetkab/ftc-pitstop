@@ -59,9 +59,7 @@
 		{#if data.today === null}
 			<EmptyState title="Today's events could not be loaded.">Try again in a moment.</EmptyState>
 		{:else if data.today.length === 0}
-			<EmptyState title="No events are running today.">
-				Events show here on the days they run, with live progress and the current leader.
-			</EmptyState>
+			<EmptyState title="No events are running today.">Live events show here.</EmptyState>
 		{:else}
 			<TodayEvents rows={data.today} />
 		{/if}
