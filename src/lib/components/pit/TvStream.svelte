@@ -32,7 +32,9 @@
 <div class="cols" style:--cols="minmax(0, 1fr) 30em">
 	<section class="watch">
 		<h2 class="visually-hidden">Live stream</h2>
-		<StreamPlayer code={event.code} listed={eventStream(event)} />
+		<div class="fit">
+			<StreamPlayer code={event.code} listed={eventStream(event)} />
+		</div>
 		{#if view.matches.length > 0}
 			<h2 class="tv-label">Our matches</h2>
 			<MatchList items={matchItems(view.matches, next?.key ?? null, timeZone, now, 3)} />
@@ -66,6 +68,20 @@
 </div>
 
 <style>
+	.watch {
+		grid-template-rows: minmax(0, 1fr) auto auto;
+		align-content: stretch;
+	}
+
+	.fit {
+		min-height: 0;
+		container-type: size;
+	}
+
+	.fit :global(.frame) {
+		width: min(100%, calc((100cqh - 3.2em) * 16 / 9));
+	}
+
 	.side {
 		align-content: stretch;
 	}
