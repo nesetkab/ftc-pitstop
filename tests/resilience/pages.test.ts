@@ -9,6 +9,7 @@ import {
 	importPages,
 	onEventDay,
 	PAGE_BUDGET_MS,
+	pause,
 	TEAM,
 	visit,
 	visitAll
@@ -50,7 +51,7 @@ describe('last good data', () => {
 		upstreams.set({ ftc: 'error', scout: 'down' });
 		vi.setSystemTime(EVENT_DAY + 10 * 60_000);
 		await visitAll(pages);
-		await new Promise((resolve) => setTimeout(resolve, 2_000));
+		await pause(2_000);
 		const outcomes = await visitAll(pages);
 		expectGraceful(outcomes, PAGE_BUDGET_MS);
 		for (const page of [`/api/events/${CODE}/lite`, `/events/${CODE}#layout`, `/${TEAM}`]) {

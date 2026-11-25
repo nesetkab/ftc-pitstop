@@ -1,7 +1,6 @@
 import { isHttpError, isRedirect } from '@sveltejs/kit';
 import { afterEach, beforeEach, expect, vi } from 'vitest';
 import type { EventBundle } from '#lib/types.ts';
-import { ceiling } from '../timing.ts';
 import { fakeUpstreams, type Modes } from './upstream.ts';
 
 export const CODE = 'USAZGIQ';
@@ -137,7 +136,43 @@ async function measure(page: string, run: (headers: Record<string, string>) => P
 	}
 }
 
+const realTimeout = globalThis.setTimeout;
+
+function realPause(): Promise<void> {
+	return new Promise((resolve) => realTimeout(resolve, 1));
+}
+
+function fakeTimeout(ms: number): AbortSignal {
+	const controller = new AbortController();
+	setTimeout(
+		() => controller.abort(new DOMException('The operation timed out.', 'TimeoutError')),
+		ms
+	);
+	return controller.signal;
+}
+
+async function drive<T>(task: Promise<T>): Promise<T> {
+	let settled = false;
+	const done = task.finally(() => {
+		settled = true;
+	});
+	done.catch(() => {});
+	while (!settled) {
+		await realPause();
+		if (!settled && vi.getTimerCount() > 0) await vi.advanceTimersToNextTimerAsync();
+	}
+	return task;
+}
+
+export function pause(ms: number): Promise<void> {
+	return drive(new Promise((resolve) => setTimeout(resolve, ms)));
+}
+
 export function visitAll(pages: PageModules): Promise<Outcome[]> {
+	return drive(visitEvery(pages));
+}
+
+function visitEvery(pages: PageModules): Promise<Outcome[]> {
 	const event = (path: string, routeId: string, load: Load) =>
 		measure(path, async (headers) => {
 			const layoutEvent = kitEvent(path, routeId, { code: CODE }, headers, async () => ({}));
@@ -182,8 +217,11 @@ export function find(outcomes: Outcome[], page: string): Outcome {
 export function onEventDay() {
 	beforeEach(() => {
 		vi.resetModules();
-		vi.useFakeTimers({ toFake: ['Date'] });
+		vi.useFakeTimers({
+			toFake: ['setTimeout', 'clearTimeout', 'setInterval', 'clearInterval', 'Date', 'performance']
+		});
 		vi.setSystemTime(EVENT_DAY);
+		vi.spyOn(AbortSignal, 'timeout').mockImplementation(fakeTimeout);
 		vi.spyOn(console, 'warn').mockImplementation(() => {});
 		vi.spyOn(console, 'error').mockImplementation(() => {});
 	});
@@ -212,11 +250,10 @@ export function sharedMaxAge(cacheControl: string | null): number {
 }
 
 export function expectGraceful(outcomes: Outcome[], budgetMs: number) {
-	const limit = ceiling(budgetMs);
 	for (const outcome of outcomes) {
 		expect(outcome.status, `${outcome.page}: ${outcome.message}`).not.toBe(500);
 		expect([200, 503], outcome.page).toContain(outcome.status);
-		expect(outcome.ms, outcome.page).toBeLessThan(limit);
+		expect(outcome.ms, outcome.page).toBeLessThan(budgetMs);
 	}
 }
 
