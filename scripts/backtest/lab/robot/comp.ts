@@ -46,8 +46,11 @@ export class Comp {
 	played = new Int32Array(0);
 	ph = new Float64Array(0);
 
-	constructor(p: CompParams) {
+	diag: boolean;
+
+	constructor(p: CompParams, diag = false) {
 		this.p = p;
+		this.diag = diag;
 	}
 
 	startSeason(prevRel: Map<number, number>): void {
@@ -118,6 +121,10 @@ export class Comp {
 	variance(idx: number[], w: number[]): number {
 		const n = this.n;
 		let v = 0;
+		if (this.diag) {
+			for (let a = 0; a < idx.length; a++) v += w[a] * w[a] * this.P[idx[a] * n + idx[a]];
+			return v;
+		}
 		for (let a = 0; a < idx.length; a++) {
 			const row = idx[a] * n;
 			for (let b = 0; b < idx.length; b++) v += w[a] * w[b] * this.P[row + idx[b]];
@@ -133,6 +140,16 @@ export class Comp {
 	observe(idx: number[], h: number[], y: number, r = 1): void {
 		const n = this.n;
 		const P = this.P;
+		if (this.diag) {
+			const i = idx[0];
+			const pii = P[i * n + i];
+			const s = h[0] * h[0] * pii + r;
+			const g = (h[0] * pii) / s;
+			this.mu[i] += g * (y - h[0] * this.mu[i]);
+			this.nu[i] += g * (y - h[0] * this.nu[i]);
+			P[i * n + i] = pii - g * h[0] * pii;
+			return;
+		}
 		const ph = this.ph;
 		ph.fill(0);
 		for (let a = 0; a < idx.length; a++) {

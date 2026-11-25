@@ -51,10 +51,10 @@ export class RobotOpr implements Model {
 		this.name = name;
 		this.o = o;
 		this.rest = new Comp(o.rest);
-		this.robot = o.robot ? new Comp(o.robot) : null;
-		this.robotEnd = o.robotSplit ? new Comp(o.robotSplit) : null;
+		this.robot = o.robot ? new Comp(o.robot, true) : null;
+		this.robotEnd = o.robotSplit ? new Comp(o.robotSplit, true) : null;
 		this.auto = o.auto ? new Comp(o.auto) : null;
-		this.move = o.move ? new Comp(o.move) : null;
+		this.move = o.move ? new Comp(o.move, true) : null;
 		this.comps = [this.rest, this.robot, this.robotEnd, this.auto, this.move].filter(
 			(c): c is Comp => c !== null
 		);
@@ -65,6 +65,7 @@ export class RobotOpr implements Model {
 		const out = new Map<number, number>();
 		const totals = new Map<number, number>();
 		for (let j = 0; j < w.length && j < this.past.length; j++) {
+			if (w[j] <= 0) continue;
 			const rel = this.past[this.past.length - 1 - j][k];
 			for (const [t, r] of rel) {
 				out.set(t, (out.get(t) ?? 0) + w[j] * r);
