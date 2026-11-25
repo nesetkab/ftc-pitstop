@@ -67,7 +67,8 @@
 			first: best,
 			sort: (row) => value(row, season),
 			text: (row) => format(value(row, season)),
-			hide: index > 2 ? 'phone' : undefined
+			hide: index > 2 ? 'phone' : undefined,
+			class: 'season'
 		}))
 	]);
 </script>
@@ -87,6 +88,22 @@
 />
 
 <style>
+	:global(.seasons table.t td.season::before),
+	:global(.seasons table.t td.season::after) {
+		display: block;
+		height: 0;
+		overflow: hidden;
+		visibility: hidden;
+	}
+
+	:global(.seasons table.t td.season::before) {
+		content: '00.0%';
+	}
+
+	:global(.seasons table.t td.season::after) {
+		content: '0.000';
+	}
+
 	:global(.seasons table.t :is(th, td):last-child) {
 		padding-right: 10px;
 	}
