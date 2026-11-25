@@ -1,10 +1,12 @@
 export function keepAwake(): () => void {
 	let lock: WakeLockSentinel | null = null;
+	let asking = false;
 	let active = true;
 
 	async function request() {
-		if (!active || lock || document.visibilityState !== 'visible') return;
+		if (!active || lock || asking || document.visibilityState !== 'visible') return;
 		if (!('wakeLock' in navigator)) return;
+		asking = true;
 		try {
 			const sentinel = await navigator.wakeLock.request('screen');
 			if (!active) {
@@ -17,6 +19,8 @@ export function keepAwake(): () => void {
 			});
 		} catch {
 			lock = null;
+		} finally {
+			asking = false;
 		}
 	}
 

@@ -26,6 +26,7 @@
 	const id = $props.id();
 	let access: BrowserWorkspaces | null = null;
 	let stop = () => {};
+	let closed = false;
 	let copied = $state(false);
 
 	const tabs = $derived([
@@ -43,7 +44,7 @@
 		if (!access) return;
 		stop();
 		await workspace.open(access.access);
-		if (workspace.status !== 'ready') return;
+		if (closed || workspace.status !== 'ready') return;
 		stop = workspace.start();
 		rememberRecent(access.storage, {
 			code,
@@ -57,6 +58,7 @@
 		access = browserWorkspaces(shared);
 		void open();
 		return () => {
+			closed = true;
 			stop();
 			void workspace.flush();
 		};
