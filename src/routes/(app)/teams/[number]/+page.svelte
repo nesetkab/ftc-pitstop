@@ -232,12 +232,11 @@
 
 	@media (max-width: 600px) {
 		.team-actions {
-			flex-wrap: nowrap;
-			gap: 6px;
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
 		}
 
-		.team-actions > :global(:first-child) {
-			flex: 1 1 auto;
+		.team-actions > :global(*) {
 			min-width: 0;
 		}
 	}
