@@ -62,12 +62,29 @@
 	}
 </script>
 
-{#snippet label(column: Column<T>)}
+{#snippet words(column: Column<T>, text: string, nested: boolean)}
 	{#if column.term}<Term
-			label={column.label}
-			term={termOf(column)}
-			nested
-		/>{:else}{column.label}{/if}
+			label={text}
+			term={termOf(column) ?? column.label}
+			{nested}
+		/>{:else}{text}{/if}
+{/snippet}
+
+{#snippet label(column: Column<T>, nested: boolean)}
+	{#if column.short}<span class="long">{@render words(column, column.label, nested)}</span><span
+			class="short"
+			aria-hidden="true">{column.short}</span
+		>{:else}{@render words(column, column.label, nested)}{/if}
+{/snippet}
+
+{#snippet sortLabel(column: Column<T>)}
+	{#if column.numeric}<Arrow
+			dir={arrow(column) === 'asc' ? 'up' : 'down'}
+			class="sort-arrow"
+		/>{/if}<span>{@render label(column, true)}</span>{#if !column.numeric}<Arrow
+			dir={arrow(column) === 'asc' ? 'up' : 'down'}
+			class="sort-arrow"
+		/>{/if}
 {/snippet}
 
 {#if shown.length === 0 && empty}
@@ -82,21 +99,15 @@
 						{#if column.sort}
 							{#if href}
 								<a class="sort" href={href(nextSort(column, sort))} data-sveltekit-noscroll
-									><Arrow dir={arrow(column) === 'asc' ? 'up' : 'down'} class="sort-arrow" /><span
-										>{@render label(column)}</span
-									></a
+									>{@render sortLabel(column)}</a
 								>
 							{:else}
 								<button class="sort" type="button" onclick={() => (sort = nextSort(column, sort))}
-									><Arrow dir={arrow(column) === 'asc' ? 'up' : 'down'} class="sort-arrow" /><span
-										>{@render label(column)}</span
-									></button
+									>{@render sortLabel(column)}</button
 								>
 							{/if}
-						{:else if column.term}
-							<Term label={column.label} term={termOf(column)} />
 						{:else}
-							{column.label}
+							{@render label(column, false)}
 						{/if}
 					</th>
 				{/each}
@@ -134,7 +145,6 @@
 	}
 
 	.sort {
-		position: relative;
 		display: inline-block;
 		padding: 0;
 		border: 0;
@@ -151,13 +161,17 @@
 	}
 
 	th :global(.sort-arrow) {
-		position: absolute;
-		top: 50%;
-		right: calc(100% + 2px);
-		margin: 0;
-		translate: 0 -50%;
+		margin: 0 3px 0 0;
 		opacity: 0;
 		transition: opacity 0.12s;
+	}
+
+	th.l :global(.sort-arrow) {
+		margin: 0 0 0 3px;
+	}
+
+	.short {
+		display: none;
 	}
 
 	th .sort:hover :global(.sort-arrow),
@@ -205,6 +219,19 @@
 		th.num,
 		td.num {
 			padding-inline: 8px;
+		}
+
+		.long {
+			position: absolute;
+			width: 1px;
+			height: 1px;
+			overflow: hidden;
+			clip-path: inset(50%);
+			white-space: nowrap;
+		}
+
+		.short {
+			display: inline;
 		}
 	}
 </style>

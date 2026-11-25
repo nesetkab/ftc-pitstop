@@ -105,6 +105,7 @@
 			list.push({
 				key: 'opr',
 				label: 'aOPR here',
+				short: 'aOPR',
 				term: true,
 				numeric: true,
 				sort: (team) => here.get(team.number) ?? null,
@@ -117,6 +118,7 @@
 				{
 					key: 'season',
 					label: 'Season aOPR',
+					short: 'Season',
 					term: true,
 					numeric: true,
 					sort: (team) => standings[team.number]?.opr ?? null,
