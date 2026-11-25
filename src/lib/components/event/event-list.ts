@@ -28,7 +28,7 @@ export function listed(
 		name: event.name,
 		type: event.type,
 		region: event.region,
-		place: placeName(event) || null,
+		place: placeName(event, 'short') || null,
 		timezone: event.timezone,
 		start: event.start,
 		end: event.end,
