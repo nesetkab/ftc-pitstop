@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { integer } from '#lib/format/number.ts';
 	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import Bars from '#lib/ui/Bars.svelte';
 	import type { PointAverages } from './averages.ts';
@@ -22,7 +21,3 @@
 </script>
 
 <Bars {items} />
-<p class="note">
-	From {integer(averages.scores)} alliance scores in {integer(averages.matches)}
-	{averages.matches === 1 ? 'match' : 'matches'}.
-</p>

@@ -66,7 +66,6 @@
 		if (match.result) {
 			const played = match.actualTime;
 			parts.push(played === null ? 'Played.' : `Played ${multiDay ? '' : 'at '}${at(played)}.`);
-			if (match.scheduledTime !== null) parts.push(`Scheduled for ${at(match.scheduledTime)}.`);
 		} else {
 			if (match.scheduledTime !== null) parts.push(`Scheduled for ${at(match.scheduledTime)}.`);
 			if (expected !== null) parts.push(`Expected around ${at(expected)}.`);
@@ -125,7 +124,6 @@
 			<div class="panel">
 				<h2 class="sec-title">What this match changed</h2>
 				<MatchImpact {match} teams={bundle.teams} {ranks} oprs={oprShifts} {followed} />
-				<p class="note">Each team's standing and aOPR just before and just after this match.</p>
 			</div>
 		{/if}
 

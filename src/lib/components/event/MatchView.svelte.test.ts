@@ -115,7 +115,6 @@ describe('MatchView at a two-day event', () => {
 	it('names the day without doubling up the words', () => {
 		render(MatchView, { props: { bundle: twoDay, match: first } });
 		expect(screen.getByText(/^Played Saturday at \d+:\d\d/)).toBeInTheDocument();
-		expect(screen.getByText(/Scheduled for Saturday at \d+:\d\d/)).toBeInTheDocument();
 		expect(screen.queryByText(/Played at Saturday/)).toBeNull();
 	});
 });
@@ -147,7 +146,6 @@ describe('MatchView before the match', () => {
 				.getAllByRole('columnheader')
 				.map((cell) => cell.textContent)
 		).toEqual(['Team', 'Alliance', 'aOPR', 'Auto', 'Hive', 'Park', 'Avg tips', 'Matches']);
-		expect(screen.getByText(/alliance scores in 25 matches/)).toBeInTheDocument();
 		const stakes = screen.getByRole('table', { name: 'Chance to finish in the top 6' });
 		expect(within(stakes).getAllByRole('row')).toHaveLength(5);
 		expect(stakes).toHaveTextContent('If they win');
