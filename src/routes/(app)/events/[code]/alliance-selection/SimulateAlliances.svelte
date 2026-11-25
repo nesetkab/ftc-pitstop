@@ -29,7 +29,6 @@
 				<option value={alliance.seed}>Red: alliance {alliance.seed}</option>
 			{/each}
 		</select>
-		<span class="vs">vs</span>
 		<label class="visually-hidden" for="{id}-blue">Blue alliance</label>
 		<select id="{id}-blue" class="ctl-select" bind:value={blue}>
 			{#each alliances as alliance (alliance.seed)}
@@ -50,14 +49,8 @@
 
 	.row {
 		display: grid;
-		grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 		gap: 6px;
-		align-items: center;
 		width: 100%;
-	}
-
-	.vs {
-		font-size: 13px;
-		color: var(--text-3);
 	}
 </style>
