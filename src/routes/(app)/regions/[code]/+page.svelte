@@ -38,12 +38,6 @@
 		{ value: 'upcoming' as const, label: `Upcoming ${integer(data.events.upcoming.length)}` },
 		{ value: 'done' as const, label: `Finished ${integer(data.events.done.length)}` }
 	]);
-	const advanced = $derived(
-		(data.advancement?.rows ?? [])
-			.filter((row) => row.level === 'regional')
-			.reduce((sum, row) => sum + row.advanced, 0)
-	);
-	const left = $derived(region.live + region.upcoming);
 	const seo = $derived({
 		title: regionTitle(region.name),
 		description: regionDescription(region),
@@ -93,7 +87,7 @@
 
 <p class="crumb"><a href="/regions">Regions</a></p>
 
-<PageHeader title={region.name} meta="FTC region {code}.">
+<PageHeader title={region.name}>
 	{#snippet status()}
 		{#if data.updated}
 			<StaleNotice updated={data.updated} staleAfter={86400} prefix="Ratings updated" />.
@@ -102,35 +96,6 @@
 		<a href="/events/strength?region={code}">Event strength</a>
 	{/snippet}
 </PageHeader>
-
-<dl class="stats">
-	<div>
-		<dt>Teams</dt>
-		<dd>{region.teams > 0 ? integer(region.teams) : '—'}</dd>
-	</div>
-	<div>
-		<dt>Events played</dt>
-		<dd>{integer(region.done)} <small>of {integer(region.events)}</small></dd>
-	</div>
-	<div>
-		<dt>Still to play</dt>
-		<dd>
-			{integer(left)}
-			{#if region.live > 0}<small>{integer(region.live)} today</small>{/if}
-		</dd>
-	</div>
-	<div>
-		<dt>Top aOPR</dt>
-		<dd>
-			{#if region.top}
-				{fixed(region.top.opr)}
-				<small><a href="/teams/{region.top.team}">{region.top.team}</a></small>
-			{:else}
-				—
-			{/if}
-		</dd>
-	</div>
-</dl>
 
 <section aria-labelledby="teams-title">
 	<div class="head">
@@ -223,10 +188,6 @@
 	{:else if data.advancement.rows.length === 0}
 		<p class="muted">No championship lists events from this region yet.</p>
 	{:else}
-		<p class="muted summary">
-			{integer(advanced)}
-			{advanced === 1 ? 'team has' : 'teams have'} advanced from {region.name} so far.
-		</p>
 		<ChampionshipTable
 			caption="Championships {region.name} teams advance to"
 			rows={data.advancement.rows}
@@ -319,45 +280,6 @@
 		text-decoration: underline;
 	}
 
-	.stats {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 12px 40px;
-		margin: 0;
-	}
-
-	.stats div {
-		display: grid;
-		gap: 2px;
-	}
-
-	.stats dt {
-		font-size: 13px;
-		color: var(--text-2);
-	}
-
-	.stats dd {
-		margin: 0;
-		font-size: 24px;
-		font-weight: 600;
-		font-variant-numeric: tabular-nums;
-	}
-
-	@media (max-width: 600px) {
-		.stats {
-			display: grid;
-			grid-template-columns: repeat(2, minmax(0, 1fr));
-			gap: 12px 16px;
-		}
-	}
-
-	.stats small {
-		margin-left: 4px;
-		font-size: 14px;
-		font-weight: 400;
-		color: var(--text-2);
-	}
-
 	section {
 		display: grid;
 		gap: 10px;
@@ -410,7 +332,6 @@
 		font-weight: 600;
 	}
 
-	.summary,
 	.empty,
 	.small {
 		font-size: 14px;
