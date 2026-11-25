@@ -59,7 +59,6 @@
 	const ratings = $derived(analysis && analysis.ratings.length > 0 ? analysis.ratings : null);
 	const sources = $derived(availableSources(ratings, stats));
 	const columns = $derived(visibleColumns(choice, sources));
-	const shown = $derived(new Set(columns.map((column) => column.key)));
 	const rows = $derived(
 		sortRankingRows(rankingRows(bundle.rankings, ratings, stats, projections), choice)
 	);
@@ -101,12 +100,8 @@
 			elsewhere
 				? "These are league rankings, so they include teams that didn't play at this meet."
 				: null,
-			league
-				? `League rankings use each team's best ${league} league matches so far.`
-				: null,
-			meetOnly
-				? "FIRST's rankings aren't loading, so these count this event's matches only."
-				: null
+			league ? `League rankings use each team's best ${league} league matches so far.` : null,
+			meetOnly ? "FIRST's rankings aren't loading, so these count this event's matches only." : null
 		]
 			.filter(Boolean)
 			.join(' ')

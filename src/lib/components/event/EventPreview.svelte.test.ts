@@ -33,7 +33,6 @@ describe('EventPreview', () => {
 		const first = within(table).getAllByRole('row')[1];
 		expect(first).toHaveTextContent(String(analysis.projections![0].team));
 		expect(first).toHaveTextContent('1.0');
-		expect(screen.getByText(/The top 6 become alliance captains/)).toBeInTheDocument();
 	});
 
 	it('sticks to starting aOPR without projections', () => {

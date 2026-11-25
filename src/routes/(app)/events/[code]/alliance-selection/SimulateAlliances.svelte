@@ -38,9 +38,7 @@
 		</select>
 	</div>
 	<Button variant="secondary" {href}>Simulate this match</Button>
-	<p class="note">
-		Uses each alliance's captain and first pick.
-	</p>
+	<p class="note">Uses each alliance's captain and first pick.</p>
 </div>
 
 <style>
