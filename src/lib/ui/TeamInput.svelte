@@ -165,8 +165,10 @@
 				onclick={() => pick(hit)}
 			>
 				<b>{hit.number}</b>
-				<span class="hit-name">{hit.name}</span>
-				{#if hit.place}<span class="place">{hit.place}</span>{/if}
+				<span class="hit-text">
+					<span class="hit-name">{hit.name}</span>
+					{#if hit.place}<span class="place">{hit.place}</span>{/if}
+				</span>
 			</button>
 		{:else}
 			<span class="empty" role="status">
@@ -192,7 +194,6 @@
 		right: 0;
 		left: 0;
 		z-index: 5;
-		container-type: inline-size;
 		display: grid;
 		padding: 4px;
 		border: 1px solid var(--line-2);
@@ -206,10 +207,10 @@
 	}
 
 	button {
-		display: flex;
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
 		align-items: baseline;
-		gap: 8px;
-		min-width: 0;
+		column-gap: 8px;
 		padding: 7px 8px;
 		border: 0;
 		border-radius: calc(var(--radius-control) - 2px);
@@ -217,7 +218,6 @@
 		color: var(--text);
 		font: 400 14px/1.3 var(--font);
 		text-align: left;
-		white-space: nowrap;
 		cursor: pointer;
 	}
 
@@ -231,39 +231,28 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	.hit-name,
-	.place {
+	.hit-text {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: baseline;
+		column-gap: 8px;
 		min-width: 0;
-		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 
 	.hit-name {
-		flex: 0 1 auto;
+		overflow-wrap: anywhere;
 	}
 
 	.place {
-		flex: 0 1000 auto;
 		font-size: 13px;
 		color: var(--text-3);
+		overflow-wrap: anywhere;
 	}
 
 	.empty {
 		padding: 7px 8px;
 		font-size: 13px;
 		color: var(--text-2);
-	}
-
-	@container (max-width: 260px) {
-		.place {
-			display: none;
-		}
-	}
-
-	@media (max-width: 480px) {
-		.place {
-			display: none;
-		}
 	}
 
 	@media (pointer: coarse) {
