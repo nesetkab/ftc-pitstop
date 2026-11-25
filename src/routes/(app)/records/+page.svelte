@@ -38,10 +38,7 @@
 	path="/records"
 />
 
-<PageHeader
-	title="Season records"
-	meta="The highest alliance scores this season. Scores leave out points from the other alliance's fouls."
->
+<PageHeader title="Season records" meta="Scores leave out points from the other alliance's fouls.">
 	{#snippet status()}
 		<StaleNotice updated={data.updated} staleAfter={86400} prefix="Updated" />
 	{/snippet}

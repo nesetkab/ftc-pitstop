@@ -1,4 +1,3 @@
-import { integer } from '#lib/format/number.ts';
 import { dateRange } from '#lib/format/time.ts';
 import type { Event, EventType } from '#lib/types.ts';
 import { placeName } from '#lib/format/places.ts';
@@ -47,7 +46,7 @@ type MetaEvent = Pick<
 	'type' | 'venue' | 'city' | 'state' | 'country' | 'start' | 'end' | 'remote'
 >;
 
-export function eventMeta(event: MetaEvent, teamCount?: number | null): string {
+export function eventMeta(event: MetaEvent): string {
 	const noun = typeNoun(event.type);
 	const place = placeName(event);
 	let where = noun;
@@ -55,7 +54,5 @@ export function eventMeta(event: MetaEvent, teamCount?: number | null): string {
 	else if (event.venue && place) where = `${noun} at ${event.venue}, ${place}`;
 	else if (event.venue) where = `${noun} at ${event.venue}`;
 	else if (place) where = `${noun} in ${place}`;
-	const parts = [`${where}.`, `${dateRange(event.start, event.end)}.`];
-	if (teamCount) parts.push(`${integer(teamCount)} ${teamCount === 1 ? 'team' : 'teams'}.`);
-	return parts.join(' ');
+	return `${where}. ${dateRange(event.start, event.end)}.`;
 }

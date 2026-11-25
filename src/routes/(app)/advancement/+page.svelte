@@ -49,10 +49,7 @@
 
 <EventSections />
 
-<PageHeader
-	title={where ? `Advancement in ${where}` : 'Advancement'}
-	meta="Who has advanced to each championship so far, how they earned it, and which events are still to play."
->
+<PageHeader title={where ? `Advancement in ${where}` : 'Advancement'}>
 	{#snippet status()}
 		<StaleNotice updated={data.updated} staleAfter={7200} prefix="Updated" />
 	{/snippet}

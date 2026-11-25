@@ -349,8 +349,10 @@ describe('team page', () => {
 	it('opens with season takeaways', () => {
 		show();
 		const lede = screen.getByLabelText('Season takeaways');
-		expect(lede.querySelector('mark')?.textContent).toBe('Top 7% worldwide by season aOPR.');
-		expect(lede.textContent).not.toMatch(/Award|Finalist/);
+		expect(lede.querySelector('mark')?.textContent).toBe(
+			'Strongest at teleop, better than 94% of teams.'
+		);
+		expect(lede.textContent).not.toMatch(/Award|Finalist|worldwide|OPR rose|OPR fell/);
 		expect(lede.textContent?.match(/\./g)?.length ?? 0).toBeLessThanOrEqual(5);
 	});
 

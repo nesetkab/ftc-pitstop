@@ -504,7 +504,6 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 	const takeaways = seasonTakeaways({
 		stats,
 		comparison,
-		trend,
 		advancement: advancementRows(season, bundles),
 		rookie: season.team.rookieYear === SEASON,
 		scores: allianceScores(seasonMatches),

@@ -93,10 +93,7 @@
 
 <p class="crumb"><a href="/regions">Regions</a></p>
 
-<PageHeader
-	title={region.name}
-	meta="FTC region {code}. Top teams, events, advancement and the best scores this season."
->
+<PageHeader title={region.name} meta="FTC region {code}.">
 	{#snippet status()}
 		{#if data.updated}
 			<StaleNotice updated={data.updated} staleAfter={86400} prefix="Ratings updated" />.

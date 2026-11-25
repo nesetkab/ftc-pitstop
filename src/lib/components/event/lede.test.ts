@@ -12,17 +12,13 @@ describe('event lede', () => {
 		expect(lede?.rest).toBe('as alliance 2.');
 	});
 
-	it('names the qualification leader before the playoffs end', () => {
+	it('says nothing before the event is decided, since the rankings show the leader', () => {
 		const bundle = unplay(fixtureBundle('USAZGIQ'), (match) => match.level === 'playoff');
-		const top = bundle.rankings.find((row) => row.rank === 1);
-		const lede = eventLede({ ...bundle, phase: 'quals' });
-		expect(lede?.lead.startsWith(`${top?.team} `)).toBe(true);
-		expect(lede?.lead).toMatch(/leads the rankings$/);
-		expect(lede?.rest).toMatch(/^with a \d+-\d+-\d+ record\.$/);
+		expect(eventLede(bundle)).toBeNull();
 	});
 
 	it('says nothing before a match is played', () => {
 		const bundle = fixtureBundle('USAZGIQ');
-		expect(eventLede({ ...bundle, alliances: [], rankings: [] })).toBeNull();
+		expect(eventLede({ ...bundle, alliances: [] })).toBeNull();
 	});
 });

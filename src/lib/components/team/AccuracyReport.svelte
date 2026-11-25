@@ -30,10 +30,7 @@
 	);
 </script>
 
-<PageHeader
-	title="Prediction accuracy"
-	meta="How the match predictions did on past seasons and on this one."
-/>
+<PageHeader title="Prediction accuracy" />
 
 {#if sample}
 	<p class="sample">Sample numbers. The full backtest is not part of this build.</p>

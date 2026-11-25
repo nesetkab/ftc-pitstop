@@ -1,10 +1,9 @@
-import { record } from '#lib/format/record.ts';
 import type { EventBundle } from '#lib/types.ts';
 import { buildBracket } from './bracket.ts';
 
 export type Lede = { lead: string; rest?: string };
 
-type LedeSource = Pick<EventBundle, 'alliances' | 'matches' | 'rankings' | 'teams' | 'phase'>;
+type LedeSource = Pick<EventBundle, 'alliances' | 'matches'>;
 
 function list(items: string[]): string {
 	if (items.length < 2) return items.join('');
@@ -20,22 +19,6 @@ function champion(bundle: LedeSource): Lede | null {
 	return { lead: `${list(teams)} won the event`, rest: `as alliance ${alliance.seed}.` };
 }
 
-function leader(bundle: LedeSource): Lede | null {
-	const top = bundle.rankings.reduce<LedeSource['rankings'][number] | null>(
-		(best, row) => (best === null || row.rank < best.rank ? row : best),
-		null
-	);
-	if (!top || top.played === 0) return null;
-	const name = bundle.teams.find((team) => team.number === top.team)?.name ?? top.name;
-	const who = name ? `${top.team} ${name}` : String(top.team);
-	const still = bundle.phase === 'quals' || bundle.phase === 'upcoming';
-	const verb = still ? 'leads the rankings' : 'finished first in qualification';
-	return {
-		lead: `${who} ${verb}`,
-		rest: `with a ${record(top.wins, top.losses, top.ties)} record.`
-	};
-}
-
 export function eventLede(bundle: LedeSource): Lede | null {
-	return champion(bundle) ?? leader(bundle);
+	return champion(bundle);
 }

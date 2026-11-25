@@ -7,10 +7,9 @@ import {
 	type RpHabits,
 	type RpKey
 } from '#lib/components/event/report.ts';
-import { fixed, integer } from '#lib/format/number.ts';
+import { integer } from '#lib/format/number.ts';
 import { ordinal as plainOrdinal } from '#lib/format/ordinal.ts';
 import { pct } from '#lib/format/pct.ts';
-import { regionName } from '#lib/format/places.ts';
 import type { AllianceColor, EventBundle, Match, TeamSeason } from '#lib/types.ts';
 import { localDate } from '#lib/format/calendar.ts';
 
@@ -70,7 +69,6 @@ export interface SeasonFacts {
 		region: { code: string; rank: number; of: number } | null;
 	};
 	comparison: { key: string; value: number; percentile: number | null }[];
-	trend: { label: string; value: number }[];
 	advancement: AdvancementRow[];
 	rookie: boolean;
 	scores: number[];
@@ -346,28 +344,6 @@ function mean(values: number[]): number {
 	return values.length ? values.reduce((sum, value) => sum + value, 0) / values.length : 0;
 }
 
-function shifted(change: number, before: number): boolean {
-	return Math.abs(change) >= Math.max(8, Math.abs(before) * 0.15);
-}
-
-function standingTakeaways(stats: SeasonFacts['stats']): Candidate[] {
-	const { rank, of, region } = stats;
-	const top =
-		rank !== null && of !== null && of > 0 ? Math.max(1, Math.ceil((100 * rank) / of)) : null;
-	const notableWorld = top !== null && top <= 10;
-	const notableRegion = region !== null && region.of >= 5 && region.rank <= 3;
-	if (!notableWorld && !notableRegion) return [];
-	const place = region && notableRegion ? regionPlace(region.rank, regionName(region.code)) : null;
-	const text = notableWorld
-		? `Top ${top}% worldwide by season aOPR${place ? `, ${place}` : ''}`
-		: `${place} by season aOPR`;
-	return [{ weight: 85, text }];
-}
-
-function regionPlace(rank: number, name: string): string {
-	return rank === 1 ? `best in ${name}` : `${ordinal(rank)} in ${name}`;
-}
-
 function partTakeaways(comparison: SeasonFacts['comparison']): Candidate[] {
 	const scored = comparison.filter((row) => row.key in PART_PHRASES);
 	const parts = scored.some((row) => row.key === 'hive')
@@ -383,35 +359,6 @@ function partTakeaways(comparison: SeasonFacts['comparison']): Candidate[] {
 		{
 			weight: 80,
 			text: `Strongest at ${PART_PHRASES[best.key]}, better than ${best.percentile}% of teams`
-		}
-	];
-}
-
-function trendTakeaways(trend: SeasonFacts['trend']): Candidate[] {
-	if (trend.length < 2) return [];
-	const first = trend[0].value;
-	const last = trend[trend.length - 1].value;
-	const count = `${trend.length} events`;
-	if (shifted(last - first, first)) {
-		const word = last > first ? 'rose' : 'fell';
-		return [
-			{ weight: 75, text: `aOPR ${word} from ${fixed(first)} to ${fixed(last)} over ${count}` }
-		];
-	}
-	const values = trend.map((point) => point.value);
-	const low = Math.min(...values);
-	const high = Math.max(...values);
-	if (shifted(high - low, low)) {
-		const text =
-			last < high
-				? `aOPR peaked at ${fixed(high)} and ended at ${fixed(last)} over ${count}`
-				: `aOPR dipped to ${fixed(low)} and ended at ${fixed(last)} over ${count}`;
-		return [{ weight: 60, text }];
-	}
-	return [
-		{
-			weight: 35,
-			text: `Steady aOPR over ${count}, between ${fixed(low)} and ${fixed(high)}`
 		}
 	];
 }
@@ -451,14 +398,11 @@ function advancementTakeaways(facts: SeasonFacts): Candidate[] {
 
 export function seasonTakeaways(facts: SeasonFacts): string[] {
 	const played = facts.stats.events > 0;
-	const standing = played ? standingTakeaways(facts.stats) : [];
 	const candidates = [
 		...advancementTakeaways(facts),
-		...standing,
 		...(played
 			? [
 					...partTakeaways(facts.comparison),
-					...trendTakeaways(facts.trend),
 					...rpTakeaways(facts.rp),
 					...consistencyTakeaways(facts.scores)
 				]

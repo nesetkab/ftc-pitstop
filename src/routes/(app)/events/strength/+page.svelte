@@ -71,9 +71,7 @@
 				: `Ranked by ${BY.find((option) => option.value === by)?.label.toLowerCase()}`
 		].filter(Boolean)
 	);
-	const meta = $derived(
-		`${integer(data.total)} events this season, ranked by the average season aOPR of their ${TOP} best teams.`
-	);
+	const meta = $derived(`Events ranked by the average season aOPR of their ${TOP} best teams.`);
 
 	$effect(() => {
 		now = Date.now();

@@ -49,12 +49,8 @@
 
 	const progress = $derived.by(() => {
 		const total = quals.length;
-		const playoff = playoffMatches.length === 1 ? 'playoff match' : 'playoff matches';
 		if (bundle.phase === 'quals' || (bundle.phase === 'upcoming' && qualsPlayed > 0)) {
 			return { lead: `${qualsPlayed} of ${total}`, text: ' qualification matches played.' };
-		}
-		if (bundle.phase === 'upcoming' && total > 0) {
-			return { lead: null, text: `${total} qualification matches scheduled.` };
 		}
 		if (bundle.phase === 'selection') {
 			return {
@@ -66,13 +62,6 @@
 			const word = playoffsPlayed === 1 ? 'playoff match' : 'playoff matches';
 			return { lead: `${playoffsPlayed}`, text: ` ${word} played.` };
 		}
-		if (total > 0 && playoffMatches.length > 0) {
-			return {
-				lead: null,
-				text: `${total} qualification and ${playoffMatches.length} ${playoff} played.`
-			};
-		}
-		if (total > 0) return { lead: null, text: `${total} qualification matches played.` };
 		return { lead: null, text: '' };
 	});
 
@@ -121,6 +110,7 @@
 	};
 
 	const section = $derived(page.route.id?.split('/events/[code]/')[1] ?? '');
+	const showLede = $derived(lede !== null && section !== 'playoffs' && section !== 'now');
 	const teamTopic = $derived.by(() => {
 		const number = page.params.number;
 		if (section !== 'teams/[number]' || !number) return null;
@@ -239,9 +229,11 @@
 	{/if}
 	<PageHeader
 		title={event.name}
-		meta={eventMeta(event, scheduled ? null : bundle.teams.length)}
-		lede={lede ? ledeLine : undefined}
-		status={scheduled || started ? statusLine : undefined}
+		meta={eventMeta(event)}
+		lede={showLede ? ledeLine : undefined}
+		status={(scheduled || started) && (progress.text !== '' || showUpdated)
+			? statusLine
+			: undefined}
 		actions={headerActions}
 		compact={section !== ''}
 	/>

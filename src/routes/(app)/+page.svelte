@@ -6,11 +6,9 @@
 	import TodayEvents from '#lib/components/home/TodayEvents.svelte';
 	import WorldRecord from '#lib/components/home/WorldRecord.svelte';
 	import EventTable from '#lib/components/home/EventTable.svelte';
-	import { homeLede } from '#lib/components/home/lede.ts';
 	import PitDisplayLink from '#lib/components/team/PitDisplayLink.svelte';
 	import { SEASON_NAME, SITE_NAME } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import Lede from '#lib/ui/Lede.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import type { PageProps } from './$types';
 
@@ -25,7 +23,6 @@
 		url: `${page.url.origin}/`,
 		description: 'FIRST Tech Challenge event results, rankings and team stats.'
 	});
-	const lede = $derived(homeLede(data));
 	const live = $derived(data.today?.filter((row) => row.state === 'live').length ?? 0);
 </script>
 
@@ -39,9 +36,6 @@
 <h1 class="visually-hidden">PitStop</h1>
 
 <div class="home">
-	{#if lede}
-		<Lede size="large" lead={lede.lead} rest={lede.rest} />
-	{/if}
 	<div class="top">
 		<div class="start">
 			<Intro />

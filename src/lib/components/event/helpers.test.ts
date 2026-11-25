@@ -199,8 +199,8 @@ describe('event meta', () => {
 		expect(eventMeta(fixtureBundle('USAZGIQ').event)).toBe(
 			'Qualifier at Gilbert Christian High School, Gilbert, Arizona. Saturday, November 14, 2026.'
 		);
-		expect(eventMeta(fixtureBundle('USMTBUQ').event, 37)).toBe(
-			'Qualifier at East Middle School, Butte, Montana. November 20 and 21, 2026. 37 teams.'
+		expect(eventMeta(fixtureBundle('USMTBUQ').event)).toBe(
+			'Qualifier at East Middle School, Butte, Montana. November 20 and 21, 2026.'
 		);
 		expect(eventMeta(fixtureBundle('UZTAQ1').event)).toBe(
 			'Qualifier in Tashkent, Uzbekistan. November 14 to 16, 2026.'

@@ -331,10 +331,6 @@ describe('season takeaways', () => {
 				{ key: 'hive', value: 70, percentile: 98 },
 				{ key: 'garden', value: 0.3, percentile: 99 }
 			],
-			trend: [
-				{ label: 'A', value: 80 },
-				{ label: 'B', value: 120 }
-			],
 			advancement: [],
 			rookie: false,
 			scores: [],
@@ -343,7 +339,7 @@ describe('season takeaways', () => {
 		};
 	}
 
-	it('leads with advancement, then standing and strengths, at most four lines', () => {
+	it('leads with advancement, then strengths', () => {
 		const lines = seasonTakeaways(
 			facts({
 				advancement: [
@@ -353,40 +349,20 @@ describe('season takeaways', () => {
 		);
 		expect(lines).toEqual([
 			'Advanced to Arizona Championship from Alpha Qualifier',
-			'Top 1% worldwide by season aOPR, best in Arizona',
-			'Strongest at hive scoring, better than 98% of teams',
-			'aOPR rose from 80.0 to 120.0 over 2 events'
+			'Strongest at hive scoring, better than 98% of teams'
 		]);
 	});
 
-	it('ignores tiny parts and reports the trend across events', () => {
-		const lines = seasonTakeaways(facts({ stats: { ...facts().stats, rank: 900, region: null } }));
-		expect(lines).toEqual([
-			'Strongest at hive scoring, better than 98% of teams',
-			'aOPR rose from 80.0 to 120.0 over 2 events'
+	it('leaves out the world rank, region rank and trend that the stats row shows', () => {
+		expect(seasonTakeaways(facts())).toEqual([
+			'Strongest at hive scoring, better than 98% of teams'
 		]);
-	});
-
-	it('only calls the trend steady when every event is close', () => {
-		const quiet = { stats: { ...facts().stats, rank: 900, region: null }, comparison: [] };
-		const trend = (values: number[]) =>
-			values.map((value, index) => ({ label: String(index), value }));
-		expect(seasonTakeaways(facts({ ...quiet, trend: trend([20.5, 22, 13.5]) }))).toContain(
-			'aOPR peaked at 22.0 and ended at 13.5 over 3 events'
-		);
-		expect(seasonTakeaways(facts({ ...quiet, trend: trend([30, 18, 31]) }))).toContain(
-			'aOPR dipped to 18.0 and ended at 31.0 over 3 events'
-		);
-		expect(seasonTakeaways(facts({ ...quiet, trend: trend([40, 44, 42]) }))).toContain(
-			'Steady aOPR over 3 events, between 40.0 and 44.0'
-		);
 	});
 
 	it('notes consistent and uneven scoring', () => {
 		const quiet = {
 			stats: { ...facts().stats, rank: 900, region: null },
-			comparison: [],
-			trend: []
+			comparison: []
 		};
 		expect(seasonTakeaways(facts({ ...quiet, scores: [60, 62, 58, 61, 59, 90] }))).toContain(
 			'Consistent: 5 of 6 alliance scores within 10 points of the 65 average'
@@ -406,8 +382,7 @@ describe('season takeaways', () => {
 					record: { wins: 3, losses: 2, ties: 0 },
 					region: null
 				},
-				comparison: [],
-				trend: []
+				comparison: []
 			})
 		);
 		expect(lines).toEqual([]);

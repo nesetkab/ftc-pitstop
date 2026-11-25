@@ -40,8 +40,6 @@
 		})).filter((group) => group.regions.length > 0)
 	);
 	const listed = $derived(data.regions.filter((region) => region.events > 0));
-	const events = $derived(data.regions.reduce((sum, region) => sum + region.events, 0));
-	const done = $derived(data.regions.reduce((sum, region) => sum + region.done, 0));
 </script>
 
 <Seo
@@ -52,12 +50,7 @@
 
 <EventSections />
 
-<PageHeader
-	title="Regions"
-	meta="{integer(listed.length)} regions this season, {integer(done)} of {integer(
-		events
-	)} events played."
->
+<PageHeader title="Regions">
 	{#snippet status()}
 		{#if data.updated}
 			<StaleNotice updated={data.updated} staleAfter={86400} prefix="Ratings updated" />

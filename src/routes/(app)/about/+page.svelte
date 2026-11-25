@@ -72,10 +72,7 @@
 	<h2 id="{id}-title"><a href="#{id}">{titles.get(id)}</a></h2>
 {/snippet}
 
-<PageHeader
-	title={ABOUT_TITLE}
-	meta="What every number on PitStop means, how it is worked out, where the data comes from and where it falls short."
-/>
+<PageHeader title={ABOUT_TITLE} />
 
 <div class="about">
 	<nav class="toc" aria-label="On this page">
