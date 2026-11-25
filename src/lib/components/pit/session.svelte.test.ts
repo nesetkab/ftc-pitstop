@@ -55,6 +55,23 @@ describe('PitSession', () => {
 		stop();
 	});
 
+	it('rebuilds a live view on data changes, not on every clock tick', () => {
+		const start = replayStart('Q20', full)!;
+		const snapshot = replayBundle(full, start);
+		const session = new PitSession({
+			...options(start),
+			replay: null,
+			bundle: snapshot,
+			analysis: retime(fakeAnalysis(snapshot), snapshot, start)
+		});
+		session.now = 60_000 * Math.ceil(start / 60_000);
+		const first = session.view;
+		session.now += 1000;
+		expect(session.view).toBe(first);
+		session.now += 14_000;
+		expect(session.view).not.toBe(first);
+	});
+
 	it('replays the event on its clock and keeps a tapped takeover closed', () => {
 		const session = new PitSession(options(q23.actualTime!));
 		const stop = $effect.root(() => {

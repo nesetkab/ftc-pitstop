@@ -43,6 +43,7 @@ export function analysisLoader(
 }
 
 const LIVE = new Set(['quals', 'selection', 'playoffs']);
+const TIMING_STEP = 15_000;
 
 export class PitSession {
 	readonly team: number;
@@ -71,8 +72,12 @@ export class PitSession {
 
 	signature = $derived.by(() => (this.bundle ? bundleSignature(this.bundle) : null));
 
+	#timingClock = $derived.by(() =>
+		this.replay ? this.clock : Math.floor(this.now / TIMING_STEP) * TIMING_STEP
+	);
+
 	timed = $derived.by(() =>
-		this.analysis && this.bundle ? retime(this.analysis, this.bundle, this.clock) : null
+		this.analysis && this.bundle ? retime(this.analysis, this.bundle, this.#timingClock) : null
 	);
 
 	view = $derived.by(() =>
