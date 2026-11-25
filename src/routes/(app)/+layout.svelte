@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { Component } from 'svelte';
 	import AppBar from '#lib/ui/AppBar.svelte';
+	import NavProgress from '#lib/ui/NavProgress.svelte';
 	import ThemeSwitch from '#lib/ui/ThemeSwitch.svelte';
 	import { searchDialog, searchShortcut } from '#lib/ui/search.svelte.ts';
 	import type { LayoutProps } from './$types';
@@ -38,6 +39,8 @@
 </script>
 
 <svelte:window {onkeydown} />
+
+<NavProgress />
 
 <div class="shell">
 	<a class="skip" href="#main">Skip to content</a>
