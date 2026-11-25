@@ -29,7 +29,7 @@
 </script>
 
 {#if rows.length === 0}
-	<EmptyState title="No scores yet.">Scores show here as soon as matches are played.</EmptyState>
+	<EmptyState title="Scores show here once matches are played." />
 {:else}
 	<Table>
 		<caption class="visually-hidden">Highest alliance scores at this event</caption>
