@@ -72,7 +72,7 @@
 		].filter(Boolean)
 	);
 	const meta = $derived(
-		`${integer(data.total)} events this season, ranked by the average season OPR of their ${TOP} best teams.`
+		`${integer(data.total)} events this season, ranked by the average season aOPR of their ${TOP} best teams.`
 	);
 
 	$effect(() => {
@@ -126,7 +126,7 @@
 
 <Seo
 	title={siteTitle(`Strongest FTC events, ${SEASON_NAME} season`)}
-	description="Every FTC event in the {SEASON_NAME} season ranked by strength: the average season OPR of its {TOP} best teams. Filter by region, event type and date."
+	description="Every FTC event in the {SEASON_NAME} season ranked by strength: the average season aOPR of its {TOP} best teams. Filter by region, event type and date."
 	path="/events/strength"
 />
 

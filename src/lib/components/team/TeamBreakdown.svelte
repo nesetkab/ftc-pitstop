@@ -68,7 +68,7 @@
 {/snippet}
 
 <Table>
-	<caption class="visually-hidden">OPR by scoring part at each event</caption>
+	<caption class="visually-hidden">aOPR by scoring part at each event</caption>
 	<thead>
 		<tr>
 			<th class="l" scope="col">Event</th>
@@ -100,7 +100,7 @@
 	</tbody>
 </Table>
 <Legend>
-	OPR for each part of the score. Hive, flower, garden and park are teleop points.
+	aOPR for each part of the score. Hive, flower, garden and park are teleop points.
 	{#if comparison.length > 0}Season percentile is the share of teams this season with a lower value.{/if}
 	{#if events.length > 1}Bold marks the team's best event for that part.{/if}
 </Legend>

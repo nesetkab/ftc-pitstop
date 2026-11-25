@@ -313,7 +313,7 @@ describe('available teams table', () => {
 		]);
 	});
 
-	it('shows OPR columns once ratings exist and sorts by OPR', () => {
+	it('shows aOPR columns once ratings exist and sorts by aOPR', () => {
 		const table = selectionTable(
 			bundle,
 			analysisWith({

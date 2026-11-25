@@ -5,7 +5,7 @@ import { explain, GLOSSARY, oprTerm, termHref, termId } from './glossary.ts';
 
 describe('glossary', () => {
 	it('explains the common abbreviations', () => {
-		for (const term of ['RS', 'TBP', 'OPR', 'NP avg', 'Avg tips', 'Poll. 1', 'Pred.', '#']) {
+		for (const term of ['RS', 'TBP', 'aOPR', 'NP avg', 'Avg tips', 'Poll. 1', 'Pred.', '#']) {
 			expect(explain(term), term).toBeTruthy();
 		}
 	});
@@ -22,13 +22,13 @@ describe('glossary', () => {
 		expect(explain('Poll. 2')).toContain(`${RP_THRESHOLDS.pollinator2}+`);
 	});
 
-	it('explains every OPR part and keeps the total as plain OPR', () => {
-		expect(oprTerm(PART_LABELS.total)).toBe('OPR');
-		expect(oprTerm('OPR')).toBe('OPR');
+	it('explains every aOPR part and keeps the total as plain aOPR', () => {
+		expect(oprTerm(PART_LABELS.total)).toBe('aOPR');
+		expect(oprTerm('aOPR')).toBe('aOPR');
 		for (const part of ['auto', 'teleop', 'hive', 'flower', 'garden', 'park', 'tips'] as const) {
 			const term = oprTerm(PART_LABELS[part]);
-			expect(explain(term), term).toMatch(/^Offensive power rating for /);
-			expect(explain(PART_LABELS[part]), part).not.toMatch(/Offensive power rating/);
+			expect(explain(term), term).toMatch(/^Adjusted offensive power rating for /);
+			expect(explain(PART_LABELS[part]), part).not.toMatch(/offensive power rating/);
 		}
 	});
 
@@ -36,7 +36,7 @@ describe('glossary', () => {
 		const titled = RANKING_COLUMNS.filter((column) => explain(column.label)).map(
 			(column) => column.label
 		);
-		expect(titled).toEqual(expect.arrayContaining(['RS', 'TBP', 'NP avg', 'Avg tips', 'OPR']));
+		expect(titled).toEqual(expect.arrayContaining(['RS', 'TBP', 'NP avg', 'Avg tips', 'aOPR']));
 	});
 
 	it('gives every term its own anchor on the about page', () => {

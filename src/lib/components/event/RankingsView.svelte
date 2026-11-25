@@ -149,7 +149,7 @@
 				? { text: 'Spread is how much those scores vary.', phone: !offPhone(['npsd']) }
 				: null,
 			sources.has('rating')
-				? { text: "OPR is each team's estimated share of its alliance's score.", phone: true }
+				? { text: "aOPR is each team's estimated share of its alliance's score.", phone: true }
 				: null,
 			projections
 				? {
@@ -194,7 +194,7 @@
 			{eventCode}
 		/>
 		<Legend>
-			Partners' and opponents' OPR are averages over the matches each team has played{remaining > 0
+			Partners' and opponents' aOPR are averages over the matches each team has played{remaining > 0
 				? ' so far'
 				: ''}. Difference is partners minus opponents, so a team above zero had the easier schedule.
 		</Legend>

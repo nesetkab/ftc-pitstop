@@ -29,7 +29,7 @@ describe('TeamsTable', () => {
 			props: { teams, season: { [teams[0].number]: { opr: 40.2, rank: 850 } } }
 		});
 		expect(screen.getByRole('columnheader', { name: 'Location' })).toHaveClass('opt');
-		expect(screen.getByRole('columnheader', { name: 'Season OPR' })).not.toHaveClass('opt');
+		expect(screen.getByRole('columnheader', { name: 'Season aOPR' })).not.toHaveClass('opt');
 		expect(screen.getByRole('columnheader', { name: 'World rank' })).toHaveClass('opt');
 	});
 });

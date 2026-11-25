@@ -165,7 +165,7 @@ describe('available teams', () => {
 		expect(taken[2]).toHaveTextContent('Captain of alliance 2');
 	});
 
-	it('shows OPR columns when ratings exist', () => {
+	it('shows aOPR columns when ratings exist', () => {
 		const analysis = {
 			ratings: [
 				{
@@ -182,7 +182,7 @@ describe('available teams', () => {
 		const table = selectionTable({ teams, rankings, matches: [] }, analysis, selection);
 		render(AvailableTeams, { props: { table } });
 		const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
-		expect(headers.slice(0, 3)).toEqual(['Team', 'OPR', 'Auto OPR']);
+		expect(headers.slice(0, 3)).toEqual(['Team', 'aOPR', 'Auto aOPR']);
 		const row = screen.getByText('Valley X').closest('tr') as HTMLElement;
 		expect(row).toHaveTextContent('47.4');
 		expect(row).toHaveTextContent('24.5');

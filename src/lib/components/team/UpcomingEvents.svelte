@@ -40,7 +40,7 @@
 </Table>
 <Legend>
 	Expected rank comes from simulating the remaining qualification schedule. Before a schedule is
-	out, teams are ordered by season OPR.
+	out, teams are ordered by season aOPR.
 </Legend>
 
 <style>

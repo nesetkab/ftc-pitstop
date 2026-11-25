@@ -39,7 +39,7 @@
 			<th class="l" scope="col">Team</th>
 			<th class="l" scope="col">Alliance</th>
 			{#if rated}
-				<th scope="col"><Term label="OPR" /></th>
+				<th scope="col"><Term label="aOPR" /></th>
 				<th scope="col"><Term label={PART_LABELS.auto} term={oprTerm(PART_LABELS.auto)} /></th>
 				<th class="opt" scope="col"
 					><Term label={PART_LABELS.hive} term={oprTerm(PART_LABELS.hive)} /></th

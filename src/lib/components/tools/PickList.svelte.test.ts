@@ -450,14 +450,14 @@ describe('keyboard focus', () => {
 });
 
 describe('stats and export', () => {
-	it('shows OPR and rank next to each team', () => {
+	it('shows aOPR and rank next to each team', () => {
 		setup(list(1, 2), { stats: new Map([[1, { opr: 45.25, rank: 3 }]]) });
 		const rows = screen.getAllByRole('listitem');
-		expect(rows[0]).toHaveTextContent('OPR 45.3 · #3');
-		expect(rows[1]).not.toHaveTextContent('OPR');
+		expect(rows[0]).toHaveTextContent('aOPR 45.3 · #3');
+		expect(rows[1]).not.toHaveTextContent('aOPR');
 	});
 
-	it('uses season OPR for teams away from the event and explains a missing one', () => {
+	it('uses season aOPR for teams away from the event and explains a missing one', () => {
 		setup(list(1, 2), {
 			stats: new Map([
 				[1, { opr: 30, rank: null, season: true }],
@@ -465,8 +465,8 @@ describe('stats and export', () => {
 			])
 		});
 		const rows = screen.getAllByRole('listitem');
-		expect(rows[0]).toHaveTextContent('Season OPR 30.0');
-		expect(rows[1]).toHaveTextContent('Not at this event, no season OPR yet');
+		expect(rows[0]).toHaveTextContent('Season aOPR 30.0');
+		expect(rows[1]).toHaveTextContent('Not at this event, no season aOPR yet');
 	});
 
 	it('copies the list as text', async () => {

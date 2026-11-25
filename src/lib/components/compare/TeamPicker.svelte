@@ -70,7 +70,7 @@
 
 {#if suggestions.length > 0 && !full}
 	<p class="suggest">
-		{teams.length === 0 ? 'Top teams this season:' : 'Close in OPR:'}
+		{teams.length === 0 ? 'Top teams this season:' : 'Close in aOPR:'}
 		{#each suggestions as team, index (team.number)}
 			<a href={compareHref([...numbers, team.number])} data-sveltekit-reset="false"
 				><b>{team.number}</b>{team.name ? ` ${team.name}` : ''}</a

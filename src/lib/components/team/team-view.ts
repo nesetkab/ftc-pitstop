@@ -292,7 +292,7 @@ function historyChart(
 	return {
 		id: code,
 		title: name,
-		label: `OPR after each match at ${name}`,
+		label: `aOPR after each match at ${name}`,
 		points: history.map((entry) => ({ label: keyLabel(entry.key), value: entry.opr })),
 		divider:
 			lastQual >= 0 && lastQual < history.length - 1 ? { after: lastQual, label: 'Playoffs' } : null
@@ -445,8 +445,8 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 				? [
 						{
 							id: 'events',
-							title: 'OPR at each event',
-							label: `OPR at each event for team ${number}`,
+							title: 'aOPR at each event',
+							label: `aOPR at each event for team ${number}`,
 							points: played.map((entry) => ({
 								label: shortDate(entry.event.start),
 								value: entry.stats?.opr.total ?? 0
@@ -523,7 +523,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		stats,
 		trend,
 		breakdown,
-		chartTitle: histories.length > 0 ? 'OPR after each match' : 'OPR at each event',
+		chartTitle: histories.length > 0 ? 'aOPR after each match' : 'aOPR at each event',
 		charts,
 		comparison,
 		events,

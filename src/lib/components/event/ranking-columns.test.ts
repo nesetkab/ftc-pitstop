@@ -156,7 +156,7 @@ describe('scoreStats', () => {
 });
 
 describe('columns', () => {
-	it('only offers OPR and score columns when the data is there', () => {
+	it('only offers aOPR and score columns when the data is there', () => {
 		expect([...availableSources(null, new Map())]).toEqual(['ranking']);
 		expect([...availableSources(analysis.ratings, stats)].sort()).toEqual([
 			'ranking',
@@ -170,7 +170,7 @@ describe('columns', () => {
 		]);
 	});
 
-	it('formats cells and works out teleop OPR', () => {
+	it('formats cells and works out teleop aOPR', () => {
 		const row = rows()[0];
 		expect(cellText(columnOf('record'), row)).toBe('5-0-0');
 		expect(cellText(columnOf('opr-teleop'), row)).toBe('48.0');
@@ -191,7 +191,7 @@ describe('columns', () => {
 			parse('cols=record,npsd,opr'),
 			availableSources(analysis.ratings, stats)
 		);
-		expect(csvHeader(columns)).toEqual(['Wins', 'Losses', 'Ties', 'NP spread', 'OPR']);
+		expect(csvHeader(columns)).toEqual(['Wins', 'Losses', 'Ties', 'NP spread', 'aOPR']);
 		expect(csvDigits(columns)).toEqual([0, 0, 0, 1, 1]);
 		expect(csvValues(columns, rows()[0]).slice(0, 3)).toEqual([5, 0, 0]);
 	});

@@ -49,7 +49,7 @@
 				{followed}
 			/>
 			{#if showOdds}
-				<p class="note">Chances to win the event play out the rest of the bracket using OPR.</p>
+				<p class="note">Chances to win the event play out the rest of the bracket using aOPR.</p>
 			{/if}
 		</section>
 	{/if}

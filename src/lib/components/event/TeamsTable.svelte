@@ -51,10 +51,10 @@
 				<th scope="col">Rank</th>
 			{/if}
 			{#if opr}
-				<th scope="col"><Term label="OPR here" /></th>
+				<th scope="col"><Term label="aOPR here" /></th>
 			{/if}
 			{#if season}
-				<th scope="col"><Term label="Season OPR" /></th>
+				<th scope="col"><Term label="Season aOPR" /></th>
 				<th class="opt" scope="col"><Term label="World rank" /></th>
 			{/if}
 		</tr>

@@ -97,23 +97,25 @@
 		<section id="opr" aria-labelledby="opr-title">
 			{@render heading('opr')}
 			<p>
-				OPR, short for offensive power rating, is an estimate of how many points a team adds to its
-				alliance’s score in a typical match. It is the number most of PitStop is built on.
+				aOPR, adjusted OPR, is PitStop’s version of OPR, short for offensive power rating. It is an
+				estimate of how many points a team adds to its alliance’s score in a typical match. It is
+				the number most of PitStop is built on.
 			</p>
 			<p>
-				Most of the score is only reported per alliance, so OPR works backwards. Across every match,
-				it finds the set of team numbers that best explains all the alliance scores at once. PitStop
-				leaves penalty points out, so a team gets no credit for fouls the other alliance committed.
+				Most of the score is only reported per alliance, so aOPR works backwards. Across every
+				match, it finds the set of team numbers that best explains all the alliance scores at once.
+				PitStop leaves penalty points out, so a team gets no credit for fouls the other alliance
+				committed.
 			</p>
 			<p>
 				Some points are scored by one robot on its own, like leaving and parking, and FIRST records
 				those per robot. Each team gets those points directly. Only the rest of the score is split
-				between partners. A team’s OPR is its own robot points plus its share of the rest.
+				between partners. A team’s aOPR is its own robot points plus its share of the rest.
 			</p>
 			<p>
-				OPR never goes below zero. A team cannot take points away from its own alliance, so a rating
-				that would drift negative is eased back toward zero. That keeps a weak team with strong
-				partners from being blamed for points it never cost them.
+				aOPR never goes below zero. A team cannot take points away from its own alliance, so a
+				rating that would drift negative is eased back toward zero. That keeps a weak team with
+				strong partners from being blamed for points it never cost them.
 			</p>
 			<p>
 				A handful of matches is not enough to tell teams apart, so each team starts from a guess
@@ -123,10 +125,10 @@
 				between events.
 			</p>
 			<p>
-				That is why PitStop’s OPR will not match FTCScout’s. FTCScout shows the classic version,
-				solved from qualification matches alone with no starting guess. PitStop also counts playoff
-				matches, credits robot points directly and starts each team from a guess. Both leave penalty
-				points out.
+				That is why aOPR will not match the OPR on FTCScout. FTCScout shows classic OPR, solved from
+				qualification matches alone with no starting guess. PitStop also counts playoff matches,
+				credits robot points directly and starts each team from a guess. Both leave penalty points
+				out.
 			</p>
 			<p>
 				PitStop uses this version because it tested best. Every traditional FTC event from 2021 to
@@ -135,9 +137,10 @@
 				EPA, in every season. The <a href="/accuracy">accuracy page</a> has the full results.
 			</p>
 			<p>
-				The same method runs on each part of the score, which gives auto OPR, hive OPR, tips OPR and
-				the rest. The point parts are scaled to add up to total OPR. Tips are a count, not points,
-				so they are left as they are. Every variant is listed in the <a href="#glossary">glossary</a
+				The same method runs on each part of the score, which gives auto aOPR, hive aOPR, tips aOPR
+				and the rest. The point parts are scaled to add up to total aOPR. Tips are a count, not
+				points, so they are left as they are. Every variant is listed in the <a href="#glossary"
+					>glossary</a
 				>.
 			</p>
 		</section>
@@ -198,7 +201,7 @@
 			<p>
 				That is at most {maxRp} ranking points per match. PitStop predicts each bonus before the match.
 				The Swarm chance combines each robot’s record of leaving and parking with the alliance’s predicted
-				leave and park points. The Pollinator chances treat tips OPR as an expected count and ask how
+				leave and park points. The Pollinator chances treat tips aOPR as an expected count and ask how
 				likely the alliance is to reach each threshold. Both were fitted to this season’s results, and
 				the
 				<a href="/accuracy">accuracy page</a> shows how close they come on those same matches.
@@ -209,11 +212,11 @@
 			{@render heading('predictions')}
 			<p>
 				For a match that has not been played, each alliance’s predicted score adds up its two teams’
-				OPRs and the foul points the other alliance tends to give away.
+				aOPRs and the foul points the other alliance tends to give away.
 			</p>
 			<p>
 				A strong robot can carry a weaker partner, so an alliance with one much stronger team tends
-				to score more than its two OPRs add up to. PitStop adds a fifth of the gap between the two
+				to score more than its two aOPRs add up to. PitStop adds a fifth of the gap between the two
 				partners, measured on the points they score together.
 			</p>
 			<p>
@@ -251,7 +254,7 @@
 			</p>
 			<h3>What this match changed</h3>
 			<p>
-				Shown on played qualification matches. It lists each team’s rank and OPR just before and
+				Shown on played qualification matches. It lists each team’s rank and aOPR just before and
 				just after the match, so you can see who moved and by how much.
 			</p>
 		</section>
@@ -280,14 +283,14 @@
 		<section id="event-strength" aria-labelledby="event-strength-title">
 			{@render heading('event-strength')}
 			<p>
-				<dfn>Strength</dfn> is how tough an event’s field is: the average season OPR of the {TOP} best
+				<dfn>Strength</dfn> is how tough an event’s field is: the average season aOPR of the {TOP} best
 				rated teams there. The top of the field decides who wins and advances, so a few strong teams count
 				for more than a long tail of new ones.
 			</p>
 			<p>
 				Before and during an event, it uses every registered team. Once the event is over, it uses
-				only the teams that played. Every team is measured by its current season OPR, so a past
-				event’s strength moves as its teams improve. Teams with no matches yet have no OPR and are
+				only the teams that played. Every team is measured by its current season aOPR, so a past
+				event’s strength moves as its teams improve. Teams with no matches yet have no aOPR and are
 				left out.
 			</p>
 			<p>
@@ -310,7 +313,7 @@
 				<div>
 					<dt><a href="https://ftcscout.org">FTCScout</a></dt>
 					<dd>
-						Season-wide match history behind season OPR and world ranks, the season’s event list,
+						Season-wide match history behind season aOPR and world ranks, the season’s event list,
 						and a backup when the FIRST API is slow or down. Event pages say when they are showing
 						FTCScout data.
 					</dd>
@@ -339,8 +342,8 @@
 			{@render heading('impossible-scores')}
 			<p>
 				Now and then a score is entered wrong. In one case a real match was recorded as 7,308 to
-				8,355. Because OPR solves every match at an event together, a single bad score can throw off
-				every team at that event, and even the season-wide numbers.
+				8,355. Because aOPR solves every match at an event together, a single bad score can throw
+				off every team at that event, and even the season-wide numbers.
 			</p>
 			<p>
 				So PitStop leaves a match out of its ratings and predictions when an alliance total is above
@@ -353,7 +356,7 @@
 			{@render heading('limits')}
 			<ul>
 				<li>
-					OPR mostly assumes points add up. The one exception it handles is a strong robot carrying
+					aOPR mostly assumes points add up. The one exception it handles is a strong robot carrying
 					a weaker partner. Defense, and partners who work especially well or badly together, still
 					get spread across the teams involved.
 				</li>

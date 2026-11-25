@@ -365,9 +365,9 @@
 		<span class="meta"
 			>{#if stat}<span class="stat">{stat}</span>{:else if unrated}<span
 					class="stat faint"
-					title="Not at this event and no season OPR yet"
+					title="Not at this event and no season aOPR yet"
 					><span aria-hidden="true">—</span><span class="visually-hidden"
-						>Not at this event, no season OPR yet</span
+						>Not at this event, no season aOPR yet</span
 					></span
 				>{/if}{#if tags}<span class="tags">{tags}</span>{/if}</span
 		>
@@ -495,7 +495,7 @@
 		{#if eventHref}
 			<a href={eventHref}>Open alliance selection</a>
 		{:else if update}
-			<span class="faint">Shows OPR, rank and live picks</span>
+			<span class="faint">Shows aOPR, rank and live picks</span>
 		{/if}
 	</div>
 {/snippet}

@@ -31,7 +31,7 @@
 
 <Seo
 	title="PitStop: FTC event results, rankings and team stats"
-	description="Live FIRST Tech Challenge results, rankings, match predictions and team OPR for the {SEASON_NAME} season, plus a pit display for your team's matches."
+	description="Live FIRST Tech Challenge results, rankings, match predictions and team aOPR for the {SEASON_NAME} season, plus a pit display for your team's matches."
 	path="/"
 	data={[website]}
 />

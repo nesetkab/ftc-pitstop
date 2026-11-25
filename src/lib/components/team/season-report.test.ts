@@ -136,7 +136,7 @@ describe('partners and opponents', () => {
 		expect(partners[1]).toMatchObject({ team: 4, matches: 1, losses: 1, best: { score: 30 } });
 	});
 
-	it('sorts opponents by season OPR, toughest first, with unrated teams last', () => {
+	it('sorts opponents by season aOPR, toughest first, with unrated teams last', () => {
 		const pool = [rating(2, 40), rating(3, 80), rating(TEAM, 50)];
 		const { opponents, opponentCount } = allySummary(season, bundles, pool);
 		expect(opponentCount).toBe(4);
@@ -280,13 +280,13 @@ describe('upcoming events', () => {
 		expect(row.outlook).toBe('Expected rank 4 of 12, 71% chance of top 8');
 	});
 
-	it('orders registered teams by season OPR before a schedule is out', () => {
+	it('orders registered teams by season aOPR before a schedule is out', () => {
 		const teams = [team(TEAM, 'Us'), team(1, 'One'), team(2, 'Two'), team(9, 'New')];
 		const [row, second] = upcomingEvents(season, { NEXT: { matches: [], teams } }, {}, pool, NOW);
 		expect(row).toMatchObject({
 			kind: 'opr',
 			registered: 4,
-			outlook: '2nd of 3 rated teams by season OPR'
+			outlook: '2nd of 3 rated teams by season aOPR'
 		});
 		expect(second).toMatchObject({
 			code: 'LATER',
@@ -296,10 +296,10 @@ describe('upcoming events', () => {
 		});
 	});
 
-	it('says when the team has no season OPR yet', () => {
+	it('says when the team has no season aOPR yet', () => {
 		const teams = [team(TEAM, 'Us'), team(1, 'One'), team(2, 'Two')];
 		const [row] = upcomingEvents(season, { NEXT: { matches: [], teams } }, {}, [], NOW);
-		expect(row).toMatchObject({ kind: 'none', outlook: 'No season OPR yet' });
+		expect(row).toMatchObject({ kind: 'none', outlook: 'No season aOPR yet' });
 	});
 
 	it('marks an event that is under way', () => {
@@ -353,9 +353,9 @@ describe('season takeaways', () => {
 		);
 		expect(lines).toEqual([
 			'Advanced to Arizona Championship from Alpha Qualifier',
-			'Top 1% worldwide by season OPR, best in Arizona',
+			'Top 1% worldwide by season aOPR, best in Arizona',
 			'Strongest at hive scoring, better than 98% of teams',
-			'OPR rose from 80.0 to 120.0 over 2 events'
+			'aOPR rose from 80.0 to 120.0 over 2 events'
 		]);
 	});
 
@@ -363,7 +363,7 @@ describe('season takeaways', () => {
 		const lines = seasonTakeaways(facts({ stats: { ...facts().stats, rank: 900, region: null } }));
 		expect(lines).toEqual([
 			'Strongest at hive scoring, better than 98% of teams',
-			'OPR rose from 80.0 to 120.0 over 2 events'
+			'aOPR rose from 80.0 to 120.0 over 2 events'
 		]);
 	});
 
@@ -372,13 +372,13 @@ describe('season takeaways', () => {
 		const trend = (values: number[]) =>
 			values.map((value, index) => ({ label: String(index), value }));
 		expect(seasonTakeaways(facts({ ...quiet, trend: trend([20.5, 22, 13.5]) }))).toContain(
-			'OPR peaked at 22.0 and ended at 13.5 over 3 events'
+			'aOPR peaked at 22.0 and ended at 13.5 over 3 events'
 		);
 		expect(seasonTakeaways(facts({ ...quiet, trend: trend([30, 18, 31]) }))).toContain(
-			'OPR dipped to 18.0 and ended at 31.0 over 3 events'
+			'aOPR dipped to 18.0 and ended at 31.0 over 3 events'
 		);
 		expect(seasonTakeaways(facts({ ...quiet, trend: trend([40, 44, 42]) }))).toContain(
-			'Steady OPR over 3 events, between 40.0 and 44.0'
+			'Steady aOPR over 3 events, between 40.0 and 44.0'
 		);
 	});
 

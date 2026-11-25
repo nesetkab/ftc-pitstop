@@ -103,32 +103,32 @@ export const RANKING_COLUMNS = [
 	score('npmin', 'NP min', 'Worst', 0, (stats) => stats.min),
 	score('npsd', 'Spread', 'Spread', 1, (stats) => stats.sd),
 	ranking('avgtips', 'Avg tips', 'Average tips', 1, (row) => row.avgTips),
-	rating('opr', 'OPR', 'Total', 1, (row) => row.opr),
-	rating('opr-auto', `${PART_LABELS.auto} OPR`, PART_LABELS.auto, 1, (row) => row.parts.auto),
+	rating('opr', 'aOPR', 'Total', 1, (row) => row.opr),
+	rating('opr-auto', `${PART_LABELS.auto} aOPR`, PART_LABELS.auto, 1, (row) => row.parts.auto),
 	rating(
 		'opr-teleop',
-		`${PART_LABELS.teleop} OPR`,
+		`${PART_LABELS.teleop} aOPR`,
 		PART_LABELS.teleop,
 		1,
 		(row) => row.opr - row.parts.auto
 	),
-	rating('opr-hive', `${PART_LABELS.hive} OPR`, PART_LABELS.hive, 1, (row) => row.parts.hive),
+	rating('opr-hive', `${PART_LABELS.hive} aOPR`, PART_LABELS.hive, 1, (row) => row.parts.hive),
 	rating(
 		'opr-flower',
-		`${PART_LABELS.flower} OPR`,
+		`${PART_LABELS.flower} aOPR`,
 		PART_LABELS.flower,
 		1,
 		(row) => row.parts.flower
 	),
 	rating(
 		'opr-garden',
-		`${PART_LABELS.garden} OPR`,
+		`${PART_LABELS.garden} aOPR`,
 		PART_LABELS.garden,
 		1,
 		(row) => row.parts.garden
 	),
-	rating('opr-park', `${PART_LABELS.park} OPR`, PART_LABELS.park, 1, (row) => row.parts.park),
-	rating('opr-tips', `${PART_LABELS.tips} OPR`, PART_LABELS.tips, 2, (row) => row.parts.tips)
+	rating('opr-park', `${PART_LABELS.park} aOPR`, PART_LABELS.park, 1, (row) => row.parts.park),
+	rating('opr-tips', `${PART_LABELS.tips} aOPR`, PART_LABELS.tips, 2, (row) => row.parts.tips)
 ] as const satisfies readonly RankingColumn[];
 
 export type ColumnKey = (typeof RANKING_COLUMNS)[number]['key'];
@@ -136,7 +136,7 @@ export type ColumnKey = (typeof RANKING_COLUMNS)[number]['key'];
 export const COLUMN_GROUPS: { source: ColumnSource; label: string }[] = [
 	{ source: 'ranking', label: 'Rankings' },
 	{ source: 'score', label: 'Scores' },
-	{ source: 'rating', label: 'OPR' }
+	{ source: 'rating', label: 'aOPR' }
 ];
 
 export const DEFAULT_COLUMNS: ColumnKey[] = ['rs', 'record', 'tbp', 'npmax', 'avgtips', 'opr'];

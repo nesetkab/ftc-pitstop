@@ -85,7 +85,7 @@ const PAGES: Record<string, PageCard> = {
 	'compare.png': {
 		kicker: 'Compare',
 		title: 'Compare FTC teams side by side',
-		subtitle: 'OPR by part, records, shared events and head-to-head results.'
+		subtitle: 'aOPR by part, records, shared events and head-to-head results.'
 	},
 	'simulate.png': {
 		kicker: 'Match simulator',
@@ -161,7 +161,7 @@ export function teamStats(season: TeamSeason, ratings: SeasonRatings | null): St
 	const rating = ratings?.teams.find((entry) => entry.team === number) ?? null;
 	const stats: Stat[] = [];
 	if (ratings && rating) {
-		stats.push({ label: 'Season OPR', value: fixed(rating.opr, 1) });
+		stats.push({ label: 'Season aOPR', value: fixed(rating.opr, 1) });
 		stats.push({
 			label: `World rank of ${integer(ratings.teams.length)}`,
 			value: rankText(rating.rank)
@@ -326,7 +326,7 @@ async function matchCardFor(
 
 async function leaderboardCard(host: string, deps: OgDeps, budget: number) {
 	const ratings = valueOf(await settle(deps.loadSeasonRatings(), budget));
-	const title = `Top FTC teams by OPR, ${SEASON_NAME}`;
+	const title = `Top FTC teams by aOPR, ${SEASON_NAME}`;
 	if (!ratings || ratings.teams.length === 0) {
 		return { node: pageCard({ kicker: 'Leaderboards', title }, host), maxAge: 300 };
 	}
@@ -419,7 +419,7 @@ async function compareCardFor(numbers: number[], host: string, deps: OgDeps, bud
 		const rating = rated?.teams.find((entry) => entry.team === number) ?? null;
 		const stats: Stat[] = rating
 			? [
-					{ label: 'OPR', value: fixed(rating.opr, 1) },
+					{ label: 'aOPR', value: fixed(rating.opr, 1) },
 					{ label: 'world rank', value: rankText(rating.rank) }
 				]
 			: [];

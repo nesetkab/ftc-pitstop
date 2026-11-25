@@ -69,7 +69,7 @@
 				? `Playoff chances are for alliance ${table.pickAlliance} (${selection.picking.captain}) if it picked that team.`
 				: '',
 			table.rated
-				? 'OPR is a team’s estimated points per match, from the qualification scores so far.'
+				? 'aOPR is a team’s estimated points per match, from the qualification scores so far.'
 				: 'RS is the average ranking points per match. TBP is the average match score without penalties.'
 		].filter(Boolean)
 	);

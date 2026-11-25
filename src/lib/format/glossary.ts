@@ -1,9 +1,9 @@
 import { PART_LABELS, RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
 
-const OPR = 'Offensive power rating, estimated points per match';
+const OPR = 'Adjusted offensive power rating, estimated points per match';
 
 function partOpr(part: string, unit: string): string {
-	return `Offensive power rating for ${part}, estimated ${unit} per match`;
+	return `Adjusted offensive power rating for ${part}, estimated ${unit} per match`;
 }
 
 export const GLOSSARY: Readonly<Record<string, string>> = {
@@ -12,27 +12,27 @@ export const GLOSSARY: Readonly<Record<string, string>> = {
 	TBP: 'Tiebreaker points, average match score without penalties',
 	Record: 'Wins, losses and ties',
 	'Qual record': 'Qualification wins, losses and ties at every event this season, not playoffs',
-	OPR,
-	'Season OPR': 'Offensive power rating over the whole season, estimated points per match',
-	'OPR here': 'Offensive power rating at this event, estimated points per match',
-	'Starting OPR': 'Season OPR coming into this event',
-	'Best event OPR': 'Highest offensive power rating at any one event this season',
-	'Rank by OPR': 'Where the team would rank at this event if sorted by OPR',
-	'World rank': 'Rank among all teams by season OPR',
-	'World rank by OPR': 'Rank among all teams by season OPR',
-	Strength: 'Average season OPR of the 8 best rated teams at an event',
-	'Top 24': 'Average season OPR of the 24 best rated teams at an event',
-	'Field avg': 'Average season OPR of every rated team at an event',
-	Rated: 'Teams with a season OPR, out of every team at the event',
-	"Partners' OPR": 'Average OPR of qualification partners',
-	"Opponents' OPR": 'Average OPR of qualification opponents',
-	[`${PART_LABELS.auto} OPR`]: partOpr('auto', 'auto points'),
-	[`${PART_LABELS.teleop} OPR`]: partOpr('teleop', 'teleop points'),
-	[`${PART_LABELS.hive} OPR`]: partOpr('the hive', 'hive points'),
-	[`${PART_LABELS.flower} OPR`]: partOpr('flowers', 'flower points'),
-	[`${PART_LABELS.garden} OPR`]: partOpr('the garden', 'garden points'),
-	[`${PART_LABELS.park} OPR`]: partOpr('parking', 'park points'),
-	[`${PART_LABELS.tips} OPR`]: partOpr('tips', 'hive tips'),
+	aOPR: OPR,
+	'Season aOPR': 'Adjusted offensive power rating over the whole season, estimated points per match',
+	'aOPR here': 'Adjusted offensive power rating at this event, estimated points per match',
+	'Starting aOPR': 'Season aOPR coming into this event',
+	'Best event aOPR': 'Highest aOPR at any one event this season',
+	'Rank by aOPR': 'Where the team would rank at this event if sorted by aOPR',
+	'World rank': 'Rank among all teams by season aOPR',
+	'World rank by aOPR': 'Rank among all teams by season aOPR',
+	Strength: 'Average season aOPR of the 8 best rated teams at an event',
+	'Top 24': 'Average season aOPR of the 24 best rated teams at an event',
+	'Field avg': 'Average season aOPR of every rated team at an event',
+	Rated: 'Teams with a season aOPR, out of every team at the event',
+	"Partners' aOPR": 'Average aOPR of qualification partners',
+	"Opponents' aOPR": 'Average aOPR of qualification opponents',
+	[`${PART_LABELS.auto} aOPR`]: partOpr('auto', 'auto points'),
+	[`${PART_LABELS.teleop} aOPR`]: partOpr('teleop', 'teleop points'),
+	[`${PART_LABELS.hive} aOPR`]: partOpr('the hive', 'hive points'),
+	[`${PART_LABELS.flower} aOPR`]: partOpr('flowers', 'flower points'),
+	[`${PART_LABELS.garden} aOPR`]: partOpr('the garden', 'garden points'),
+	[`${PART_LABELS.park} aOPR`]: partOpr('parking', 'park points'),
+	[`${PART_LABELS.tips} aOPR`]: partOpr('tips', 'hive tips'),
 	'NP avg': 'Average score without opponent fouls',
 	'NP max': 'Best score without opponent fouls',
 	'NP min': 'Worst score without opponent fouls',
@@ -75,5 +75,5 @@ export function termHref(term: string): string | null {
 }
 
 export function oprTerm(part: string): string {
-	return part === PART_LABELS.total || part === 'OPR' ? 'OPR' : `${part} OPR`;
+	return part === PART_LABELS.total || part === 'aOPR' ? 'aOPR' : `${part} aOPR`;
 }

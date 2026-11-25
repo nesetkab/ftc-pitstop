@@ -39,7 +39,7 @@
 					<td class:dim={!cell.attending || cell.record === null}>
 						<span class="line">{line(cell)}</span>
 						{#if cell.opr !== null}
-							<span class="sub">OPR {fixed(cell.opr)}</span>
+							<span class="sub">aOPR {fixed(cell.opr)}</span>
 						{/if}
 						{#if cell.awards.length > 0}
 							<span class="sub">{cell.awards.join(', ')}</span>

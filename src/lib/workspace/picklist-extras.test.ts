@@ -172,7 +172,7 @@ describe('export', () => {
 		expect(pickListText(sample(), context)).toBe(
 			[
 				'Pick list, USAZGIQ',
-				'1. 2844 Valley X - OPR 51.2 · #3 - Defense - Great driver, "fast"',
+				'1. 2844 Valley X - aOPR 51.2 · #3 - Defense - Great driver, "fast"',
 				'2. 14624 (picked by alliance 2)',
 				'',
 				'Do not pick',
@@ -192,7 +192,7 @@ describe('export', () => {
 	it('formats stats only when they exist', () => {
 		expect(statText(undefined)).toBe('');
 		expect(statText({ opr: null, rank: 4 })).toBe('#4');
-		expect(statText({ opr: 12, rank: null })).toBe('OPR 12.0');
+		expect(statText({ opr: 12, rank: null })).toBe('aOPR 12.0');
 	});
 });
 

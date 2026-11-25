@@ -114,7 +114,7 @@ describe('selection feed', () => {
 		second.stop();
 	});
 
-	it('shows each team its rank and OPR, asking for ratings only after new results', async () => {
+	it('shows each team its rank and aOPR, asking for ratings only after new results', async () => {
 		const rankings = [{ team: 100, rank: 2 }];
 		const lite = (played: number) =>
 			respond({
@@ -140,7 +140,7 @@ describe('selection feed', () => {
 		stop();
 	});
 
-	it('falls back to season OPR for picks that are not at the event', async () => {
+	it('falls back to season aOPR for picks that are not at the event', async () => {
 		const fetcher = vi.fn(async (url: string) =>
 			url.startsWith('/api/following')
 				? respond({

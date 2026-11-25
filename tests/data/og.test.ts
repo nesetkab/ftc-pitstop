@@ -143,9 +143,9 @@ function texts(node: OgNode): string[] {
 }
 
 describe('preview card data', () => {
-	it('shows OPR, world rank and record for a rated team', () => {
+	it('shows aOPR, world rank and record for a rated team', () => {
 		expect(teamStats(season([{ wins: 4, losses: 1, ties: 0 }]), ratings)).toEqual([
-			{ label: 'Season OPR', value: '61.3' },
+			{ label: 'Season aOPR', value: '61.3' },
 			{ label: 'World rank of 2', value: '1,787th' },
 			{ label: 'Record', value: '4-1-0' }
 		]);
@@ -340,7 +340,7 @@ describe('preview card layout', () => {
 			pageCard({ kicker: 'K', title: 'T', subtitle: 'S', stats: [{ label: 'A', value: '1' }] }, host),
 			compareCard(
 				[
-					{ number: 1, name: 'A', stats: [{ label: 'OPR', value: '1' }] },
+					{ number: 1, name: 'A', stats: [{ label: 'aOPR', value: '1' }] },
 					{ number: 2, name: 'B', stats: [] }
 				],
 				host

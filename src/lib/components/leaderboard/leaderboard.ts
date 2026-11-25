@@ -17,7 +17,7 @@ export const PAGE_SIZE = 50;
 export const MIN_MATCH_CHOICES = [5, 10, 15, 20, 30];
 
 export const LEADERBOARD_SORTS = [
-	{ key: 'opr', label: 'OPR' },
+	{ key: 'opr', label: 'aOPR' },
 	{ key: 'auto', label: 'Auto' },
 	{ key: 'teleop', label: 'Teleop' },
 	{ key: 'tips', label: 'Tips' },

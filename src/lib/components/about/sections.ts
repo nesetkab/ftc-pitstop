@@ -1,10 +1,10 @@
 export const ABOUT_TITLE = 'About the numbers';
 
 export const ABOUT_DESCRIPTION =
-	'How PitStop works out OPR, ranking score, match predictions, win chances, queue times and event strength for FTC, where the data comes from, and where the numbers fall short.';
+	'How PitStop works out aOPR, ranking score, match predictions, win chances, queue times and event strength for FTC, where the data comes from, and where the numbers fall short.';
 
 export const ABOUT_SECTIONS = [
-	{ id: 'opr', title: 'OPR' },
+	{ id: 'opr', title: 'aOPR' },
 	{ id: 'rankings', title: 'Rankings: RS, TBP and NP' },
 	{ id: 'ranking-points', title: 'Ranking points' },
 	{ id: 'predictions', title: 'Predictions and win chances' },

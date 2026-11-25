@@ -239,7 +239,7 @@
 					<th scope="col">Record</th>
 					<th scope="col">TBP</th>
 					<th scope="col">Avg tips</th>
-					<th scope="col">OPR</th>
+					<th scope="col">aOPR</th>
 					<th scope="col">EPA</th>
 					<th class="sep" scope="col">Finish, 1st to 27th</th>
 					<th scope="col">Top 4</th>
@@ -336,8 +336,8 @@
 				<thead>
 					<tr>
 						<th class="l" scope="col">Team</th>
-						<th scope="col">OPR</th>
-						<th scope="col">Auto OPR</th>
+						<th scope="col">aOPR</th>
+						<th scope="col">Auto aOPR</th>
 						<th scope="col">Avg tips</th>
 						<th scope="col">Avg park</th>
 						<th scope="col">Win round 1</th>
@@ -450,7 +450,7 @@
 					<thead>
 						<tr>
 							<th class="l" scope="col"><span class="visually-hidden">Part</span></th>
-							<th scope="col">OPR</th>
+							<th scope="col">aOPR</th>
 							<th scope="col">Percentile</th>
 						</tr>
 					</thead>

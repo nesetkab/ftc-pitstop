@@ -322,7 +322,7 @@ export function upcomingEvents(
 				...base,
 				registered,
 				kind: 'none' as const,
-				outlook: mine ? `${integer(field.size)} teams registered` : 'No season OPR yet'
+				outlook: mine ? `${integer(field.size)} teams registered` : 'No season aOPR yet'
 			};
 		}
 		const rank = oprRank(rated, mine);
@@ -330,7 +330,7 @@ export function upcomingEvents(
 			...base,
 			registered,
 			kind: 'opr' as const,
-			outlook: `${ordinal(rank)} of ${rated.length} rated teams by season OPR`
+			outlook: `${ordinal(rank)} of ${rated.length} rated teams by season aOPR`
 		};
 	});
 }
@@ -359,8 +359,8 @@ function standingTakeaways(stats: SeasonFacts['stats']): Candidate[] {
 	if (!notableWorld && !notableRegion) return [];
 	const place = region && notableRegion ? regionPlace(region.rank, regionName(region.code)) : null;
 	const text = notableWorld
-		? `Top ${top}% worldwide by season OPR${place ? `, ${place}` : ''}`
-		: `${place} by season OPR`;
+		? `Top ${top}% worldwide by season aOPR${place ? `, ${place}` : ''}`
+		: `${place} by season aOPR`;
 	return [{ weight: 85, text }];
 }
 
@@ -395,7 +395,7 @@ function trendTakeaways(trend: SeasonFacts['trend']): Candidate[] {
 	if (shifted(last - first, first)) {
 		const word = last > first ? 'rose' : 'fell';
 		return [
-			{ weight: 75, text: `OPR ${word} from ${fixed(first)} to ${fixed(last)} over ${count}` }
+			{ weight: 75, text: `aOPR ${word} from ${fixed(first)} to ${fixed(last)} over ${count}` }
 		];
 	}
 	const values = trend.map((point) => point.value);
@@ -404,14 +404,14 @@ function trendTakeaways(trend: SeasonFacts['trend']): Candidate[] {
 	if (shifted(high - low, low)) {
 		const text =
 			last < high
-				? `OPR peaked at ${fixed(high)} and ended at ${fixed(last)} over ${count}`
-				: `OPR dipped to ${fixed(low)} and ended at ${fixed(last)} over ${count}`;
+				? `aOPR peaked at ${fixed(high)} and ended at ${fixed(last)} over ${count}`
+				: `aOPR dipped to ${fixed(low)} and ended at ${fixed(last)} over ${count}`;
 		return [{ weight: 60, text }];
 	}
 	return [
 		{
 			weight: 35,
-			text: `Steady OPR over ${count}, between ${fixed(low)} and ${fixed(high)}`
+			text: `Steady aOPR over ${count}, between ${fixed(low)} and ${fixed(high)}`
 		}
 	];
 }

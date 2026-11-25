@@ -30,7 +30,7 @@
 				<th class="l opt" scope="col">Date</th>
 				<th scope="col">Rank</th>
 				<th scope="col"><Term label="Record" /></th>
-				<th scope="col"><Term label="OPR" /></th>
+				<th scope="col"><Term label="aOPR" /></th>
 				<th class="l opt" scope="col">Playoffs</th>
 				<th class="l" scope="col"><span class="visually-hidden">Scouting report</span></th>
 			</tr>

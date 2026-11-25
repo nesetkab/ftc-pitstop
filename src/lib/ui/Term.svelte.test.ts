@@ -27,10 +27,10 @@ describe('Term', () => {
 	});
 
 	it('can show a short label while explaining a longer term', () => {
-		render(Term, { props: { label: 'Auto', term: 'Auto OPR' } });
+		render(Term, { props: { label: 'Auto', term: 'Auto aOPR' } });
 		const link = screen.getByRole('link', { name: 'Auto' });
-		expect(link).toHaveAttribute('href', '/about#term-auto-opr');
-		expect(tipFor(link)).toHaveTextContent(explain('Auto OPR')!);
+		expect(link).toHaveAttribute('href', '/about#term-auto-aopr');
+		expect(tipFor(link)).toHaveTextContent(explain('Auto aOPR')!);
 	});
 
 	it('becomes a tooltip button when it should not link', () => {
@@ -94,7 +94,7 @@ describe('Term', () => {
 	});
 
 	it('removes its tooltip when it goes away', () => {
-		const { unmount } = render(Term, { props: { label: 'OPR' } });
+		const { unmount } = render(Term, { props: { label: 'aOPR' } });
 		expect(document.querySelectorAll('.term-tip')).toHaveLength(1);
 		unmount();
 		expect(document.querySelectorAll('.term-tip')).toHaveLength(0);

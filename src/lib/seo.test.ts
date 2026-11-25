@@ -29,13 +29,13 @@ describe('structured data', () => {
 			path: '/about',
 			headline: 'About the numbers',
 			description: 'How it works.',
-			sections: ['OPR', 'Glossary']
+			sections: ['aOPR', 'Glossary']
 		});
 		expect(data).toMatchObject({
 			'@type': 'TechArticle',
 			headline: 'About the numbers',
 			url: `${ORIGIN}/about`,
-			articleSection: ['OPR', 'Glossary'],
+			articleSection: ['aOPR', 'Glossary'],
 			isPartOf: { '@type': 'WebSite', url: `${ORIGIN}/` }
 		});
 	});
@@ -73,7 +73,7 @@ describe('search text', () => {
 		rookieYear: 2007
 	};
 
-	it('names a team with its place, season OPR and world rank', () => {
+	it('names a team with its place, season aOPR and world rank', () => {
 		expect(teamTitle(team)).toBe('FTC 724 RedNek Robotics Wun (Sun River, Montana) - PitStop');
 		expect(
 			teamDescription(team, {
@@ -84,7 +84,7 @@ describe('search text', () => {
 				events: 1
 			})
 		).toBe(
-			'FTC team 724 RedNek Robotics Wun from Sun River, Montana. 2026-27 BIOBUZZ OPR 57.2, 201st of 3,871 teams worldwide. Qualification record 4-1-0 across 1 event. Match history, OPR by part and awards.'
+			'FTC team 724 RedNek Robotics Wun from Sun River, Montana. 2026-27 BIOBUZZ aOPR 57.2, 201st of 3,871 teams worldwide. Qualification record 4-1-0 across 1 event. Match history, aOPR by part and awards.'
 		);
 	});
 
@@ -94,7 +94,7 @@ describe('search text', () => {
 				{ ...team, place: '' },
 				{ opr: null, rank: null, of: null, record: null, events: 0 }
 			)
-		).toBe('FTC team 724 RedNek Robotics Wun. Match history, OPR by part and awards.');
+		).toBe('FTC team 724 RedNek Robotics Wun. Match history, aOPR by part and awards.');
 	});
 
 	it('says where and when an event is and whether it is over', () => {
@@ -119,7 +119,7 @@ describe('search text', () => {
 		expect(regionTitle('Arizona')).toBe('Arizona FTC region, 2026-27 BIOBUZZ - PitStop');
 		const top = { team: 18420, name: 'Metal Masters', opr: 75.21 };
 		expect(regionDescription({ name: 'Arizona', teams: 101, events: 14, done: 3, top })).toBe(
-			'The Arizona FTC region in the 2026-27 BIOBUZZ season: 14 events, 3 played, 101 teams. Top team by OPR is 18420 Metal Masters at 75.2. Top teams, live and upcoming events, advancement and the best scores.'
+			'The Arizona FTC region in the 2026-27 BIOBUZZ season: 14 events, 3 played, 101 teams. Top team by aOPR is 18420 Metal Masters at 75.2. Top teams, live and upcoming events, advancement and the best scores.'
 		);
 		expect(regionDescription({ name: 'Wyoming', teams: 1, events: 1, done: 0, top: null })).toBe(
 			'The Wyoming FTC region in the 2026-27 BIOBUZZ season: 1 event, 0 played, 1 team. Top teams, live and upcoming events, advancement and the best scores.'

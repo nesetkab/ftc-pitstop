@@ -134,7 +134,7 @@ describe('queryString', () => {
 describe('createDataset', () => {
 	const dataset = createDataset(rows);
 
-	it('sorts by OPR with the team number as the tiebreak', () => {
+	it('sorts by aOPR with the team number as the tiebreak', () => {
 		expect(dataset.rows.map((entry) => entry.team)).toEqual([2, 5, 3, 4, 7, 1, 6]);
 	});
 
@@ -185,7 +185,7 @@ describe('filterRows', () => {
 		expect(teams({ q: '  ' })).toEqual([2, 5, 3, 4, 1, 6]);
 	});
 
-	it('sorts by another column with OPR as the tiebreak', () => {
+	it('sorts by another column with aOPR as the tiebreak', () => {
 		expect(teams({ sort: 'matches' })).toEqual([2, 5, 3, 1, 6, 4]);
 		expect(teams({ sort: 'auto' })).toEqual([2, 5, 3, 4, 1, 6]);
 	});

@@ -16,7 +16,7 @@
 
 	const DESCRIPTIONS: Record<string, string> = {
 		'robot-opr':
-			"PitStop predicts matches from OPR, the points a team adds to its alliance's score, without penalty points. Points FIRST records per robot, like leaving and parking, go straight to that team, and the rest is solved from alliance scores. Each team's earlier events and last three seasons give a starting estimate that the matches at the current event soon replace. No team is rated below zero, and an alliance with one much stronger team is expected to score a little more. The win chance comes from the predicted score gap.",
+			"PitStop predicts matches from aOPR, adjusted OPR, the points a team adds to its alliance's score, without penalty points. Points FIRST records per robot, like leaving and parking, go straight to that team, and the rest is solved from alliance scores. Each team's earlier events and last three seasons give a starting estimate that the matches at the current event soon replace. No team is rated below zero, and an alliance with one much stronger team is expected to score a little more. The win chance comes from the predicted score gap.",
 		'opr-map':
 			"PitStop predicts matches from OPR, the points a team adds to its alliance's score. OPR is solved from the scores of earlier matches, without penalty points. Each team's earlier events and last season give a starting estimate that the matches at the current event soon replace. The win chance comes from the predicted score gap."
 	};

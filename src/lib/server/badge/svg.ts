@@ -241,7 +241,7 @@ export function renderCard(card: CardData, theme: BadgeTheme): string {
 		body.push(
 			`<polyline points="${line}" fill="none" stroke="${colors.text2}" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>`,
 			`<circle cx="${lastX}" cy="${lastY}" r="2.5" fill="${colors.text}"/>`,
-			text('OPR by event', {
+			text('aOPR by event', {
 				...CARD_META_FONT,
 				x: SPARK.x + SPARK.width,
 				y: 54,

@@ -9,7 +9,7 @@ export type BadgeTheme = 'light' | 'dark';
 export const BADGE_KINDS: { kind: BadgeKind; label: string }[] = [
 	{ kind: 'summary', label: 'Summary' },
 	{ kind: 'card', label: 'Card' },
-	{ kind: 'opr', label: 'Season OPR' },
+	{ kind: 'opr', label: 'Season aOPR' },
 	{ kind: 'rank', label: 'World rank' },
 	{ kind: 'region', label: 'Region rank' },
 	{ kind: 'record', label: 'Qual record' },

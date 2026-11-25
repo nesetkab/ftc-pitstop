@@ -59,14 +59,14 @@ describe('RankingsView', () => {
 		expect(within(rows[0]).getByRole('link')).toHaveAttribute('href', '/teams/26670');
 		expect(screen.queryByText(/Projected after/)).toBeNull();
 		expect(screen.queryByText('Schedule so far')).toBeNull();
-		expect(screen.queryByText(/OPR is/)).toBeNull();
+		expect(screen.queryByText(/aOPR is/)).toBeNull();
 	});
 
-	it('adds OPR, projections and schedule strength when analysis is present', () => {
+	it('adds aOPR, projections and schedule strength when analysis is present', () => {
 		render(RankingsView, { props: { bundle: midway, analysis: fakeAnalysis(midway) } });
 		expect(screen.getByText('Projected after 34 matches')).toBeInTheDocument();
 		expect(headers()).toEqual(
-			expect.arrayContaining(['OPR', 'Finish, 1st to 27th', 'Top 4', 'Top 8'])
+			expect.arrayContaining(['aOPR', 'Finish, 1st to 27th', 'Top 4', 'Top 8'])
 		);
 		const table = screen.getByRole('table', { name: 'Rankings' });
 		const first = bodyRows(table)[0];
@@ -84,7 +84,7 @@ describe('RankingsView', () => {
 	it('hides the projection once every qualification match is played', () => {
 		render(RankingsView, { props: { bundle: finished, analysis: fakeAnalysis(finished) } });
 		expect(screen.queryByText(/Projected after/)).toBeNull();
-		expect(headers()).toContain('OPR');
+		expect(headers()).toContain('aOPR');
 		expect(screen.getByRole('columnheader', { name: 'Record' })).not.toHaveClass('opt');
 	});
 
@@ -272,9 +272,9 @@ describe('RankingsView', () => {
 			'RS',
 			'NP avg',
 			'Spread',
-			'OPR',
-			'Auto OPR',
-			'Teleop OPR'
+			'aOPR',
+			'Auto aOPR',
+			'Teleop aOPR'
 		]);
 		const averages = bodyRows(table).map((row) =>
 			Number(row.querySelectorAll('td')[3].textContent)
@@ -321,7 +321,7 @@ describe('RankingsView', () => {
 		expect(trigger).toHaveFocus();
 	});
 
-	it('greys out OPR columns before the model has run', async () => {
+	it('greys out aOPR columns before the model has run', async () => {
 		render(RankingsView, { props: { bundle: finished, onchoose: () => {} } });
 		await fireEvent.click(screen.getByRole('button', { name: /Columns/ }));
 		expect(await screen.findByRole('checkbox', { name: 'Auto' })).toBeDisabled();

@@ -25,8 +25,8 @@
 	);
 	const description = $derived(
 		paired
-			? `Compare FTC teams ${names.slice(0, -1).join(', ')} and ${names.at(-1)} side by side: OPR by part, records, head to head, alliance fit and shared events.`
-			: 'Compare up to four FTC teams side by side: OPR by part, records, head to head, alliance fit and shared events.'
+			? `Compare FTC teams ${names.slice(0, -1).join(', ')} and ${names.at(-1)} side by side: aOPR by part, records, head to head, alliance fit and shared events.`
+			: 'Compare up to four FTC teams side by side: aOPR by part, records, head to head, alliance fit and shared events.'
 	);
 	const width = $derived(300 + 190 * Math.max(2, view.teams.length));
 	const canonical = $derived(

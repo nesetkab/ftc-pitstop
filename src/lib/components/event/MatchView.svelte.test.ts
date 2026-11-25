@@ -71,7 +71,7 @@ describe('MatchView after the match', () => {
 		expect(within(points).getAllByText('Chance')).toHaveLength(2);
 	});
 
-	it('shows how the match moved each team rank and OPR', () => {
+	it('shows how the match moved each team rank and aOPR', () => {
 		render(MatchView, {
 			props: { bundle, match: q26, oprShifts: { 14624: { before: 30, after: 32.5 } } }
 		});
@@ -146,7 +146,7 @@ describe('MatchView before the match', () => {
 			within(teams)
 				.getAllByRole('columnheader')
 				.map((cell) => cell.textContent)
-		).toEqual(['Team', 'Alliance', 'OPR', 'Auto', 'Hive', 'Park', 'Avg tips', 'Matches']);
+		).toEqual(['Team', 'Alliance', 'aOPR', 'Auto', 'Hive', 'Park', 'Avg tips', 'Matches']);
 		expect(screen.getByText(/alliance scores in 25 matches/)).toBeInTheDocument();
 		const stakes = screen.getByRole('table', { name: 'Chance to finish in the top 6' });
 		expect(within(stakes).getAllByRole('row')).toHaveLength(5);

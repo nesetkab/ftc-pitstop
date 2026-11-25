@@ -149,7 +149,7 @@
 	const facts = $derived.by(() => {
 		const all = eventFacts(view);
 		if (!view.ranking)
-			return all.filter((fact) => ['OPR', 'OPR rank', 'Top 8 chance'].includes(fact.label));
+			return all.filter((fact) => ['aOPR', 'aOPR rank', 'Top 8 chance'].includes(fact.label));
 		return view.phase === 'done' ? all.filter((fact) => fact.label !== 'Rank') : all;
 	});
 	const prediction = $derived.by(() => {

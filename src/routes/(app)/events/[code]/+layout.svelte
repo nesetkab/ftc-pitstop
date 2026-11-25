@@ -100,7 +100,7 @@
 			label: 'Now',
 			topic: 'The match on the field, what is next, the latest results and the top 8, live.'
 		},
-		rankings: { label: 'Rankings', topic: 'Rankings, OPR and schedule strength.' },
+		rankings: { label: 'Rankings', topic: 'Rankings, aOPR and schedule strength.' },
 		schedule: { label: 'Schedule', topic: 'Match schedule with predicted scores and win chances.' },
 		results: { label: 'Results', topic: 'Match results with score breakdowns.' },
 		insights: {
@@ -108,7 +108,7 @@
 			topic: 'Highest scores and average points by part, compared with the season.'
 		},
 		playoffs: { label: 'Playoffs', topic: 'Playoff bracket, alliances and records.' },
-		teams: { label: 'Teams', topic: 'Teams with OPR and world ranks.' },
+		teams: { label: 'Teams', topic: 'Teams with aOPR and world ranks.' },
 		awards: { label: 'Awards', topic: 'Award winners.' },
 		'alliance-selection': {
 			label: 'Alliance selection',
@@ -116,7 +116,7 @@
 		},
 		scouting: {
 			label: 'Scouting binder',
-			topic: 'Printable scouting reports for every team, with OPR by part and ranking points.'
+			topic: 'Printable scouting reports for every team, with aOPR by part and ranking points.'
 		}
 	};
 
@@ -127,7 +127,7 @@
 		const name = bundle.teams.find((team) => String(team.number) === number)?.name;
 		return {
 			label: name ? `${number} ${name}` : `Team ${number}`,
-			topic: `Scouting report for team ${number}: OPR by part, consistency, ranking points and remaining matches.`,
+			topic: `Scouting report for team ${number}: aOPR by part, consistency, ranking points and remaining matches.`,
 			path: `teams/${number}`
 		};
 	});

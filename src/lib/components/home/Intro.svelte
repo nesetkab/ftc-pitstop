@@ -31,7 +31,7 @@
 	<section class="intro" aria-labelledby="intro-title">
 		<h2 class="visually-hidden" id="intro-title">What PitStop does</h2>
 		<p class="lead">
-			Live FTC results, rankings and OPR for the <span class="season">{SEASON_NAME}</span> season.
+			Live FTC results, rankings and aOPR for the <span class="season">{SEASON_NAME}</span> season.
 		</p>
 		<p class="sub">
 			Plus a <a href="#pit">pit display</a> for your TV, a shared

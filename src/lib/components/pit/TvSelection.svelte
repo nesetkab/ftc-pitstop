@@ -86,7 +86,7 @@
 							<th class="l" scope="col">#</th>
 							<th class="l" scope="col">Team</th>
 							<th class="l" scope="col"><span class="visually-hidden">Name</span></th>
-							<th scope="col">{withOpr ? 'OPR' : 'RS'}</th>
+							<th scope="col">{withOpr ? 'aOPR' : 'RS'}</th>
 							{#if withOdds}<th scope="col">Win event</th>{/if}
 						</tr>
 					</thead>

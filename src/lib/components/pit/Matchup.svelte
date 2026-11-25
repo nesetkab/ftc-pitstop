@@ -32,7 +32,7 @@
 
 <div class={['matchup', { forecast }]}>
 	<div class="row head">
-		<span>{withOpr ? 'Teams and OPR' : 'Teams and rank'}</span>
+		<span>{withOpr ? 'Teams and aOPR' : 'Teams and rank'}</span>
 		{#if forecast}
 			<span class="num">Win chance</span>
 			<span class="num">Predicted</span>

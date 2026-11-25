@@ -125,7 +125,7 @@
 			<div class="panel">
 				<h2 class="sec-title">What this match changed</h2>
 				<MatchImpact {match} teams={bundle.teams} {ranks} oprs={oprShifts} {followed} />
-				<p class="note">Each team's standing and OPR just before and just after this match.</p>
+				<p class="note">Each team's standing and aOPR just before and just after this match.</p>
 			</div>
 		{/if}
 

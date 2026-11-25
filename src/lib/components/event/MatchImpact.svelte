@@ -52,7 +52,7 @@
 				<th class="l opt" scope="col"><span class="visually-hidden">Rank change</span></th>
 			{/if}
 			{#if showOpr}
-				<th scope="col"><Term label="OPR" /></th>
+				<th scope="col"><Term label="aOPR" /></th>
 				<th scope="col">Change</th>
 			{/if}
 		</tr>

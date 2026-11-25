@@ -22,13 +22,13 @@
 		caption?: string;
 	}
 
-	let { rows, start, filters, caption = 'Teams ranked by season OPR' }: Props = $props();
+	let { rows, start, filters, caption = 'Teams ranked by season aOPR' }: Props = $props();
 
 	const followed = $derived(new Set(follows.teams));
 	const showEvents = $derived(rows.some((row) => row.events !== null));
 	const sort = $derived(filters?.sort ?? 'opr');
 	const columns: { key: LeaderboardSort; label: string; optional?: boolean }[] = [
-		{ key: 'opr', label: 'OPR' },
+		{ key: 'opr', label: 'aOPR' },
 		{ key: 'auto', label: 'Auto' },
 		{ key: 'teleop', label: 'Teleop' },
 		{ key: 'tips', label: 'Tips', optional: true },

@@ -280,10 +280,10 @@ export function eventFacts(view: PitView): Fact[] {
 	});
 	facts.push({ label: 'RS', value: ranking ? fixed(ranking.rs, 2) : '—' });
 	if (view.opr !== null) {
-		facts.push({ label: 'OPR', value: fixed(view.opr, 1) });
+		facts.push({ label: 'aOPR', value: fixed(view.opr, 1) });
 		if (view.oprRank !== null) {
 			facts.push({
-				label: 'OPR rank',
+				label: 'aOPR rank',
 				value: String(view.oprRank),
 				detail: `of ${view.teamCount}`
 			});

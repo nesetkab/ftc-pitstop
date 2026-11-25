@@ -36,7 +36,7 @@ describe('EventPreview', () => {
 		expect(screen.getByText(/The top 6 become alliance captains/)).toBeInTheDocument();
 	});
 
-	it('sticks to starting OPR without projections', () => {
+	it('sticks to starting aOPR without projections', () => {
 		render(EventPreview, { props: props(null) });
 		expect(screen.queryByRole('columnheader', { name: 'Expected rank' })).toBeNull();
 		expect(screen.queryByText(/alliance captains/)).toBeNull();

@@ -160,7 +160,7 @@ describe('text widths', () => {
 
 	it('sizes every badge so its text fits inside its own half', () => {
 		const samples = [
-			{ label: 'FTC 1', value: 'OPR 1.0' },
+			{ label: 'FTC 1', value: 'aOPR 1.0' },
 			{
 				label: 'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
 				value: 'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM'
@@ -196,7 +196,7 @@ describe('text widths', () => {
 		});
 		expect(header.nameX + textWidth(header.name, CARD_NAME_FONT)).toBeLessThanOrEqual(header.right);
 		const columns = cardColumns([
-			{ label: 'Season OPR', value: '1234.5' },
+			{ label: 'Season aOPR', value: '1234.5' },
 			{ label: 'World rank', value: '12,345', suffix: 'of 12,345' },
 			{ label: 'Rank in Texas West and Panhandle', value: '1,234', suffix: 'of 1,234' },
 			{ label: 'Qual record', value: '120-120-12' }
@@ -243,9 +243,9 @@ describe('badge text', () => {
 	it('writes each variant', () => {
 		expect(badgeText(facts, null)).toEqual({
 			label: 'FTC 26670',
-			value: 'OPR 100.0 · 3rd worldwide'
+			value: 'aOPR 100.0 · 3rd worldwide'
 		});
-		expect(badgeText(facts, 'opr')).toEqual({ label: '26670 season OPR', value: '100.0' });
+		expect(badgeText(facts, 'opr')).toEqual({ label: '26670 season aOPR', value: '100.0' });
 		expect(badgeText(facts, 'rank')).toEqual({ label: '26670 world rank', value: '3rd of 5' });
 		expect(badgeText(facts, 'region')).toEqual({
 			label: '26670 rank in Arizona',
@@ -289,7 +289,7 @@ describe('badge text', () => {
 			null,
 			NOW
 		);
-		expect(badgeText(quick, null).value).toBe('OPR 55.5 · 1,200th worldwide');
+		expect(badgeText(quick, null).value).toBe('aOPR 55.5 · 1,200th worldwide');
 		expect(badgeText(quick, 'rank').value).toBe('1,200th of 4,000');
 	});
 

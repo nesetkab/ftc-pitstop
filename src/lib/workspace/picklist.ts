@@ -140,7 +140,7 @@ export function tagText(entry: PickEntry): string {
 export function statText(stat: PickStat | undefined): string {
 	if (!stat) return '';
 	return [
-		stat.opr === null ? '' : `${stat.season ? 'Season OPR' : 'OPR'} ${stat.opr.toFixed(1)}`,
+		stat.opr === null ? '' : `${stat.season ? 'Season aOPR' : 'aOPR'} ${stat.opr.toFixed(1)}`,
 		stat.rank === null ? '' : `#${stat.rank}`
 	]
 		.filter(Boolean)

@@ -18,7 +18,7 @@
 	const ORDERS: { value: Order; label: string }[] = [
 		{ value: 'name', label: 'Name' },
 		{ value: 'teams', label: 'Teams' },
-		{ value: 'opr', label: 'Top OPR' }
+		{ value: 'opr', label: 'Top aOPR' }
 	];
 
 	let { data }: PageProps = $props();
@@ -46,7 +46,7 @@
 
 <Seo
 	title={siteTitle(`FTC regions, ${SEASON_NAME}`)}
-	description="Every FTC region in the {SEASON_NAME} season with its team count, events played and still to come, and its top team by OPR."
+	description="Every FTC region in the {SEASON_NAME} season with its team count, events played and still to come, and its top team by aOPR."
 	path="/regions"
 />
 
@@ -90,7 +90,7 @@
 							<th class="count" scope="col">Played</th>
 							<th class="opt left" scope="col">Left</th>
 							<th class="l" scope="col">Top team</th>
-							<th class="score" scope="col"><Term label="OPR" /></th>
+							<th class="score" scope="col"><Term label="aOPR" /></th>
 						</tr>
 					</thead>
 					<tbody>

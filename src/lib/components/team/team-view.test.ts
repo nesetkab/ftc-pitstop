@@ -115,9 +115,9 @@ describe('buildTeamPage without season ratings', () => {
 		]);
 	});
 
-	it('draws one OPR point per event', () => {
+	it('draws one aOPR point per event', () => {
 		const view = buildTeamPage({ season, ratings: null, analyses: {}, bundles: {}, now: NOW });
-		expect(view.chartTitle).toBe('OPR at each event');
+		expect(view.chartTitle).toBe('aOPR at each event');
 		expect(view.charts).toHaveLength(1);
 		expect(view.charts[0].points).toEqual([{ label: 'Nov 14', value: expect.any(Number) }]);
 		expect(view.charts[0].points[0].value).toBeCloseTo(47.3615, 3);
@@ -258,7 +258,7 @@ describe('buildTeamPage with season ratings', () => {
 		expect(view.comparison.find((row) => row.key === 'hive')?.nested).toBe(true);
 	});
 
-	it('charts OPR after each match and marks where playoffs start', () => {
+	it('charts aOPR after each match and marks where playoffs start', () => {
 		const view = buildTeamPage({
 			season,
 			ratings: pool,
@@ -266,7 +266,7 @@ describe('buildTeamPage with season ratings', () => {
 			bundles: {},
 			now: NOW
 		});
-		expect(view.chartTitle).toBe('OPR after each match');
+		expect(view.chartTitle).toBe('aOPR after each match');
 		expect(view.charts).toHaveLength(1);
 		expect(view.charts[0]).toMatchObject({
 			id: 'USAZGIQ',
@@ -297,10 +297,10 @@ describe('buildTeamPage with season ratings', () => {
 			bundles: {},
 			now: NOW
 		});
-		expect(view.chartTitle).toBe('OPR at each event');
+		expect(view.chartTitle).toBe('aOPR at each event');
 	});
 
-	it('ranks a tie on OPR the same way the leaderboard lists it', () => {
+	it('ranks a tie on aOPR the same way the leaderboard lists it', () => {
 		const tied = ratings([rating(111, 80), rating(9000, 50), rating(2844, 50), rating(100, 50)]);
 		const view = buildTeamPage({ season, ratings: tied, analyses: {}, bundles: {}, now: NOW });
 		expect(view.stats).toMatchObject({ rank: 3, of: 4, region: { rank: 3, of: 4 } });
@@ -415,7 +415,7 @@ describe('eventBreakdown and seasonTrend', () => {
 		]
 	};
 
-	it('uses analysis parts when there are some and event OPR otherwise', () => {
+	it('uses analysis parts when there are some and event aOPR otherwise', () => {
 		const rows = eventBreakdown(played, { BBB: rated }, null);
 		expect(rows.map((row) => row.key)).toEqual(['AAA', 'BBB']);
 		expect(rows[0]).toMatchObject({ opr: 40, auto: 10, teleop: 30, hive: null, tips: null });

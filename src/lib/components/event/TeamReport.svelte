@@ -20,14 +20,14 @@
 
 	const NESTED = new Set<ReportPart>(['hive', 'flower', 'garden', 'park']);
 	const TERMS: Record<ReportPart, string> = {
-		opr: 'OPR',
-		auto: 'Auto OPR',
-		teleop: 'Teleop OPR',
-		hive: 'Hive OPR',
-		flower: 'Flower OPR',
-		garden: 'Garden OPR',
-		park: 'Park OPR',
-		tips: 'Tips OPR'
+		opr: 'aOPR',
+		auto: 'Auto aOPR',
+		teleop: 'Teleop aOPR',
+		hive: 'Hive aOPR',
+		flower: 'Flower aOPR',
+		garden: 'Garden aOPR',
+		park: 'Park aOPR',
+		tips: 'Tips aOPR'
 	};
 
 	const base = $derived(`/events/${code}`);
@@ -50,12 +50,12 @@
 			}
 		}
 		if (opr) {
-			const word = expected ? 'Expected OPR' : 'OPR';
+			const word = expected ? 'Expected aOPR' : 'aOPR';
 			list.push(`${word} ${fixed(opr.value)}, ${ordinal(opr.rank)} of ${opr.of} here`);
 		}
 		if (report.season) {
 			list.push(
-				`Season OPR ${fixed(report.season.opr)}, ${ordinal(report.season.rank)} of ${integer(report.season.of)}`
+				`Season aOPR ${fixed(report.season.opr)}, ${ordinal(report.season.rank)} of ${integer(report.season.of)}`
 			);
 		}
 		return list;
@@ -114,7 +114,7 @@
 	{/if}
 
 	{#if report.league}
-		<p class="note">League meet: rankings, record and OPR include earlier meets in the league.</p>
+		<p class="note">League meet: rankings, record and aOPR include earlier meets in the league.</p>
 	{/if}
 
 	<div class="grid">
@@ -191,7 +191,7 @@
 				<p class={['note', { 'screen-only': compact }]}>
 					{expected
 						? 'Expected values come from season form before this event.'
-						: 'OPR estimates points per match. Rank is among teams that played here.'}
+						: 'aOPR estimates points per match. Rank is among teams that played here.'}
 				</p>
 			</section>
 		{/if}

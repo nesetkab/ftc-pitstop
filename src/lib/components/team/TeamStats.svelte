@@ -22,12 +22,12 @@
 
 <dl class="stats">
 	<div class="lead">
-		<dt>Season OPR</dt>
+		<dt>Season aOPR</dt>
 		<dd>{fixed(stats.opr)}</dd>
 	</div>
 	{#if change !== null}
 		<div class="spark">
-			<dt>OPR by event</dt>
+			<dt>aOPR by event</dt>
 			<dd class="trend">
 				<TrendSpark points={trend} width={150} height={44} />
 				<small>{signed(change)} since first</small>
@@ -35,7 +35,7 @@
 		</div>
 	{/if}
 	<div>
-		<dt>World rank by OPR</dt>
+		<dt>World rank by aOPR</dt>
 		<dd>
 			{#if stats.rank !== null && stats.of !== null}
 				{#if worldHref}

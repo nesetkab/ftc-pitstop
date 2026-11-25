@@ -192,14 +192,14 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 		? [
 				row(
 					'opr',
-					'Season OPR',
+					'Season aOPR',
 					rated.map((r) => r?.opr ?? null),
 					fixed,
 					'high'
 				),
 				row(
 					'rank',
-					'World rank by OPR',
+					'World rank by aOPR',
 					rated.map((r) => (r ? rankOf(r) : null)),
 					integer,
 					'low'
@@ -263,7 +263,7 @@ function seasonRows(seasons: TeamSeason[], ratings: SeasonRatings | null): Compa
 			? [
 					row(
 						'opr',
-						'Best event OPR',
+						'Best event aOPR',
 						quick.map((q) => q?.total.value ?? null),
 						fixed,
 						'high'

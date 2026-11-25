@@ -11,7 +11,7 @@ export const BRIEF_PARTS = ['opr', 'auto', 'hive', 'tips'] as const;
 export type BriefPart = (typeof BRIEF_PARTS)[number];
 
 export const BRIEF_LABELS: Record<BriefPart, string> = {
-	opr: 'OPR',
+	opr: 'aOPR',
 	auto: PART_LABELS.auto,
 	hive: PART_LABELS.hive,
 	tips: PART_LABELS.tips

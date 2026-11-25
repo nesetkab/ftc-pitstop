@@ -40,14 +40,14 @@
 </script>
 
 <Seo
-	title={siteTitle(`FTC team leaderboards by OPR, ${SEASON_NAME}`)}
-	description="Every FTC team ranked by OPR in the {SEASON_NAME} season, with auto, teleop and tips OPR, matches and events. Filter by region, country or state, sort by any column and download a CSV."
+	title={siteTitle(`FTC team leaderboards by aOPR, ${SEASON_NAME}`)}
+	description="Every FTC team ranked by aOPR in the {SEASON_NAME} season, with auto, teleop and tips aOPR, matches and events. Filter by region, country or state, sort by any column and download a CSV."
 	path="/leaderboards"
 />
 
 <PageHeader
 	title="Leaderboards"
-	meta="Teams ranked by OPR this season. OPR is the points a team adds to its alliance's score."
+	meta="Teams ranked by aOPR this season. aOPR is the points a team adds to its alliance's score."
 >
 	{#snippet status()}
 		<StaleNotice updated={data.updated} staleAfter={86400} prefix="Updated" />.

@@ -134,7 +134,7 @@ export function badgeText(facts: BadgeFacts, stat: BadgeStat | null): BadgeText 
 	const team = String(facts.number);
 	switch (stat) {
 		case 'opr':
-			return { label: `${team} season OPR`, value: oprText(facts) };
+			return { label: `${team} season aOPR`, value: oprText(facts) };
 		case 'rank':
 			return { label: `${team} world rank`, value: standingText(facts.world, 'not ranked yet') };
 		case 'region':
@@ -149,7 +149,7 @@ export function badgeText(facts: BadgeFacts, stat: BadgeStat | null): BadgeText 
 		default: {
 			if (facts.opr === null) return { label: `FTC ${team}`, value: NO_MATCHES };
 			const world = facts.world ? ` · ${rankText(facts.world.rank)} worldwide` : '';
-			return { label: `FTC ${team}`, value: `OPR ${fixed(facts.opr)}${world}` };
+			return { label: `FTC ${team}`, value: `aOPR ${fixed(facts.opr)}${world}` };
 		}
 	}
 }
@@ -164,7 +164,7 @@ export function cardData(facts: BadgeFacts): CardData {
 		name: facts.name,
 		meta: `${SEASON_NAME} · ftcpitstop.com`,
 		stats: [
-			{ label: 'Season OPR', value: facts.opr === null ? MISSING : fixed(facts.opr) },
+			{ label: 'Season aOPR', value: facts.opr === null ? MISSING : fixed(facts.opr) },
 			{
 				label: 'World rank',
 				value: facts.world ? integer(facts.world.rank) : MISSING,

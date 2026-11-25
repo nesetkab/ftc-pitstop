@@ -36,7 +36,7 @@ function isEvent(value: unknown): value is EventSummary {
 
 function teamMeta(team: TeamHit): string | null {
 	if (typeof team.opr !== 'number' || typeof team.rank !== 'number') return null;
-	return `${fixed(team.opr)} OPR · #${team.rank}`;
+	return `${fixed(team.opr)} aOPR · #${team.rank}`;
 }
 
 function teamResult(team: TeamHit): SearchResult {

@@ -157,7 +157,7 @@ describe('team page', () => {
 		show();
 		const description = document.head.querySelector('meta[name="description"]');
 		expect(description?.getAttribute('content')).toBe(
-			'FTC team 26670 SCA Iron Eagles from Phoenix, Arizona. 2026-27 BIOBUZZ OPR 58.2, 214th of 3,272 teams worldwide. Qualification record 5-0-0 across 1 event. Match history, OPR by part and awards.'
+			'FTC team 26670 SCA Iron Eagles from Phoenix, Arizona. 2026-27 BIOBUZZ aOPR 58.2, 214th of 3,272 teams worldwide. Qualification record 5-0-0 across 1 event. Match history, aOPR by part and awards.'
 		);
 		const canonical = document.head.querySelector('link[rel="canonical"]');
 		expect(canonical?.getAttribute('href')).toMatch(/\/teams\/26670$/);
@@ -195,19 +195,19 @@ describe('team page', () => {
 			'href',
 			'/leaderboards?region=USAZ&team=26670'
 		);
-		expect(within(stat('World rank by OPR') as HTMLElement).getByRole('link')).toHaveAttribute(
+		expect(within(stat('World rank by aOPR') as HTMLElement).getByRole('link')).toHaveAttribute(
 			'href',
 			'/leaderboards?team=26670'
 		);
-		expect(stat('OPR by event')).toHaveTextContent('+20.0 since first');
+		expect(stat('aOPR by event')).toHaveTextContent('+20.0 since first');
 		expect(
-			screen.getByRole('img', { name: 'OPR at each event: First 50.0, Second 70.0' })
+			screen.getByRole('img', { name: 'aOPR at each event: First 50.0, Second 70.0' })
 		).toBeInTheDocument();
 	});
 
-	it('breaks down OPR by scoring part at each event under the season percentiles', () => {
+	it('breaks down aOPR by scoring part at each event under the season percentiles', () => {
 		show();
-		const table = screen.getByRole('table', { name: 'OPR by scoring part at each event' });
+		const table = screen.getByRole('table', { name: 'aOPR by scoring part at each event' });
 		const rows = within(table).getAllByRole('row');
 		expect(rows).toHaveLength(3);
 		expect(rows[1]).toHaveTextContent('Season percentile');
@@ -221,8 +221,8 @@ describe('team page', () => {
 		const stat = (name: string) =>
 			screen.getByText((_, node) => node?.tagName === 'DT' && node.textContent === name)
 				.nextElementSibling;
-		expect(stat('Season OPR')).toHaveTextContent('58.2');
-		expect(stat('World rank by OPR')).toHaveTextContent('214 of 3,272');
+		expect(stat('Season aOPR')).toHaveTextContent('58.2');
+		expect(stat('World rank by aOPR')).toHaveTextContent('214 of 3,272');
 		expect(stat('Qual record')).toHaveTextContent('5-0-0 in 1 event');
 	});
 
@@ -245,17 +245,17 @@ describe('team page', () => {
 
 	it('compares the team with all teams using percentiles', () => {
 		show();
-		const table = screen.getByRole('table', { name: 'OPR by scoring part at each event' });
+		const table = screen.getByRole('table', { name: 'aOPR by scoring part at each event' });
 		const row = within(table).getByRole('row', { name: /Season percentile/ });
 		const cells = [...row.querySelectorAll('td')].map((cell) => cell.textContent?.trim());
 		expect(cells.slice(0, 3)).toEqual(['93rd', '81st', '94th']);
 		expect(cells.slice(3)).toEqual([MISSING, MISSING, MISSING, MISSING, MISSING]);
 	});
 
-	it('draws the OPR chart for each event', () => {
+	it('draws the aOPR chart for each event', () => {
 		show();
-		expect(screen.getByRole('heading', { name: 'OPR at each event' })).toBeInTheDocument();
-		const chart = screen.getByRole('table', { name: 'OPR at each event for team 26670' });
+		expect(screen.getByRole('heading', { name: 'aOPR at each event' })).toBeInTheDocument();
+		const chart = screen.getByRole('table', { name: 'aOPR at each event for team 26670' });
 		expect(within(chart).getByText('58.2')).toBeInTheDocument();
 	});
 
@@ -339,9 +339,9 @@ describe('team page', () => {
 			})
 		);
 		expect(screen.getByText('This team has no events this season.')).toBeInTheDocument();
-		expect(screen.queryByRole('heading', { name: /OPR/ })).not.toBeInTheDocument();
+		expect(screen.queryByRole('heading', { name: /aOPR/ })).not.toBeInTheDocument();
 		expect(
-			screen.queryByText((_, node) => node?.tagName === 'DT' && node.textContent === 'Season OPR')
+			screen.queryByText((_, node) => node?.tagName === 'DT' && node.textContent === 'Season aOPR')
 		).not.toBeInTheDocument();
 		expect(screen.queryByRole('link', { name: /Highest scores/ })).not.toBeInTheDocument();
 	});
@@ -349,7 +349,7 @@ describe('team page', () => {
 	it('opens with season takeaways', () => {
 		show();
 		const lede = screen.getByLabelText('Season takeaways');
-		expect(lede.querySelector('mark')?.textContent).toBe('Top 7% worldwide by season OPR.');
+		expect(lede.querySelector('mark')?.textContent).toBe('Top 7% worldwide by season aOPR.');
 		expect(lede.textContent).not.toMatch(/Award|Finalist/);
 		expect(lede.textContent?.match(/\./g)?.length ?? 0).toBeLessThanOrEqual(5);
 	});
@@ -424,7 +424,7 @@ describe('team page', () => {
 		expect(screen.getByRole('heading', { name: 'Toughest opponents' })).toBeInTheDocument();
 		expect(screen.getByText(/^\d+ partners?, most matches together first\.$/)).toBeInTheDocument();
 		expect(
-			screen.getByText(/^\d+ opponents?, toughest first by season OPR\.$/)
+			screen.getByText(/^\d+ opponents?, toughest first by season aOPR\.$/)
 		).toBeInTheDocument();
 	});
 

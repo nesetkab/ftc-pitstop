@@ -37,19 +37,19 @@ beforeEach(() => {
 describe('rankings csv', () => {
 	it('exports the default columns', async () => {
 		const [header, first] = await csv();
-		expect(header).toBe('Rank,Team,Name,RS,Wins,Losses,Ties,TBP,NP max,Avg tips,OPR');
+		expect(header).toBe('Rank,Team,Name,RS,Wins,Losses,Ties,TBP,NP max,Avg tips,aOPR');
 		expect(first.startsWith('1,26670,SCA Iron Eagles,4.4,5,0,0,')).toBe(true);
 	});
 
 	it('exports the chosen columns in the chosen order', async () => {
 		const lines = await csv('?cols=played,npavg,opr-auto,opr-teleop&sort=team');
-		expect(lines[0]).toBe('Rank,Team,Name,Played,NP avg,Auto OPR,Teleop OPR');
+		expect(lines[0]).toBe('Rank,Team,Name,Played,NP avg,Auto aOPR,Teleop aOPR');
 		const teams = lines.slice(1).map((line) => Number(line.split(',')[1]));
 		expect(teams).toEqual([...teams].sort((a, b) => a - b));
 		expect(lines[1].split(',').slice(-2)).toEqual(['12', expect.any(String)]);
 	});
 
-	it('leaves OPR out when the model has not run', async () => {
+	it('leaves aOPR out when the model has not run', async () => {
 		server.loadEventAnalysisEntry.mockRejectedValue(new Error('down'));
 		const [header] = await csv('?cols=rs,opr,opr-hive');
 		expect(header).toBe('Rank,Team,Name,RS');

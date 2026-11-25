@@ -19,7 +19,7 @@ const view: Comparison = {
 		{ number: 200, name: 'Bravo', place: 'Tempe, AZ' }
 	],
 	rows: [
-		{ key: 'opr', label: 'Season OPR', values: ['120.0', '60.0'], best: [0], nested: false },
+		{ key: 'opr', label: 'Season aOPR', values: ['120.0', '60.0'], best: [0], nested: false },
 		{ key: 'hive', label: 'Hive', values: ['60.0', '30.0'], best: [0], nested: true }
 	],
 	pairs: [
@@ -100,7 +100,7 @@ describe('compare page', () => {
 		show();
 		const table = screen.getByRole('table', { name: 'Season stats side by side' });
 		expect(within(table).getByRole('link', { name: '100' })).toHaveAttribute('href', '/teams/100');
-		const opr = within(table).getByRole('row', { name: /Season OPR/ });
+		const opr = within(table).getByRole('row', { name: /Season aOPR/ });
 		expect(within(opr).getByText('120.0')).toHaveClass('best');
 		expect(within(opr).getByText('60.0')).not.toHaveClass('best');
 		expect(screen.getByRole('link', { name: 'Remove 100' })).toHaveAttribute(

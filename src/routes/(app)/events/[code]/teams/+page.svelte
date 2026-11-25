@@ -11,7 +11,7 @@
 	const bundle = $derived(data.bundle);
 	const note = $derived(
 		data.season
-			? `${bundle.teams.length} teams. Season OPR and world rank cover every BIOBUZZ match played so far.`
+			? `${bundle.teams.length} teams. Season aOPR and world rank cover every BIOBUZZ match played so far.`
 			: `${bundle.teams.length} teams.`
 	);
 	const ratings = $derived(

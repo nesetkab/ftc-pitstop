@@ -90,7 +90,7 @@ beforeEach(() => {
 });
 
 describe('leaderboards load with season ratings', () => {
-	it('ranks teams by OPR, adds names and leaves out teams with no matches', async () => {
+	it('ranks teams by aOPR, adds names and leaves out teams with no matches', async () => {
 		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 10));
 		const { result, setHeaders } = call();
 		const data = await result;

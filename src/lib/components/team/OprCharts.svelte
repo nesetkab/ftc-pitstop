@@ -26,7 +26,7 @@
 				yMax={top}
 				height={charts.length > 1 ? 170 : 220}
 				xName={perEvent ? 'Event' : 'Match'}
-				yName="OPR"
+				yName="aOPR"
 				format={(value) => fixed(value)}
 			/>
 		</figure>

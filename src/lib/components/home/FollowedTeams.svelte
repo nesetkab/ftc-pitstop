@@ -216,7 +216,7 @@
 						</p>
 						{#if row.opr !== null}
 							<p class="line">
-								<span class="faint">OPR</span>
+								<span class="faint">aOPR</span>
 								<span class="num">{fixed(row.opr)}</span>
 								{#if row.worldRank}
 									<span class="faint">

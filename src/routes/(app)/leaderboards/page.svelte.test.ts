@@ -114,7 +114,7 @@ function bodyRows() {
 }
 
 describe('leaderboard page', () => {
-	it('lists the columns for rank, team, location and the OPR parts', () => {
+	it('lists the columns for rank, team, location and the aOPR parts', () => {
 		show();
 		const headers = within(screen.getByRole('table'))
 			.getAllByRole('columnheader')
@@ -123,7 +123,7 @@ describe('leaderboard page', () => {
 			'Rank',
 			'Team',
 			'Location',
-			'OPR',
+			'aOPR',
 			'Auto',
 			'Teleop',
 			'Tips',
@@ -210,7 +210,7 @@ describe('leaderboard page', () => {
 			'/leaderboards?region=USAZ&sort=auto'
 		);
 		expect(
-			within(screen.getByRole('columnheader', { name: /OPR/ })).getByRole('link')
+			within(screen.getByRole('columnheader', { name: /aOPR/ })).getByRole('link')
 		).toHaveAttribute('href', '/leaderboards?region=USAZ');
 		expect(screen.getByText('USAZ · By auto')).toBeInTheDocument();
 	});

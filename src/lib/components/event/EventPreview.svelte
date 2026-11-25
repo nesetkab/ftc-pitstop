@@ -129,7 +129,7 @@
 				{#if rated}<th class="l" scope="col">#</th>{/if}
 				<th class="l" scope="col">Team</th>
 				{#if rated}
-					<th scope="col"><Term label="Starting OPR" /></th>
+					<th scope="col"><Term label="Starting aOPR" /></th>
 					{#if withRange}
 						<th scope="col">Likely range</th>
 					{/if}
@@ -197,7 +197,7 @@
 	</Table>
 	{#if rated}
 		<Legend>
-			Starting OPR is the rating each team brings into this event. Teams with BIOBUZZ matches start
+			Starting aOPR is the rating each team brings into this event. Teams with BIOBUZZ matches start
 			from their own results. Teams without start from last season's results.
 			{#if projected && spots > 0}
 				Expected rank and top {spots} chance play out the posted schedule thousands of times, so they

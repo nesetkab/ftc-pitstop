@@ -19,7 +19,7 @@ export const REPORT_PARTS = [
 export type ReportPart = (typeof REPORT_PARTS)[number];
 
 export const REPORT_PART_LABELS: Record<ReportPart, string> = {
-	opr: 'OPR',
+	opr: 'aOPR',
 	auto: PART_LABELS.auto,
 	teleop: PART_LABELS.teleop,
 	hive: PART_LABELS.hive,
@@ -535,7 +535,7 @@ function seasonTakeaways(report: Omit<TeamReport, 'takeaways'>): Candidate[] {
 	return [
 		{
 			weight: 55,
-			text: `${word} season form: ${fixed(opr.value)} OPR here vs ${fixed(report.season.opr)} for the season`
+			text: `${word} season form: ${fixed(opr.value)} aOPR here vs ${fixed(report.season.opr)} for the season`
 		}
 	];
 }

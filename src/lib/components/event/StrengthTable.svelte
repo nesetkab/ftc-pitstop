@@ -44,9 +44,9 @@
 		<tr>
 			<th class="l rank" scope="col">Rank</th>
 			<th class="l" scope="col">Team</th>
-			<th scope="col"><Term label="Rank by OPR" /></th>
-			<th class="opt" scope="col"><Term label="Partners' OPR" /></th>
-			<th class="opt" scope="col"><Term label="Opponents' OPR" /></th>
+			<th scope="col"><Term label="Rank by aOPR" /></th>
+			<th class="opt" scope="col"><Term label="Partners' aOPR" /></th>
+			<th class="opt" scope="col"><Term label="Opponents' aOPR" /></th>
 			<th scope="col">Difference</th>
 		</tr>
 	</thead>

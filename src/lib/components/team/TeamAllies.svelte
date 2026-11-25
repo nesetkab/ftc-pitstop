@@ -22,7 +22,7 @@
 	const summary = $derived(
 		kind === 'partners'
 			? `${total} ${total === 1 ? 'partner' : 'partners'}, most matches together first.`
-			: `${total} ${total === 1 ? 'opponent' : 'opponents'}, toughest first by season OPR.`
+			: `${total} ${total === 1 ? 'opponent' : 'opponents'}, toughest first by season aOPR.`
 	);
 </script>
 
@@ -37,7 +37,7 @@
 			{#if kind === 'partners'}
 				<th scope="col">Best score</th>
 			{:else}
-				<th scope="col"><Term label="Season OPR" /></th>
+				<th scope="col"><Term label="Season aOPR" /></th>
 			{/if}
 		</tr>
 	</thead>

@@ -123,7 +123,7 @@
 		</dd>
 	</div>
 	<div>
-		<dt>Top OPR</dt>
+		<dt>Top aOPR</dt>
 		<dd>
 			{#if region.top}
 				{fixed(region.top.opr)}
@@ -144,20 +144,20 @@
 	</div>
 	{#if data.teams.length === 0}
 		<EmptyState title="No rated teams yet.">
-			Teams get a season OPR once they play matches. It fills in as events finish.
+			Teams get a season aOPR once they play matches. It fills in as events finish.
 		</EmptyState>
 	{:else}
 		<div class="table-wrap">
 			<table class="t">
-				<caption class="visually-hidden">Top teams in {region.name} by season OPR</caption>
+				<caption class="visually-hidden">Top teams in {region.name} by season aOPR</caption>
 				<thead>
 					<tr>
 						<th class="l" scope="col"><Term label="#" /></th>
 						<th class="l" scope="col">Team</th>
 						<th class="l place" scope="col">Location</th>
-						<th scope="col"><Term label="OPR" /></th>
-						<th class="opt" scope="col"><Term label="Auto" term="Auto OPR" /></th>
-						<th class="opt" scope="col"><Term label="Teleop" term="Teleop OPR" /></th>
+						<th scope="col"><Term label="aOPR" /></th>
+						<th class="opt" scope="col"><Term label="Auto" term="Auto aOPR" /></th>
+						<th class="opt" scope="col"><Term label="Teleop" term="Teleop aOPR" /></th>
 						<th scope="col"><Term label="World rank" /></th>
 					</tr>
 				</thead>

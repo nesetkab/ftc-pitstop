@@ -250,7 +250,7 @@ describe('buildComparison', () => {
 		const fallback = buildComparison({ seasons: [quick, bravo], ratings: null, matches: [] });
 		expect(fallback.source).toBe('scout');
 		expect(fallback.rows.find((row) => row.key === 'opr')).toMatchObject({
-			label: 'Best event OPR',
+			label: 'Best event aOPR',
 			values: ['110.0', '—'],
 			best: []
 		});
@@ -305,7 +305,7 @@ describe('suggestNeighbors', () => {
 		[5, 160]
 	]);
 
-	it('suggests teams close in OPR', () => {
+	it('suggests teams close in aOPR', () => {
 		expect(suggestNeighbors(pool, [3])).toEqual([2, 4, 1]);
 	});
 

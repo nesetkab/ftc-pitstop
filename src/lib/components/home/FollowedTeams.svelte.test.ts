@@ -157,7 +157,7 @@ describe('followed teams', () => {
 		expect(within(card).getByText('No matches played')).toBeInTheDocument();
 	});
 
-	it('shows the next event and season OPR for a team that is not playing today', async () => {
+	it('shows the next event and season aOPR for a team that is not playing today', async () => {
 		localStorage.setItem(FOLLOW_KEY, '[3747]');
 		render(FollowedTeams);
 		await screen.findByText('Montana Qualifier - Butte MT-Tech');

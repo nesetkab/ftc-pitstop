@@ -53,7 +53,7 @@ describe('badge endpoint', () => {
 		expect(CACHE_CONTROL.badge).toMatch(/stale-while-revalidate=86400\b/);
 		const svg = await response.text();
 		expect(svg.startsWith('<svg xmlns="http://www.w3.org/2000/svg"')).toBe(true);
-		expect(svg).toContain('OPR 48.7 · 1st worldwide');
+		expect(svg).toContain('aOPR 48.7 · 1st worldwide');
 		expect(server.loadTeamSeason).toHaveBeenCalledWith(26670);
 	});
 
@@ -65,7 +65,7 @@ describe('badge endpoint', () => {
 		expect(junk.status).toBe(308);
 		expect(junk.headers.get('location')).toBe('/badge/26670.svg');
 		const light = await (await call(badge, '26670', '')).text();
-		expect(light).toContain('OPR 48.7');
+		expect(light).toContain('aOPR 48.7');
 		expect(light).toContain('#f4f4f2');
 	});
 

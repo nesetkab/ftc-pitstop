@@ -20,7 +20,7 @@
 	const coords = $derived(points.map((point, index) => [x(index), y(point.value)] as const));
 	const line = $derived(coords.map(([cx, cy]) => `${cx.toFixed(1)},${cy.toFixed(1)}`).join(' '));
 	const label = $derived(
-		`OPR at each event: ${points.map((point) => `${point.label} ${fixed(point.value)}`).join(', ')}`
+		`aOPR at each event: ${points.map((point) => `${point.label} ${fixed(point.value)}`).join(', ')}`
 	);
 </script>
 

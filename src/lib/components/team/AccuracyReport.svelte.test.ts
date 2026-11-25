@@ -44,6 +44,7 @@ describe('accuracy page', () => {
 		const report = load();
 		show({ ...report, chosen: { id: 'robot-opr', label: 'OPR with robot credit' } });
 		const method = section('Method');
+		expect(within(method).getByText(/predicts matches from aOPR/)).toBeInTheDocument();
 		expect(within(method).getByText(/go straight to that team/)).toBeInTheDocument();
 		expect(within(method).getByText(/No team is rated below zero/)).toBeInTheDocument();
 	});

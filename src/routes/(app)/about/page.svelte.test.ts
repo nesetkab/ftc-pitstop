@@ -21,7 +21,7 @@ describe('about page', () => {
 		expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent('About the numbers');
 		expect(document.title).toBe('How PitStop’s FTC numbers work - PitStop');
 		const description = document.head.querySelector('meta[name="description"]');
-		expect(description?.getAttribute('content')).toMatch(/OPR/);
+		expect(description?.getAttribute('content')).toMatch(/aOPR/);
 		const canonical = document.head.querySelector('link[rel="canonical"]');
 		expect(canonical?.getAttribute('href')).toMatch(/\/about$/);
 		const data = [...document.head.querySelectorAll('script[type="application/ld+json"]')].map(

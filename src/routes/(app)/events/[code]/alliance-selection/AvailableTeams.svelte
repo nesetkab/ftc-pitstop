@@ -35,8 +35,8 @@
 		<tr>
 			<th class="l" scope="col">Team</th>
 			{#if table.rated}
-				<th class="w" scope="col"><Term label="OPR" /></th>
-				<th class="w" scope="col"><Term label="Auto OPR" /></th>
+				<th class="w" scope="col"><Term label="aOPR" /></th>
+				<th class="w" scope="col"><Term label="Auto aOPR" /></th>
 			{:else}
 				<th class="w" scope="col"><Term label="RS" /></th>
 				<th class="w opt" scope="col"><Term label="TBP" /></th>

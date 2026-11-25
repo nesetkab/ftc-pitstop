@@ -35,9 +35,9 @@ describe('toSearchResults', () => {
 		]);
 	});
 
-	it('shows season OPR and rank for a team that has played', () => {
+	it('shows season aOPR and rank for a team that has played', () => {
 		const [result] = toSearchResults({ teams: [{ ...team, opr: 85.24, rank: 12 }] });
-		expect(result.meta).toBe('85.2 OPR · #12');
+		expect(result.meta).toBe('85.2 aOPR · #12');
 	});
 
 	it('marks events that are running now', () => {

@@ -83,14 +83,14 @@ export function teamDescription(team: SeoTeam, stats: SeoTeamStats): string {
 			stats.rank !== null && stats.of !== null
 				? `, ${ordinal(stats.rank)} of ${integer(stats.of)} teams worldwide`
 				: '';
-		parts.push(`${SEASON_NAME} OPR ${fixed(stats.opr)}${rank}.`);
+		parts.push(`${SEASON_NAME} aOPR ${fixed(stats.opr)}${rank}.`);
 	}
 	if (stats.record && stats.events > 0) {
 		const { wins, losses, ties } = stats.record;
 		const events = stats.events === 1 ? '1 event' : `${stats.events} events`;
 		parts.push(`Qualification record ${wins}-${losses}-${ties} across ${events}.`);
 	}
-	parts.push('Match history, OPR by part and awards.');
+	parts.push('Match history, aOPR by part and awards.');
 	return parts.join(' ');
 }
 
@@ -202,7 +202,7 @@ export function regionDescription(region: SeoRegion): string {
 	];
 	if (region.top) {
 		const name = region.top.name ? ` ${region.top.name}` : '';
-		parts.push(`Top team by OPR is ${region.top.team}${name} at ${fixed(region.top.opr)}.`);
+		parts.push(`Top team by aOPR is ${region.top.team}${name} at ${fixed(region.top.opr)}.`);
 	}
 	parts.push('Top teams, live and upcoming events, advancement and the best scores.');
 	return parts.join(' ');
