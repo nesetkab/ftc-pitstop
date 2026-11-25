@@ -1,10 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { Blend, KalmanOpr, type Model, type OprParams } from '../../models.ts';
-import { PooledPriorOpr } from './hybrid.ts';
+import { PlayoffShift, PooledPriorOpr } from './hybrid.ts';
 import { POOLED_BASE, PooledOpr, type PooledParams } from './model.ts';
 
-export type Extra = Partial<PooledParams> & { mix?: number; w?: number };
+export type Extra = Partial<PooledParams> & { mix?: number; w?: number; alt?: Partial<OprParams>; shift?: number };
 
 const SHIPPED = (
 	JSON.parse(readFileSync(join(import.meta.dirname, '..', '..', 'params.json'), 'utf8')) as {
@@ -46,6 +46,14 @@ export const VARIANTS: Record<string, (x: Extra) => Model> = {
 			'blend',
 			new KalmanOpr('a', SHIPPED),
 			new PooledOpr('b', { ...POOLED_BASE, ...TUNED, ...x }),
+			x.w ?? 0.5
+		),
+	'shipped-shift': (x) => new PlayoffShift('shipped-shift', new KalmanOpr('a', SHIPPED), x.shift ?? 0),
+	'blend-ctrl': (x) =>
+		new Blend(
+			'blend-ctrl',
+			new KalmanOpr('a', SHIPPED),
+			new KalmanOpr('b', { ...SHIPPED, ...x.alt }),
 			x.w ?? 0.5
 		)
 };

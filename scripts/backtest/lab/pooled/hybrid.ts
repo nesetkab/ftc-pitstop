@@ -1,4 +1,4 @@
-import { KalmanOpr, type Ctx, type OprParams } from '../../models.ts';
+import { KalmanOpr, type Ctx, type Model, type OprParams, type Pred } from '../../models.ts';
 import type { PEvent, PMatch } from '../../prep.ts';
 import { PooledOpr } from './model.ts';
 
@@ -51,5 +51,44 @@ export class PooledPriorOpr extends KalmanOpr {
 	endSeason(): Map<number, number> {
 		this.pooledRel = this.pooled.endSeason();
 		return super.endSeason();
+	}
+}
+
+export class PlayoffShift implements Model {
+	name: string;
+	inner: Model;
+	shift: number;
+
+	constructor(name: string, inner: Model, shift: number) {
+		this.name = name;
+		this.inner = inner;
+		this.shift = shift;
+	}
+
+	startSeason(prevRel: Map<number, number>): void {
+		this.inner.startSeason(prevRel);
+	}
+
+	startEvent(event: PEvent, ctx: Ctx): void {
+		this.inner.startEvent(event, ctx);
+	}
+
+	predict(m: PMatch, ctx: Ctx): Pred {
+		const p = this.inner.predict(m, ctx);
+		if (!m.playoff) return p;
+		const d = this.shift * ctx.sd;
+		return { ...p, red: p.red + d / 2, blue: p.blue - d / 2 };
+	}
+
+	update(m: PMatch, ctx: Ctx): void {
+		this.inner.update(m, ctx);
+	}
+
+	endEvent(event: PEvent, ctx: Ctx): void {
+		this.inner.endEvent(event, ctx);
+	}
+
+	endSeason(): Map<number, number> {
+		return this.inner.endSeason();
 	}
 }
