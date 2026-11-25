@@ -8,6 +8,7 @@
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import SkeletonRows from '#lib/ui/SkeletonRows.svelte';
 	import { browserWorkspaces } from '#lib/workspace/browser.ts';
 	import type { SharePayload, ShareTool } from '#lib/workspace/schemas.ts';
 	import { saveShared } from '#lib/workspace/save-shared.ts';
@@ -60,7 +61,7 @@
 </svelte:head>
 
 {#if phase === 'loading'}
-	<p class="muted" role="status">Opening the shared copy.</p>
+	<SkeletonRows label="Opening the shared copy." header />
 {:else if phase === 'invalid' || !payload}
 	<PageHeader title={TITLES[data.tool]} />
 	<EmptyState title="This link is damaged or incomplete.">

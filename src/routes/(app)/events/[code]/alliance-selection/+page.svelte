@@ -5,6 +5,7 @@
 	import PickList from '#lib/components/tools/PickList.svelte';
 	import type { EventBundle } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import SkeletonRows from '#lib/ui/SkeletonRows.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
 	import { formatCode } from '#lib/workspace/code.ts';
@@ -218,7 +219,7 @@
 			{:else if chosen}
 				<div class="panel">
 					<h3 class="sec-title">Our pick list</h3>
-					<p class="note" role="status">Loading the pick list.</p>
+					<SkeletonRows label="Loading the pick list." rows={8} />
 				</div>
 			{:else if access}
 				<div class="panel">

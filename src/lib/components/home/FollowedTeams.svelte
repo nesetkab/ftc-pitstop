@@ -2,6 +2,7 @@
 	import { compareHref, MAX_COMPARE } from '#lib/components/compare/compare.ts';
 	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { fixed, ordinal, shortDate } from '#lib/format/index.ts';
+	import Skeleton from '#lib/ui/Skeleton.svelte';
 	import type { EventBundle } from '#lib/types.ts';
 	import {
 		liveStatus,
@@ -131,6 +132,16 @@
 		<div class={{ pending: !ready }}>
 			<TeamFinder onfollow={(team) => (focusTeam = team)} />
 		</div>
+		{#if !ready}
+			<ul class="teams ghost" aria-hidden="true">
+				{#each [0, 1] as index (index)}
+					<li>
+						<span class="sk-line"><Skeleton width="60%" /></span>
+						<span class="sk-line"><Skeleton width="80%" /></span>
+					</li>
+				{/each}
+			</ul>
+		{/if}
 	{:else}
 		<ul class="teams" bind:this={list}>
 			{#each ordered as team (team)}
@@ -146,8 +157,10 @@
 						</a>
 						<a class="pit-link" href="/{team}">Pit screen</a>
 					</div>
-					{#if !row}
-						<p class="line faint">{failed ? 'Could not load this team' : 'Loading'}</p>
+					{#if !row && failed}
+						<p class="line faint">Could not load this team</p>
+					{:else if !row}
+						<span class="sk-line"><Skeleton width="75%" /></span>
 					{:else if !row.found}
 						<p class="line faint">Team not found</p>
 					{:else if event?.reason === 'today'}
@@ -182,8 +195,10 @@
 										{/if}
 									{:else if status}
 										<span class="faint">{status.note}</span>
+									{:else if bundle === null}
+										<span class="faint">Unavailable</span>
 									{:else}
-										<span class="faint">{bundle === null ? 'Unavailable' : 'Loading'}</span>
+										<span class="sk-line"><Skeleton width="9em" height="13px" /></span>
 									{/if}
 								</dd>
 							</div>
@@ -259,8 +274,18 @@
 		color: var(--text);
 	}
 
-	:global(:root[data-following]) .pending {
-		visibility: hidden;
+	:global(:root[data-following]) .pending,
+	.teams.ghost {
+		display: none;
+	}
+
+	:global(:root[data-following]) .ghost {
+		display: grid;
+	}
+
+	.sk-line {
+		display: block;
+		padding-block: 4px;
 	}
 
 	.teams {

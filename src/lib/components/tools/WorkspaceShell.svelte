@@ -5,6 +5,7 @@
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import SkeletonRows from '#lib/ui/SkeletonRows.svelte';
 	import Tabs, { type Tab } from '#lib/ui/Tabs.svelte';
 	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
 	import { setMatch } from '#lib/workspace/checklist.ts';
@@ -79,7 +80,7 @@
 </svelte:head>
 
 {#if workspace.status === 'loading'}
-	<p class="muted" role="status">Loading the workspace.</p>
+	<SkeletonRows label="Loading the workspace." header />
 {:else if workspace.status === 'missing'}
 	<EmptyState title="No workspace uses the code {formatCode(code)}.">
 		Check the code with your team, or make a new workspace.

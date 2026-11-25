@@ -23,6 +23,7 @@
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
+	import SkeletonRows from '#lib/ui/SkeletonRows.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import Term from '#lib/ui/Term.svelte';
@@ -214,7 +215,7 @@
 {/if}
 
 {#if waiting && !firstPageOnly}
-	<p class="count" role="status">Loading all {integer(data.total)} events…</p>
+	<SkeletonRows label="Loading all {integer(data.total)} events." rows={10} />
 {:else if shown.length === 0}
 	<EmptyState title="No events match.">
 		{#if elsewhere > 0}
@@ -280,7 +281,7 @@
 		</table>
 	</div>
 	{#if waiting}
-		<p class="notice" role="status">Loading more events…</p>
+		<SkeletonRows label="Loading more events." rows={3} />
 	{:else if count > limit}
 		<div>
 			<Button variant="secondary" onclick={() => (limit += PAGE_SIZE * 2)}>Show more events</Button>

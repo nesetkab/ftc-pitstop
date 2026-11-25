@@ -35,7 +35,7 @@
 	<div class="rows">
 		<div class="row head">
 			<Skeleton width="24px" height="10px" />
-			<Skeleton width="60px" height="10px" />
+			<span class="name"><Skeleton width="60px" height="10px" /></span>
 			<span class="nums">
 				{#each { length: numbers }, index (index)}
 					<Skeleton width="36px" height="10px" />
