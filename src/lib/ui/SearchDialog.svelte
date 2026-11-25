@@ -33,6 +33,7 @@
 	let status = $state<'idle' | 'loading' | 'done' | 'error'>('idle');
 	let active = $state(-1);
 	let recent = $state<SearchResult[]>([]);
+	let kind = $state<'all' | SearchResult['type']>('all');
 	let opener: HTMLElement | null = null;
 	let restoreFocus = true;
 
@@ -43,10 +44,20 @@
 
 	const showingRecent = $derived(!query.trim() && recent.length > 0);
 
+	const shown = $derived(
+		kind === 'all' ? results : results.filter((result) => result.type === kind)
+	);
+
+	const kinds = $derived([
+		{ value: 'all', label: 'All', count: results.length },
+		{ value: 'team', label: 'Teams', count: results.filter((r) => r.type === 'team').length },
+		{ value: 'event', label: 'Events', count: results.filter((r) => r.type === 'event').length }
+	] as const);
+
 	const ordered = $derived(
 		showingRecent
 			? recent
-			: typeOrder(results).flatMap((type) => results.filter((result) => result.type === type))
+			: typeOrder(shown).flatMap((type) => shown.filter((result) => result.type === type))
 	);
 
 	const groups = $derived(
@@ -58,7 +69,7 @@
 						items: ordered.map((result, index) => ({ result, index }))
 					}
 				]
-			: typeOrder(results)
+			: typeOrder(shown)
 					.map((type) => ({
 						type,
 						label: type === 'team' ? 'Teams' : 'Events',
@@ -85,6 +96,7 @@
 		const trimmed = query.trim();
 		const find = search;
 		if (!trimmed) {
+			kind = 'all';
 			results = [];
 			status = 'idle';
 			active = recent.length > 0 ? 0 : -1;
@@ -97,6 +109,7 @@
 				const found = await find(trimmed, controller.signal);
 				if (controller.signal.aborted) return;
 				results = found;
+				if (!found.some((result) => result.type === kind)) kind = 'all';
 				active = found.length > 0 ? 0 : -1;
 				status = 'done';
 			} catch {
@@ -195,6 +208,12 @@
 		}
 	}
 
+	function choose(value: typeof kind) {
+		kind = value;
+		active = ordered.length > 0 ? 0 : -1;
+		input?.focus();
+	}
+
 	function forget() {
 		recent = clearRecent();
 		active = -1;
@@ -238,6 +257,23 @@
 				<Icon name="close" />
 			</button>
 		</div>
+
+		{#if query.trim() && results.length > 0}
+			<div class="kinds" role="group" aria-label="Show">
+				{#each kinds as option (option.value)}
+					<button
+						type="button"
+						aria-pressed={kind === option.value}
+						disabled={option.count === 0}
+						onclick={() => choose(option.value)}
+					>
+						{#if option.value !== 'all'}<Icon name={option.value} size={14} />{/if}
+						{option.label}
+						<span class="count">{option.count}</span>
+					</button>
+				{/each}
+			</div>
+		{/if}
 
 		<div class="list" hidden={ordered.length === 0}>
 			{#if showingRecent}
@@ -290,26 +326,32 @@
 		<p class={['message', { 'visually-hidden': !message }]} role="status">
 			{message || (ordered.length > 0 || query.trim() ? summary : '')}
 		</p>
+
+		<div class="hints" aria-hidden="true">
+			<span><kbd>↑</kbd> <kbd>↓</kbd> to move</span>
+			<span><kbd>Enter</kbd> to open</span>
+			<span><kbd>Esc</kbd> to close</span>
+		</div>
 	</div>
 </dialog>
 
 <style>
 	.search {
-		width: min(560px, calc(100vw - 2 * var(--gutter)));
+		width: min(600px, calc(100vw - 32px));
 		max-width: none;
-		max-height: min(520px, calc(100dvh - 16px));
-		margin: 8px max(var(--gutter), calc((100vw - var(--page-max)) / 2 + var(--gutter))) auto auto;
+		max-height: min(540px, calc(100dvh - 32px));
+		margin: min(12vh, 96px) auto auto;
 		padding: 0;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-panel);
 		background: var(--bg);
 		color: var(--text);
-		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
 		overflow: hidden;
 	}
 
 	.search::backdrop {
-		background: rgba(0, 0, 0, 0.12);
+		background: rgba(0, 0, 0, 0.36);
 	}
 
 	.box {
@@ -357,6 +399,48 @@
 	.close:hover {
 		color: var(--text);
 		background: var(--surface);
+	}
+
+	.kinds {
+		display: flex;
+		gap: 4px;
+		padding: 8px 10px 0;
+	}
+
+	.kinds button {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		min-height: 30px;
+		padding: 0 10px;
+		border: 1px solid transparent;
+		border-radius: var(--radius-control);
+		background: none;
+		font: inherit;
+		font-size: 13px;
+		color: var(--text-2);
+		cursor: pointer;
+	}
+
+	.kinds button:hover:not(:disabled) {
+		color: var(--text);
+	}
+
+	.kinds button[aria-pressed='true'] {
+		border-color: var(--line-2);
+		color: var(--text);
+		font-weight: 500;
+	}
+
+	.kinds button:disabled {
+		opacity: 0.45;
+		cursor: default;
+	}
+
+	.count {
+		font-size: 12px;
+		color: var(--text-3);
+		font-variant-numeric: tabular-nums;
 	}
 
 	.list {
@@ -490,10 +574,19 @@
 		color: var(--text-2);
 	}
 
-	@media (max-width: 900px) {
-		.search {
-			width: calc(100vw - 2 * var(--gutter));
-			margin-inline: auto;
+	.hints {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 6px 16px;
+		padding: 9px 14px;
+		border-top: 1px solid var(--line);
+		font-size: 12px;
+		color: var(--text-3);
+	}
+
+	@media (hover: none) {
+		.hints {
+			display: none;
 		}
 	}
 
