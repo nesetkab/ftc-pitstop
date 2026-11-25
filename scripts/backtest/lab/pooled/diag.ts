@@ -1,11 +1,12 @@
 import { run } from '../../engine.ts';
 import { fitMapping, probAt, rowsOf } from '../../metrics.ts';
-import { ALL, ENGINE, QUICK_FIT, seasons, shipped, TRAIN } from '../harness.ts';
+import { ALL, ENGINE, QUICK_FIT, shipped, TRAIN } from '../harness.ts';
+import { data as robotData } from '../robot/setup.ts';
 import { load } from './oddbot.ts';
 import { make } from './variants.ts';
 
 const names = process.argv.slice(2);
-const data = await seasons(ALL);
+const data = await robotData(ALL);
 const models = [await shipped(), ...names.map((n) => make(n))];
 const rec = run(data, models, ENGINE);
 const train = new Set(TRAIN);

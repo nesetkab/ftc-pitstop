@@ -100,7 +100,7 @@ export const VARIANTS: Record<string, (x: Extra) => Model> = {
 			'blend-robot',
 			new ImbRobotOpr('a', ROBOT_HET, x.imb ?? 0.2, x.imbF ?? 0.1),
 			new PooledOpr('b', { ...POOLED_BASE, ...IMB, ...x }),
-			x.w ?? 0.5
+			x.w ?? 0.65
 		),
 	'blend-ctrl': (x) =>
 		new Blend(
