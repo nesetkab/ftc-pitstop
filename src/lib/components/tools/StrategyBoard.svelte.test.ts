@@ -150,11 +150,33 @@ describe('strategy board', () => {
 
 	it('labels a marker with the number typed in the side panel', async () => {
 		const { state } = setup({ plans: [] }, { team: 14624 });
-		await fireEvent.input(screen.getByLabelText('Robot number'), { target: { value: '25a620' } });
-		expect(screen.getByLabelText('Robot number')).toHaveValue('25620');
+		await fireEvent.input(screen.getByLabelText('Robot number'), { target: { value: '25620' } });
 		await fireEvent.click(screen.getByRole('button', { name: 'Robot' }));
 		await stroke([[100, 400]]);
 		expect(shapesOf(state.current)[0]).toMatchObject({ label: '25620' });
+	});
+
+	it('labels a marker with a team picked by name', async () => {
+		const search = vi.fn(async () => [
+			{ type: 'team' as const, label: '25620 Gear Ticks', href: '/teams/25620' }
+		]);
+		const { state } = setup({ plans: [] }, { team: 14624, search });
+		const input = screen.getByLabelText('Robot number');
+		await fireEvent.input(input, { target: { value: 'gear ticks' } });
+		await fireEvent.click(await screen.findByRole('option', { name: /25620 Gear Ticks/ }));
+		expect(input).toHaveValue('25620');
+		await fireEvent.click(screen.getByRole('button', { name: 'Robot' }));
+		await stroke([[100, 400]]);
+		expect(shapesOf(state.current)[0]).toMatchObject({ label: '25620' });
+	});
+
+	it('keeps the team number on a marker while a name is half typed', async () => {
+		const search = vi.fn(async () => []);
+		const { state } = setup({ plans: [] }, { team: 14624, search });
+		await fireEvent.input(screen.getByLabelText('Robot number'), { target: { value: 'gea' } });
+		await fireEvent.click(screen.getByRole('button', { name: 'Robot' }));
+		await stroke([[100, 400]]);
+		expect(shapesOf(state.current)[0]).toMatchObject({ label: '14624' });
 	});
 
 	it('adds text where the field is clicked', async () => {

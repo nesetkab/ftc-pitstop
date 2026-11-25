@@ -1,6 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import Button from '#lib/ui/Button.svelte';
+	import type { SearchFn } from '#lib/ui/search.svelte.ts';
+	import TeamInput from '#lib/ui/TeamInput.svelte';
+
+	interface Props {
+		search?: SearchFn;
+		delay?: number;
+	}
+
+	let { search, delay }: Props = $props();
 
 	let value = $state('');
 
@@ -9,6 +18,10 @@
 	function open(event: SubmitEvent) {
 		event.preventDefault();
 		if (team) goto(`/${team}/tv`);
+	}
+
+	function pick(number: number) {
+		goto(`/${number}/tv`);
 	}
 </script>
 
@@ -21,15 +34,16 @@
 	<div class="row">
 		<label class="address">
 			<span class="host">ftcpitstop.com/</span>
-			<input
+			<TeamInput
 				name="team"
-				type="text"
-				inputmode="numeric"
-				autocomplete="off"
-				maxlength="6"
-				placeholder="Team number"
-				aria-label="Team number"
+				class="field"
+				label="Team number or name"
+				placeholder="Number or name"
+				enterkeyhint="go"
+				{search}
+				{delay}
 				bind:value
+				onpick={pick}
 			/>
 			<span class="host">/tv</span>
 		</label>
@@ -61,6 +75,7 @@
 	}
 
 	.address {
+		position: relative;
 		display: inline-flex;
 		align-items: center;
 		padding: 0 10px;
@@ -86,8 +101,14 @@
 		color: var(--text-3);
 	}
 
-	input {
+	.address :global(.team-input) {
+		position: static;
+		flex: 0 1 auto;
+	}
+
+	.address :global(.field) {
 		width: 8.5em;
+		min-width: 0;
 		padding: 7px 2px;
 		border: 0;
 		background: transparent;
@@ -98,12 +119,12 @@
 	}
 
 	@media (pointer: coarse) {
-		input {
+		.address :global(.field) {
 			min-height: 38px;
 		}
 	}
 
-	input::placeholder {
+	.address :global(.field::placeholder) {
 		color: var(--text-3);
 	}
 </style>

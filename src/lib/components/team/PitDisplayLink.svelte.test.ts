@@ -15,7 +15,7 @@ afterEach(() => {
 	cleanup();
 });
 
-const field = () => screen.getByRole('textbox', { name: 'Team number' });
+const field = () => screen.getByRole('combobox', { name: 'Team number or name' });
 const open = () => screen.getByRole('button', { name: 'Open' });
 
 describe('pit display link', () => {
@@ -58,5 +58,18 @@ describe('pit display link', () => {
 			await fireEvent.submit(field().closest('form') as HTMLFormElement);
 		}
 		expect(navigation.goto).not.toHaveBeenCalled();
+	});
+
+	it('opens the pit display for a team picked by name', async () => {
+		const search = vi.fn(async () => [
+			{ type: 'team' as const, label: '3747 The Hive', href: '/teams/3747' },
+			{ type: 'team' as const, label: '37470 Hive Two', href: '/teams/37470' }
+		]);
+		render(PitDisplayLink, { props: { search, delay: 0 } });
+		await fireEvent.input(field(), { target: { value: 'hive' } });
+		await screen.findByRole('option', { name: /3747 The Hive/ });
+		await fireEvent.keyDown(field(), { key: 'ArrowDown' });
+		await fireEvent.keyDown(field(), { key: 'Enter' });
+		expect(navigation.goto).toHaveBeenCalledWith('/37470/tv');
 	});
 });
