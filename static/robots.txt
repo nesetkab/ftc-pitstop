@@ -1,6 +1,32 @@
 User-agent: *
+Crawl-delay: 10
 Disallow: /api/
 Disallow: /w/
 Disallow: /*/tv
+Disallow: /*?
+Disallow: /compare
+Disallow: /simulate
+Disallow: /badge/
+Disallow: /events/season.json
+Disallow: /events/*/matches/
+Disallow: /events/*/teams/
+Disallow: /events/*/scouting
+Disallow: /*.csv
+Disallow: /*.ics
+
+User-agent: GPTBot
+User-agent: ClaudeBot
+User-agent: CCBot
+User-agent: Bytespider
+User-agent: meta-externalagent
+User-agent: Amazonbot
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: MJ12bot
+User-agent: DotBot
+User-agent: PetalBot
+User-agent: DataForSeoBot
+User-agent: Barkrowler
+Disallow: /
 
 Sitemap: https://www.ftcpitstop.com/sitemap.xml
