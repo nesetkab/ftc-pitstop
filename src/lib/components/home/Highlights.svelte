@@ -28,7 +28,7 @@
 						<span class="score">
 							<Score left={item.redScore} right={item.blueScore} winner={item.winner} />
 						</span>
-						<span class="where">{item.label} · {eventName(item)}</span>
+						<span class="where">{item.label} at {eventName(item)}</span>
 					</a>
 					<span class="teams">
 						<span class="red-team">{item.red.join(' ')}</span>

@@ -176,7 +176,7 @@
 								<dd>
 									{#if status?.rank}
 										{ordinal(status.rank)}
-										<span class="faint">of {status.teams} · {status.record}</span>
+										<span class="faint">of {status.teams} with a {status.record} record</span>
 									{:else if !status && row.standing}
 										{ordinal(row.standing.rank)}
 									{:else}
@@ -234,12 +234,9 @@
 						{#if row.opr !== null}
 							<p class="line">
 								<span class="faint">aOPR</span>
-								<span class="num">{fixed(row.opr)}</span>
-								{#if row.worldRank}
-									<span class="faint">
-										· {place(row.worldRank)}{row.rated ? ` of ${count(row.rated)}` : ''} worldwide
-									</span>
-								{/if}
+								<span class="num">{fixed(row.opr)}</span>{#if row.worldRank}<span class="faint"
+										>, {place(row.worldRank)}{row.rated ? ` of ${count(row.rated)}` : ''} worldwide</span
+									>{/if}
 							</p>
 						{/if}
 					{/if}

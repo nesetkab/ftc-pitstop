@@ -40,7 +40,9 @@
 				<tr class={row.state}>
 					<td class="l name">
 						<a href="/events/{row.code}">{row.name}</a>
-						<span class="sub">{row.place} · {row.type}</span>
+						<span class="sub"
+							>{row.name.includes(row.type) ? row.place : `${row.type} in ${row.place}`}</span
+						>
 					</td>
 					<td class="l where">{row.place}</td>
 					<td class="l day">{row.dates}</td>

@@ -82,7 +82,7 @@ describe('home page', () => {
 		const cells = (row: HTMLElement) =>
 			[...row.querySelectorAll('td')].map((cell) => cell.textContent?.replace(/\s+/g, ' ').trim());
 		expect(cells(first)).toEqual([
-			'Roadrunner - Gilbert Qualifier Gilbert, AZ · Qualifier',
+			'Roadrunner - Gilbert Qualifier Gilbert, AZ',
 			'Gilbert, AZ',
 			'Today',
 			'Q23 of 40 Leading 26670',
@@ -211,7 +211,7 @@ describe('home page', () => {
 		});
 		const highest = screen.getByRole('list', { name: 'Highest scores today' });
 		expect(within(highest).getByRole('link')).toHaveAttribute('href', '/events/USAZGIQ/matches/p7');
-		expect(within(highest).getByRole('link')).toHaveTextContent('288–155 M7 · Gilbert Qualifier');
+		expect(within(highest).getByRole('link')).toHaveTextContent('288–155 M7 at Gilbert Qualifier');
 		expect(screen.queryByText(/Closest games|Upsets|Won by 2|18% chance/)).not.toBeInTheDocument();
 		expect(screen.getByRole('link', { name: 'More records' })).toHaveAttribute(
 			'href',

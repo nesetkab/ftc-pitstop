@@ -156,7 +156,7 @@ describe('followed teams', () => {
 		expect(within(card).getByText('red')).toBeInTheDocument();
 		expect(within(card).getByText(/^1:58\sPM$/)).toBeInTheDocument();
 		expect(within(card).getByText('7th')).toBeInTheDocument();
-		expect(within(card).getByText('of 27 · 3-0-0')).toBeInTheDocument();
+		expect(within(card).getByText('of 27 with a 3-0-0 record')).toBeInTheDocument();
 		expect(within(card).getByText('No matches played')).toBeInTheDocument();
 	});
 
@@ -167,7 +167,7 @@ describe('followed teams', () => {
 		const card = cardFor(3747);
 		expect(within(card).getByText('Nov 20')).toBeInTheDocument();
 		expect(within(card).getByText('87.3')).toBeInTheDocument();
-		expect(within(card).getByText('· 2,284th of 3,926 worldwide')).toBeInTheDocument();
+		expect(within(card).getByText(', 2,284th of 3,926 worldwide')).toBeInTheDocument();
 		expect(requested).toEqual(['/api/following?teams=3747']);
 	});
 
