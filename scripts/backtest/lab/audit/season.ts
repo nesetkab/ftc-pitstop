@@ -61,8 +61,10 @@ models.forEach((m, k) => {
 		['2026 in-sample', fitMapping(rec, k, rowsOf(rec, std), SIMPLE)]
 	] as const) {
 		const prob = (r: number) => probAt(rec, k, r, map);
-		for (const [name, f] of sets) console.log(m.name.padEnd(22), label.padEnd(15), name.padEnd(16), stats(prob, f));
+		for (const [name, f] of sets)
+			console.log(m.name.padEnd(22), label.padEnd(15), name.padEnd(16), stats(prob, f));
 	}
 });
 const oddProb = (r: number) => odd.get(rec.keys[r])!.pRed;
-for (const [name, f] of sets.slice(1)) console.log('oddbot EPA'.padEnd(22), 'theirs'.padEnd(15), name.padEnd(16), stats(oddProb, f));
+for (const [name, f] of sets.slice(1))
+	console.log('oddbot EPA'.padEnd(22), 'theirs'.padEnd(15), name.padEnd(16), stats(oddProb, f));

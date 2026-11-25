@@ -18,7 +18,15 @@ type Filter = (r: number) => boolean;
 
 type Cell = { n: number; brier: number; accOdd: number; accOurs: number; mae: number };
 
-function cell(n: number, b: number, dec: number, cor: number, all: number, corAll: number, mae: number): Cell {
+function cell(
+	n: number,
+	b: number,
+	dec: number,
+	cor: number,
+	all: number,
+	corAll: number,
+	mae: number
+): Cell {
 	return {
 		n,
 		brier: b / n,
@@ -28,7 +36,12 @@ function cell(n: number, b: number, dec: number, cor: number, all: number, corAl
 	};
 }
 
-function scoreProbs(rec: Records, prob: (r: number) => number, filter: Filter, pts?: (r: number) => [number, number]): Cell {
+function scoreProbs(
+	rec: Records,
+	prob: (r: number) => number,
+	filter: Filter,
+	pts?: (r: number) => [number, number]
+): Cell {
 	let n = 0;
 	let b = 0;
 	let dec = 0;
@@ -55,7 +68,12 @@ function scoreProbs(rec: Records, prob: (r: number) => number, filter: Filter, p
 	return cell(n, b, dec, cor, n, corAll, mae);
 }
 
-function pairedDiff(rec: Records, pa: (r: number) => number, pb: (r: number) => number, filter: Filter) {
+function pairedDiff(
+	rec: Records,
+	pa: (r: number) => number,
+	pb: (r: number) => number,
+	filter: Filter
+) {
 	let n = 0;
 	let s = 0;
 	let ss = 0;
@@ -74,7 +92,11 @@ function pairedDiff(rec: Records, pa: (r: number) => number, pb: (r: number) => 
 const stored = JSON.parse(
 	await readFile(join(import.meta.dirname, '..', '..', 'params.json'), 'utf8')
 ) as { candidates: Record<string, OprParams | EpaParams> };
-const cand = (id: string) => build(CANDIDATES.find((c) => c.id === id)!, stored.candidates[id]);
+const cand = (id: string) =>
+	build(
+		CANDIDATES.find((c) => c.id === id)!,
+		stored.candidates[id]
+	);
 
 const models: Model[] = [
 	await shipped(),
@@ -142,7 +164,12 @@ const splits = (set: Filter) => ({
 	playoffs: (r: number) => set(r) && rec.playoff[r] === 1
 });
 
-function addLines(model: string, map: string, prob: (r: number) => number, pts?: (r: number) => [number, number]) {
+function addLines(
+	model: string,
+	map: string,
+	prob: (r: number) => number,
+	pts?: (r: number) => [number, number]
+) {
 	for (const [setName, set] of [
 		['ours', std],
 		['oddbot', matched]
@@ -252,41 +279,56 @@ console.log('\noutcome agreement on matched set');
 	console.log(`${same} of ${n} outcomes agree`);
 }
 
-console.log('\nby new teams in match (teams with no quals yet at the event), 2026 our set, train mapping');
+console.log(
+	'\nby new teams in match (teams with no quals yet at the event), 2026 our set, train mapping'
+);
 const groups: [string, Filter][] = [
 	['0 new', (r) => std(r) && newTeams[r] === 0],
 	['1-2 new', (r) => std(r) && newTeams[r] > 0 && newTeams[r] <= 2],
 	['3-4 new', (r) => std(r) && newTeams[r] > 2]
 ];
 for (const [label, f] of groups) {
-	const parts = ['shipped', 'opr-event', 'live-opr mean', 'live-opr best', 'live-opr last', 'avg score season'].map(
-		(name) => {
-			const c = scoreProbs(rec, probFns[name], f);
-			return `${name} ${b4(c.brier)}/${pct(c.accOdd)}`;
-		}
-	);
+	const parts = [
+		'shipped',
+		'opr-event',
+		'live-opr mean',
+		'live-opr best',
+		'live-opr last',
+		'avg score season'
+	].map((name) => {
+		const c = scoreProbs(rec, probFns[name], f);
+		return `${name} ${b4(c.brier)}/${pct(c.accOdd)}`;
+	});
 	const n = scoreProbs(rec, probFns.shipped, f).n;
 	console.log(label.padEnd(8), String(n).padStart(5), parts.join(' | '));
 }
 
 const oneMore = rowsOf(rec, (r) => std(r) && newTeams[r] === 0);
-console.log(`\nmatches with every team already seen at the event: ${oneMore.length} of ${stdRows.length}`);
+console.log(
+	`\nmatches with every team already seen at the event: ${oneMore.length} of ${stdRows.length}`
+);
 
 console.log('\nmatch set');
 const raw = await loadSeason(TEST);
 let played = 0;
 let scored = 0;
-for (const e of raw.events) for (const m of e.matches) if (m.played) {
-	played++;
-	if (m.rs && m.bs) scored++;
-}
+for (const e of raw.events)
+	for (const m of e.matches)
+		if (m.played) {
+			played++;
+			if (m.rs && m.bs) scored++;
+		}
 const prepped = prepSeason(raw).reduce((a, e) => a + e.matches.length, 0);
-console.log(`fetched ${raw.fetchedAt}: events ${raw.events.length}, played ${played}, with scores ${scored}, after prep ${prepped}, after warmup ${stdRows.length}`);
+console.log(
+	`fetched ${raw.fetchedAt}: events ${raw.events.length}, played ${played}, with scores ${scored}, after prep ${prepped}, after warmup ${stdRows.length}`
+);
 const ours = new Set<string>();
 for (let r = first.get(TEST)!; r < rec.n; r++) ours.add(rec.keys[r]);
 const onlyOdd = [...odd.values()].filter((o) => !ours.has(o.key));
 const onlyOurs = [...ours].filter((k) => !odd.has(k));
-console.log(`oddbot ${odd.size}, ours (no warmup) ${ours.size}, both ${oddAt.size}, only oddbot ${onlyOdd.length}, only ours ${onlyOurs.length}`);
+console.log(
+	`oddbot ${odd.size}, ours (no warmup) ${ours.size}, both ${oddAt.size}, only oddbot ${onlyOdd.length}, only ours ${onlyOurs.length}`
+);
 const byEvent = (keys: string[]) => {
 	const out: Record<string, number> = {};
 	for (const k of keys) {
@@ -308,11 +350,18 @@ console.log(
 		})
 		.join(' ')
 );
-console.log('only ours by event:', byEvent(onlyOurs).slice(0, 25).map(([c, n]) => `${c}(${n})`).join(' '));
+console.log(
+	'only ours by event:',
+	byEvent(onlyOurs)
+		.slice(0, 25)
+		.map(([c, n]) => `${c}(${n})`)
+		.join(' ')
+);
 const types: Record<string, number> = {};
 for (const o of odd.values()) types[o.type] = (types[o.type] ?? 0) + 1;
 const ourTypes: Record<string, number> = {};
-for (const e of raw.events) ourTypes[e.type] = (ourTypes[e.type] ?? 0) + e.matches.filter((m) => m.played).length;
+for (const e of raw.events)
+	ourTypes[e.type] = (ourTypes[e.type] ?? 0) + e.matches.filter((m) => m.played).length;
 console.log('oddbot types', types, 'our types', ourTypes);
 
 await mkdir(OUT, { recursive: true });
