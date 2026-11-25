@@ -1,9 +1,12 @@
 <script lang="ts" module>
-	export type Tab = { href: string; label: string };
+	import type { IconName } from './Icon.svelte';
+
+	export type Tab = { href: string; label: string; icon?: IconName };
 </script>
 
 <script lang="ts">
 	import { page } from '$app/state';
+	import Icon from './Icon.svelte';
 
 	interface Props {
 		tabs: Tab[];
@@ -55,7 +58,7 @@
 	<nav class="tabs" aria-label={label} bind:this={nav} onscroll={measure}>
 		{#each tabs as tab (tab.href)}
 			<a href={tab.href} aria-current={pathOf(tab.href) === active ? 'page' : undefined}>
-				{tab.label}
+				{#if tab.icon}<Icon name={tab.icon} size={14} />{/if}{tab.label}
 			</a>
 		{/each}
 	</nav>
@@ -120,6 +123,9 @@
 	}
 
 	a {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
 		padding: 9px 0 10px;
 		text-decoration: none;
 		white-space: nowrap;

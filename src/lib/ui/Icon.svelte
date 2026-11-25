@@ -21,7 +21,11 @@
 		| 'info'
 		| 'refresh'
 		| 'prev'
-		| 'next';
+		| 'next'
+		| 'list'
+		| 'battery'
+		| 'check'
+		| 'board';
 </script>
 
 <script lang="ts">
@@ -108,6 +112,17 @@
 		<path d="M10 3.5 5.5 8l4.5 4.5" />
 	{:else if name === 'next'}
 		<path d="M6 3.5 10.5 8 6 12.5" />
+	{:else if name === 'list'}
+		<path d="M6.5 4h7M6.5 8h7M6.5 12h7M2.75 4h.5M2.75 8h.5M2.75 12h.5" />
+	{:else if name === 'battery'}
+		<rect x="1.75" y="4.5" width="11" height="7" rx="1.5" />
+		<path d="M14.25 7v2M4.25 7v2M6.5 7v2" />
+	{:else if name === 'check'}
+		<rect x="2.5" y="2.5" width="11" height="11" rx="2" />
+		<path d="M5.25 8.25 7 10l3.75-4" />
+	{:else if name === 'board'}
+		<rect x="2.25" y="2.25" width="11.5" height="11.5" rx="1.5" />
+		<path d="M5 11c1.5-4 4.5-2 6-6M9.5 5H11v1.5" />
 	{/if}
 </svg>
 
