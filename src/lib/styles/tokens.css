@@ -16,7 +16,8 @@
 	--blue: #2c5fcc;
 	--blue-wash: #e6edfa;
 	--ok: #24884a;
-	--heat: 26, 26, 25;
+	--heat: 72, 72, 68;
+	--scrim: rgb(0 0 0 / 0.22);
 	color-scheme: light;
 }
 
@@ -39,6 +40,7 @@
 		--blue-wash: rgba(94, 142, 255, 0.16);
 		--ok: #3cbf6e;
 		--heat: 239, 239, 236;
+		--scrim: rgb(0 0 0 / 0.36);
 		color-scheme: dark;
 	}
 }
@@ -61,6 +63,7 @@
 	--blue-wash: rgba(94, 142, 255, 0.16);
 	--ok: #3cbf6e;
 	--heat: 239, 239, 236;
+	--scrim: rgb(0 0 0 / 0.36);
 	color-scheme: dark;
 }
 
@@ -83,6 +86,7 @@
 	--blue-wash: rgba(94, 142, 255, 0.18);
 	--ok: #3cbf6e;
 	--heat: 242, 242, 239;
+	--scrim: rgb(0 0 0 / 0.36);
 	color-scheme: dark;
 }
 
@@ -94,6 +98,7 @@
 	--radius-panel: 8px;
 	--control-h: 36px;
 	--shadow-pop: 0 8px 24px rgb(0 0 0 / 0.12);
+	--shadow-dialog: 0 16px 48px rgb(0 0 0 / 0.2);
 	--page-max: 1180px;
 	--gutter: clamp(16px, 3vw, 24px);
 	--space-title: 10px;
