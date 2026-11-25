@@ -286,7 +286,7 @@ describe('trouble saving', () => {
 		await vi.advanceTimersByTimeAsync(60_000);
 		expect(write).toHaveBeenCalledTimes(1);
 		expect(workspace.sync).toBe('failed');
-		expect(workspace.message).toBe('This is too large to save. Remove some items and try again.');
+		expect(workspace.message).toBe('This is too large to save. Remove some items first.');
 	});
 
 	it('reports a workspace that disappeared', async () => {

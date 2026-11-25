@@ -350,8 +350,8 @@ export class Workspace {
 			this.sync = 'failed';
 			this.message =
 				code === 'too-large'
-					? 'This is too large to save. Remove some items and try again.'
-					: 'This change could not be saved.';
+					? 'This is too large to save. Remove some items first.'
+					: "This change couldn't be saved.";
 			return false;
 		}
 		if (code === 'not-found') {

@@ -15,7 +15,7 @@
 		return pit ? 'Team not found' : 'Page not found';
 	});
 	const detail = $derived.by(() => {
-		if (!missing) return 'This page could not be loaded. Try again in a moment.';
+		if (!missing) return "This page couldn't be loaded.";
 		if (found) return found.meta;
 		return pit ? missingTeam(page.params.team) : 'There is no page at this address.';
 	});

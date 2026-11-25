@@ -151,7 +151,7 @@
 				updated={bundle.fetchedAt}
 				timeZone={bundle.event.timezone}
 				staleAfter={ongoing ? undefined : Infinity}
-			/>{#if refreshFailed}. The page could not refresh just now.{/if}
+			/>{#if refreshFailed}. The page couldn't refresh just now.{/if}
 		</p>
 	</div>
 

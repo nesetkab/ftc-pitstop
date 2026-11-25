@@ -57,7 +57,7 @@
 			{/if}
 		</div>
 		{#if data.today === null}
-			<EmptyState title="Today's events could not be loaded.">Try again in a moment.</EmptyState>
+			<EmptyState title="Today's events couldn't be loaded." />
 		{:else if data.today.length === 0}
 			<EmptyState title="No events are running today.">Live events show here.</EmptyState>
 		{:else}
@@ -79,8 +79,7 @@
 			</a>
 		</div>
 		{#if data.week === null}
-			<EmptyState title="This week's events could not be loaded.">Try again in a moment.</EmptyState
-			>
+			<EmptyState title="This week's events couldn't be loaded." />
 		{:else if data.week.length === 0}
 			<EmptyState title="No events start in the next 7 days." />
 		{:else}

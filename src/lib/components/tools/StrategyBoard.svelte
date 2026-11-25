@@ -380,7 +380,7 @@
 		try {
 			await exportPng(svg, plan?.name ?? 'plan');
 		} catch {
-			exportError = 'The plan could not be saved as an image.';
+			exportError = "The plan couldn't be saved as an image.";
 		}
 	}
 </script>

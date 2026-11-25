@@ -135,8 +135,8 @@ describe('home page', () => {
 
 	it('says when the lists could not be loaded', () => {
 		show({ today: null, week: null });
-		expect(screen.getByText("Today's events could not be loaded.")).toBeInTheDocument();
-		expect(screen.getByText("This week's events could not be loaded.")).toBeInTheDocument();
+		expect(screen.getByText("Today's events couldn't be loaded.")).toBeInTheDocument();
+		expect(screen.getByText("This week's events couldn't be loaded.")).toBeInTheDocument();
 	});
 
 	it('has the pit display address with a team number field', () => {

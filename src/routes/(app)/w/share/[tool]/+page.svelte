@@ -48,7 +48,7 @@
 			const saved = await saveShared(payload, device, storage);
 			await goto(`/w/${saved.code}/${saved.tool}`);
 		} catch {
-			failure = 'This device could not save the copy. Storage may be full or blocked.';
+			failure = "This device couldn't save the copy. Its storage may be full or blocked.";
 		} finally {
 			saving = false;
 		}

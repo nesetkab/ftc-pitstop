@@ -30,9 +30,9 @@
 
 	function explain(error: unknown): string {
 		if (error instanceof WorkspaceError && error.code === 'rate-limited') {
-			return 'Too many requests. Try again in a minute.';
+			return "You've sent too many requests. Wait a minute.";
 		}
-		return 'The shared workspace could not be reached. Try again.';
+		return "The shared workspace couldn't be reached.";
 	}
 
 	async function create(event: SubmitEvent) {
@@ -89,10 +89,10 @@
 			}
 			if (!found) {
 				joinError = unreachable
-					? 'The shared workspace could not be reached. Try again.'
+					? "The shared workspace couldn't be reached."
 					: data.shared
 						? 'No workspace uses that code.'
-						: 'That code is not saved on this device. Ask your team for a share link instead.';
+						: "That code isn't saved on this device. Ask your team for a share link.";
 				return;
 			}
 			rememberRecent(access.storage, {
