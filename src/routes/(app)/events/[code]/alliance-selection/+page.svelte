@@ -3,14 +3,11 @@
 	import { onMount } from 'svelte';
 	import '#lib/components/tools/controls.css';
 	import { teamsAction } from '#lib/components/event/empty.ts';
-	import PickList from '#lib/components/tools/PickList.svelte';
 	import type { EventBundle } from '#lib/types.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import SkeletonRows from '#lib/ui/SkeletonRows.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
-	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
-	import { formatCode } from '#lib/workspace/code.ts';
-	import { pickMarks } from '#lib/workspace/picklist.ts';
+	import type { PickMark } from '#lib/workspace/picklist.ts';
 	import { readRecents, type Recent } from '#lib/workspace/recents.ts';
 	import {
 		bundleSignature,
@@ -19,7 +16,6 @@
 		selectionTable,
 		takenLabels
 	} from '#lib/workspace/selection.ts';
-	import { Workspace } from '#lib/workspace/workspace.svelte.ts';
 	import AllianceTable from './AllianceTable.svelte';
 	import AvailableTeams from './AvailableTeams.svelte';
 	import PlayoffOdds from './PlayoffOdds.svelte';
@@ -28,14 +24,13 @@
 
 	let { data }: PageProps = $props();
 
-	const id = $props.id();
 	const teams = $derived(teamsAction(data.selection.bundle));
 	let live = $state.raw<EventBundle | null>(null);
 	let refreshFailed = $state(false);
-	let access = $state.raw<BrowserWorkspaces | null>(null);
+	let ready = $state(false);
 	let recents = $state.raw<Recent[]>([]);
 	let chosen = $state<string | null>(null);
-	let ours = $state.raw<Workspace | null>(null);
+	let marks = $state.raw<ReadonlyMap<number, PickMark> | undefined>(undefined);
 
 	const bundle = $derived<EventBundle>(
 		live && live.fetchedAt >= data.selection.bundle.fetchedAt ? live : data.selection.bundle
@@ -52,7 +47,6 @@
 			])
 		)
 	);
-	const marks = $derived(ours ? pickMarks(ours.docs.picklist) : undefined);
 	const ongoing = $derived(
 		bundle.phase === 'selection' && (!selection.started || selection.picking !== null)
 	);
@@ -71,6 +65,19 @@
 			? `Playoff chances assume alliance ${table.pickAlliance} (${selection.picking.captain}) picks that team.`
 			: null
 	);
+
+	const loadPickList = () => import('./OurPickList.svelte');
+
+	async function savedRecents(): Promise<Recent[]> {
+		try {
+			localStorage.setItem('ps-probe', '1');
+			localStorage.removeItem('ps-probe');
+			return readRecents(localStorage);
+		} catch {
+			const { browserStorage } = await import('#lib/workspace/device-store.ts');
+			return readRecents(browserStorage().storage);
+		}
+	}
 
 	onMount(() => {
 		let signature = bundleSignature(bundle);
@@ -109,9 +116,12 @@
 		timer = setTimeout(tick, refreshInterval(bundle.phase) ?? 60_000);
 		document.addEventListener('visibilitychange', wake);
 
-		access = browserWorkspaces(data.workspaceShared);
-		recents = readRecents(access.storage);
-		chosen = recents[0]?.code ?? null;
+		void savedRecents().then((saved) => {
+			if (stopped) return;
+			recents = saved;
+			chosen = saved[0]?.code ?? null;
+			ready = true;
+		});
 
 		return () => {
 			stopped = true;
@@ -119,29 +129,12 @@
 			document.removeEventListener('visibilitychange', wake);
 		};
 	});
-
-	$effect(() => {
-		const code = chosen;
-		const current = access;
-		if (!code || !current) {
-			ours = null;
-			return;
-		}
-		const next = new Workspace(code, { docs: ['picklist'] });
-		let stop = () => {};
-		let active = true;
-		void next.open(current.access).then(() => {
-			if (!active || next.status !== 'ready') return;
-			stop = next.start();
-			ours = next;
-		});
-		return () => {
-			active = false;
-			stop();
-			ours = null;
-		};
-	});
 </script>
+
+{#snippet loading()}
+	<h3 class="sec-title">Our pick list</h3>
+	<SkeletonRows label="Loading the pick list." rows={8} />
+{/snippet}
 
 <div class="page">
 	<div class="head">
@@ -188,42 +181,26 @@
 					</div>
 				{/if}
 			{/if}
-			{#if ours}
+			{#if chosen}
 				<div class="panel">
-					<PickList
-						list={ours.docs.picklist}
-						auto={labels}
-						{stats}
-						title="Our pick list"
-						showEvent={false}
-					>
-						{#snippet share()}
-							<a href="/w/{ours?.code}/picklist">Edit pick list</a>
-						{/snippet}
-					</PickList>
-					{#if recents.length > 1}
-						<div class="choose">
-							<label class="ctl-label" for="{id}-workspace">Workspace</label>
-							<select id="{id}-workspace" class="ctl-select" bind:value={chosen}>
-								{#each recents as recent (recent.code)}
-									<option value={recent.code}>
-										{recent.teamNumber ? `Team ${recent.teamNumber}` : 'Saved from a link'},
-										{formatCode(recent.code)}
-									</option>
-								{/each}
-							</select>
-						</div>
-					{/if}
-					<p class="note">
-						{ours.kind === 'shared' ? 'Shared with your team.' : 'Saved on this device.'}
-					</p>
+					{#await loadPickList()}
+						{@render loading()}
+					{:then { default: OurPickList }}
+						<OurPickList
+							shared={data.workspaceShared}
+							{recents}
+							bind:chosen
+							{labels}
+							{stats}
+							{loading}
+							onmarks={(next) => (marks = next)}
+						/>
+					{:catch}
+						<h3 class="sec-title">Our pick list</h3>
+						<p class="note">The pick list couldn't load.</p>
+					{/await}
 				</div>
-			{:else if chosen}
-				<div class="panel">
-					<h3 class="sec-title">Our pick list</h3>
-					<SkeletonRows label="Loading the pick list." rows={8} />
-				</div>
-			{:else if access}
+			{:else if ready}
 				<div class="panel">
 					<h3 class="sec-title">Our pick list</h3>
 					<EmptyState title="Make a shared pick list with your team.">
@@ -318,11 +295,6 @@
 		gap: var(--space-title);
 		align-content: start;
 		min-width: 0;
-	}
-
-	.choose {
-		display: grid;
-		gap: 4px;
 	}
 
 	@media (min-width: 1061px) {
