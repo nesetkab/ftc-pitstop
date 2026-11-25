@@ -52,9 +52,9 @@ export function analysisPolicy(tier: EventTier, phase: EventPhase): CachePolicy 
 	return { ttl: 15, maxStale: 300 };
 }
 
-function fingerprint(bundle: EventBundle, season: SeasonModel): string {
+function fingerprint(bundle: EventBundle, season: SeasonModel | null): string {
 	const content = JSON.stringify([
-		season.generatedAt,
+		season?.generatedAt ?? null,
 		bundle.event,
 		bundle.teams,
 		bundle.matches,
@@ -123,7 +123,12 @@ export function createAnalysis(deps: AnalysisDeps) {
 	let pendingSince = 0;
 	const analyzed = new LruMap<{ key: string; analysis: EventAnalysis }>(100);
 
-	function analyzeOnce(bundle: EventBundle, season: SeasonModel, teams: number[], day: number) {
+	function analyzeOnce(
+		bundle: EventBundle,
+		season: SeasonModel | null,
+		teams: number[],
+		day: number
+	) {
 		const time = now();
 		const key = fingerprint(bundle, season);
 		const known = analyzed.get(bundle.event.code);
@@ -204,9 +209,8 @@ export function createAnalysis(deps: AnalysisDeps) {
 		} catch (error) {
 			if (!(error instanceof ColdStart)) throw error;
 			background(model);
-			const context = contextFor(null, teams, day, previous);
 			return {
-				analysis: analyzeEvent(bundle, context, { now: now() }),
+				analysis: analyzeOnce(bundle, null, teams, day),
 				cacheControl: CACHE_CONTROL.live
 			};
 		}
