@@ -21,6 +21,9 @@ export type PooledParams = {
 	qMatch: number;
 	hetero: number;
 	heteroPool: number;
+	hetVar: number;
+	imbPred: number;
+	imbFit: number;
 	kappa: number;
 	block: boolean;
 	q: number;
@@ -53,6 +56,9 @@ export const POOLED_BASE: PooledParams = {
 	qMatch: 0,
 	hetero: 0,
 	heteroPool: 0,
+	hetVar: 0,
+	imbPred: 0,
+	imbFit: 0,
 	kappa: 1,
 	block: true,
 	q: 0,
@@ -129,14 +135,20 @@ function invertSpd(H: Float64Array, n: number): Float64Array {
 	return out;
 }
 
-function rowSums(P: Float64Array, ph: Float64Array, n: number, idx: number[]): number {
+function weightedSums(
+	P: Float64Array,
+	ph: Float64Array,
+	n: number,
+	idx: number[],
+	h: number[]
+): number {
 	ph.fill(0);
-	for (const i of idx) {
+	idx.forEach((i, j) => {
 		const row = i * n;
-		for (let k = 0; k < n; k++) ph[k] += P[row + k];
-	}
+		for (let k = 0; k < n; k++) ph[k] += h[j] * P[row + k];
+	});
 	let hph = 0;
-	for (const i of idx) hph += ph[i];
+	idx.forEach((i, j) => (hph += h[j] * ph[i]));
 	return hph;
 }
 
@@ -172,6 +184,8 @@ export class PooledOpr implements Model {
 	rmean = new Float64Array(1024);
 	rpo = new Uint8Array(1024);
 	w = new Float64Array(0);
+	ca = new Float64Array(0);
+	cb = new Float64Array(0);
 	diag = new Float64Array(0);
 	pending: Pending[] = [];
 	solvedDay = -Infinity;
@@ -281,13 +295,13 @@ export class PooledOpr implements Model {
 	matvec(v: Float64Array, out: Float64Array, lam: Float64Array): void {
 		const N = v.length;
 		for (let t = 0; t < N; t++) out[t] = lam[t] * v[t];
-		const { ra, rb, w } = this;
+		const { ra, rb, w, ca, cb } = this;
 		for (let r = 0; r < this.rows; r++) {
 			const a = ra[r];
 			const b = rb[r];
-			const s = w[r] * (b >= 0 ? v[a] + v[b] : v[a]);
-			out[a] += s;
-			if (b >= 0) out[b] += s;
+			const s = w[r] * (b >= 0 ? ca[r] * v[a] + cb[r] * v[b] : ca[r] * v[a]);
+			out[a] += ca[r] * s;
+			if (b >= 0) out[b] += cb[r] * s;
 		}
 	}
 
@@ -358,6 +372,17 @@ export class PooledOpr implements Model {
 		const ys = new Float64Array(R);
 		const decay = Number.isFinite(p.halfLife) ? LN2 / p.halfLife : 0;
 		const robust = new Float64Array(R).fill(1);
+		this.ca = new Float64Array(R).fill(1);
+		this.cb = new Float64Array(R).fill(1);
+		if (p.imbFit !== 0) {
+			for (let r = 0; r < R; r++) {
+				const b = this.rb[r];
+				if (b < 0) continue;
+				const sgn = Math.sign(this.xs[this.ra[r]] - this.xs[b]);
+				this.ca[r] = 1 + p.imbFit * sgn;
+				this.cb[r] = 1 - p.imbFit * sgn;
+			}
+		}
 		const passes = Number.isFinite(p.huber) ? 3 : 1;
 		for (let pass = 0; pass < passes; pass++) {
 			for (let r = 0; r < R; r++) {
@@ -367,7 +392,7 @@ export class PooledOpr implements Model {
 				if (p.heteroPool !== 0 && ctx.mean > 0) {
 					const a = this.ra[r];
 					const b = this.rb[r];
-					const lvl = (this.xs[a] + (b >= 0 ? this.xs[b] : 0)) / ctx.mean;
+					const lvl = (this.ca[r] * this.xs[a] + (b >= 0 ? this.cb[r] * this.xs[b] : 0)) / ctx.mean;
 					w /= Math.min(Math.max(lvl, 0.25), 4) ** p.heteroPool;
 				}
 				this.w[r] = w * robust[r];
@@ -386,13 +411,15 @@ export class PooledOpr implements Model {
 				const a = this.ra[r];
 				const b = this.rb[r];
 				const wy = this.w[r] * ys[r];
-				this.diag[a] += this.w[r];
-				rhs[a] += wy;
-				rhsS[a] += wy;
+				const ka = this.ca[r];
+				this.diag[a] += this.w[r] * ka * ka;
+				rhs[a] += wy * ka;
+				rhsS[a] += wy * ka;
 				if (b >= 0) {
-					this.diag[b] += this.w[r];
-					rhs[b] += wy;
-					rhsS[b] += wy;
+					const kb = this.cb[r];
+					this.diag[b] += this.w[r] * kb * kb;
+					rhs[b] += wy * kb;
+					rhsS[b] += wy * kb;
 				}
 			}
 			this.pcg(lam, rhs, this.x);
@@ -405,7 +432,7 @@ export class PooledOpr implements Model {
 			for (let r = 0; r < R; r++) {
 				const a = this.ra[r];
 				const b = this.rb[r];
-				res[r] = ys[r] - this.x[a] - (b >= 0 ? this.x[b] : 0);
+				res[r] = ys[r] - this.ca[r] * this.x[a] - (b >= 0 ? this.cb[r] * this.x[b] : 0);
 				const w = this.w[r] / robust[r];
 				sw += w;
 				swr += w * res[r] * res[r];
@@ -442,12 +469,18 @@ export class PooledOpr implements Model {
 			}
 		}
 		const saved = this.diag;
+		const savedA = this.ca;
+		const savedB = this.cb;
 		this.diag = diag;
+		this.ca = new Float64Array(R).fill(1);
+		this.cb = new Float64Array(R).fill(1);
 		const c = new Float64Array(N);
 		for (let t = 0; t < N; t++) c[t] = t < this.c.length ? this.c[t] : this.penPrior;
 		this.pcg(lam, rhs, c);
 		this.c = c;
 		this.diag = saved;
+		this.ca = savedA;
+		this.cb = savedB;
 	}
 
 	pen(team: number): number {
@@ -509,7 +542,7 @@ export class PooledOpr implements Model {
 					const other = this.ra[r] === g ? this.rb[r] : this.ra[r];
 					if (other < 0) continue;
 					const j = local.get(other);
-					if (j !== undefined) H[i * n + j] += this.w[r];
+					if (j !== undefined) H[i * n + j] += this.w[r] * this.ca[r] * this.cb[r];
 				}
 			}
 			P = invertSpd(H, n);
@@ -587,6 +620,17 @@ export class PooledOpr implements Model {
 			idx.push(i);
 			sign.push(-1);
 		}
+		const c = this.p.imbPred;
+		if (c !== 0) {
+			const gap = (teams: number[], v: Float64Array) =>
+				teams.length === 2
+					? Math.abs(v[this.index.get(teams[0])!] - v[this.index.get(teams[1])!])
+					: 0;
+			red += c * gap(m.red, this.mu);
+			blue += c * gap(m.blue, this.mu);
+			redScore += c * gap(m.red, this.nu);
+			blueScore += c * gap(m.blue, this.nu);
+		}
 		if (this.p.penW > 0) {
 			for (const t of m.red) blue += this.p.penW * this.pen(t);
 			for (const t of m.blue) red += this.p.penW * this.pen(t);
@@ -594,20 +638,31 @@ export class PooledOpr implements Model {
 		let v = 0;
 		for (let a = 0; a < idx.length; a++)
 			for (let b = 0; b < idx.length; b++) v += sign[a] * sign[b] * this.P[idx[a] * n + idx[b]];
-		return { red, blue, varFactor: (v + 2) / 2, redScore, blueScore };
+		let noise = 2;
+		if (this.p.hetVar !== 0 && ctx.mean > 0) {
+			const lv = (x: number) => Math.min(Math.max(x / ctx.mean, 0.25), 4) ** this.p.hetVar;
+			noise = lv(redScore) + lv(blueScore);
+		}
+		return { red, blue, varFactor: (v + noise) / 2, redScore, blueScore };
 	}
 
 	observe(teams: number[], y: number, base: number, ctx: Ctx): void {
 		const n = this.n;
 		const split = this.split();
 		const idx = teams.map((t) => this.index.get(t)!);
-		const hph = rowSums(this.P, this.ph, n, idx);
+		const h = idx.map(() => 1);
+		if (this.p.imbFit !== 0 && idx.length === 2) {
+			const sgn = Math.sign(this.nu[idx[0]] - this.nu[idx[1]]);
+			h[0] = 1 + this.p.imbFit * sgn;
+			h[1] = 1 - this.p.imbFit * sgn;
+		}
+		const hph = weightedSums(this.P, this.ph, n, idx, h);
 		let pred = 0;
 		let predNu = 0;
-		for (const i of idx) {
-			pred += this.mu[i];
-			predNu += this.nu[i];
-		}
+		idx.forEach((i, j) => {
+			pred += h[j] * this.mu[i];
+			predNu += h[j] * this.nu[i];
+		});
 		const resid = y - pred;
 		const residNu = y - predNu;
 		const p = this.p;
@@ -623,7 +678,7 @@ export class PooledOpr implements Model {
 		if (!split) for (let k = 0; k < n; k++) this.nu[k] += (this.ph[k] / s) * residNu;
 		downdate(this.P, this.ph, n, s);
 		if (!split) return;
-		const ss = rowSums(this.S, this.sh, n, idx) + noise;
+		const ss = weightedSums(this.S, this.sh, n, idx, h) + noise;
 		for (let k = 0; k < n; k++) this.nu[k] += (this.sh[k] / ss) * residNu;
 		downdate(this.S, this.sh, n, ss);
 	}
