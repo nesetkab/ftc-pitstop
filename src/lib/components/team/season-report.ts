@@ -399,10 +399,19 @@ function trendTakeaways(trend: SeasonFacts['trend']): Candidate[] {
 		];
 	}
 	const values = trend.map((point) => point.value);
+	const low = Math.min(...values);
+	const high = Math.max(...values);
+	if (shifted(high - low, low)) {
+		const text =
+			last < high
+				? `OPR peaked at ${fixed(high)} and ended at ${fixed(last)} over ${count}`
+				: `OPR dipped to ${fixed(low)} and ended at ${fixed(last)} over ${count}`;
+		return [{ weight: 60, text }];
+	}
 	return [
 		{
 			weight: 35,
-			text: `Steady OPR over ${count}, between ${fixed(Math.min(...values))} and ${fixed(Math.max(...values))}`
+			text: `Steady OPR over ${count}, between ${fixed(low)} and ${fixed(high)}`
 		}
 	];
 }

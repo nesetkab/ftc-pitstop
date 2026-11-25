@@ -8,10 +8,15 @@
 	const title = $derived(
 		missing ? page.error?.message || 'Event not found' : 'Event data is unavailable'
 	);
+	const route = $derived(page.route.id ?? '');
 	const meta = $derived(
-		missing
-			? 'Check the event code or match number, or search by name.'
-			: 'The event could not be loaded. Try again in a moment.'
+		!missing
+			? 'The event could not be loaded. Try again in a moment.'
+			: route.includes('/matches/')
+				? 'Check the match number in the address.'
+				: route.includes('/teams/')
+					? 'This team is not on the list for this event.'
+					: 'Check the event code, or search for the event by name.'
 	);
 </script>
 
