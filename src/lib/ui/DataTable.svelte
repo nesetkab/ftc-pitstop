@@ -2,6 +2,7 @@
 	import type { Snippet } from 'svelte';
 	import Arrow from './Arrow.svelte';
 	import Table from './Table.svelte';
+	import Term from './Term.svelte';
 	import { nextSort, sortRows, type Column, type SortState } from './data-table.ts';
 
 	interface Props {
@@ -55,6 +56,10 @@
 	}
 </script>
 
+{#snippet label(column: Column<T>)}
+	{#if column.term}<Term label={column.label} nested />{:else}{column.label}{/if}
+{/snippet}
+
 {#if shown.length === 0 && empty}
 	{@render empty()}
 {:else}
@@ -68,16 +73,18 @@
 							{#if href}
 								<a class="sort" href={href(nextSort(column, sort))} data-sveltekit-noscroll
 									><Arrow dir={arrow(column) === 'asc' ? 'up' : 'down'} class="sort-arrow" /><span
-										>{column.label}</span
+										>{@render label(column)}</span
 									></a
 								>
 							{:else}
 								<button class="sort" type="button" onclick={() => (sort = nextSort(column, sort))}
 									><Arrow dir={arrow(column) === 'asc' ? 'up' : 'down'} class="sort-arrow" /><span
-										>{column.label}</span
+										>{@render label(column)}</span
 									></button
 								>
 							{/if}
+						{:else if column.term}
+							<Term label={column.label} />
 						{:else}
 							{column.label}
 						{/if}

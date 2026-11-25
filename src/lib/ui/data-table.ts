@@ -10,6 +10,7 @@ export interface SortState {
 export interface Column<T> {
 	key: string;
 	label: string;
+	term?: boolean;
 	title?: string;
 	numeric?: boolean;
 	sort?: (row: T) => number | string | null;
