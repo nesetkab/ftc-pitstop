@@ -8,6 +8,7 @@ import {
 	withSelectedType,
 	type LeaderboardFilters
 } from '#lib/components/leaderboard/leaderboard.ts';
+import { oprSpread } from '#lib/components/leaderboard/spread.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { PageServerLoad } from './$types';
 import { loadLeaderboardSource } from './source.server.ts';
@@ -39,6 +40,7 @@ export const load: PageServerLoad = async ({ url, setHeaders }) => {
 		page: result.page,
 		pages: result.pages,
 		start: result.start,
+		spread: source.kind === 'ratings' ? oprSpread(rows.map((row) => row.opr)) : null,
 		population: dataset.rows.length,
 		regions: dataset.regions,
 		countries: dataset.countries,

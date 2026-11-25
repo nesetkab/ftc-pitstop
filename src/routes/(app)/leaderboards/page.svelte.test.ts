@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { tick } from 'svelte';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FOLLOW_KEY, follows } from '#lib/components/follow/follow.svelte.ts';
 import type {
 	FilterOption,
@@ -12,6 +13,14 @@ import Page from './+page.svelte';
 const navigation = vi.hoisted(() => ({ goto: vi.fn() }));
 
 vi.mock('$app/navigation', () => navigation);
+
+beforeAll(() => {
+	globalThis.ResizeObserver ??= class {
+		observe() {}
+		unobserve() {}
+		disconnect() {}
+	};
+});
 
 beforeEach(() => {
 	localStorage.clear();
@@ -58,6 +67,7 @@ interface Data {
 	window: { from: string; to: string } | null;
 	types: FilterOption[];
 	weeks: FilterOption[];
+	spread?: { start: number; step: number; counts: number[] } | null;
 }
 
 const base: Data = {
@@ -231,7 +241,33 @@ describe('leaderboard page', () => {
 
 	it('says when the team asked for is not in the list', () => {
 		show({ filters: { ...base.filters, team: 9999 } });
-		expect(screen.getByText('Team 9999 is not in this list.')).toBeInTheDocument();
+		expect(screen.getByText("Team 9999 isn't on this list.")).toBeInTheDocument();
+	});
+
+	it('draws how teams spread by aOPR and marks the team asked for', () => {
+		show({
+			filters: { ...base.filters, team: 3747 },
+			found: true,
+			spread: { start: 0, step: 10, counts: [5, 40, 50, 20, 5] }
+		});
+		expect(screen.getByText('Teams by aOPR', { selector: 'figcaption' })).toBeInTheDocument();
+		const table = screen.getByRole('table', { name: 'Teams by aOPR' });
+		expect(within(table).getAllByRole('row')).toHaveLength(6);
+		expect(within(table).getByText('20 to 30')).toBeInTheDocument();
+		expect(screen.getByText('Team 3747 has an aOPR of 40.0.')).toBeInTheDocument();
+	});
+
+	it('marks followed teams on the spread when they are on the page', async () => {
+		localStorage.setItem(FOLLOW_KEY, '[26670]');
+		show({ spread: { start: 0, step: 10, counts: [5, 40, 50, 20, 5, 0, 1] } });
+		await tick();
+		expect(screen.getByText('Team 26670 has an aOPR of 58.2.')).toBeInTheDocument();
+		expect(screen.queryByText(/Team 3747 has an aOPR/)).not.toBeInTheDocument();
+	});
+
+	it('leaves the spread out when there is nothing to draw', () => {
+		show({ spread: null });
+		expect(screen.queryByText('Teams by aOPR')).not.toBeInTheDocument();
 	});
 
 	it('highlights followed teams', async () => {

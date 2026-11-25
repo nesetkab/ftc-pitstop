@@ -1,10 +1,12 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import LeaderboardFilters from '#lib/components/leaderboard/LeaderboardFilters.svelte';
+	import OprSpread from '#lib/components/leaderboard/OprSpread.svelte';
 	import LeaderboardTable from '#lib/components/leaderboard/LeaderboardTable.svelte';
 	import DownloadLink from '#lib/ui/DownloadLink.svelte';
 	import Pagination from '#lib/ui/Pagination.svelte';
 	import { hasFilters, queryString } from '#lib/components/leaderboard/leaderboard.ts';
+	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { integer } from '#lib/format/index.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
@@ -26,7 +28,15 @@
 			? (data.regions.find((option) => option.value === data.filters.region)?.label ?? null)
 			: null
 	);
+	const marks = $derived(
+		data.rows
+			.filter((row) => row.team === data.filters.team || follows.teams.includes(row.team))
+			.sort((a, b) => Number(b.team === data.filters.team) - Number(a.team === data.filters.team))
+			.map((row) => ({ team: row.team, opr: row.opr }))
+	);
 	const csvHref = $derived(`/leaderboards.csv${queryString({ ...data.filters, team: 0 }, 1)}`);
+
+	$effect(() => syncFollows());
 
 	$effect(() => {
 		if (!data.found) return;
@@ -65,7 +75,7 @@
 		<span>
 			{showing}{missing ? '.' : ''}
 			{#if missing}
-				<span class="faint">Team {data.filters.team} is not in this list.</span>
+				<span class="faint">Team {data.filters.team} isn't on this list.</span>
 			{/if}
 		</span>
 		{#if regionLabel || hasFilters(data.filters)}
@@ -79,6 +89,13 @@
 			</span>
 		{/if}
 	</p>
+{/if}
+
+{#if data.spread}
+	<figure class="spread">
+		<figcaption>Teams by aOPR</figcaption>
+		<OprSpread spread={data.spread} {marks} />
+	</figure>
 {/if}
 
 <LeaderboardTable rows={data.rows} start={data.start} filters={data.filters} />
@@ -118,6 +135,18 @@
 		gap: 16px;
 		margin-left: auto;
 		white-space: nowrap;
+	}
+
+	.spread {
+		display: grid;
+		gap: 4px;
+		margin: 0;
+		min-width: 0;
+	}
+
+	figcaption {
+		font-size: 13px;
+		color: var(--text-2);
 	}
 
 	.csv {

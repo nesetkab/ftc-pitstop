@@ -42,6 +42,7 @@ type Result = Awaited<ReturnType<typeof load>> & {
 	types: { value: string; label: string }[];
 	weeks: { value: string; label: string }[];
 	found: boolean;
+	spread: { start: number; step: number; counts: number[] } | null;
 };
 
 function call(query = '') {
@@ -106,6 +107,16 @@ describe('leaderboards load with season ratings', () => {
 		expect(setHeaders).toHaveBeenCalledWith({
 			'cache-control': 'public, s-maxage=300, stale-while-revalidate=3600'
 		});
+	});
+
+	it('sends the aOPR spread of every team that matches the filters', async () => {
+		server.loadSeasonRatingsWithin.mockResolvedValue(ratings(120, 11));
+		const all = await call().result;
+		expect(all.spread).not.toBeNull();
+		expect(all.spread!.counts.reduce((sum, count) => sum + count, 0)).toBe(all.total);
+		const region = await call('?region=USAZ').result;
+		expect(region.spread!.counts.reduce((sum, count) => sum + count, 0)).toBe(region.total);
+		expect(region.total).toBeLessThan(all.total);
 	});
 
 	it('pages the list and numbers the ranks from the start of the page', async () => {
