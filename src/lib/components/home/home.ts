@@ -6,6 +6,7 @@ import {
 	type TodayState
 } from './today.ts';
 import { eventDay } from '#lib/components/event/dates.ts';
+import { typeLabel } from '#lib/components/event/event-meta.ts';
 import { placeName } from '#lib/format/places.ts';
 import { isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary } from '#lib/types.ts';
@@ -38,7 +39,7 @@ function row(event: EventSummary, dates: string, status: string): HomeEvent {
 	return {
 		code: event.code,
 		name: event.name,
-		type: event.typeName,
+		type: typeLabel(event.type),
 		place: placeName(event, 'short'),
 		dates,
 		status
