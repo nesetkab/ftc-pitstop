@@ -10,7 +10,7 @@ type Flat = Record<string, unknown>;
 const DIR = join(import.meta.dirname, 'params');
 
 function get(p: Flat, path: string): number {
-	return path.split('.').reduce((o: any, k) => o?.[k], p) as number;
+	return (path.split('.').reduce((o: any, k) => o?.[k], p) as number) ?? 0;
 }
 
 function set(p: Flat, path: string, v: number): Flat {
@@ -43,9 +43,10 @@ function grid(path: string, x: number): number[] {
 
 const [variant, seasonArg, ...keys] = process.argv.slice(2);
 const list = seasonArg.split(',').map(Number);
-const v = VARIANTS[variant];
+const [vname, file] = variant.split('@');
+const v = VARIANTS[vname];
 await mkdir(DIR, { recursive: true });
-const path = join(DIR, `${variant}.json`);
+const path = join(DIR, `${file ?? vname}.json`);
 let best: Flat = existsSync(path) ? JSON.parse(await readFile(path, 'utf8')) : v.start;
 const t0 = Date.now();
 let bestLoss = Infinity;

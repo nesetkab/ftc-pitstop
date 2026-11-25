@@ -27,6 +27,7 @@ export type RepaOpts = {
 	margin?: number;
 	clip?: number;
 	unc?: number;
+	het?: number;
 	hist?: number[];
 };
 
@@ -194,7 +195,9 @@ export class RobotEpa implements Model {
 		const clip = (x: number) => (x > lim ? lim : x < -lim ? -lim : x);
 		const M = this.o.margin ?? 0;
 		const g = this.o.gate ?? 1;
-		type Work = { ts: number[]; pos: number[]; ok: boolean; err: number; errS: number; sd: Side | null | undefined };
+		type Work = { ts: number[]; pos: number[]; ok: boolean; err: number; errS: number; f: number; sd: Side | null | undefined };
+		const restMean = this.means(ctx)[0];
+		const het = this.o.het ?? 0;
 		const prep = (all: number[], upd: number[], y: number, ok: boolean, sd: Side | null | undefined): Work => {
 			const pos = upd.map((t) => all.indexOf(t));
 			let target = y;
@@ -204,10 +207,12 @@ export class RobotEpa implements Model {
 			}
 			let pred = 0;
 			let predS = 0;
+			let level = 0;
 			for (const t of upd) {
 				const st = this.states(t, ctx);
 				pred += st[0].r;
 				predS += st[0].s;
+				level += st[0].r;
 				if (!sd) {
 					let k = 1;
 					if (this.robot) {
@@ -221,13 +226,14 @@ export class RobotEpa implements Model {
 					}
 				}
 			}
-			return { ts: upd, pos, ok, err: clip(target - pred), errS: clip(target - predS), sd };
+			const f = het !== 0 && restMean > 0 ? Math.min(Math.max(level / restMean, 0.25), 4) ** -het : 1;
+			return { ts: upd, pos, ok, err: clip(target - pred), errS: clip(target - predS), f, sd };
 		};
 		const red = prep(m.red, m.redUpd, m.redNp, m.redOk, r.red2);
 		const blue = prep(m.blue, m.blueUpd, m.blueNp, m.blueOk, r.blue2);
 		const apply = (w: Work, opp: Work) => {
 			if (!w.ok || !w.ts.length) return;
-			const d = (w.err - M * (opp.ok ? opp.err : 0)) / (1 + M) / w.ts.length;
+			const d = (w.f * (w.err - M * (opp.ok ? opp.err : 0))) / (1 + M) / w.ts.length;
 			const dS = (w.errS - M * (opp.ok ? opp.errS : 0)) / (1 + M) / w.ts.length;
 			const sd = w.sd;
 			const hs = sd ? w.pos.map((p) => (sd.mv[p] ? 1 : g)) : [];

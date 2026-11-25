@@ -35,7 +35,7 @@
 	"auto": {
 		"lamNew": 1.5,
 		"lamPrev": 2,
-		"q": 0.375,
+		"q": 0.563,
 		"qWeek": 0.01,
 		"qMatch": 0,
 		"carry": 1,
@@ -60,6 +60,6 @@
 		"rhoNewScore": 0.5,
 		"rhoPrevScore": 0.7
 	},
-	"gate": 0.7,
+	"gate": 0.6,
 	"het": 0.45
 }

@@ -1,0 +1,67 @@
+{
+	"rest": {
+		"k0": 0.45,
+		"kMin": 0.0938,
+		"tau": 8,
+		"reset": 0.275,
+		"wk": 0,
+		"carry": 0.9,
+		"drift": 0.25,
+		"beta": 0.4,
+		"rhoNew": 0.375,
+		"rhoPrev": 0.5,
+		"rhoNewScore": 0.6,
+		"rhoPrevScore": 0.7
+	},
+	"robot": {
+		"k0": 0.375,
+		"kMin": 0.036,
+		"tau": 6.4,
+		"reset": 0.275,
+		"wk": 0.03,
+		"carry": 1,
+		"drift": 0.25,
+		"beta": 0.325,
+		"rhoNew": 0.3,
+		"rhoPrev": 0.5,
+		"rhoNewScore": 0.6,
+		"rhoPrevScore": 0.7
+	},
+	"margin": 0,
+	"clip": 6.4,
+	"unc": 0.225,
+	"hist": [
+		0.45,
+		0.15
+	],
+	"het": 0.225,
+	"auto": {
+		"k0": 0.72,
+		"kMin": 0.0938,
+		"tau": 8,
+		"reset": 0.275,
+		"wk": 0,
+		"carry": 0.9,
+		"drift": 0.25,
+		"beta": 0.4,
+		"rhoNew": 0.375,
+		"rhoPrev": 0.5,
+		"rhoNewScore": 0.6,
+		"rhoPrevScore": 0.7
+	},
+	"move": {
+		"k0": 0.6,
+		"kMin": 0.036,
+		"tau": 6.4,
+		"reset": 0.275,
+		"wk": 0.03,
+		"carry": 1,
+		"drift": 0.25,
+		"beta": 0.325,
+		"rhoNew": 0.3,
+		"rhoPrev": 0.5,
+		"rhoNewScore": 0.6,
+		"rhoPrevScore": 0.7
+	},
+	"gate": 0.5
+}
