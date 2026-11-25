@@ -5,6 +5,7 @@
 	import { PART_LABELS } from '#lib/game/biobuzz.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import type { TeamComparisonRow, TeamPartRow } from './team-view.ts';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	interface Props {
 		rows: TeamPartRow[];
@@ -98,11 +99,11 @@
 		{/each}
 	</tbody>
 </Table>
-<p class="note">
+<Legend>
 	OPR for each part of the score. Hive, flower, garden and park are teleop points.
 	{#if comparison.length > 0}Season percentile is the share of teams this season with a lower value.{/if}
 	{#if events.length > 1}Bold marks the team's best event for that part.{/if}
-</p>
+</Legend>
 
 <style>
 	tbody th {

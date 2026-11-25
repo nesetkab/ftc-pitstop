@@ -19,6 +19,7 @@
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import type { PageProps } from './$types';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -105,9 +106,9 @@
 />
 
 {#if data.total > 0}
-	<p class="note">
+	<Legend>
 		Each match counts twice, once for each alliance. Opponent is the other alliance's score.
-	</p>
+	</Legend>
 
 	<p class="csv">
 		<DownloadLink href="/records.csv{recordQuery({ ...data.filters, page: 1 })}" />

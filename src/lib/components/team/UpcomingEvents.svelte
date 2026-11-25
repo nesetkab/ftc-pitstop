@@ -3,6 +3,7 @@
 	import { shortRange } from '#lib/format/time.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import type { UpcomingEventRow } from './season-report.ts';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	interface Props {
 		rows: UpcomingEventRow[];
@@ -37,10 +38,10 @@
 		{/each}
 	</tbody>
 </Table>
-<p class="note">
+<Legend>
 	Expected rank comes from simulating the remaining qualification schedule. Before a schedule is
 	out, teams are ordered by season OPR.
-</p>
+</Legend>
 
 <style>
 	.live {

@@ -6,6 +6,7 @@
 	import Table from '#lib/ui/Table.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { LEAD_SHARE, partLead, type Alliance, type Fit, type FitPart } from './fit.ts';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	interface Props {
 		fit: Fit;
@@ -135,13 +136,13 @@
 	{/if}
 {/if}
 
-<p class="note">
+{#if fit.missing.length > 0}
+	<p class="note">No season rating yet for {fit.missing.join(', ')}.</p>
+{/if}
+<Legend>
 	As if these teams met at a new event today, before penalties. Chances are for one match. A team's
 	share shows when it brings {LEAD_SHARE * 100}% or more of a part.
-	{#if fit.missing.length > 0}
-		No season rating yet for {fit.missing.join(', ')}.
-	{/if}
-</p>
+</Legend>
 
 <style>
 	.lead {
