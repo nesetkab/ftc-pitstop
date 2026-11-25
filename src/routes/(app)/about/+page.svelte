@@ -137,9 +137,8 @@
 			<p>
 				Official rankings come straight from FIRST, and PitStop does not reorder them.
 				<dfn>RS</dfn>, the ranking score, is a team’s average ranking points per match, and it
-				decides the order. <dfn>TBP</dfn>, tiebreaker points, is the average match score without
-				fouls, and it separates teams with the same RS. A match a team was disqualified from or did
-				not show up for counts as zero for both.
+				decides the order. <dfn>TBP</dfn>, tiebreaker points, separates teams with the same RS. A
+				match a team was disqualified from or did not show up for counts as zero for both.
 			</p>
 			<p>
 				League meets use each team’s best 10 league matches so far. There RS and TBP are totals over
@@ -155,9 +154,9 @@
 			</p>
 			<p>
 				PitStop leaves out the points an alliance gets from the other alliance’s fouls, so a team
-				gets no credit for its opponents’ mistakes. aOPR and <dfn>NP</dfn>, or non-penalty, scores
-				work this way. Predicted scores add back the foul points each opponent tends to give away,
-				so they can be compared with the final score.
+				gets no credit for its opponents’ mistakes. aOPR, TBP and <dfn>NP</dfn>, or non-penalty,
+				scores all work this way. Predicted scores add back the foul points each opponent tends to
+				give away, so they can be compared with the final score.
 			</p>
 			<p>
 				NP avg, NP max and NP min describe the scores of the alliances a team played on, and spread
