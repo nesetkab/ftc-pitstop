@@ -118,7 +118,7 @@ describe('leaderboard page', () => {
 		show();
 		const headers = within(screen.getByRole('table'))
 			.getAllByRole('columnheader')
-			.map((cell) => cell.textContent?.replace('↓', '').trim());
+			.map((cell) => cell.textContent?.trim());
 		expect(headers).toEqual([
 			'Rank',
 			'Team',
