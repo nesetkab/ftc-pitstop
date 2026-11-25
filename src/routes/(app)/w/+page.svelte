@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
+	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import { browserWorkspaces, type BrowserWorkspaces } from '#lib/workspace/browser.ts';
 	import { formatCode, normalizeCode, parseTeamNumber } from '#lib/workspace/code.ts';
 	import { readRecents, rememberRecent, type Recent } from '#lib/workspace/recents.ts';
@@ -38,7 +39,9 @@
 		if (!access) return;
 		const teamNumber = parseTeamNumber(team);
 		if (teamNumber === null) {
-			createError = 'Enter your team number, 1 to 6 digits.';
+			createError = /^[\d\s]*$/.test(team)
+				? 'Enter your team number, 1 to 6 digits.'
+				: 'Pick your team from the list, or enter its number.';
 			return;
 		}
 		createError = '';
@@ -139,18 +142,15 @@
 <div class="start">
 	<form class="part" onsubmit={create} novalidate>
 		<h2 class="sec-title">Create a workspace</h2>
-		<label class="ctl-label" for="{id}-team">Team number</label>
+		<label class="ctl-label" for="{id}-team">Team number or name</label>
 		<div class="row">
-			<input
+			<TeamInput
 				id="{id}-team"
-				class="ctl-input"
-				inputmode="numeric"
-				autocomplete="off"
-				maxlength="6"
-				placeholder="14624"
+				placeholder="Number or name, like 14624"
+				listLabel="Teams"
 				bind:value={team}
-				aria-invalid={createError ? 'true' : undefined}
-				aria-describedby={createError ? `${id}-create-error` : undefined}
+				invalid={Boolean(createError)}
+				describedby={createError ? `${id}-create-error` : undefined}
 			/>
 			<Button type="submit" disabled={busy || !access}>Create</Button>
 		</div>

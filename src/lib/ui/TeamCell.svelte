@@ -29,6 +29,11 @@
 		font-variant-numeric: tabular-nums;
 	}
 
+	:global(table) b {
+		display: inline-block;
+		min-width: var(--team-digits);
+	}
+
 	.name {
 		margin-left: 4px;
 		color: var(--text-2);

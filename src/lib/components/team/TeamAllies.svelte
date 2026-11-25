@@ -100,9 +100,12 @@
 	}
 
 	small {
+		display: inline-block;
+		min-width: 6ch;
 		margin-left: 4px;
 		font-size: 12px;
 		color: var(--text-3);
+		text-align: left;
 	}
 
 	.foot {

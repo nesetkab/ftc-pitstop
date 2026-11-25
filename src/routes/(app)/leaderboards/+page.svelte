@@ -70,11 +70,15 @@
 				<span class="faint">Team {data.filters.team} is not in this list.</span>
 			{/if}
 		</span>
-		{#if regionLabel}
-			<a class="region" href="/regions/{data.filters.region}">{regionLabel} region page</a>
-		{/if}
-		{#if hasFilters(data.filters)}
-			<a class="clear" href="/leaderboards">Clear filters</a>
+		{#if regionLabel || hasFilters(data.filters)}
+			<span class="links">
+				{#if regionLabel}
+					<a href="/regions/{data.filters.region}">{regionLabel} region page</a>
+				{/if}
+				{#if hasFilters(data.filters)}
+					<a href="/leaderboards">Clear filters</a>
+				{/if}
+			</span>
 		{/if}
 	</p>
 {/if}
@@ -117,15 +121,14 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	.clear {
+	.links {
+		display: flex;
+		gap: 16px;
 		margin-left: auto;
+		white-space: nowrap;
 	}
 
 	.csv {
 		font-size: 14px;
-	}
-
-	.region {
-		white-space: nowrap;
 	}
 </style>

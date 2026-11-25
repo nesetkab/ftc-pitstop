@@ -9,6 +9,8 @@ import TvScreen from './TvScreen.svelte';
 import { sideOf } from '#lib/components/event/matches.ts';
 import { pitView, ROW_FIT } from './view.ts';
 
+vi.mock('$app/state', () => ({ page: { url: new URL('https://www.ftcpitstop.com/14624') } }));
+
 const TEAM = 14624;
 const full = fixtureBundle('USAZGIQ');
 const at = (label: string) => replayStart(label, full)!;
@@ -497,5 +499,52 @@ describe('PhoneScreen', () => {
 		});
 		expect(screen.getByRole('switch', { name: 'Two matches before ours' })).toBeInTheDocument();
 		expect(screen.queryByRole('switch', { name: 'Alliance selection starts' })).toBeNull();
+	});
+});
+
+describe('pit stream', () => {
+	afterEach(() => localStorage.clear());
+
+	it('puts the stream beside the next match and rankings on the TV and remembers it', async () => {
+		const base = props(at('Q22'));
+		const event = { ...base.event, liveStreamUrl: 'https://www.twitch.tv/firstinspires' };
+		const { container } = render(TvScreen, { props: { ...base, event } });
+		expect(container.querySelector('iframe')).toBeNull();
+		await fireEvent.click(screen.getByRole('button', { name: 'Show stream' }));
+		expect(container.querySelector('iframe')?.getAttribute('src')).toBe(
+			'https://player.twitch.tv/?parent=www.ftcpitstop.com&autoplay=true&muted=true&channel=firstinspires'
+		);
+		const headings = screen.getAllByRole('heading', { level: 2 }).map((node) => node.textContent);
+		expect(headings).toEqual(expect.arrayContaining(['Live stream', 'Next match', 'Our matches']));
+		expect(container.querySelector('table.rank tr.me')).not.toBeNull();
+		expect(localStorage.getItem('ps-tv-stream')).toBe('on');
+		cleanup();
+		const again = render(TvScreen, { props: { ...base, event } });
+		await vi.waitFor(() => expect(again.container.querySelector('iframe')).not.toBeNull());
+		await fireEvent.click(screen.getByRole('button', { name: 'Hide stream' }));
+		expect(again.container.querySelector('iframe')).toBeNull();
+		expect(localStorage.getItem('ps-tv-stream')).toBeNull();
+	});
+
+	it('opens a pinned stream on the phone only when asked', async () => {
+		const base = props(at('Q22'));
+		const { container } = render(PhoneScreen, {
+			props: {
+				...base,
+				event: { ...base.event, liveStreamUrl: 'https://youtu.be/dQw4w9WgXcQ' },
+				matches: replayBundle(full, at('Q22')).matches,
+				alerts: DEFAULT_ALERTS,
+				permission: 'default'
+			}
+		});
+		expect(container.querySelector('iframe')).toBeNull();
+		const toggle = screen.getByRole('button', { name: 'Stream' });
+		expect(toggle).toHaveAttribute('aria-expanded', 'false');
+		await fireEvent.click(toggle);
+		expect(container.querySelector('.pinned iframe')?.getAttribute('src')).toContain(
+			'/embed/dQw4w9WgXcQ'
+		);
+		await fireEvent.click(screen.getByRole('button', { name: 'Hide stream' }));
+		expect(container.querySelector('iframe')).toBeNull();
 	});
 });

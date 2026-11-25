@@ -121,7 +121,7 @@ describe('buildRecordDataset', () => {
 		expect(rows[1]).toMatchObject({ alliance: 'blue', result: 'loss', label: 'Q1' });
 		expect(rows[2]).toMatchObject({ label: 'M2', result: 'tie', day: '2026-11-21' });
 		expect(regions.map((option) => option.value)).toEqual(['USAZ', 'USCALA']);
-		expect(types.map((option) => option.label)).toEqual(['League Meet', 'Qualifier']);
+		expect(types.map((option) => option.label)).toEqual(['League meet', 'Qualifier']);
 	});
 
 	it('keeps the match day inside the event dates', () => {

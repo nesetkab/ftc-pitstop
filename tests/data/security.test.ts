@@ -88,7 +88,6 @@ describe('security headers', () => {
 
 describe('content security policy', () => {
 	const directives = cspDirectives(appHtml);
-	const text = JSON.stringify(directives);
 
 	it('only runs scripts from this site and the inline scripts it knows', () => {
 		const script = directives['script-src'] ?? [];
@@ -118,7 +117,6 @@ describe('content security policy', () => {
 
 	it('keeps the site out of frames and blocks plugins, base tags and foreign forms', () => {
 		expect(directives['frame-ancestors']).toEqual(['none']);
-		expect(directives['frame-src']).toEqual(['none']);
 		expect(directives['object-src']).toEqual(['none']);
 		expect(directives['base-uri']).toEqual(['self']);
 		expect(directives['form-action']).toEqual(['self']);
@@ -129,7 +127,16 @@ describe('content security policy', () => {
 		expect(directives['connect-src']).toEqual(['self']);
 		expect(directives['worker-src']).toEqual(['self']);
 		expect(directives['manifest-src']).toEqual(['self']);
-		expect(text).not.toMatch(/https?:|\*/);
+		const { 'frame-src': frames, ...rest } = directives;
+		expect(frames).toBeDefined();
+		expect(JSON.stringify(rest)).not.toMatch(/https?:|\*/);
+	});
+
+	it('only frames the YouTube and Twitch stream players', () => {
+		expect(directives['frame-src']).toEqual([
+			'https://www.youtube-nocookie.com',
+			'https://player.twitch.tv'
+		]);
 	});
 
 	it('is the policy the build uses', () => {

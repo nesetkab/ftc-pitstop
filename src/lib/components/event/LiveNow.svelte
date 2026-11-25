@@ -10,7 +10,9 @@
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import type { ReplaySettings } from '#lib/game/replay.ts';
 	import type { AllianceColor, EventBundle } from '#lib/types.ts';
+	import Arrow from '#lib/ui/Arrow.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
+	import Score from '#lib/ui/Score.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
@@ -119,12 +121,6 @@
 			win: match.forecast?.[color].win ?? null,
 			score: match.forecast?.[color].score ?? null
 		};
-	}
-
-	function move(value: number | null): string {
-		if (value === null) return '';
-		if (value === 0) return '–';
-		return value > 0 ? `↑${value}` : `↓${-value}`;
 	}
 
 	function moveLabel(value: number | null): string | undefined {
@@ -268,7 +264,10 @@
 									<td class="l">{@render alliance(match.blue, 'blue', match.pending.blue)}</td>
 									<td class="muted opt">
 										{#if match.forecast}
-											{fixed(match.forecast.red.score, 0)}–{fixed(match.forecast.blue.score, 0)}
+											<Score
+												left={fixed(match.forecast.red.score, 0)}
+												right={fixed(match.forecast.blue.score, 0)}
+											/>
 										{/if}
 									</td>
 									<td>
@@ -415,9 +414,7 @@
 									</td>
 									<td class="l">{@render alliance(result.red, 'red', null)}</td>
 									<td class="score">
-										<span class:won={result.winner === 'red'}>{result.redScore}</span><span
-											class="dash">–</span
-										><span class:won={result.winner === 'blue'}>{result.blueScore}</span>
+										<Score left={result.redScore} right={result.blueScore} winner={result.winner} />
 									</td>
 									<td class="l">{@render alliance(result.blue, 'blue', null)}</td>
 								</tr>
@@ -458,7 +455,18 @@
 									<td>{fixed(row.rs, 2)}</td>
 									<td class="opt">{row.wins}-{row.losses}-{row.ties}</td>
 									{#if view.since}
-										<td class="move" aria-label={moveLabel(row.move)}>{move(row.move)}</td>
+										<td class="move">
+											{#if row.move === 0}
+												<span aria-hidden="true">–</span>
+											{:else if row.move !== null}
+												<span class="moved" aria-hidden="true"
+													><Arrow dir={row.move > 0 ? 'up' : 'down'} />{Math.abs(row.move)}</span
+												>
+											{/if}
+											{#if moveLabel(row.move)}
+												<span class="visually-hidden">{moveLabel(row.move)}</span>
+											{/if}
+										</td>
 									{/if}
 								</tr>
 							{/each}
@@ -526,21 +534,21 @@
 	.layout {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-		gap: 32px;
+		gap: var(--space-columns);
 		align-items: start;
 	}
 
 	.column {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 28px;
+		gap: var(--space-stack);
 		min-width: 0;
 	}
 
 	.block {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 10px;
+		gap: var(--space-title);
 		min-width: 0;
 	}
 
@@ -637,22 +645,14 @@
 		color: var(--blue);
 	}
 
-	.score span {
-		color: var(--text-2);
-	}
-
-	.score .dash {
-		padding-inline: 1px;
-		color: var(--text-3);
-	}
-
-	.score .won {
-		color: var(--text);
-		font-weight: 600;
-	}
-
 	.move {
 		color: var(--text-2);
+	}
+
+	.moved {
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
 	}
 
 	tr.picking td {
@@ -662,7 +662,7 @@
 	@media (max-width: 960px) {
 		.layout {
 			grid-template-columns: minmax(0, 1fr);
-			gap: 28px;
+			gap: var(--space-stack);
 		}
 	}
 

@@ -99,13 +99,14 @@
 								<td class="l name">
 									<a href="/regions/{region.code}">{region.name}</a>
 									<span class="sub">
-										{integer(region.teams)}
-										{region.teams === 1 ? 'team' : 'teams'}{region.live > 0
+										{region.teams > 0
+											? `${integer(region.teams)} ${region.teams === 1 ? 'team' : 'teams'}`
+											: 'No team list yet'}{region.live > 0
 											? ` · ${integer(region.live)} today`
 											: ''}
 									</span>
 								</td>
-								<td class="opt">{integer(region.teams)}</td>
+								<td class="opt">{region.teams > 0 ? integer(region.teams) : '—'}</td>
 								<td class="played">
 									{integer(region.done)} <span class="faint">of {integer(region.events)}</span>
 								</td>

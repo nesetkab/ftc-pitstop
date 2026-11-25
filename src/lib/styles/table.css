@@ -83,27 +83,37 @@ table.t th a.sort-link {
 	cursor: pointer;
 }
 
+table.t th .sort-arrow {
+	margin-left: 0.2em;
+}
+
+table.t th .sort-hint {
+	display: none;
+}
+
 @media (hover: hover) {
 	table.t th a.sort-link:hover {
 		color: var(--text);
 		text-decoration: none;
 	}
 
-	table.t th:not([aria-sort]) a.sort-link::before {
-		content: var(--sort-hint, '↓');
+	table.t th .sort-hint {
+		display: inline-block;
 		position: absolute;
+		top: 50%;
 		right: calc(100% + 3px);
+		translate: 0 -50%;
 		opacity: 0;
 		transition: opacity 0.12s;
 	}
 
-	table.t th.l:not([aria-sort]) a.sort-link::before {
+	table.t th.l .sort-hint {
 		right: auto;
 		left: calc(100% + 3px);
 	}
 
-	table.t th:not([aria-sort]) a.sort-link:hover::before,
-	table.t th:not([aria-sort]) a.sort-link:focus-visible::before {
+	table.t th a.sort-link:hover .sort-hint,
+	table.t th a.sort-link:focus-visible .sort-hint {
 		opacity: 0.6;
 	}
 }

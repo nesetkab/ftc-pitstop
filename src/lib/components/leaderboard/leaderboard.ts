@@ -6,6 +6,7 @@ import {
 import { addDays, weekStart } from '#lib/components/event/dates.ts';
 import { shortRange } from '#lib/format/time.ts';
 import { shortDate } from '#lib/format/time.ts';
+import { TYPE_LABELS } from '#lib/components/event/event-meta.ts';
 import { EVENT_TYPE_NAMES, isCompetition } from '#lib/game/event-types.ts';
 import type { EventSummary, EventType, SearchTeam } from '#lib/types.ts';
 import { regionName, stateName } from '#lib/format/places.ts';
@@ -324,7 +325,7 @@ export function matchesType(type: EventType, filter: string): boolean {
 export function typeLabel(filter: string): string {
 	if (filter === 'official') return 'Official events';
 	return Object.hasOwn(EVENT_TYPE_NAMES, filter)
-		? `${EVENT_TYPE_NAMES[filter as EventType]} events`
+		? `${TYPE_LABELS[filter as EventType]} events`
 		: 'All events';
 }
 
@@ -403,12 +404,19 @@ export function eventFilterOptions(
 	return {
 		types: [
 			...(official ? [{ value: 'official', label: typeLabel('official') }] : []),
-			...ordered.map((type) => ({ value: type, label: EVENT_TYPE_NAMES[type] }))
+			...ordered.map((type) => ({ value: type, label: TYPE_LABELS[type] }))
 		],
 		weeks: [...weeks]
 			.sort((a, b) => b.localeCompare(a))
 			.map((start) => ({ value: start, label: shortRange(start, addDays(start, 6)) }))
 	};
+}
+
+export function withSelectedType(types: FilterOption[], selected: string): FilterOption[] {
+	if (!selected || types.some((option) => option.value === selected)) return types;
+	const label =
+		selected === 'official' ? typeLabel('official') : TYPE_LABELS[selected as EventType];
+	return [...types, { value: selected, label }];
 }
 
 export function scopeRows(

@@ -187,6 +187,26 @@ describe('redis commands for the home page', () => {
 		expect(await commands(redis, () => fresh.home.loadTodayProgress(today))).toEqual(['mget']);
 	});
 
+	it('reads the world record from the loaded season model without more commands', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		const fresh = instance(redis, clock);
+		await fresh.analysis.loadSeasonModel();
+		const home = createHome({
+			cache: fresh.cache,
+			loadTeamSeason: fresh.loaders.loadTeamSeason,
+			loadSeasonRatingsWithin: fresh.analysis.loadSeasonRatingsWithin,
+			loadSeasonModelWithin: fresh.analysis.loadSeasonModelWithin,
+			now: () => clock.now
+		});
+		let record: Awaited<ReturnType<typeof home.loadWorldRecord>> = null;
+		const calls = await commands(redis, async () => {
+			record = await home.loadWorldRecord(1000);
+		});
+		expect(calls).toEqual([]);
+		expect(record).toMatchObject({ event: 'USAZXXQ' });
+	});
+
 	it('reads all followed teams and their ratings in one batch', async () => {
 		const redis = createFakeRedis(() => LIVE);
 		const clock = { now: LIVE };

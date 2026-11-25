@@ -187,7 +187,7 @@
 							{/if}
 						{/if}
 					{:else}
-						<td class="l muted">{placeName(row.team)}</td>
+						<td class="l muted">{placeName(row.team, 'short')}</td>
 						<td>{row.team.rookieYear ?? '—'}</td>
 					{/if}
 				</tr>

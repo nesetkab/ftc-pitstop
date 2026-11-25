@@ -252,7 +252,7 @@
 <style>
 	.page {
 		display: grid;
-		gap: 22px;
+		gap: var(--space-stack);
 		min-width: 0;
 	}
 
@@ -299,7 +299,7 @@
 	.as {
 		display: grid;
 		grid-template-columns: 270px minmax(0, 1fr);
-		gap: 28px;
+		gap: var(--space-columns);
 		align-items: start;
 	}
 
@@ -313,13 +313,13 @@
 
 	.side {
 		display: grid;
-		gap: 22px;
+		gap: var(--space-stack);
 		align-content: start;
 	}
 
 	.panel {
 		display: grid;
-		gap: 10px;
+		gap: var(--space-title);
 		align-content: start;
 		min-width: 0;
 	}

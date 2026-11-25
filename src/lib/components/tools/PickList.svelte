@@ -4,6 +4,8 @@
 	import UndoBar from '#lib/components/tools/UndoBar.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import type { SearchFn } from '#lib/ui/search.svelte.ts';
+	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import { parseEventCode, parseTeamNumber } from '#lib/workspace/code.ts';
 	import {
 		addEntry,
@@ -41,6 +43,7 @@
 		showTitle?: boolean;
 		showEvent?: boolean;
 		exportable?: boolean;
+		search?: SearchFn;
 	}
 
 	let {
@@ -53,7 +56,8 @@
 		title = 'Pick list',
 		showTitle = true,
 		showEvent = true,
-		exportable
+		exportable,
+		search
 	}: Props = $props();
 
 	interface Drag {
@@ -92,9 +96,15 @@
 		event.preventDefault();
 		const team = parseTeamNumber(draft);
 		if (team === null) {
-			error = 'Enter a team number, 1 to 6 digits.';
+			error = /^[\d\s]*$/.test(draft)
+				? 'Enter a team number, 1 to 6 digits.'
+				: 'Pick the team from the list, or enter its number.';
 			return;
 		}
+		addTeam(team);
+	}
+
+	function addTeam(team: number) {
 		const status = checkAdd(list, team);
 		if (status === 'duplicate') {
 			error = `${team} is already on the list.`;
@@ -502,17 +512,15 @@
 
 	{#if update}
 		<form class="add" onsubmit={add} novalidate>
-			<label class="visually-hidden" for="{id}-team">Team number</label>
-			<input
+			<label class="visually-hidden" for="{id}-team">Team number or name</label>
+			<TeamInput
 				id="{id}-team"
-				class="ctl-input"
-				inputmode="numeric"
-				autocomplete="off"
-				maxlength="6"
-				placeholder="Team number"
+				placeholder="Team number or name"
+				{search}
 				bind:value={draft}
-				aria-invalid={error ? 'true' : undefined}
-				aria-describedby={error ? `${id}-error` : undefined}
+				invalid={Boolean(error)}
+				describedby={error ? `${id}-error` : undefined}
+				onpick={addTeam}
 			/>
 			<Button type="submit">Add team</Button>
 		</form>
@@ -584,10 +592,6 @@
 		display: flex;
 		gap: 8px;
 		max-width: 420px;
-	}
-
-	.add input {
-		flex: 1 1 auto;
 	}
 
 	.sub {

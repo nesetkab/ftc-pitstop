@@ -3,12 +3,14 @@
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { relative } from '#lib/format/relative.ts';
 	import { dayTime, relativeDay, time } from '#lib/format/time.ts';
+	import { eventStream } from '#lib/stream.ts';
 	import type { DataSource, Event, Match } from '#lib/types.ts';
 	import AllianceChip from '#lib/ui/AllianceChip.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import MatchList from '#lib/ui/MatchList.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
+	import Score from '#lib/ui/Score.svelte';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import Toggle from '#lib/ui/Toggle.svelte';
 	import { ALERT_OPTIONS, type AlertKey, type AlertSettings } from './alerts.ts';
@@ -38,6 +40,7 @@
 	import type { QueueCall } from './queue.ts';
 	import { sideOf } from '#lib/components/event/matches.ts';
 	import { lastMatch, moveText, type RankMemory } from './standing.ts';
+	import StreamPlayer from './StreamPlayer.svelte';
 	import type { PitView } from './view.ts';
 
 	interface Props {
@@ -86,6 +89,7 @@
 
 	let tab = $state<'team' | 'matches'>('team');
 	let briefOpen = $state(false);
+	let watching = $state(false);
 
 	const timeZone = $derived(event.timezone);
 	const selectionAhead = $derived(
@@ -170,10 +174,27 @@
 </script>
 
 <div class="phone">
-	<header class="top">
-		<h1>{view.team}</h1>
-		<span>{event.name}</span>
-	</header>
+	<div class="pinned">
+		<header class="top">
+			<h1>{view.team}</h1>
+			<span>{event.name}</span>
+			{#if view.registered}
+				<button
+					type="button"
+					class="watch"
+					aria-expanded={watching}
+					onclick={() => (watching = !watching)}
+				>
+					{watching ? 'Hide stream' : 'Stream'}
+				</button>
+			{/if}
+		</header>
+		{#if watching && view.registered}
+			<div class="player">
+				<StreamPlayer code={event.code} listed={eventStream(event)} />
+			</div>
+		{/if}
+	</div>
 
 	<main class="body">
 		<p class="visually-hidden" role="status">{announcement}</p>
@@ -424,7 +445,11 @@
 							<a class="label" href={href(match.key)}>{match.label}</a>
 							<span class="when">
 								{#if match.result}
-									{match.result.red.total}–{match.result.blue.total}
+									<Score
+										left={match.result.red.total}
+										right={match.result.blue.total}
+										winner={match.result.winner}
+									/>
 								{:else if match.actualTime !== null}
 									On field
 								{:else if match.scheduledTime !== null}
@@ -477,17 +502,25 @@
 		background: var(--bg);
 	}
 
-	.top {
+	.pinned {
 		position: sticky;
 		top: 0;
 		z-index: 2;
+		border-bottom: 1px solid var(--line);
+		background: var(--bg);
+	}
+
+	.top {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		gap: 16px;
 		padding: 14px 16px;
-		border-bottom: 1px solid var(--line);
-		background: var(--bg);
+	}
+
+	.player {
+		padding: 0 16px 12px;
+		font-size: 15px;
 	}
 
 	.top h1 {
@@ -499,11 +532,30 @@
 	}
 
 	.top span {
+		flex: 1;
+		min-width: 0;
 		overflow: hidden;
+		text-align: right;
 		font-size: 13px;
 		color: var(--text-2);
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	.watch {
+		flex-shrink: 0;
+		min-height: 40px;
+		margin-block: -8px;
+		padding: 0 12px;
+		border: 1px solid var(--line-2);
+		border-radius: var(--radius-control);
+		background: transparent;
+		color: var(--text);
+		font: 500 14px/1 var(--font);
+	}
+
+	.watch[aria-expanded='true'] {
+		color: var(--text-2);
 	}
 
 	.body {

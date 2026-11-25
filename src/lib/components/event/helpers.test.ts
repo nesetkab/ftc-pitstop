@@ -132,7 +132,7 @@ describe('event list', () => {
 			'SOON Qualifier',
 			0,
 			3,
-			'Butte, Montana',
+			'Butte, MT',
 			4,
 			'2026-11-21',
 			1,

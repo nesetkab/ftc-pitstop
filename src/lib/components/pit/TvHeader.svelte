@@ -8,9 +8,19 @@
 		teamName: string | null;
 		now: number;
 		timeZone: string;
+		streaming?: boolean | null;
+		onstream?: () => void;
 	}
 
-	let { eventName, team, teamName, now, timeZone }: Props = $props();
+	let {
+		eventName,
+		team,
+		teamName,
+		now,
+		timeZone,
+		streaming = null,
+		onstream = () => {}
+	}: Props = $props();
 
 	let canFullscreen = $state(false);
 	let fullscreen = $state(false);
@@ -40,6 +50,11 @@
 		{team}{#if teamName}<span class="name">{` ${teamName}`}</span>{/if}
 	</h1>
 	<time datetime={new Date(now).toISOString()}>{time(now, timeZone)}</time>
+	{#if streaming !== null}
+		<button type="button" aria-pressed={streaming} onclick={onstream}>
+			{streaming ? 'Hide stream' : 'Show stream'}
+		</button>
+	{/if}
 	{#if canFullscreen && !fullscreen}
 		<button type="button" onclick={enterFullscreen}>Full screen</button>
 	{/if}

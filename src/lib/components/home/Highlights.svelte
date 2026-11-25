@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Score from '#lib/ui/Score.svelte';
 	import type { Highlight, HighlightNames, Highlights } from './highlights.ts';
 
 	interface Props {
@@ -47,9 +48,7 @@
 						<li>
 							<a class="match" href="/events/{item.event}/matches/{item.key}">
 								<span class="score">
-									<span class={['red', { won: item.winner === 'red' }]}>{item.redScore}</span><span
-										class="dash">–</span
-									><span class={['blue', { won: item.winner === 'blue' }]}>{item.blueScore}</span>
+									<Score left={item.redScore} right={item.blueScore} winner={item.winner} />
 								</span>
 								<span class="where">{item.label} · {eventName(item)}</span>
 							</a>
@@ -120,17 +119,6 @@
 	.score {
 		flex: none;
 		font-size: 15px;
-		color: var(--text-2);
-	}
-
-	.score .won {
-		font-weight: 600;
-		color: var(--text);
-	}
-
-	.dash {
-		padding-inline: 2px;
-		color: var(--text-3);
 	}
 
 	.where {

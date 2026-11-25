@@ -1,13 +1,26 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import Button from '#lib/ui/Button.svelte';
+	import type { SearchFn } from '#lib/ui/search.svelte.ts';
+	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import { compareHref, MAX_COMPARE, type CompareTeam } from './compare.ts';
 
 	interface Props {
 		teams: CompareTeam[];
 		suggestions: { number: number; name: string | null }[];
+		search?: SearchFn;
+		delay?: number;
 	}
 
-	let { teams, suggestions }: Props = $props();
+	let { teams, suggestions, search, delay }: Props = $props();
+
+	let draft = $state('');
+
+	function pick(number: number) {
+		draft = '';
+		if (numbers.includes(number)) return;
+		goto(compareHref([...numbers, number]), { reset: false });
+	}
 
 	const id = $props.id();
 	const numbers = $derived(teams.map((team) => team.number));
@@ -35,16 +48,20 @@
 			{#if numbers.length > 0}
 				<input type="hidden" name="teams" value={numbers.join(',')} />
 			{/if}
-			<label for="{id}-add" class="visually-hidden">Team number to add</label>
-			<input
+			<label for="{id}-add" class="visually-hidden">Team number or name to add</label>
+			<TeamInput
 				id="{id}-add"
 				name="add"
-				type="text"
-				inputmode="numeric"
-				maxlength="30"
-				autocomplete="off"
-				placeholder={teams.length === 0 ? 'Team numbers, like 19666 7759' : 'Add a team number'}
+				class="field"
+				maxlength={30}
+				placeholder={teams.length === 0
+					? 'Numbers or a name, like 19666 7759'
+					: 'Add a team number or name'}
 				required
+				{search}
+				{delay}
+				bind:value={draft}
+				onpick={pick}
 			/>
 			<Button variant="secondary" type="submit">{teams.length === 0 ? 'Compare' : 'Add'}</Button>
 		</form>
@@ -123,8 +140,8 @@
 		gap: 8px;
 	}
 
-	.add input {
-		width: 240px;
+	.add :global(.field) {
+		width: 260px;
 		padding: 7px 10px;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);
@@ -134,7 +151,7 @@
 		line-height: 1.4;
 	}
 
-	.add input:hover {
+	.add :global(.field:hover) {
 		border-color: var(--text-3);
 	}
 
@@ -165,9 +182,9 @@
 			flex: 1 1 100%;
 		}
 
-		.add input {
+		.add :global(.field) {
 			flex: 1;
-			width: auto;
+			width: 100%;
 			min-width: 0;
 		}
 	}
@@ -186,7 +203,7 @@
 			padding: 0;
 		}
 
-		.add input {
+		.add :global(.field) {
 			min-height: 40px;
 		}
 

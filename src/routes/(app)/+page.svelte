@@ -4,6 +4,7 @@
 	import Highlights from '#lib/components/home/Highlights.svelte';
 	import Intro from '#lib/components/home/Intro.svelte';
 	import TodayEvents from '#lib/components/home/TodayEvents.svelte';
+	import WorldRecord from '#lib/components/home/WorldRecord.svelte';
 	import EventTable from '#lib/components/home/EventTable.svelte';
 	import PitDisplayLink from '#lib/components/team/PitDisplayLink.svelte';
 	import { SEASON_NAME, SITE_NAME } from '#lib/seo.ts';
@@ -41,6 +42,11 @@
 			<FollowedTeams />
 		</div>
 		<PitDisplayLink />
+		{#if data.record}
+			<div class="record">
+				<WorldRecord record={data.record} />
+			</div>
+		{/if}
 	</div>
 
 	<section aria-labelledby="today-title">
@@ -92,20 +98,20 @@
 	.home {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 44px;
+		gap: var(--space-section);
 	}
 
 	.top {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 36px;
+		gap: var(--space-section);
 		align-items: start;
 	}
 
 	.start {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 32px;
+		gap: var(--space-section);
 	}
 
 	@media (min-width: 900px) {
@@ -113,12 +119,20 @@
 			grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
 			column-gap: 72px;
 		}
+
+		.start {
+			grid-row: span 2;
+		}
+
+		.record {
+			grid-column: 2;
+		}
 	}
 
 	section {
 		display: grid;
 		grid-template-columns: minmax(0, 1fr);
-		gap: 10px;
+		gap: var(--space-title);
 		align-content: start;
 	}
 
@@ -146,12 +160,6 @@
 
 		.top > :global(#pit) {
 			order: 1;
-		}
-	}
-
-	@media (max-width: 600px) {
-		.home {
-			gap: 36px;
 		}
 	}
 

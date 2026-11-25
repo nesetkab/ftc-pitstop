@@ -7,9 +7,9 @@
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { regionName } from '#lib/format/places.ts';
 	import { shortRange } from '#lib/format/time.ts';
-	import { httpUrl } from '#lib/format/url.ts';
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import { breadcrumbs, eventDescription, eventJsonLd, siteTitle } from '#lib/seo.ts';
+	import { eventStream } from '#lib/stream.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import CalendarMenu from '#lib/ui/CalendarMenu.svelte';
 	import Hint from '#lib/ui/Hint.svelte';
@@ -34,9 +34,7 @@
 	const playoffsPlayed = $derived(playoffMatches.filter((match) => match.result).length);
 	const started = $derived(bundle.rankings.length > 0 || qualsPlayed > 0 || playoffsPlayed > 0);
 	const scheduled = $derived(bundle.matches.length > 0);
-	const stream = $derived(
-		[event.liveStreamUrl, ...event.webcasts].map(httpUrl).find((url) => url !== null) ?? null
-	);
+	const stream = $derived(eventStream(event));
 	const withPlayoffs = $derived(hasPlayoffs(event.type) || bundle.alliances.length > 0);
 	const onMatchPage = $derived(page.route.id?.includes('/matches/') ?? false);
 	const status = $derived(eventStatus(event, Date.now()));

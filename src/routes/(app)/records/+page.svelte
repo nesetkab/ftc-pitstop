@@ -58,8 +58,7 @@
 
 {#if data.total > 0}
 	<p class="note">
-		Each match counts twice, once for each alliance. Hive, flower and garden are teleop points.
-		Opponent is the other alliance's score.
+		Each match counts twice, once for each alliance. Opponent is the other alliance's score.
 	</p>
 
 	<p class="csv">

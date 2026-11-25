@@ -16,11 +16,13 @@
 <style>
 	.team-chip {
 		display: inline-block;
-		padding: 2px 7px;
+		min-width: calc(var(--team-digits) + 12px);
+		padding: 2px 6px;
 		border-radius: var(--radius-chip);
 		background: var(--surface);
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
+		text-align: center;
 		text-decoration: none;
 		white-space: nowrap;
 	}

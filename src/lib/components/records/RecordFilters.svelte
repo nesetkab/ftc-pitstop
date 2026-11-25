@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { tick } from 'svelte';
 	import { SvelteURLSearchParams } from 'svelte/reactivity';
 	import FilterPanel from '#lib/ui/FilterPanel.svelte';
+	import type { SearchFn } from '#lib/ui/search.svelte.ts';
+	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import {
 		RECORD_PARTS,
 		RECORD_RANGES,
@@ -14,9 +17,19 @@
 		filters: RecordFilters;
 		regions: RecordOption[];
 		types: RecordOption[];
+		search?: SearchFn;
+		delay?: number;
 	}
 
-	let { filters, regions, types }: Props = $props();
+	let { filters, regions, types, search, delay }: Props = $props();
+
+	let form = $state<HTMLFormElement>();
+	let team = $derived(filters.team ? String(filters.team) : '');
+
+	async function pickTeam() {
+		await tick();
+		form?.requestSubmit();
+	}
 
 	const summary = $derived(recordSummary(filters, { regions, types }));
 
@@ -32,7 +45,7 @@
 	}
 </script>
 
-<form class="filters" method="get" onchange={apply} onsubmit={apply}>
+<form class="filters" method="get" bind:this={form} onchange={apply} onsubmit={apply}>
 	<FilterPanel {summary}>
 		<label>
 			<span>Dates</span>
@@ -68,17 +81,17 @@
 				<option value="playoff">Playoffs only</option>
 			</select>
 		</label>
-		<label>
+		<label class="team">
 			<span>Team</span>
-			<input
+			<TeamInput
 				name="team"
-				type="text"
-				inputmode="numeric"
-				pattern="[0-9]*"
-				maxlength="6"
-				placeholder="Team number"
-				autocomplete="off"
-				value={filters.team ?? ''}
+				class="field"
+				placeholder="Number or name"
+				listLabel="Teams to filter by"
+				{search}
+				{delay}
+				bind:value={team}
+				onpick={pickTeam}
 			/>
 		</label>
 		<label class="sort">
@@ -112,8 +125,8 @@
 		min-width: 128px;
 	}
 
-	input {
-		width: 128px;
+	.team :global(.field) {
+		width: 200px;
 		padding: 7px 10px;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);
@@ -124,7 +137,7 @@
 		font-variant-numeric: tabular-nums;
 	}
 
-	input:hover {
+	.team :global(.field:hover) {
 		border-color: var(--text-3);
 	}
 
@@ -144,14 +157,14 @@
 		}
 
 		select,
-		input {
+		.team :global(.field) {
 			min-width: 0;
 			width: 100%;
 		}
 	}
 
 	@media (pointer: coarse) {
-		input {
+		.team :global(.field) {
 			min-height: 40px;
 		}
 	}
