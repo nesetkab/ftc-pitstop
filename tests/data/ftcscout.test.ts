@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { matchScoreCheck } from '#lib/game/biobuzz.ts';
 import {
+	awardSeasons,
 	createFtcScoutClient,
+	fetchAwardHistory,
 	fetchEventByCode,
 	fetchEventsOnDate,
 	fetchSeasonMatches,
@@ -111,6 +113,54 @@ describe('FTCScout client', () => {
 		});
 		const none = createFtcScoutClient({ fetch: scoutFetch({ TeamSeason: 'team-missing' }).fetch });
 		expect(await fetchTeamSeason(999998, 2026, none)).toBeNull();
+	});
+
+	it('asks for past seasons back to the rookie year', () => {
+		expect(awardSeasons(2022, 2026)).toEqual([2025, 2024, 2023, 2022]);
+		expect(awardSeasons(2005, 2026)).toEqual([2025, 2024, 2023, 2022, 2021, 2020, 2019]);
+		expect(awardSeasons(null, 2026)).toHaveLength(7);
+		expect(awardSeasons(2026, 2026)).toEqual([]);
+	});
+
+	it('maps past awards to their event in one request', async () => {
+		const fake = scoutFetch({
+			AwardHistory: {
+				data: {
+					teamByNumber: {
+						e2025: [
+							{ eventCode: 'USUTQ1', event: { name: 'Utah Qualifier 1', start: '2025-11-15' } }
+						],
+						a2025: [
+							{ eventCode: 'USUTQ1', type: 'Inspire', placement: 2, teamNumber: 3747, personName: null },
+							{ eventCode: 'GONE', type: 'Think', placement: 1, teamNumber: 3747, personName: null }
+						],
+						e2024: [],
+						a2024: []
+					}
+				}
+			}
+		});
+		const awards = await fetchAwardHistory(
+			3747,
+			[2025, 2024],
+			createFtcScoutClient({ fetch: fake.fetch })
+		);
+		expect(fake.bodies).toHaveLength(1);
+		expect(fake.bodies[0].variables).toEqual({ number: 3747 });
+		expect(fake.bodies[0].query).toContain('a2024: awards(season: 2024)');
+		expect(awards).toEqual([
+			{
+				season: 2025,
+				code: 'USUTQ1',
+				event: 'Utah Qualifier 1',
+				start: '2025-11-15',
+				award: { id: 11, name: 'Inspire Award', placement: 2, team: 3747, person: null }
+			}
+		]);
+		expect(await fetchAwardHistory(3747, [], createFtcScoutClient({ fetch: fake.fetch }))).toEqual(
+			[]
+		);
+		expect(fake.bodies).toHaveLength(1);
 	});
 
 	it('asks for events on a date at noon UTC', async () => {

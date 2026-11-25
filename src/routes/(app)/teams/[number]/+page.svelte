@@ -127,7 +127,7 @@
 {#if view.awards.length > 0}
 	<section class="panel" aria-labelledby="awards-title">
 		<h2 class="sec-title" id="awards-title">Awards</h2>
-		<TeamAwards rows={view.awards} />
+		<TeamAwards seasons={view.awards} />
 	</section>
 {/if}
 

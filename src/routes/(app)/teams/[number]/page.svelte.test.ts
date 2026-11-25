@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { cleanup, render, screen, within } from '@testing-library/svelte';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/svelte';
 import { afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { MISSING } from '#lib/format/index.ts';
 import { follows } from '#lib/components/follow/follow.svelte.ts';
@@ -318,6 +318,39 @@ describe('team page', () => {
 	it('leaves out the matches section when no event has match data', () => {
 		show(view({ matches: [] }));
 		expect(screen.queryByRole('heading', { name: 'Matches' })).not.toBeInTheDocument();
+	});
+
+	it('shows a banner for each award from every season, newest first', async () => {
+		const rows = Array.from({ length: 14 }, (_, index) => ({
+			code: null,
+			event: `Utah Qualifier ${index + 1}`,
+			name: 'Think Award',
+			win: false
+		}));
+		show(
+			view({
+				awards: [
+					{
+						season: 2026,
+						game: 'BIOBUZZ',
+						rows: [{ code: 'USAZGIQ', event: 'Gilbert', name: 'Winning alliance', win: true }]
+					},
+					{ season: 2025, game: 'DECODE', rows }
+				]
+			})
+		);
+		const banners = screen.getAllByRole('listitem').filter((item) => item.matches('.banner'));
+		expect(banners).toHaveLength(12);
+		expect(banners[0]).toHaveTextContent('Winning alliance');
+		expect(banners[0]).toHaveTextContent('2026-27');
+		expect(within(banners[0]).getByRole('link', { name: 'Gilbert' })).toHaveAttribute(
+			'href',
+			'/events/USAZGIQ'
+		);
+		expect(banners[1]).toHaveTextContent(/2025-26\s*DECODE/);
+		expect(within(banners[1]).queryByRole('link')).toBeNull();
+		await fireEvent.click(screen.getByRole('button', { name: 'Show all 15' }));
+		expect(document.querySelectorAll('.banner')).toHaveLength(15);
 	});
 
 	it('leaves out the awards and last season sections when there is nothing to show', () => {

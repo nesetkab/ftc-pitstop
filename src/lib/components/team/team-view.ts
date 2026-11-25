@@ -7,7 +7,15 @@ import type {
 import { matchLabel, parseMatchKey, shortDate } from '#lib/format/index.ts';
 import { GAME_NAME, PART_LABELS, SEASON } from '#lib/game/biobuzz.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
-import type { Award, EventBundle, QuickStat, QuickStats, Ranking, TeamSeason } from '#lib/types.ts';
+import type {
+	Award,
+	EventBundle,
+	PastAward,
+	QuickStat,
+	QuickStats,
+	Ranking,
+	TeamSeason
+} from '#lib/types.ts';
 import { awardName } from '#lib/components/event/awards.ts';
 import { localDate } from '#lib/format/calendar.ts';
 import { placeName } from '#lib/format/places.ts';
@@ -27,6 +35,8 @@ import {
 } from './season-report.ts';
 
 export const SEASON_GAMES: Record<number, string> = {
+	2019: 'SKYSTONE',
+	2020: 'ULTIMATE GOAL',
 	2021: 'Freight Frenzy',
 	2022: 'POWERPLAY',
 	2023: 'CENTERSTAGE',
@@ -79,9 +89,16 @@ export interface TeamEventRow {
 }
 
 export interface TeamAwardRow {
-	code: string;
+	code: string | null;
 	event: string;
 	name: string;
+	win: boolean;
+}
+
+export interface TeamAwardSeason {
+	season: number;
+	game: string | null;
+	rows: TeamAwardRow[];
 }
 
 export interface RegionStanding {
@@ -137,7 +154,7 @@ export interface TeamPageData {
 	comparison: TeamComparisonRow[];
 	events: TeamEventRow[];
 	matches: TeamMatchEvent[];
-	awards: TeamAwardRow[];
+	awards: TeamAwardSeason[];
 	upcoming: UpcomingEventRow[];
 	allies: AllySummary;
 	previous: PreviousSeason | null;
@@ -147,6 +164,7 @@ export interface TeamPageData {
 
 export interface TeamViewInput {
 	season: TeamSeason;
+	history?: PastAward[] | null;
 	ratings: SeasonRatings | null;
 	analyses: Record<string, EventAnalysis | null>;
 	bundles: Record<
@@ -378,6 +396,43 @@ function sumRecord(season: TeamSeason): RecordTotals | null {
 	);
 }
 
+const INSPIRE = 11;
+
+function topAward(award: Award): boolean {
+	return award.id === WINNING_ALLIANCE || (award.id === INSPIRE && award.placement === 1);
+}
+
+function awardSeasons(season: TeamSeason, history: PastAward[]): TeamAwardSeason[] {
+	const current = season.events.flatMap((entry) =>
+		entry.awards.map((award) => ({
+			code: entry.event.code,
+			event: entry.event.name,
+			name: awardLabel(award),
+			win: topAward(award)
+		}))
+	);
+	const past = new Map<number, PastAward[]>();
+	for (const entry of history) {
+		if (entry.season >= SEASON) continue;
+		past.set(entry.season, [...(past.get(entry.season) ?? []), entry]);
+	}
+	const seasons: TeamAwardSeason[] = [];
+	if (current.length > 0)
+		seasons.push({ season: SEASON, game: SEASON_GAMES[SEASON], rows: current });
+	for (const year of [...past.keys()].sort((a, b) => b - a)) {
+		const rows = [...(past.get(year) ?? [])]
+			.sort((a, b) => a.start.localeCompare(b.start))
+			.map((entry) => ({
+				code: null,
+				event: entry.event,
+				name: awardLabel(entry.award),
+				win: topAward(entry.award)
+			}));
+		seasons.push({ season: year, game: SEASON_GAMES[year] ?? null, rows });
+	}
+	return seasons;
+}
+
 function previousSeason(stats: QuickStats | null): PreviousSeason | null {
 	if (!stats) return null;
 	return {
@@ -491,13 +546,7 @@ export function buildTeamPage(input: TeamViewInput): TeamPageData {
 		];
 	});
 
-	const awards = season.events.flatMap((entry) =>
-		entry.awards.map((award) => ({
-			code: entry.event.code,
-			event: entry.event.name,
-			name: awardLabel(award)
-		}))
-	);
+	const awards = awardSeasons(season, input.history ?? []);
 	const seasonMatches = playedMatches(season, bundles);
 	const trend = seasonTrend(breakdown);
 	const previous = previousSeason(season.previousQuickStats);

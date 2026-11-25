@@ -5,7 +5,7 @@ import { buildTeamPage } from '#lib/components/team/team-view.ts';
 import { loadEventAnalysis, loadSeasonRatingsWithin } from '#lib/server/analysis.ts';
 import { settleWithin } from '#lib/server/cache.ts';
 import { DataError } from '#lib/server/errors.ts';
-import { loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
+import { loadAwardHistory, loadEventBundle, loadTeamSeason } from '#lib/server/event.ts';
 import { CACHE_CONTROL } from '#lib/server/http.ts';
 import type { EventBundle } from '#lib/types.ts';
 import type { PageServerLoad } from './$types';
@@ -19,6 +19,7 @@ async function settled<T>(task: Promise<T>): Promise<T | null> {
 }
 
 const AHEAD_WAIT_MS = 2500;
+const HISTORY_WAIT_MS = 2500;
 
 async function lookAhead(code: string) {
 	const bundle = await settled(loadEventBundle(code));
@@ -48,7 +49,8 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	const startedCodes = new Set(started.map((entry) => entry.event.code));
 	const ahead = upcomingEntries(season, now).filter((entry) => !startedCodes.has(entry.event.code));
 
-	const [ratings, analysisList, bundleList, aheadList] = await Promise.all([
+	const [history, ratings, analysisList, bundleList, aheadList] = await Promise.all([
+		settleWithin(loadAwardHistory(season.team.number, season.team.rookieYear), HISTORY_WAIT_MS),
 		ratingsTask,
 		Promise.all(started.map((entry) => settled(loadEventAnalysis(entry.event.code)))),
 		Promise.all(started.map((entry) => settled(loadEventBundle(entry.event.code)))),
@@ -65,5 +67,5 @@ export const load: PageServerLoad = async ({ params, setHeaders }) => {
 	]);
 
 	setHeaders({ 'cache-control': CACHE_CONTROL.short });
-	return { view: buildTeamPage({ season, ratings, analyses, bundles, now }) };
+	return { view: buildTeamPage({ season, history, ratings, analyses, bundles, now }) };
 };

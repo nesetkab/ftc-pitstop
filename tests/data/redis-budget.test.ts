@@ -25,7 +25,14 @@ const ARCHIVED = Date.parse('2026-12-10T12:00:00Z');
 const earlier = seasonMatchesOf(await bundleFor('USAZGIQ'), 'USAZXXQ', '2026-11-07');
 
 const scoutFetch = (async (_input: RequestInfo | URL, init?: RequestInit) => {
-	const body = JSON.parse(String(init?.body ?? '{}')) as { variables?: { start?: string } };
+	const body = JSON.parse(String(init?.body ?? '{}')) as {
+		operationName?: string;
+		variables?: { start?: string };
+	};
+	if (body.operationName === 'AwardHistory') {
+		const empty = Object.fromEntries([2025, 2024, 2023].flatMap((year) => [[`e${year}`, []], [`a${year}`, []]]));
+		return Response.json({ data: { teamByNumber: empty } });
+	}
 	if (body.variables?.start) return Response.json({ data: { eventsSearch: [] } });
 	const list = scoutSeasonList('USAZGIQ', 'USAZCMP');
 	const events = list.data.eventsSearch.map((event) => ({ ...event, regionCode: 'USAZ' }));
@@ -136,6 +143,21 @@ describe('redis commands for team scouting reports', () => {
 		const cold = reads(await commands(redis, () => report(fresh)));
 		expect(cold.every((call) => call === 'mget')).toBe(true);
 		expect(cold.length).toBeLessThanOrEqual(3);
+	});
+});
+
+describe('redis commands for past awards', () => {
+	it('reads past awards once per instance and keeps them for weeks', async () => {
+		const redis = createFakeRedis(() => LIVE);
+		const clock = { now: LIVE };
+		const history = (page: ReturnType<typeof instance>) =>
+			page.loaders.loadAwardHistory(3747, 2023);
+		const first = instance(redis, clock);
+		expect(await history(first)).toEqual([]);
+		clock.now += 20 * DAY_MS;
+		expect(await commands(redis, () => history(first))).toEqual([]);
+		expect(reads(await commands(redis, () => history(instance(redis, clock))))).toHaveLength(1);
+		expect(await commands(redis, () => first.loaders.loadAwardHistory(3747, 2026))).toEqual([]);
 	});
 });
 

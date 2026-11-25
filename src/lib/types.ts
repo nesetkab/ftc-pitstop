@@ -262,6 +262,14 @@ export interface TeamEventStats {
 	};
 }
 
+export interface PastAward {
+	season: number;
+	code: string;
+	event: string;
+	start: string;
+	award: Award;
+}
+
 export interface TeamSeasonEvent {
 	event: EventSummary;
 	stats: TeamEventStats | null;

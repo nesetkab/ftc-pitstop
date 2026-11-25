@@ -7,6 +7,7 @@ import { load } from './+page.server.ts';
 
 const server = vi.hoisted(() => ({
 	loadTeamSeason: vi.fn(),
+	loadAwardHistory: vi.fn(),
 	loadEventBundle: vi.fn(),
 	loadSeasonRatingsWithin: vi.fn(),
 	loadEventAnalysis: vi.fn()
@@ -14,6 +15,7 @@ const server = vi.hoisted(() => ({
 
 vi.mock('#lib/server/event.ts', () => ({
 	loadTeamSeason: server.loadTeamSeason,
+	loadAwardHistory: server.loadAwardHistory,
 	loadEventBundle: server.loadEventBundle
 }));
 
@@ -73,6 +75,7 @@ beforeEach(() => {
 	for (const mock of Object.values(server)) mock.mockReset();
 	server.loadSeasonRatingsWithin.mockResolvedValue(null);
 	server.loadEventAnalysis.mockResolvedValue(null);
+	server.loadAwardHistory.mockResolvedValue([]);
 	server.loadEventBundle.mockRejectedValue(new DataError(503, 'down'));
 });
 
@@ -98,6 +101,31 @@ describe('team page load', () => {
 		expect(setHeaders).toHaveBeenCalledWith({
 			'cache-control': 'public, s-maxage=300, stale-while-revalidate=3600'
 		});
+	});
+
+	it('asks for past awards with the rookie year and shows them', async () => {
+		server.loadTeamSeason.mockResolvedValue(season([played('AAA', '2026-11-07')]));
+		server.loadAwardHistory.mockResolvedValue([
+			{
+				season: 2025,
+				code: 'OLD',
+				event: 'Old Qualifier',
+				start: '2025-11-01',
+				award: { id: 6, name: 'Design Award', placement: 1, team: 26670, person: null }
+			}
+		]);
+		const { view } = (await call().result) as unknown as {
+			view: { awards: { season: number }[] };
+		};
+		expect(server.loadAwardHistory).toHaveBeenCalledWith(26670, 2024);
+		expect(view.awards.map((entry) => entry.season)).toEqual([2025]);
+	});
+
+	it('still loads when past awards fail', async () => {
+		server.loadTeamSeason.mockResolvedValue(season([played('AAA', '2026-11-07')]));
+		server.loadAwardHistory.mockRejectedValue(new DataError(503, 'down'));
+		const { view } = (await call().result) as unknown as { view: { awards: unknown[] } };
+		expect(view.awards).toEqual([]);
 	});
 
 	it('uses season ratings when they exist', async () => {

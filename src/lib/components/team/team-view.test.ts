@@ -139,11 +139,76 @@ describe('buildTeamPage without season ratings', () => {
 		]);
 		expect(view.awards).toEqual([
 			{
-				code: 'USAZGIQ',
-				event: 'Roadrunner - Gilbert Qualifier',
-				name: 'Inspire Award 3rd place'
+				season: 2026,
+				game: 'BIOBUZZ',
+				rows: [
+					{
+						code: 'USAZGIQ',
+						event: 'Roadrunner - Gilbert Qualifier',
+						name: 'Inspire Award 3rd place',
+						win: false
+					}
+				]
 			}
 		]);
+	});
+
+	it('adds awards from past seasons, newest season first', () => {
+		const award = (id: number, name: string, placement = 1) => ({
+			id,
+			name,
+			placement,
+			team: 3747,
+			person: null
+		});
+		const history = [
+			{
+				season: 2023,
+				code: 'USUTCMP',
+				event: 'Utah Championship',
+				start: '2024-02-10',
+				award: award(13, 'Winning Alliance')
+			},
+			{
+				season: 2025,
+				code: 'USUTQ2',
+				event: 'Utah Qualifier 2',
+				start: '2025-12-06',
+				award: award(6, 'Design Award', 2)
+			},
+			{
+				season: 2025,
+				code: 'USUTQ1',
+				event: 'Utah Qualifier 1',
+				start: '2025-11-15',
+				award: award(11, 'Inspire Award')
+			},
+			{
+				season: 2026,
+				code: 'USAZGIQ',
+				event: 'Repeat',
+				start: '2026-11-14',
+				award: award(11, 'Inspire Award')
+			}
+		];
+		const view = buildTeamPage({
+			season,
+			history,
+			ratings: null,
+			analyses: {},
+			bundles: {},
+			now: NOW
+		});
+		expect(view.awards.map((entry) => [entry.season, entry.game])).toEqual([
+			[2026, 'BIOBUZZ'],
+			[2025, 'DECODE'],
+			[2023, 'CENTERSTAGE']
+		]);
+		expect(view.awards[1].rows).toEqual([
+			{ code: null, event: 'Utah Qualifier 1', name: 'Inspire Award', win: true },
+			{ code: null, event: 'Utah Qualifier 2', name: 'Design Award 2nd place', win: false }
+		]);
+		expect(view.awards[2].rows[0]).toMatchObject({ name: 'Winning alliance', win: true });
 	});
 
 	it('summarizes last season', () => {
