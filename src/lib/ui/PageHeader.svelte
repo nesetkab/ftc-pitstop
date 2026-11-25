@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import type { Snippet } from 'svelte';
 
 	interface Props {
@@ -14,9 +15,9 @@
 </script>
 
 <header class={['page-header', { compact }]}>
-	<h1>{title}</h1>
+	<h1><Brand text={title} /></h1>
 	{#if meta}
-		<p class="meta">{meta}</p>
+		<p class="meta"><Brand text={meta} /></p>
 	{/if}
 	{#if lede}
 		<div class="lede">{@render lede()}</div>

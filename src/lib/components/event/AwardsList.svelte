@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import type { Award, Team } from '#lib/types.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
@@ -30,7 +31,9 @@
 			{#each group.entries as entry, index (index)}
 				<tr class:me={entry.team !== null && followed.has(entry.team)}>
 					{#if index === 0}
-						<th class="l award" scope="rowgroup" rowspan={group.entries.length}>{group.name}</th>
+						<th class="l award" scope="rowgroup" rowspan={group.entries.length}
+							><Brand text={group.name} /></th
+						>
 					{/if}
 					<td class="l muted">{entry.label ?? ''}</td>
 					<td class="team wrap">

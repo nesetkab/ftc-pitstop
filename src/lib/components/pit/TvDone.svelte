@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { fixed } from '#lib/format/number.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { record } from '#lib/format/record.ts';
@@ -42,7 +43,7 @@
 			<h2 class="tv-label">Our awards</h2>
 			<ul class="ours">
 				{#each view.awards as award (`${award.id}-${award.placement}`)}
-					<li>{awardName(award.name)}</li>
+					<li><Brand text={awardName(award.name)} /></li>
 				{/each}
 			</ul>
 		{/if}
@@ -56,7 +57,7 @@
 					<ul class="awards">
 						{#each view.eventAwards.slice(0, cut ? shown - 1 : shown) as award (`${award.id}-${award.placement}-${award.team}`)}
 							<li class={{ mine: award.team === view.team }} in:fade={{ duration: 400 }}>
-								<span class="name">{awardName(award.name)}</span>
+								<span class="name"><Brand text={awardName(award.name)} /></span>
 								<span class="winner">
 									<b>{award.team}</b>
 									{view.names.get(award.team ?? 0) ?? ''}

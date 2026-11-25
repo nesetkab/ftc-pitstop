@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	interface Props {
 		number: number;
 		name?: string | null;
@@ -11,7 +12,7 @@
 <svelte:element this={href ? 'a' : 'span'} class="team-cell" {href}>
 	<b>{number}</b>
 	{#if name}
-		<span class="name">{name}</span>
+		<span class="name"><Brand text={name} /></span>
 	{/if}
 </svelte:element>
 

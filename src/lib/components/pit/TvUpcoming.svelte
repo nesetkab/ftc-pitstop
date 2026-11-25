@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { dateRange, relativeDay, time } from '#lib/format/time.ts';
 	import type { Event } from '#lib/types.ts';
 	import MatchList from '#lib/ui/MatchList.svelte';
@@ -36,7 +37,7 @@
 			<b>{view.team}</b>
 			{#if view.teamName}<span>{view.teamName}</span>{/if}
 		</div>
-		<p class="event">{event.name}</p>
+		<p class="event"><Brand text={event.name} /></p>
 		{#if where}<p class="sub">{where}</p>{/if}
 		<div class="first">
 			{#if first}

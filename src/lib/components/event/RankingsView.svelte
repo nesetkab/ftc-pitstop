@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
 	import type { EventBundle } from '#lib/types.ts';
 	import DownloadLink from '#lib/ui/DownloadLink.svelte';
@@ -148,7 +149,7 @@
 			{followed}
 			{eventCode}
 		/>
-		{#if caveat}<p class="note">{caveat}</p>{/if}
+		{#if caveat}<p class="note"><Brand text={caveat} /></p>{/if}
 		{#if csvHref}
 			<p class="csv"><DownloadLink href="{csvHref}{query}" /></p>
 		{/if}

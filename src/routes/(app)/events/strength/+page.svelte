@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -215,14 +216,14 @@
 						<tr>
 							<td class="rank muted">{at + 1}</td>
 							<td class="l name">
-								<a href="/events/{row.code}">{row.name}</a>
+								<a href="/events/{row.code}"><Brand text={row.name} /></a>
 								<span class="sub">
 									{row.place ?? ''}<span class="when"
 										>{row.place ? ' on ' : ''}{shortRange(row.start, row.end)}</span
 									>
 								</span>
 							</td>
-							<td class="l type muted">{typeLabel(row.type)}</td>
+							<td class="l type muted"><Brand text={typeLabel(row.type)} /></td>
 							<td class="l opt">{shortRange(row.start, row.end)}</td>
 							<td class="opt muted">{row.rated} of {row.teams ?? row.rated}</td>
 							<td class={{ on: by === 'top' }}>{fixed(row.top)}</td>

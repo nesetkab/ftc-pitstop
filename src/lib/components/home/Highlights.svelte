@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import Score from '#lib/ui/Score.svelte';
 	import type { Highlight, HighlightNames, Highlights } from './highlights.ts';
 
@@ -28,7 +29,7 @@
 						<span class="score">
 							<Score left={item.redScore} right={item.blueScore} winner={item.winner} />
 						</span>
-						<span class="where">{item.label} at {eventName(item)}</span>
+						<span class="where">{item.label} at <Brand text={eventName(item)} /></span>
 					</a>
 					<span class="teams">
 						<span class="red-team">{item.red.join(' ')}</span>

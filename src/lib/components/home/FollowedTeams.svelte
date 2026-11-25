@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { compareHref, MAX_COMPARE } from '#lib/components/compare/compare.ts';
 	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { fixed, ordinal, shortDate } from '#lib/format/index.ts';
@@ -154,7 +155,7 @@
 					<div class="head">
 						<a class="team" href="/teams/{team}">
 							<b>{team}</b>
-							{#if row?.name}<span class="name">{row.name}</span>{/if}
+							{#if row?.name}<span class="name"><Brand text={row.name} /></span>{/if}
 						</a>
 						<a class="pit-link" href="/{team}">Pit screen</a>
 					</div>
@@ -168,7 +169,7 @@
 					{:else if event?.reason === 'today'}
 						<p class="line">
 							<span class="faint">At</span>
-							<a href="/events/{event.code}">{event.name}</a>
+							<a href="/events/{event.code}"><Brand text={event.name} /></a>
 						</p>
 						<dl class="facts">
 							<div>
@@ -221,7 +222,7 @@
 						<p class="line">
 							{#if event}
 								<span class="faint">{event.reason === 'next' ? 'Next' : 'Last'}</span>
-								<a href="/events/{event.code}">{event.name}</a>
+								<a href="/events/{event.code}"><Brand text={event.name} /></a>
 								<span class="faint">
 									{event.reason === 'next'
 										? shortDate(event.start)

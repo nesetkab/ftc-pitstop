@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import type { TodayEvent } from './home.ts';
 	import Button from '#lib/ui/Button.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -39,9 +40,11 @@
 			{#each shown as row (row.code)}
 				<tr class={row.state}>
 					<td class="l name">
-						<a href="/events/{row.code}">{row.name}</a>
+						<a href="/events/{row.code}"><Brand text={row.name} /></a>
 						<span class="sub"
-							>{row.name.includes(row.type) ? row.place : `${row.type} in ${row.place}`}</span
+							><Brand
+								text={row.name.includes(row.type) ? row.place : `${row.type} in ${row.place}`}
+							/></span
 						>
 					</td>
 					<td class="l where">{row.place}</td>
@@ -61,7 +64,9 @@
 								<span class="faint">{row.leaderLabel}</span>
 								<a href="/teams/{row.leader.team}"
 									><b>{row.leader.team}</b>
-									{#if row.leader.name}<span class="team-name">{row.leader.name}</span>{/if}</a
+									{#if row.leader.name}<span class="team-name"
+											><Brand text={row.leader.name} /></span
+										>{/if}</a
 								>
 							{/if}
 						</td>

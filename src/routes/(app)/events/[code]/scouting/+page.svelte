@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { page } from '$app/state';
 	import { getEventView } from '#lib/components/event/context.ts';
 	import TeamReport from '#lib/components/event/TeamReport.svelte';
@@ -60,7 +61,7 @@
 	<div class={['sheets', per === '1' ? 'one' : 'two']}>
 		{#each reports as report (report.team)}
 			<div class="sheet">
-				<p class="event">{event.name}</p>
+				<p class="event"><Brand text={event.name} /></p>
 				<TeamReport
 					{report}
 					code={event.code}

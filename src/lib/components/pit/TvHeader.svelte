@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { time } from '#lib/format/time.ts';
 	import Logo from '#lib/ui/Logo.svelte';
 
@@ -44,7 +45,7 @@
 
 <header class="head">
 	<Logo height="0.95em" />
-	<span class="event">{eventName}</span>
+	<span class="event"><Brand text={eventName} /></span>
 	<span class="space"></span>
 	<h1 class="me">
 		{team}{#if teamName}<span class="name">{` ${teamName}`}</span>{/if}

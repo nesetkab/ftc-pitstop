@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { fixed, integer, MISSING, record } from '#lib/format/index.ts';
 	import Table from '#lib/ui/Table.svelte';
@@ -41,7 +42,7 @@
 			<tr>
 				<td class="l team">
 					<TeamChip number={row.team} href="/teams/{row.team}" />
-					{#if row.name}<span class="name">{row.name}</span>{/if}
+					{#if row.name}<span class="name"><Brand text={row.name} /></span>{/if}
 				</td>
 				<td>{row.matches}</td>
 				<td>{record(row.wins, row.losses, row.ties)}</td>

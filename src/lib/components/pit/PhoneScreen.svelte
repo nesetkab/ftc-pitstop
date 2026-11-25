@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { relative } from '#lib/format/relative.ts';
@@ -181,7 +182,7 @@
 	<div class="pinned">
 		<header class="top">
 			<h1>{view.team}</h1>
-			<span>{event.name}</span>
+			<span><Brand text={event.name} /></span>
 			{#if view.registered}
 				<button
 					type="button"
@@ -384,7 +385,7 @@
 					<h2 class="sec-title">Our awards</h2>
 					<ul class="awards">
 						{#each view.awards as award (`${award.id}-${award.placement}`)}
-							<li>{awardName(award.name)}</li>
+							<li><Brand text={awardName(award.name)} /></li>
 						{/each}
 					</ul>
 				</section>

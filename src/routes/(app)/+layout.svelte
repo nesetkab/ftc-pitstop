@@ -116,10 +116,10 @@
 	<footer>
 		<div class="credits">
 			<p>
-				Data from <a href="https://ftc-events.firstinspires.org">FIRST FTC Events</a>,
+				Data from <a href="https://ftc-events.firstinspires.org">FTC Events</a>,
 				<a href="https://ftcscout.org">FTCScout</a> and <a href="https://ftc.nexus">Nexus</a>.
 			</p>
-			<p>Not affiliated with or endorsed by FIRST.</p>
+			<p>Not affiliated with or endorsed by <em>FIRST</em>.</p>
 		</div>
 		<nav aria-label="Footer">
 			<a href="/w">Team workspace</a>

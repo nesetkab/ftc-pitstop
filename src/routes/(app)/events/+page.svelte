@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { untrack } from 'svelte';
 	import { goto } from '$app/navigation';
 	import { page } from '$app/state';
@@ -261,10 +262,10 @@
 					{#each group.events as event (event.code)}
 						<tr>
 							<td class="l name">
-								<a href="/events/{event.code}">{event.name}</a>
+								<a href="/events/{event.code}"><Brand text={event.name} /></a>
 								<span class="sub">{event.place ?? ''}</span>
 							</td>
-							<td class="l type muted">{typeLabel(event.type)}</td>
+							<td class="l type muted"><Brand text={typeLabel(event.type)} /></td>
 							<td class="l place muted">{event.place ?? ''}</td>
 							<td class="l dates">
 								{shortRange(event.start, event.end)}

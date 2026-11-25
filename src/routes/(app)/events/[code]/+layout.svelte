@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { invalidate } from '$app/navigation';
 	import { page } from '$app/state';
 	import { setEventView } from '#lib/components/event/context.ts';
@@ -222,7 +223,7 @@
 {/if}
 
 {#if onMatchPage}
-	<p class="crumb"><a href={base}>{event.name}</a></p>
+	<p class="crumb"><a href={base}><Brand text={event.name} /></a></p>
 {:else}
 	{#if event.region}
 		<p class="crumb"><a href="/regions/{event.region}">{regionName(event.region)}</a></p>

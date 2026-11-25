@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { fixed, MISSING, ordinal, shortDate } from '#lib/format/index.ts';
 	import Table from '#lib/ui/Table.svelte';
 	import type { CompareTeam, SharedEvent, SharedEventCell } from './compare.ts';
@@ -32,7 +33,7 @@
 		{#each events as event (event.code)}
 			<tr>
 				<td class="l event pin">
-					<a href="/events/{event.code}">{event.name}</a>
+					<a href="/events/{event.code}"><Brand text={event.name} /></a>
 					<span class="date">{shortDate(event.start)}</span>
 				</td>
 				{#each event.cells as cell, index (index)}

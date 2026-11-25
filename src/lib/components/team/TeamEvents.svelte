@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { fixed, MISSING, record } from '#lib/format/index.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
@@ -36,7 +37,7 @@
 		<tbody>
 			{#each rows as row (row.code)}
 				<tr>
-					<td class="l wrap"><a href="/events/{row.code}">{row.name}</a></td>
+					<td class="l wrap"><a href="/events/{row.code}"><Brand text={row.name} /></a></td>
 					<td class="l opt">{shortRange(row.start, row.end)}</td>
 					<td>{row.rank ?? MISSING}</td>
 					<td>{recordText(row)}</td>

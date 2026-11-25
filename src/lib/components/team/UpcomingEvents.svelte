@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { integer, MISSING } from '#lib/format/index.ts';
 	import { shortRange } from '#lib/format/time.ts';
 	import Table from '#lib/ui/Table.svelte';
@@ -26,7 +27,7 @@
 		{#each rows as row (row.code)}
 			<tr>
 				<td class="l wrap">
-					<a href="/events/{row.code}">{row.name}</a>
+					<a href="/events/{row.code}"><Brand text={row.name} /></a>
 					{#if row.live}<span class="live">Now</span>{/if}
 				</td>
 				<td class="l opt">{shortRange(row.start, row.end)}</td>

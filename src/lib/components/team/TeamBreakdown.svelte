@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { oprTerm } from '#lib/format/glossary.ts';
 	import Term from '#lib/ui/Term.svelte';
 	import { fixed, MISSING, ordinal } from '#lib/format/index.ts';
@@ -49,9 +50,9 @@
 	<tr class:season={row.code === null}>
 		<th class="l wrap" scope="row">
 			{#if row.code}
-				<a href="/events/{row.code}">{row.label}</a>
+				<a href="/events/{row.code}"><Brand text={row.label} /></a>
 			{:else}
-				{row.label}
+				<Brand text={row.label} />
 			{/if}
 		</th>
 		{#each columns as column (column.key)}

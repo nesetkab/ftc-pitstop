@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import Arrow from '#lib/ui/Arrow.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
@@ -134,7 +135,7 @@
 					</td>
 					<td class="l event">
 						<a class="event-name" href="/events/{row.event}"
-							>{names.events[row.event] ?? row.event}</a
+							><Brand text={names.events[row.event] ?? row.event} /></a
 						>
 						<span class="date">{shortDate(row.day)}</span>
 						<a class="phone" href="/events/{row.event}/matches/{row.key}"

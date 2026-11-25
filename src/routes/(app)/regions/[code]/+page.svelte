@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { page } from '$app/state';
 	import ChampionshipTable from '#lib/components/advancement/ChampionshipTable.svelte';
 	import { typeLabel } from '#lib/components/event/event-meta.ts';
@@ -69,10 +70,10 @@
 				{#each events as event (event.code)}
 					<tr>
 						<td class="l name">
-							<a href="/events/{event.code}">{event.name}</a>
+							<a href="/events/{event.code}"><Brand text={event.name} /></a>
 							<span class="sub">{event.place ?? ''}</span>
 						</td>
-						<td class="l type muted">{typeLabel(event.type)}</td>
+						<td class="l type muted"><Brand text={typeLabel(event.type)} /></td>
 						<td class="l">{shortRange(event.start, event.end)}</td>
 						<td class="opt">{event.teams ?? '—'}</td>
 						<td>{fixed(event.strength)}</td>

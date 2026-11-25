@@ -8,6 +8,7 @@
 </script>
 
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import './score-table.css';
 	import Term from './Term.svelte';
 	import { fixed } from '#lib/format/number.ts';
@@ -78,7 +79,7 @@
 									<span class="team">
 										<b>{team.number}</b>
 										{#if team.name}
-											<span class="name">{team.name}</span>
+											<span class="name"><Brand text={team.name} /></span>
 										{/if}
 									</span>
 								{/if}

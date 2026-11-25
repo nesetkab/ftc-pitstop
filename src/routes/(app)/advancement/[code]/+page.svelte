@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import type { Feeder } from '#lib/components/advancement/advancement.ts';
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { typeLabel, typeNoun } from '#lib/components/event/event-meta.ts';
@@ -96,7 +97,8 @@
 	{/if}
 	{#if data.next}
 		<p class="muted">
-			Teams here go on to <a href="/advancement/{data.next.code}">{data.next.name}</a>.
+			Teams here go on to <a href="/advancement/{data.next.code}"><Brand text={data.next.name} /></a
+			>.
 		</p>
 	{/if}
 </div>
@@ -121,10 +123,10 @@
 						<tr class={{ me: followed.has(team.team) }}>
 							<td class="l team">
 								<TeamCell number={team.team} name={team.name} href="/teams/{team.team}" />
-								<a class="sub" href="/events/{team.event}">{team.eventName}</a>
+								<a class="sub" href="/events/{team.event}"><Brand text={team.eventName} /></a>
 							</td>
 							<td class="l from">
-								<a href="/events/{team.event}">{team.eventName}</a>
+								<a href="/events/{team.event}"><Brand text={team.eventName} /></a>
 							</td>
 							<td class="l why">
 								{team.reasons.length > 0 ? team.reasons.join(', ') : 'Advancement points'}
@@ -154,7 +156,7 @@
 					{#each ahead as event (event.code)}
 						<tr>
 							<td class="l event">
-								<a href={feederHref(event)}>{event.name}</a>
+								<a href={feederHref(event)}><Brand text={event.name} /></a>
 								{#if event.state === 'live'}
 									<span class="live">{STATE.live}</span>
 								{/if}
@@ -162,7 +164,7 @@
 									<span class="faint expected">Expected</span>
 								{/if}
 							</td>
-							<td class="l kind muted">{typeLabel(event.type)}</td>
+							<td class="l kind muted"><Brand text={typeLabel(event.type)} /></td>
 							<td class="l">{shortRange(event.start, event.end)}</td>
 						</tr>
 					{/each}
@@ -190,7 +192,7 @@
 					{#each played.toReversed() as event (event.code)}
 						<tr>
 							<td class="l event">
-								<a href={feederHref(event)}>{event.name}</a>
+								<a href={feederHref(event)}><Brand text={event.name} /></a>
 								{#if !event.confirmed}
 									<span class="faint expected">Expected</span>
 								{/if}

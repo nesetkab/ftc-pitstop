@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import EventSections from '#lib/components/event/EventSections.svelte';
 	import { REGION_BUCKETS } from '#lib/components/event/event-list.ts';
 	import type { RegionSummary } from '#lib/components/region/regions.ts';
@@ -90,7 +91,7 @@
 						{#each group.regions as region (region.code)}
 							<tr>
 								<td class="l name">
-									<a href="/regions/{region.code}">{region.name}</a>
+									<a href="/regions/{region.code}"><Brand text={region.name} /></a>
 									<span class="sub">
 										{region.teams === null
 											? 'No team list yet'

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { oprTerm } from '#lib/format/glossary.ts';
 	import Term from '#lib/ui/Term.svelte';
 	import Table from '#lib/ui/Table.svelte';
@@ -23,7 +24,7 @@
 				{#each teams as team (team.number)}
 					<th scope="col" class="team">
 						<a href="/teams/{team.number}">{team.number}</a>
-						<span class="name">{team.name}</span>
+						<span class="name"><Brand text={team.name} /></span>
 					</th>
 				{/each}
 			</tr>

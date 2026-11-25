@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import type { HomeEvent } from './home.ts';
 
@@ -31,7 +32,7 @@
 			{#each rows as row (row.code)}
 				<tr>
 					<td class="l name">
-						<a href="/events/{row.code}">{row.name}</a>
+						<a href="/events/{row.code}"><Brand text={row.name} /></a>
 						<span class="sub">{row.place}</span>
 					</td>
 					<td class="l where">{row.place}</td>

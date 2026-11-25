@@ -102,7 +102,7 @@
 				match, it finds the set of team numbers that best explains all the alliance scores at once.
 			</p>
 			<p>
-				FIRST records some points per robot, like leaving and parking. Each team gets those points
+				<em>FIRST</em> records some points per robot, like leaving and parking. Each team gets those points
 				directly, and only the rest of the score is split between partners.
 			</p>
 			<p>
@@ -135,7 +135,7 @@
 		<section id="rankings" aria-labelledby="rankings-title">
 			{@render heading('rankings')}
 			<p>
-				Official rankings come straight from FIRST, and PitStop does not reorder them.
+				Official rankings come straight from <em>FIRST</em>, and PitStop does not reorder them.
 				<dfn>RS</dfn>, the ranking score, is a team’s average ranking points per match, and it
 				decides the order. <dfn>TBP</dfn>, tiebreaker points, separates teams with the same RS. A
 				match a team was disqualified from or did not show up for counts as zero for both.
@@ -145,8 +145,8 @@
 				those matches divided by 10, so they start low and climb as the league goes on.
 			</p>
 			<p>
-				When FIRST’s rankings are down, PitStop works them out from the match results with FIRST’s
-				rules.
+				When <em>FIRST</em>’s rankings are down, PitStop works them out from the match results with
+				<em>FIRST</em>’s rules.
 			</p>
 			<p>
 				On team pages, the season record counts qualification matches from every event, but not
@@ -277,7 +277,7 @@
 			{@render heading('sources')}
 			<dl class="rules">
 				<div>
-					<dt><a href="https://ftc-events.firstinspires.org">FIRST FTC Events</a></dt>
+					<dt><a href="https://ftc-events.firstinspires.org">FTC Events</a></dt>
 					<dd>
 						The official source for events, teams, schedules, scores, rankings, alliances and
 						awards.
@@ -286,8 +286,8 @@
 				<div>
 					<dt><a href="https://ftcscout.org">FTCScout</a></dt>
 					<dd>
-						Season match history behind season aOPR and world ranks, and a backup when FIRST is slow
-						or down.
+						Season match history behind season aOPR and world ranks, and a backup when <em>FIRST</em
+						> is slow or down.
 					</dd>
 				</div>
 				<div>
@@ -307,7 +307,7 @@
 			<p>
 				During a live event, event pages refresh every 30 seconds and pit screens every {BUNDLE_INTERVAL /
 					1000} seconds. Season ratings are rebuilt about once an hour. Scores appear once the event’s
-				scorekeeper sends them to FIRST, so a short delay after a match ends is normal.
+				scorekeeper sends them to <em>FIRST</em>, so a short delay after a match ends is normal.
 			</p>
 		</section>
 

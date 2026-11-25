@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { MISSING, record } from '#lib/format/index.ts';
@@ -44,7 +45,7 @@
 	{#each events as entry, index (entry.code)}
 		<details open={index === 0} ontoggle={(event) => toggle(entry.code, event)}>
 			<summary>
-				<span class="name">{entry.name}</span>
+				<span class="name"><Brand text={entry.name} /></span>
 				<span class="meta">
 					{shortRange(entry.start, entry.end)}, {count(entry)},
 					{record(entry.record.wins, entry.record.losses, entry.record.ties)}

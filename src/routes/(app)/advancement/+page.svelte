@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { goto } from '$app/navigation';
 	import { isAhead } from '#lib/components/advancement/advancement.ts';
 	import ChampionshipTable from '#lib/components/advancement/ChampionshipTable.svelte';
@@ -58,7 +59,7 @@
 				<li>
 					<TeamChip number={entry.team} me href="/teams/{entry.team}" />
 					advanced to
-					<a href="/advancement/{entry.row.code}">{entry.row.name}</a>
+					<a href="/advancement/{entry.row.code}"><Brand text={entry.row.name} /></a>
 				</li>
 			{/each}
 		</ul>
@@ -98,8 +99,10 @@
 	{#if world.length > 0}
 		<section aria-labelledby="world-title">
 			<div class="head">
-				<h2 class="sec-title" id="world-title">FIRST Championship</h2>
-				<p class="muted summary">FIRST posts each region's spots starting in early December.</p>
+				<h2 class="sec-title" id="world-title"><em>FIRST</em> Championship</h2>
+				<p class="muted summary">
+					<em>FIRST</em> posts each region's spots starting in early December.
+				</p>
 			</div>
 			<ChampionshipTable
 				caption="FIRST Championship"
@@ -117,9 +120,11 @@
 		<ul class="plain">
 			{#each data.unassigned as event (event.code)}
 				<li>
-					<a href="/events/{event.code}">{event.name}</a>
+					<a href="/events/{event.code}"><Brand text={event.name} /></a>
 					<span class="faint">
-						{typeLabel(event.type)} on {shortRange(event.start, event.end)}{isAhead(event)
+						<Brand text={typeLabel(event.type)} /> on {shortRange(event.start, event.end)}{isAhead(
+							event
+						)
 							? ''
 							: `. Results aren't in yet.`}
 					</span>

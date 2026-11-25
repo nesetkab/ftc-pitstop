@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import type { ReportPart, TeamReport } from '#lib/components/event/report.ts';
 	import { matchHref } from '#lib/components/event/matches.ts';
 	import { fixed, integer, MISSING, ordinal, pct, record, time } from '#lib/format/index.ts';
@@ -93,7 +94,7 @@
 		<div class="title">
 			<h2 id="report-{report.team}">
 				<span class="num">{report.team}</span>
-				{#if report.name}<span class="name">{report.name}</span>{/if}
+				{#if report.name}<span class="name"><Brand text={report.name} /></span>{/if}
 			</h2>
 			{#if facts.length > 0}
 				<p class="facts">

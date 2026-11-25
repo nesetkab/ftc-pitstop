@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import '#lib/components/tools/controls.css';
 	import { toggleFollow } from '#lib/components/follow/follow.svelte.ts';
 	import Button from '#lib/ui/Button.svelte';
@@ -75,7 +76,7 @@
 				<li>
 					<a href="/teams/{hit.number}">
 						<b>{hit.number}</b>
-						<span class="name">{hit.name}</span>
+						<span class="name"><Brand text={hit.name} /></span>
 						{#if hit.place}<span class="faint">{hit.place}</span>{/if}
 					</a>
 					<Button

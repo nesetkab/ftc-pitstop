@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { shortDate } from '#lib/format/index.ts';
 	import type { HighlightNames } from './highlights.ts';
 	import type { WorldRecord } from './record.ts';
@@ -33,7 +34,7 @@
 			</span>
 			<span class="where">
 				<a href="/events/{record.event}/matches/{record.key}">{record.label} {side}</a>
-				at <a href="/events/{record.event}">{eventName}</a>, {shortDate(record.day)}
+				at <a href="/events/{record.event}"><Brand text={eventName} /></a>, {shortDate(record.day)}
 			</span>
 		</div>
 	</div>

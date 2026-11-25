@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Brand from '#lib/ui/Brand.svelte';
 	import { integer } from '#lib/format/number.ts';
 	import { shortDate, shortRange } from '#lib/format/time.ts';
 	import TeamChip from '#lib/ui/TeamChip.svelte';
@@ -37,7 +38,7 @@
 				{@const mine = yours(row)}
 				<tr class={{ me: mine.length > 0 }}>
 					<td class="l name">
-						<a href="/advancement/{row.code}{query}">{row.name}</a>
+						<a href="/advancement/{row.code}{query}"><Brand text={row.name} /></a>
 						<span class="sub">
 							{row.place ?? ''}
 							{#if row.start && row.end}
@@ -64,7 +65,7 @@
 					</td>
 					<td class="l next">
 						{#if row.next}
-							<a href="/events/{row.next.code}">{row.next.name}</a>
+							<a href="/events/{row.next.code}"><Brand text={row.next.name} /></a>
 							<span class="faint when">{shortDate(row.next.start)}</span>
 						{:else if row.unposted > 0}
 							<span class="faint">
