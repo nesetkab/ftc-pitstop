@@ -13,6 +13,7 @@
 		sort?: SortState | null;
 		href?: (sort: SortState) => string;
 		rowClass?: (row: T) => string | undefined;
+		rowCurrent?: (row: T) => boolean;
 		empty?: Snippet;
 		class?: string;
 	}
@@ -25,6 +26,7 @@
 		sort = $bindable(null),
 		href,
 		rowClass,
+		rowCurrent,
 		empty,
 		class: className
 	}: Props = $props();
@@ -102,7 +104,7 @@
 		</thead>
 		<tbody>
 			{#each shown as row (rowKey(row))}
-				<tr class={rowClass?.(row)}>
+				<tr class={rowClass?.(row)} aria-current={rowCurrent?.(row) ? 'true' : undefined}>
 					{#each columns as column (column.key)}
 						<td class={classes(column)}>
 							{#if column.cell}

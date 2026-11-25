@@ -1,19 +1,18 @@
 <script lang="ts">
-	import { oprTerm } from '#lib/format/glossary.ts';
-	import Arrow from '#lib/ui/Arrow.svelte';
-	import Term from '#lib/ui/Term.svelte';
-	import { fixed, integer, MISSING } from '#lib/format/index.ts';
-	import EmptyState from '#lib/ui/EmptyState.svelte';
-	import Table from '#lib/ui/Table.svelte';
-	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
+	import { oprTerm } from '#lib/format/glossary.ts';
+	import { fixed, integer, MISSING } from '#lib/format/index.ts';
+	import { placeName } from '#lib/format/places.ts';
+	import DataTable from '#lib/ui/DataTable.svelte';
+	import type { Column, SortState } from '#lib/ui/data-table.ts';
+	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import TeamCell from '#lib/ui/TeamCell.svelte';
 	import {
 		queryString,
 		type LeaderboardFilters,
 		type LeaderboardRow,
 		type LeaderboardSort
 	} from './leaderboard.ts';
-	import { placeName } from '#lib/format/places.ts';
 
 	interface Props {
 		rows: LeaderboardRow[];
@@ -24,10 +23,7 @@
 
 	let { rows, start, filters, caption = 'Teams ranked by season aOPR' }: Props = $props();
 
-	const followed = $derived(new Set(follows.teams));
-	const showEvents = $derived(rows.some((row) => row.events !== null));
-	const sort = $derived(filters?.sort ?? 'opr');
-	const columns: { key: LeaderboardSort; label: string; optional?: boolean }[] = [
+	const STATS: { key: LeaderboardSort; label: string; optional?: boolean }[] = [
 		{ key: 'opr', label: 'aOPR' },
 		{ key: 'auto', label: 'Auto' },
 		{ key: 'teleop', label: 'Teleop' },
@@ -35,92 +31,89 @@
 		{ key: 'matches', label: 'Matches', optional: true }
 	];
 
-	const extra = $derived(columns.some((column) => column.optional && column.key === sort));
+	const followed = $derived(new Set(follows.teams));
+	const showEvents = $derived(rows.some((row) => row.events !== null));
+	const sortKey = $derived(filters?.sort ?? 'opr');
+	const sort = $derived<SortState>({ key: sortKey, dir: 'desc' });
+	const extra = $derived(STATS.some((stat) => stat.optional && stat.key === sortKey));
+	const places = $derived(new Map(rows.map((row, index) => [row.team, start + index + 1])));
 
 	$effect(() => syncFollows());
-
-	function hidden(column: (typeof columns)[number]): boolean {
-		if (column.key === sort) return false;
-		return Boolean(column.optional) || (extra && column.key === 'teleop');
-	}
-
-	function sortHref(key: LeaderboardSort) {
-		return filters ? `/leaderboards${queryString({ ...filters, sort: key }, 1)}` : undefined;
-	}
 
 	function value(row: LeaderboardRow, key: LeaderboardSort): string {
 		return key === 'matches' ? integer(row.matches) : fixed(row[key]);
 	}
+
+	const columns = $derived.by(() => {
+		const list: Column<LeaderboardRow>[] = [
+			{ key: 'rank', label: 'Rank', text: (row) => integer(places.get(row.team)), class: 'at' },
+			{ key: 'team', label: 'Team', cell: teamCell },
+			{
+				key: 'location',
+				label: 'Location',
+				text: (row) => placeName(row, 'short') || MISSING,
+				hide: 'phone'
+			}
+		];
+		for (const stat of STATS) {
+			list.push({
+				key: stat.key,
+				label: stat.label,
+				term: oprTerm(stat.label),
+				numeric: true,
+				sort: filters ? (row) => row[stat.key] : undefined,
+				text: (row) => value(row, stat.key),
+				hide: stat.optional || (extra && stat.key === 'teleop') ? 'phone' : undefined
+			});
+		}
+		if (showEvents) {
+			list.push({
+				key: 'events',
+				label: 'Events',
+				numeric: true,
+				text: (row) => (row.events === null ? MISSING : integer(row.events)),
+				hide: 'tablet'
+			});
+		}
+		return list;
+	});
+
+	function href(next: SortState) {
+		return `/leaderboards${queryString({ ...filters!, sort: next.key as LeaderboardSort }, 1)}`;
+	}
+
+	function rowClass(row: LeaderboardRow) {
+		return [followed.has(row.team) && 'me', filters?.team === row.team && 'target']
+			.filter(Boolean)
+			.join(' ');
+	}
 </script>
 
-{#if rows.length === 0}
+{#snippet teamCell(row: LeaderboardRow)}
+	<div class="team-name">
+		<TeamCell number={row.team} name={row.name} href="/teams/{row.team}" />
+	</div>
+{/snippet}
+
+{#snippet empty()}
 	<EmptyState title="No teams match these filters.">
 		<a href="/leaderboards">Clear filters</a>
 	</EmptyState>
-{:else}
-	<Table>
-		<caption class="visually-hidden">{caption}</caption>
-		<thead>
-			<tr>
-				<th class="l" scope="col">Rank</th>
-				<th class="l" scope="col">Team</th>
-				<th class="l optional" scope="col">Location</th>
-				{#each columns as column (column.key)}
-					{@const active = sort === column.key}
-					<th
-						scope="col"
-						class={{ optional: hidden(column), active }}
-						aria-sort={active ? 'descending' : undefined}
-					>
-						{#if filters}
-							<a class="sort-link" href={sortHref(column.key)} data-sveltekit-reset="false">
-								<Term label={column.label} term={oprTerm(column.label)} nested /><Arrow
-									dir="down"
-									class={active ? 'sort-arrow' : 'sort-hint'}
-								/>
-							</a>
-						{:else}
-							<Term label={column.label} term={oprTerm(column.label)} />
-						{/if}
-					</th>
-				{/each}
-				{#if showEvents}
-					<th class="optional roomy" scope="col">Events</th>
-				{/if}
-			</tr>
-		</thead>
-		<tbody>
-			{#each rows as row, index (row.team)}
-				{@const link = `/teams/${row.team}`}
-				{@const target = filters?.team === row.team}
-				<tr
-					class:me={followed.has(row.team)}
-					class:target
-					aria-current={target ? 'true' : undefined}
-				>
-					<td class="l">{integer(start + index + 1)}</td>
-					<td class="team">
-						<div class="team-name"><TeamCell number={row.team} name={row.name} href={link} /></div>
-					</td>
-					<td class="l optional">{placeName(row, 'short') || MISSING}</td>
-					{#each columns as column (column.key)}
-						<td
-							class={{
-								optional: hidden(column),
-								active: sort === column.key
-							}}
-						>
-							{value(row, column.key)}
-						</td>
-					{/each}
-					{#if showEvents}
-						<td class="optional roomy">{row.events === null ? MISSING : integer(row.events)}</td>
-					{/if}
-				</tr>
-			{/each}
-		</tbody>
-	</Table>
-{/if}
+{/snippet}
+
+<div class="leaderboard">
+	<DataTable
+		{rows}
+		{columns}
+		rowKey={(row) => String(row.team)}
+		{rowClass}
+		rowCurrent={(row) => filters?.team === row.team}
+		{sort}
+		href={filters ? href : undefined}
+		{empty}
+		{caption}
+	/>
+</div>
 
 <style>
 	.team-name {
@@ -129,39 +122,26 @@
 		text-overflow: ellipsis;
 	}
 
-	th a {
-		color: inherit;
+	.leaderboard :global(td.at) {
+		color: var(--text-2);
+		font-weight: 400;
 	}
 
-	th.active,
-	td.active {
-		color: var(--text);
-		font-weight: 600;
+	.leaderboard :global(:is(th, td).at) {
+		padding-left: 0;
 	}
 
-	tr.target td {
+	.leaderboard :global(tr.target td) {
 		box-shadow:
 			inset 0 1px 0 var(--text),
 			inset 0 -1px 0 var(--text);
 	}
 
-	tr.target td:first-child {
+	.leaderboard :global(tr.target td:first-child) {
 		box-shadow:
 			inset 2px 0 0 var(--text),
 			inset 0 1px 0 var(--text),
 			inset 0 -1px 0 var(--text);
-	}
-
-	@media (max-width: 900px) {
-		.roomy {
-			display: none;
-		}
-	}
-
-	@media (max-width: 640px) {
-		.optional {
-			display: none;
-		}
 	}
 
 	@media (max-width: 600px) {
