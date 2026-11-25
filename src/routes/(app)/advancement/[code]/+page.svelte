@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Feeder } from '#lib/components/advancement/advancement.ts';
 	import { watchFollows } from '#lib/components/follow/follow.svelte.ts';
-	import { typeLabel } from '#lib/components/event/event-meta.ts';
+	import { typeLabel, typeNoun } from '#lib/components/event/event-meta.ts';
 	import { integer } from '#lib/format/number.ts';
 	import { regionName } from '#lib/format/places.ts';
 	import { dateRange, shortRange } from '#lib/format/time.ts';
@@ -31,17 +31,16 @@
 	);
 	const posted = $derived(played.filter((feeder) => feeder.state === 'done').length);
 	const where = $derived(data.region ? regionName(data.region) : null);
-	const meta = $derived(
-		[
-			...new Set([
-				champ.type ? typeLabel(champ.type) : null,
-				champ.place,
-				champ.start && champ.end ? dateRange(champ.start, champ.end) : null
-			])
-		]
+	const meta = $derived.by(() => {
+		const noun = champ.type ? typeNoun(champ.type) : null;
+		const place = champ.place && champ.place !== noun ? champ.place : null;
+		const kind = noun && place ? `${noun} in ${place}` : (noun ?? place);
+		const when = champ.start && champ.end ? dateRange(champ.start, champ.end) : null;
+		return [kind, when]
 			.filter(Boolean)
-			.join(' · ')
-	);
+			.map((part) => `${part}.`)
+			.join(' ');
+	});
 	const tracked = $derived(new Set(data.tracked));
 
 	function feederHref(event: Feeder): string {

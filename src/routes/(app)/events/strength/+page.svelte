@@ -218,7 +218,7 @@
 								<a href="/events/{row.code}">{row.name}</a>
 								<span class="sub">
 									{row.place ?? ''}<span class="when"
-										>{row.place ? ' · ' : ''}{shortRange(row.start, row.end)}</span
+										>{row.place ? ' on ' : ''}{shortRange(row.start, row.end)}</span
 									>
 								</span>
 							</td>

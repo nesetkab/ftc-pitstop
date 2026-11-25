@@ -119,9 +119,9 @@
 				<li>
 					<a href="/events/{event.code}">{event.name}</a>
 					<span class="faint">
-						{typeLabel(event.type)} · {shortRange(event.start, event.end)}{isAhead(event)
+						{typeLabel(event.type)} on {shortRange(event.start, event.end)}{isAhead(event)
 							? ''
-							: ' · played, results not in yet'}
+							: `. Results aren't in yet.`}
 					</span>
 				</li>
 			{/each}

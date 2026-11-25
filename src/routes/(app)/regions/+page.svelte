@@ -96,7 +96,7 @@
 											? 'No team list yet'
 											: `${integer(region.teams)} ${region.teams === 1 ? 'team' : 'teams'}`}{region.live >
 										0
-											? ` · ${integer(region.live)} today`
+											? `, ${integer(region.live)} ${region.live === 1 ? 'event' : 'events'} today`
 											: ''}
 									</span>
 								</td>

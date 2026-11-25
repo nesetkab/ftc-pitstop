@@ -240,7 +240,7 @@
 									{/each}
 								</div>
 								<a class="match phone" href="/events/{row.event}/matches/{row.key}">
-									{row.label} · {data.names.events[row.event] ?? row.event}
+									{row.label} at {data.names.events[row.event] ?? row.event}
 								</a>
 							</td>
 							<td class="event-col">
