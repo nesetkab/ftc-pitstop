@@ -13,7 +13,8 @@ export const GLOSSARY: Readonly<Record<string, string>> = {
 	Record: 'Wins, losses and ties',
 	'Qual record': 'Qualification wins, losses and ties at every event this season, not playoffs',
 	aOPR: OPR,
-	'Season aOPR': 'Adjusted offensive power rating over the whole season, estimated points per match',
+	'Season aOPR':
+		'Adjusted offensive power rating over the whole season, estimated points per match',
 	'aOPR here': 'Adjusted offensive power rating at this event, estimated points per match',
 	'Starting aOPR': 'Season aOPR coming into this event',
 	'Best event aOPR': 'Highest aOPR at any one event this season',
