@@ -106,6 +106,7 @@
 				key: 'opr',
 				label: 'aOPR here',
 				short: 'aOPR',
+				class: 'pair',
 				term: true,
 				numeric: true,
 				sort: (team) => here.get(team.number) ?? null,
@@ -119,6 +120,7 @@
 					key: 'season',
 					label: 'Season aOPR',
 					short: 'Season',
+					class: 'pair',
 					term: true,
 					numeric: true,
 					sort: (team) => standings[team.number]?.opr ?? null,
@@ -170,4 +172,13 @@
 	{rowClass}
 	bind:sort
 	caption="Teams at this event"
+	class="teams-table"
 />
+
+<style>
+	@media (max-width: 600px) {
+		:global(.teams-table th.num.pair) {
+			width: 5.5em;
+		}
+	}
+</style>

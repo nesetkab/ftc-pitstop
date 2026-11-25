@@ -146,6 +146,7 @@
 
 	.sort {
 		display: inline-block;
+		white-space: nowrap;
 		padding: 0;
 		border: 0;
 		background: none;
