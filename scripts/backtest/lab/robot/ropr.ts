@@ -14,6 +14,7 @@ export type RoprOpts = {
 	rVar?: number;
 	aVar?: number;
 	robotNoise?: number;
+	het?: number;
 	moveNoise?: number;
 	hist?: number[];
 };
@@ -45,7 +46,7 @@ export class RobotOpr implements Model {
 	});
 	past: Map<number, number>[][] = [];
 	day = 0;
-	scale = 1;
+	restMean = 0;
 
 	constructor(name: string, o: RoprOpts) {
 		this.name = name;
@@ -177,11 +178,18 @@ export class RobotOpr implements Model {
 			}
 			if (this.auto) for (const t of upd) rest -= this.gateOf(t) * this.auto.mu[this.auto.at(t)];
 		}
-		this.rest.observe(idx, ones, rest);
+		let r = 1;
+		const het = this.o.het ?? 0;
+		if (het !== 0 && this.restMean > 0) {
+			const pred = idx.reduce((a, i) => a + this.rest.mu[i], 0);
+			r = Math.min(Math.max(pred / this.restMean, 0.25), 4) ** het;
+		}
+		this.rest.observe(idx, ones, rest, r);
 	}
 
 	update(m: PMatch, ctx: Ctx): void {
 		const r = m as RMatch;
+		this.restMean = this.means(ctx)[0];
 		const upd = [...m.redUpd, ...m.blueUpd];
 		const idx = upd.map((t) => this.rest.at(t));
 		for (const c of this.comps) c.bump(idx, c.p.qMatch);
