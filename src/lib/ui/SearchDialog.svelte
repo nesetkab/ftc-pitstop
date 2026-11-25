@@ -290,32 +290,26 @@
 		<p class={['message', { 'visually-hidden': !message }]} role="status">
 			{message || (ordered.length > 0 || query.trim() ? summary : '')}
 		</p>
-
-		<div class="hints" aria-hidden="true">
-			<span><kbd>↑</kbd> <kbd>↓</kbd> to move</span>
-			<span><kbd>Enter</kbd> to open</span>
-			<span><kbd>Esc</kbd> to close</span>
-		</div>
 	</div>
 </dialog>
 
 <style>
 	.search {
-		width: min(600px, calc(100vw - 32px));
+		width: min(560px, calc(100vw - 2 * var(--gutter)));
 		max-width: none;
-		max-height: min(540px, calc(100dvh - 32px));
-		margin: min(12vh, 96px) auto auto;
+		max-height: min(520px, calc(100dvh - 16px));
+		margin: 8px max(var(--gutter), calc((100vw - var(--page-max)) / 2 + var(--gutter))) auto auto;
 		padding: 0;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-panel);
 		background: var(--bg);
 		color: var(--text);
-		box-shadow: 0 16px 48px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
 		overflow: hidden;
 	}
 
 	.search::backdrop {
-		background: rgba(0, 0, 0, 0.36);
+		background: rgba(0, 0, 0, 0.12);
 	}
 
 	.box {
@@ -496,19 +490,10 @@
 		color: var(--text-2);
 	}
 
-	.hints {
-		display: flex;
-		flex-wrap: wrap;
-		gap: 6px 16px;
-		padding: 9px 14px;
-		border-top: 1px solid var(--line);
-		font-size: 12px;
-		color: var(--text-3);
-	}
-
-	@media (hover: none) {
-		.hints {
-			display: none;
+	@media (max-width: 900px) {
+		.search {
+			width: calc(100vw - 2 * var(--gutter));
+			margin-inline: auto;
 		}
 	}
 
