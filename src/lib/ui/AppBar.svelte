@@ -171,6 +171,12 @@
 		}
 	}
 
+	@media (max-width: 400px) {
+		nav {
+			gap: 0 8px;
+		}
+	}
+
 	@media (hover: none) {
 		.search kbd {
 			display: none;
