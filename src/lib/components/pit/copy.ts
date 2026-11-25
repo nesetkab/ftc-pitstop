@@ -241,10 +241,10 @@ export function qualsDoneText(view: PitView): { headline: string; detail: string
 
 export function absentText(view: PitView): { title: string; detail: string | null } {
 	if (view.rankings.some((row) => row.team === view.team)) {
-		return { title: `${view.team} is not at this meet.`, detail: null };
+		return { title: `${view.team} isn't at this meet.`, detail: null };
 	}
 	return {
-		title: `${view.team} is not on the team list for this event.`,
+		title: `${view.team} isn't on the team list for this event.`,
 		detail: 'Check the team number.'
 	};
 }

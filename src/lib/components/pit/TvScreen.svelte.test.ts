@@ -202,7 +202,7 @@ describe('TvScreen', () => {
 		const bundle = replayBundle(full, at('Q22'));
 		const view = pitView({ bundle, analysis: null, queue: null, team: 99999 });
 		const { container } = render(TvScreen, { props: { ...props(at('Q22')), view } });
-		expect(text(container)).toContain('99999 is not on the team list for this event.');
+		expect(text(container)).toContain("99999 isn't on the team list for this event.");
 	});
 });
 

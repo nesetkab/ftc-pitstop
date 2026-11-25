@@ -440,12 +440,12 @@ describe('pitView after quals', () => {
 		const meet = fixtureBundle('USMIWMM8');
 		const absent = pitView({ bundle: meet, analysis: null, queue: null, team: 24371 });
 		expect(absent).toMatchObject({ registered: false, ranking: null, matches: [] });
-		expect(absentText(absent).title).toBe('24371 is not at this meet.');
+		expect(absentText(absent).title).toBe("24371 isn't at this meet.");
 		const here = pitView({ bundle: meet, analysis: null, queue: null, team: 10104 });
 		expect(here.registered).toBe(true);
 		expect(
 			absentText(pitView({ bundle: full, analysis: null, queue: null, team: 99999 })).title
-		).toBe('99999 is not on the team list for this event.');
+		).toBe("99999 isn't on the team list for this event.");
 	});
 
 	it('knows when a team is not at the event', () => {
