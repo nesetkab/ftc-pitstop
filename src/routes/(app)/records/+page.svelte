@@ -19,7 +19,6 @@
 	import Seo from '#lib/ui/Seo.svelte';
 	import StaleNotice from '#lib/ui/StaleNotice.svelte';
 	import type { PageProps } from './$types';
-	import Legend from '#lib/ui/Legend.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -38,7 +37,7 @@
 	path="/records"
 />
 
-<PageHeader title="Season records" meta="Scores leave out points from the other alliance's fouls.">
+<PageHeader title="Season records">
 	{#snippet status()}
 		<StaleNotice updated={data.updated} staleAfter={86400} prefix="Updated" />
 	{/snippet}
@@ -103,10 +102,6 @@
 />
 
 {#if data.total > 0}
-	<Legend>
-		Each match counts twice, once for each alliance. Opponent is the other alliance's score.
-	</Legend>
-
 	<p class="csv">
 		<DownloadLink href="/records.csv{recordQuery({ ...data.filters, page: 1 })}" />
 		{#if data.total > RECORDS_CSV_LIMIT}

@@ -60,7 +60,6 @@
 		</fieldset>
 	{/each}
 </div>
-<p class="note">Total, Opponent and Margin leave out points from fouls. Final adds them back.</p>
 <div class="foot">
 	<Button variant="secondary" disabled={filters.show === null} onclick={() => choose(DEFAULT_SHOWN)}
 		>Reset</Button
@@ -118,17 +117,11 @@
 		color: var(--text-3);
 	}
 
-	.note {
-		margin: 14px 0 0;
-		font-size: 12.5px;
-		color: var(--text-3);
-	}
-
 	.foot {
 		display: flex;
 		justify-content: space-between;
 		gap: 10px;
-		margin-top: 12px;
+		margin-top: 16px;
 		padding-top: 12px;
 		border-top: 1px solid var(--line);
 	}
