@@ -5,6 +5,11 @@ type CspDirectives = NonNullable<NonNullable<Config['csp']>['directives']>;
 
 type ScriptHash = `sha256-${string}`;
 
+export const STREAM_FRAME_SOURCES = [
+	'https://www.youtube-nocookie.com',
+	'https://player.twitch.tv'
+] as const;
+
 export function inlineScriptHashes(html: string): ScriptHash[] {
 	const hashes: ScriptHash[] = [];
 	for (const match of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
@@ -25,7 +30,7 @@ export function cspDirectives(appHtml: string): CspDirectives {
 		'connect-src': ['self'],
 		'manifest-src': ['self'],
 		'worker-src': ['self'],
-		'frame-src': ['none'],
+		'frame-src': [...STREAM_FRAME_SOURCES],
 		'object-src': ['none'],
 		'base-uri': ['self'],
 		'form-action': ['self'],
