@@ -209,7 +209,6 @@
 
 		.records :global(:is(td, th).who) {
 			max-width: 0;
-			padding-left: 8px;
 			padding-right: 0;
 		}
 

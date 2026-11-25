@@ -78,13 +78,10 @@
 {/snippet}
 
 {#snippet sortLabel(column: Column<T>)}
-	{#if column.numeric}<Arrow
-			dir={arrow(column) === 'asc' ? 'up' : 'down'}
-			class="sort-arrow"
-		/>{/if}<span>{@render label(column, true)}</span>{#if !column.numeric}<Arrow
-			dir={arrow(column) === 'asc' ? 'up' : 'down'}
-			class="sort-arrow"
-		/>{/if}
+	<span>{@render label(column, true)}</span><Arrow
+		dir={arrow(column) === 'asc' ? 'up' : 'down'}
+		class="sort-arrow"
+	/>
 {/snippet}
 
 {#if shown.length === 0 && empty}
@@ -132,10 +129,18 @@
 {/if}
 
 <style>
+	:global(table.t) :is(th, td) {
+		padding-left: 14px;
+		padding-right: 6px;
+	}
+
+	:global(table.t) :is(th, td):first-child {
+		padding-left: 10px;
+	}
+
 	th.num,
 	td.num {
 		width: 1%;
-		padding-inline: 10px;
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -145,6 +150,7 @@
 	}
 
 	.sort {
+		position: relative;
 		display: inline-block;
 		white-space: nowrap;
 		padding: 0;
@@ -162,14 +168,18 @@
 	}
 
 	th :global(.sort-arrow) {
+		position: absolute;
+		top: 50%;
+		right: calc(100% + 2px);
 		max-width: none;
-		margin: 0 3px 0 0;
+		translate: 0 -50%;
 		opacity: 0;
 		transition: opacity 0.12s;
 	}
 
 	th.l :global(.sort-arrow) {
-		margin: 0 0 0 3px;
+		right: auto;
+		left: calc(100% + 2px);
 	}
 
 	.short {
@@ -218,9 +228,13 @@
 			display: none;
 		}
 
-		th.num,
-		td.num {
-			padding-inline: 8px;
+		:global(table.t) :is(th, td) {
+			padding-left: 13px;
+			padding-right: 5px;
+		}
+
+		:global(table.t) :is(th, td):first-child {
+			padding-left: 6px;
 		}
 
 		.long {
