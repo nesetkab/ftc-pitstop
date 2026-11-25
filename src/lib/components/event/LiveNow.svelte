@@ -10,6 +10,7 @@
 	import { hasPlayoffs } from '#lib/game/event-types.ts';
 	import type { ReplaySettings } from '#lib/game/replay.ts';
 	import type { AllianceColor, EventBundle } from '#lib/types.ts';
+	import Arrow from '#lib/ui/Arrow.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
@@ -119,12 +120,6 @@
 			win: match.forecast?.[color].win ?? null,
 			score: match.forecast?.[color].score ?? null
 		};
-	}
-
-	function move(value: number | null): string {
-		if (value === null) return '';
-		if (value === 0) return '–';
-		return value > 0 ? `↑${value}` : `↓${-value}`;
 	}
 
 	function moveLabel(value: number | null): string | undefined {
@@ -458,7 +453,18 @@
 									<td>{fixed(row.rs, 2)}</td>
 									<td class="opt">{row.wins}-{row.losses}-{row.ties}</td>
 									{#if view.since}
-										<td class="move" aria-label={moveLabel(row.move)}>{move(row.move)}</td>
+										<td class="move">
+											{#if row.move === 0}
+												<span aria-hidden="true">–</span>
+											{:else if row.move !== null}
+												<span class="moved" aria-hidden="true"
+													><Arrow dir={row.move > 0 ? 'up' : 'down'} />{Math.abs(row.move)}</span
+												>
+											{/if}
+											{#if moveLabel(row.move)}
+												<span class="visually-hidden">{moveLabel(row.move)}</span>
+											{/if}
+										</td>
 									{/if}
 								</tr>
 							{/each}
@@ -653,6 +659,12 @@
 
 	.move {
 		color: var(--text-2);
+	}
+
+	.moved {
+		display: inline-flex;
+		align-items: center;
+		gap: 2px;
 	}
 
 	tr.picking td {

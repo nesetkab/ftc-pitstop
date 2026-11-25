@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Arrow from '#lib/ui/Arrow.svelte';
 	import Term from '#lib/ui/Term.svelte';
 	import { follows, syncFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { integer, shortDate } from '#lib/format/index.ts';
@@ -66,8 +67,7 @@
 						aria-sort={active ? 'descending' : undefined}
 					>
 						<a class="sort-link" href={sortHref(column.key)} data-sveltekit-reset="false"
-							><Term label={column.label} nested /><span class="arrow" aria-hidden="true">↓</span
-							></a
+							><Term label={column.label} nested /><Arrow dir="down" class="sort-arrow" /></a
 						>
 					</th>
 				{/each}
@@ -126,16 +126,11 @@
 {/if}
 
 <style>
-	:global(.records) {
-		--sort-hint: '';
-	}
-
 	th a {
 		color: inherit;
 	}
 
-	.arrow {
-		margin-left: 3px;
+	th :global(.sort-arrow) {
 		opacity: 0.35;
 	}
 
@@ -144,7 +139,7 @@
 		font-weight: 600;
 	}
 
-	th.active .arrow {
+	th.active :global(.sort-arrow) {
 		opacity: 1;
 	}
 

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import Arrow from './Arrow.svelte';
 	import { clearRecent, readRecent, rememberRecent } from './recent-searches.ts';
 	import { searchApi } from './search-results.ts';
 	import { searchShortcut, type SearchFn, type SearchResult } from './search.svelte.ts';
@@ -279,7 +280,9 @@
 		</p>
 
 		<div class="hints" aria-hidden="true">
-			<span><kbd>↑</kbd> <kbd>↓</kbd> to move</span>
+			<span
+				><span class="keys"><kbd><Arrow dir="up" /></kbd><kbd><Arrow dir="down" /></kbd></span> to move</span
+			>
 			<span><kbd>Enter</kbd> to open</span>
 			<span><kbd>Esc</kbd> to close</span>
 		</div>
@@ -439,6 +442,31 @@
 		border-top: 1px solid var(--line);
 		font-size: 12px;
 		color: var(--text-3);
+	}
+
+	.hints > span {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+	}
+
+	.keys {
+		display: inline-flex;
+		gap: 3px;
+	}
+
+	.hints kbd {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-width: 20px;
+		height: 20px;
+		padding: 0 5px;
+	}
+
+	.hints kbd :global(.arrow) {
+		width: 10px;
+		height: 10px;
 	}
 
 	@media (hover: none) {

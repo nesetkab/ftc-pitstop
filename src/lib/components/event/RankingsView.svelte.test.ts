@@ -39,7 +39,7 @@ describe('RankingsView', () => {
 
 	it('shows the FTC rankings without any analysis', () => {
 		render(RankingsView, { props: { bundle: finished } });
-		expect(headers()).toEqual(['Rank ↑', 'Team', 'RS', 'Record', 'TBP', 'NP max', 'Avg tips']);
+		expect(headers()).toEqual(['Rank', 'Team', 'RS', 'Record', 'TBP', 'NP max', 'Avg tips']);
 		const table = screen.getByRole('table', { name: 'Rankings' });
 		const rows = bodyRows(table);
 		expect(rows).toHaveLength(27);
@@ -263,7 +263,7 @@ describe('RankingsView', () => {
 			'Rank',
 			'Team',
 			'RS',
-			'NP avg ↓',
+			'NP avg',
 			'Spread',
 			'OPR',
 			'Auto OPR',
