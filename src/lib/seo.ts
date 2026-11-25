@@ -182,7 +182,7 @@ export function matchDescription(match: Match, title: string, event: Event): str
 
 type SeoRegion = {
 	name: string;
-	teams: number;
+	teams: number | null;
 	events: number;
 	done: number;
 	top: { team: number; name: string | null; opr: number } | null;
@@ -197,8 +197,10 @@ export function regionTitle(name: string): string {
 }
 
 export function regionDescription(region: SeoRegion): string {
+	const facts = [count(region.events, 'event'), `${integer(region.done)} played`];
+	if (region.teams !== null) facts.push(count(region.teams, 'team'));
 	const parts = [
-		`The ${region.name} FTC region in the ${SEASON_NAME} season: ${count(region.events, 'event')}, ${integer(region.done)} played, ${count(region.teams, 'team')}.`
+		`The ${region.name} FTC region in the ${SEASON_NAME} season: ${facts.join(', ')}.`
 	];
 	if (region.top) {
 		const name = region.top.name ? ` ${region.top.name}` : '';

@@ -31,7 +31,7 @@ export interface RegionSummary {
 	code: string;
 	name: string;
 	bucket: RegionBucket;
-	teams: number;
+	teams: number | null;
 	rated: number;
 	events: number;
 	done: number;
@@ -111,7 +111,7 @@ export function buildRegions(input: RegionInput): Map<string, Region> {
 				code: label.value,
 				name: label.label,
 				bucket: label.bucket,
-				teams: roster.size,
+				teams: roster.size > 0 ? roster.size : null,
 				rated: rated.length,
 				events: events.length,
 				...counts,
