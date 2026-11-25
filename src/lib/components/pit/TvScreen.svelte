@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import type { DataSource, Event } from '#lib/types.ts';
 	import Takeover from './Takeover.svelte';
 	import TvDone from './TvDone.svelte';
@@ -7,10 +8,12 @@
 	import TvPlayoffs from './TvPlayoffs.svelte';
 	import TvQuals from './TvQuals.svelte';
 	import TvSelection from './TvSelection.svelte';
+	import TvStream from './TvStream.svelte';
 	import TvUpcoming from './TvUpcoming.svelte';
 	import { absentText, heroText } from './copy.ts';
 	import type { Connection } from './poll.ts';
 	import type { QueueCall } from './queue.ts';
+	import { readTvStream, saveTvStream } from './stream.ts';
 	import type { PitView } from './view.ts';
 
 	interface Props {
@@ -43,6 +46,8 @@
 		ondismiss = () => {}
 	}: Props = $props();
 
+	let streaming = $state(false);
+
 	const timeZone = $derived(event.timezone);
 	const absent = $derived(absentText(view));
 	const headline = $derived(
@@ -50,16 +55,35 @@
 			? heroText(view.next, takeover, now, timeZone, view.delaySeconds).headline
 			: 'Queue now'
 	);
+
+	onMount(() => {
+		streaming = readTvStream();
+	});
+
+	function toggleStream() {
+		streaming = !streaming;
+		saveTvStream(streaming);
+	}
 </script>
 
 <div class="tv pit" data-phase={view.phase}>
-	<TvHeader eventName={event.name} team={view.team} teamName={view.teamName} {now} {timeZone} />
+	<TvHeader
+		eventName={event.name}
+		team={view.team}
+		teamName={view.teamName}
+		{now}
+		{timeZone}
+		streaming={view.registered ? streaming : null}
+		onstream={toggleStream}
+	/>
 	<main class="main">
 		{#if !view.registered}
 			<div class="message">
 				<p class="title">{absent.title}</p>
 				<p class="sub">{absent.detail}</p>
 			</div>
+		{:else if streaming}
+			<TvStream {view} {event} {call} {now} />
 		{:else if view.phase === 'upcoming'}
 			<TvUpcoming {view} {event} {now} {phoneUrl} />
 		{:else if view.phase === 'quals'}
