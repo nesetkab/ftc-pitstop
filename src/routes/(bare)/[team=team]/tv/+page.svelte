@@ -56,7 +56,7 @@
 {#if data.state === 'no-events'}
 	<TvMessage title="{data.team} has no events this season." />
 {:else if data.state === 'unavailable'}
-	<TvMessage title={data.message} detail="This screen tries again on its own." />
+	<TvMessage title={data.message} />
 {:else if session?.view && session.bundle}
 	<TvScreen
 		view={session.view}
@@ -73,8 +73,5 @@
 		ondismiss={() => session.dismiss()}
 	/>
 {:else}
-	<TvMessage
-		title="Waiting for event data"
-		detail="FTC Events is not responding. This screen tries again on its own."
-	/>
+	<TvMessage title="Waiting for event data" detail="FTC Events is not responding." />
 {/if}

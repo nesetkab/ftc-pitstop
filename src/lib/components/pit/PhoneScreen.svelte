@@ -214,7 +214,11 @@
 		{#if tab === 'team'}
 			{#if !view.registered}
 				{@const absent = absentText(view)}
-				<EmptyState title={absent.title}>{absent.detail}</EmptyState>
+				{#if absent.detail}
+					<EmptyState title={absent.title}>{absent.detail}</EmptyState>
+				{:else}
+					<EmptyState title={absent.title} />
+				{/if}
 			{:else if next && text && view.phase !== 'upcoming'}
 				<section class={['next', { called }]}>
 					<span class="muted">
@@ -269,9 +273,7 @@
 						</span>
 					</section>
 				{:else}
-					<EmptyState title="The match schedule hasn't been posted yet.">
-						This page fills in on its own once it is.
-					</EmptyState>
+					<EmptyState title="The match schedule hasn't been posted yet." />
 				{/if}
 			{:else if view.phase === 'quals'}
 				<section class="next">
@@ -398,15 +400,12 @@
 				<section class="sec">
 					<h2 class="sec-title">Alerts</h2>
 					{#each alertOptions as option (option.key)}
-						<div class="alert">
-							<Toggle
-								label={option.label}
-								checked={alerts[option.key] && permission === 'granted'}
-								disabled={blocked}
-								onchange={(on) => onalert(option.key, on)}
-							/>
-							<p class="detail">{option.detail}</p>
-						</div>
+						<Toggle
+							label={option.label}
+							checked={alerts[option.key] && permission === 'granted'}
+							disabled={blocked}
+							onchange={(on) => onalert(option.key, on)}
+						/>
 					{/each}
 					{#if canVibrate && permission === 'granted'}
 						<Toggle
@@ -715,17 +714,6 @@
 
 	.facts {
 		font-size: 16px;
-	}
-
-	.alert {
-		display: grid;
-		gap: 2px;
-	}
-
-	.detail {
-		padding-right: 56px;
-		font-size: 13px;
-		color: var(--text-3);
 	}
 
 	.big.urgent {

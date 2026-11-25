@@ -54,9 +54,6 @@
 			<p class={['status', { won: playoff?.state === 'won' }]}>
 				{result ?? 'Waiting for the next match'}
 			</p>
-			{#if playoff?.state === 'alive' || playoff?.state === 'waiting'}
-				<p class="sub">Our next match shows up here when it is scheduled.</p>
-			{/if}
 		{/if}
 	</section>
 	<section>

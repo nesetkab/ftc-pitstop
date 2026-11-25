@@ -114,7 +114,7 @@
 		<p class="stake">{stakeText(stake)}</p>
 	{/if}
 
-	<p class="note">Bold marks the best on the field. Tap a team for its full report.</p>
+	<p class="note">Bold marks the best on the field.</p>
 </section>
 
 <style>

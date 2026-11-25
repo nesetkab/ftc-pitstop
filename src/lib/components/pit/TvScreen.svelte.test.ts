@@ -394,15 +394,6 @@ describe('PhoneScreen', () => {
 		expect(text(hero as HTMLElement)).toContain("Q25 is on the field. We're up next.");
 	});
 
-	it('describes each alert without guessing at live data', () => {
-		const { container } = phone('default');
-		const details = [...container.querySelectorAll('.alert .detail')].map((node) =>
-			text(node as HTMLElement).trim()
-		);
-		expect(details[0]).toBe('Our alliance, partners and queue time.');
-		expect(details[1]).toBe('Win or loss and the final score.');
-	});
-
 	it('offers vibration and a test alert only where they work', async () => {
 		const ontest = vi.fn();
 		const onvibrate = vi.fn();

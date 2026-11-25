@@ -80,7 +80,7 @@
 		{#if !view.registered}
 			<div class="message">
 				<p class="title">{absent.title}</p>
-				<p class="sub">{absent.detail}</p>
+				{#if absent.detail}<p class="sub">{absent.detail}</p>{/if}
 			</div>
 		{:else if streaming}
 			<TvStream {view} {event} {call} {now} />

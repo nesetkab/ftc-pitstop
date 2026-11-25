@@ -53,7 +53,6 @@
 				<b>{first.label}</b>
 			{:else}
 				<b>The match schedule hasn't been posted yet.</b>
-				<span>This screen fills in on its own once it is.</span>
 			{/if}
 		</div>
 	</section>
@@ -65,8 +64,7 @@
 			{/if}
 			{#if view.startsAt !== null}
 				<p class="sub">
-					Matches start {startDay ? `${startDay} ` : ''}at {time(view.startsAt, event.timezone)}. {view.qualsTotal}
-					qualification matches in all.
+					Matches start {startDay ? `${startDay} ` : ''}at {time(view.startsAt, event.timezone)}.
 				</p>
 			{/if}
 		</section>

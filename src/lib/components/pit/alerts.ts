@@ -21,27 +21,11 @@ export const DEFAULT_ALERTS: AlertSettings = {
 	selectionStarts: true
 };
 
-export const ALERT_OPTIONS: { key: AlertKey; label: string; detail: string }[] = [
-	{
-		key: 'twoBefore',
-		label: 'Two matches before ours',
-		detail: 'Our alliance, partners and queue time.'
-	},
-	{
-		key: 'scorePosted',
-		label: 'Our score is posted',
-		detail: 'Win or loss and the final score.'
-	},
-	{
-		key: 'rankChanges',
-		label: 'Our rank changes',
-		detail: 'Our new rank and where we moved from.'
-	},
-	{
-		key: 'selectionStarts',
-		label: 'Alliance selection starts',
-		detail: 'Where we finished in quals.'
-	}
+export const ALERT_OPTIONS: { key: AlertKey; label: string }[] = [
+	{ key: 'twoBefore', label: 'Two matches before ours' },
+	{ key: 'scorePosted', label: 'Our score is posted' },
+	{ key: 'rankChanges', label: 'Our rank changes' },
+	{ key: 'selectionStarts', label: 'Alliance selection starts' }
 ];
 
 export const VIBRATE_KEY = 'ps-alert-vibrate';

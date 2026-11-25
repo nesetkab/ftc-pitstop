@@ -112,13 +112,11 @@
 
 {#if data.state === 'no-events'}
 	<main class="message">
-		<EmptyState title="{data.team} has no events this season.">
-			Its next event shows here once the team is registered for one.
-		</EmptyState>
+		<EmptyState title="{data.team} has no events this season." />
 	</main>
 {:else if data.state === 'unavailable'}
 	<main class="message">
-		<EmptyState title={data.message}>This page tries again on its own.</EmptyState>
+		<EmptyState title={data.message} />
 	</main>
 {:else if session?.view && session.bundle}
 	<PhoneScreen
@@ -145,7 +143,7 @@
 {:else}
 	<main class="message">
 		<EmptyState title="Waiting for event data">
-			FTC Events is not responding. This page tries again on its own.
+			FTC Events is not responding.
 		</EmptyState>
 	</main>
 {/if}
