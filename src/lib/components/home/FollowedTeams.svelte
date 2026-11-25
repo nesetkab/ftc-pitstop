@@ -18,7 +18,7 @@
 	let ready = $state(false);
 	let failed = $state(false);
 	let info = $state<Record<number, FollowedTeam>>({});
-	let bundles = $state<Record<string, LiveBundle | null>>({});
+	let bundles = $state.raw<Record<string, LiveBundle | null>>({});
 	let now = $state(Date.now());
 	let list = $state<HTMLUListElement>();
 	let focusTeam = $state<number | null>(null);
@@ -79,10 +79,11 @@
 			for (const code of codes) {
 				getJson<EventBundle>(`/api/events/${code}/lite`, controller.signal)
 					.then((bundle) => {
-						if (bundle || !(code in bundles)) bundles[code] = bundle;
+						if (bundle || !(code in bundles)) bundles = { ...bundles, [code]: bundle };
 					})
 					.catch(() => {
-						if (!controller.signal.aborted && !(code in bundles)) bundles[code] = null;
+						if (!controller.signal.aborted && !(code in bundles))
+							bundles = { ...bundles, [code]: null };
 					});
 			}
 		};

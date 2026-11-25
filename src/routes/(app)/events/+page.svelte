@@ -51,7 +51,7 @@
 	let type = $state('');
 	let when = $state<DateFilter>('upcoming');
 	let limit = $state(PAGE_SIZE);
-	let season = $state<ListedEvent[] | null>(null);
+	let season = $state.raw<ListedEvent[] | null>(null);
 	let failed = $state(false);
 	let ready = false;
 
