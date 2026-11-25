@@ -16,6 +16,11 @@ export type PooledParams = {
 	offW: number;
 	penW: number;
 	penLam: number;
+	huberEvent: number;
+	sobs: number;
+	qMatch: number;
+	hetero: number;
+	heteroPool: number;
 	kappa: number;
 	block: boolean;
 	q: number;
@@ -43,6 +48,11 @@ export const POOLED_BASE: PooledParams = {
 	offW: 1,
 	penW: 0,
 	penLam: 10,
+	huberEvent: Infinity,
+	sobs: 0.8,
+	qMatch: 0,
+	hetero: 0,
+	heteroPool: 0,
 	kappa: 1,
 	block: true,
 	q: 0,
@@ -354,6 +364,12 @@ export class PooledOpr implements Model {
 				let w = decay > 0 ? Math.exp(-decay * (day - this.rday[r])) : 1;
 				if (this.rpo[r] & 1) w *= p.playoffW;
 				if (this.rpo[r] & 2) w *= p.offW;
+				if (p.heteroPool !== 0 && ctx.mean > 0) {
+					const a = this.ra[r];
+					const b = this.rb[r];
+					const lvl = (this.xs[a] + (b >= 0 ? this.xs[b] : 0)) / ctx.mean;
+					w /= Math.min(Math.max(lvl, 0.25), 4) ** p.heteroPool;
+				}
 				this.w[r] = w * robust[r];
 				const m = this.rmean[r];
 				ys[r] = m > 0 && ctx.mean > 0 ? this.ry[r] * (ctx.mean / m) ** p.drift : this.ry[r];
@@ -581,7 +597,7 @@ export class PooledOpr implements Model {
 		return { red, blue, varFactor: (v + 2) / 2, redScore, blueScore };
 	}
 
-	observe(teams: number[], y: number, noise: number): void {
+	observe(teams: number[], y: number, base: number, ctx: Ctx): void {
 		const n = this.n;
 		const split = this.split();
 		const idx = teams.map((t) => this.index.get(t)!);
@@ -594,6 +610,14 @@ export class PooledOpr implements Model {
 		}
 		const resid = y - pred;
 		const residNu = y - predNu;
+		const p = this.p;
+		let noise = base;
+		if (p.hetero !== 0 && ctx.mean > 0)
+			noise *= Math.min(Math.max(predNu / ctx.mean, 0.25), 4) ** p.hetero;
+		if (Number.isFinite(p.huberEvent)) {
+			const z = Math.abs(resid) / (p.sobs * ctx.sd * Math.sqrt(hph + noise));
+			if (z > p.huberEvent) noise *= z / p.huberEvent;
+		}
 		const s = hph + noise;
 		for (let k = 0; k < n; k++) this.mu[k] += (this.ph[k] / s) * resid;
 		if (!split) for (let k = 0; k < n; k++) this.nu[k] += (this.ph[k] / s) * residNu;
@@ -621,6 +645,12 @@ export class PooledOpr implements Model {
 				this.S[i * n + i] += p.scoreQ;
 			}
 		}
+		if (p.qMatch > 0) {
+			for (const t of [...m.redUpd, ...m.blueUpd]) {
+				const i = this.index.get(t)!;
+				this.P[i * n + i] += p.qMatch;
+			}
+		}
 		const flags = (m.playoff ? 1 : 0) | (this.currentOfficial ? 0 : 2);
 		const noise = 1 / ((m.playoff ? p.playoffW : 1) * (this.currentOfficial ? 1 : p.offW));
 		for (const [ok, teams, red] of [
@@ -629,7 +659,7 @@ export class PooledOpr implements Model {
 		] as const) {
 			if (!ok) continue;
 			const y = this.target(m, red);
-			if (Number.isFinite(noise)) this.observe(teams, y, noise);
+			if (Number.isFinite(noise)) this.observe(teams, y, noise, ctx);
 			this.pending.push({
 				end: this.currentEnd,
 				day: ctx.day,
