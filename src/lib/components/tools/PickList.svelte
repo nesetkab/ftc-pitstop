@@ -156,6 +156,10 @@
 
 	function edgeScroll() {
 		if (!drag) return;
+		if (!listElement?.querySelector(`[data-handle="${drag.team}"]`)) {
+			stopDrag();
+			return;
+		}
 		const y = drag.pointerY;
 		const bottom = window.innerHeight - EDGE;
 		const speed = y < EDGE ? -(EDGE - y) / 4 : y > bottom ? (y - bottom) / 4 : 0;
@@ -190,6 +194,8 @@
 	function moveDrag(event: PointerEvent) {
 		if (drag) drag = at(drag, event.clientY);
 	}
+
+	$effect(() => () => cancelAnimationFrame(frame));
 
 	function stopDrag() {
 		cancelAnimationFrame(frame);
@@ -337,6 +343,7 @@
 				onpointermove={moveDrag}
 				onpointerup={endDrag}
 				onpointercancel={stopDrag}
+				onlostpointercapture={stopDrag}
 				onkeydown={(event) => pressKey(event, entry.team, index)}
 			>
 				<svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true">

@@ -97,7 +97,9 @@
 		async function tick() {
 			if (stopped) return;
 			if (!document.hidden && refreshInterval(bundle.phase) !== null) await refresh();
-			if (!stopped) timer = setTimeout(tick, refreshInterval(bundle.phase) ?? 60_000);
+			if (stopped) return;
+			clearTimeout(timer);
+			timer = setTimeout(tick, refreshInterval(bundle.phase) ?? 60_000);
 		}
 
 		function wake() {
