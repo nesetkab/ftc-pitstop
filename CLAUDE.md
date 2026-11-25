@@ -30,6 +30,8 @@ leave it out.
   no "points".
 - **No hype or filler.** No "powerful", "seamless", "instantly", "simply", "just", "all in one
   place". No exclamation marks.
+- **No method notes on data pages.** Don't explain how scores, fouls, penalties or ratings are
+  counted under tables, in captions or in cards. That belongs on the about page only.
 - **aOPR, not OPR,** for PitStop's own rating. "OPR" only for classic OPR or other sites' numbers.
 
 ### Examples
