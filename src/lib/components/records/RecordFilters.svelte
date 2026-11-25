@@ -78,7 +78,7 @@
 		<label>
 			<span>Matches</span>
 			<select name="level" value={filters.level}>
-				<option value="">Quals and playoffs</option>
+				<option value="">All matches</option>
 				<option value="qual">Quals only</option>
 				<option value="playoff">Playoffs only</option>
 			</select>

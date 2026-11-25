@@ -97,9 +97,9 @@
 			</h2>
 			{#if facts.length > 0}
 				<p class="facts">
-					{#each facts as fact, index (fact)}{#if index > 0}<span class="dot" aria-hidden="true"
-								>·</span
-							>{/if}<span>{fact}</span>{/each}
+					{#each facts as fact (fact)}<span
+							><span class="dot" aria-hidden="true">·</span>{fact}</span
+						>{/each}
 				</p>
 			{/if}
 		</div>
@@ -388,14 +388,19 @@
 	.facts {
 		display: flex;
 		flex-wrap: wrap;
-		gap: 2px 8px;
+		gap: 2px 0;
+		margin-left: -20px;
+		clip-path: inset(0 0 0 20px);
 		font-size: 14px;
 		color: var(--text-2);
 		font-variant-numeric: tabular-nums;
 	}
 
 	.dot {
+		display: inline-block;
+		width: 20px;
 		color: var(--text-3);
+		text-align: center;
 	}
 
 	.actions {

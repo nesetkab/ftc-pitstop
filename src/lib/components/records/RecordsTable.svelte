@@ -122,7 +122,7 @@
 							]}>{value(row, column.key)}</td
 						>
 					{/each}
-					<td class={['l team', { bare: filters.part !== 'total' }]}>
+					<td class="l team">
 						<span class="teams">
 							{#each row.teams as team (team)}
 								<a href="/teams/{team}"
@@ -317,15 +317,11 @@
 			padding-inline: 6px;
 		}
 
-		.teams a {
-			max-width: 34vw;
-		}
-
 		.event {
-			max-width: 34vw;
+			max-width: calc(100vw - 188px);
 		}
 
-		.bare .name {
+		.name {
 			display: none;
 		}
 

@@ -163,4 +163,10 @@
 			display: none;
 		}
 	}
+
+	@media (max-width: 600px) {
+		.team-name {
+			overflow: visible;
+		}
+	}
 </style>

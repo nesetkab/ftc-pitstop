@@ -170,11 +170,13 @@
 	.nudge.start {
 		left: -6px;
 		justify-items: start;
+		background: linear-gradient(to right, var(--bg) 60%, transparent);
 	}
 
 	.nudge.end {
 		right: -6px;
 		justify-items: end;
+		background: linear-gradient(to left, var(--bg) 60%, transparent);
 	}
 
 	svg {

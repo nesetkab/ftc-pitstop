@@ -129,6 +129,7 @@
 
 	@media (max-width: 600px) {
 		fieldset.rating {
+			grid-column: 1 / -1;
 			grid-template-columns: 1fr 1fr;
 			column-gap: 20px;
 		}
