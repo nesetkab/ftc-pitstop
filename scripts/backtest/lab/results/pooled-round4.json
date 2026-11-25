@@ -1,0 +1,342 @@
+[
+	{
+		"name": "shipped",
+		"mapping": {
+			"link": "logit",
+			"kappa": 0.40444618511822666,
+			"eta": 0.2,
+			"gamma": 0.375
+		},
+		"train": {
+			"brier": 0.16778,
+			"logloss": 0.50883,
+			"accuracy": 0.746,
+			"mae": 23.31,
+			"n": 165603
+		},
+		"test": {
+			"brier": 0.17084,
+			"logloss": 0.51822,
+			"accuracy": 0.7376,
+			"mae": 13.83,
+			"n": 8594
+		},
+		"testQuals": {
+			"brier": 0.17306,
+			"logloss": 0.52422,
+			"accuracy": 0.7346,
+			"mae": 13.71,
+			"n": 8063
+		},
+		"testPlayoffs": {
+			"brier": 0.1371,
+			"logloss": 0.42712,
+			"accuracy": 0.7818,
+			"mae": 15.61,
+			"n": 531
+		},
+		"bySeason": {
+			"2021": {
+				"brier": 0.18324,
+				"logloss": 0.54794,
+				"accuracy": 0.715,
+				"mae": 26.81,
+				"n": 19601
+			},
+			"2022": {
+				"brier": 0.16826,
+				"logloss": 0.50955,
+				"accuracy": 0.7458,
+				"mae": 22.57,
+				"n": 28186
+			},
+			"2023": {
+				"brier": 0.17022,
+				"logloss": 0.51526,
+				"accuracy": 0.7404,
+				"mae": 21.79,
+				"n": 32808
+			},
+			"2024": {
+				"brier": 0.1581,
+				"logloss": 0.48388,
+				"accuracy": 0.7636,
+				"mae": 26.58,
+				"n": 39799
+			},
+			"2025": {
+				"brier": 0.16753,
+				"logloss": 0.50873,
+				"accuracy": 0.7479,
+				"mae": 20.49,
+				"n": 45209
+			},
+			"2026": {
+				"brier": 0.17084,
+				"logloss": 0.51822,
+				"accuracy": 0.7376,
+				"mae": 13.83,
+				"n": 8594
+			}
+		},
+		"gapVsShipped": {
+			"diff": 0,
+			"se": 0
+		}
+	},
+	{
+		"name": "robot-het",
+		"mapping": {
+			"link": "logit",
+			"kappa": 0.36242547141729625,
+			"eta": 0,
+			"gamma": 0.375
+		},
+		"train": {
+			"brier": 0.16479,
+			"logloss": 0.5012,
+			"accuracy": 0.7518,
+			"mae": 23.91,
+			"n": 165603
+		},
+		"test": {
+			"brier": 0.16593,
+			"logloss": 0.50623,
+			"accuracy": 0.745,
+			"mae": 14.26,
+			"n": 8594
+		},
+		"testQuals": {
+			"brier": 0.16785,
+			"logloss": 0.51145,
+			"accuracy": 0.7429,
+			"mae": 14.07,
+			"n": 8063
+		},
+		"testPlayoffs": {
+			"brier": 0.13679,
+			"logloss": 0.42697,
+			"accuracy": 0.7761,
+			"mae": 17.26,
+			"n": 531
+		},
+		"bySeason": {
+			"2021": {
+				"brier": 0.1813,
+				"logloss": 0.54302,
+				"accuracy": 0.7188,
+				"mae": 28.17,
+				"n": 19601
+			},
+			"2022": {
+				"brier": 0.16562,
+				"logloss": 0.50287,
+				"accuracy": 0.7519,
+				"mae": 22.83,
+				"n": 28186
+			},
+			"2023": {
+				"brier": 0.16345,
+				"logloss": 0.49825,
+				"accuracy": 0.7519,
+				"mae": 21.65,
+				"n": 32808
+			},
+			"2024": {
+				"brier": 0.15565,
+				"logloss": 0.47743,
+				"accuracy": 0.7685,
+				"mae": 27.62,
+				"n": 39799
+			},
+			"2025": {
+				"brier": 0.16613,
+				"logloss": 0.5051,
+				"accuracy": 0.7511,
+				"mae": 21.12,
+				"n": 45209
+			},
+			"2026": {
+				"brier": 0.16593,
+				"logloss": 0.50623,
+				"accuracy": 0.745,
+				"mae": 14.26,
+				"n": 8594
+			}
+		},
+		"gapVsShipped": {
+			"diff": -0.004916105443534911,
+			"se": 0.000585724086797408
+		}
+	},
+	{
+		"name": "robot-imb",
+		"mapping": {
+			"link": "logit",
+			"kappa": 0.36924331342047784,
+			"eta": 0,
+			"gamma": 0.375
+		},
+		"train": {
+			"brier": 0.164,
+			"logloss": 0.49921,
+			"accuracy": 0.7532,
+			"mae": 23.36,
+			"n": 165603
+		},
+		"test": {
+			"brier": 0.16343,
+			"logloss": 0.49981,
+			"accuracy": 0.7509,
+			"mae": 13.71,
+			"n": 8594
+		},
+		"testQuals": {
+			"brier": 0.16523,
+			"logloss": 0.50469,
+			"accuracy": 0.749,
+			"mae": 13.48,
+			"n": 8063
+		},
+		"testPlayoffs": {
+			"brier": 0.13613,
+			"logloss": 0.42579,
+			"accuracy": 0.7799,
+			"mae": 17.09,
+			"n": 531
+		},
+		"bySeason": {
+			"2021": {
+				"brier": 0.18081,
+				"logloss": 0.54187,
+				"accuracy": 0.7213,
+				"mae": 27.43,
+				"n": 19601
+			},
+			"2022": {
+				"brier": 0.16521,
+				"logloss": 0.50183,
+				"accuracy": 0.7513,
+				"mae": 22.39,
+				"n": 28186
+			},
+			"2023": {
+				"brier": 0.16308,
+				"logloss": 0.49736,
+				"accuracy": 0.7532,
+				"mae": 21.39,
+				"n": 32808
+			},
+			"2024": {
+				"brier": 0.15458,
+				"logloss": 0.47472,
+				"accuracy": 0.77,
+				"mae": 26.87,
+				"n": 39799
+			},
+			"2025": {
+				"brier": 0.16491,
+				"logloss": 0.50199,
+				"accuracy": 0.7536,
+				"mae": 20.53,
+				"n": 45209
+			},
+			"2026": {
+				"brier": 0.16343,
+				"logloss": 0.49981,
+				"accuracy": 0.7509,
+				"mae": 13.71,
+				"n": 8594
+			}
+		},
+		"gapVsShipped": {
+			"diff": -0.007412517297187769,
+			"se": 0.0006248400042351302
+		}
+	},
+	{
+		"name": "blend-robot",
+		"mapping": {
+			"link": "logit",
+			"kappa": 0.3781010343794366,
+			"eta": 0,
+			"gamma": 0.375
+		},
+		"train": {
+			"brier": 0.16366,
+			"logloss": 0.49838,
+			"accuracy": 0.7532,
+			"mae": 22.94,
+			"n": 165603
+		},
+		"test": {
+			"brier": 0.16338,
+			"logloss": 0.49935,
+			"accuracy": 0.7486,
+			"mae": 13.44,
+			"n": 8594
+		},
+		"testQuals": {
+			"brier": 0.1652,
+			"logloss": 0.5043,
+			"accuracy": 0.7471,
+			"mae": 13.24,
+			"n": 8063
+		},
+		"testPlayoffs": {
+			"brier": 0.13574,
+			"logloss": 0.42427,
+			"accuracy": 0.7723,
+			"mae": 16.38,
+			"n": 531
+		},
+		"bySeason": {
+			"2021": {
+				"brier": 0.18116,
+				"logloss": 0.543,
+				"accuracy": 0.7195,
+				"mae": 26.78,
+				"n": 19601
+			},
+			"2022": {
+				"brier": 0.16493,
+				"logloss": 0.50109,
+				"accuracy": 0.7523,
+				"mae": 22.1,
+				"n": 28186
+			},
+			"2023": {
+				"brier": 0.16286,
+				"logloss": 0.49687,
+				"accuracy": 0.7528,
+				"mae": 21.01,
+				"n": 32808
+			},
+			"2024": {
+				"brier": 0.15405,
+				"logloss": 0.47332,
+				"accuracy": 0.7701,
+				"mae": 26.37,
+				"n": 39799
+			},
+			"2025": {
+				"brier": 0.16434,
+				"logloss": 0.5005,
+				"accuracy": 0.7536,
+				"mae": 20.19,
+				"n": 45209
+			},
+			"2026": {
+				"brier": 0.16338,
+				"logloss": 0.49935,
+				"accuracy": 0.7486,
+				"mae": 13.44,
+				"n": 8594
+			}
+		},
+		"gapVsShipped": {
+			"diff": -0.007462233238719743,
+			"se": 0.0005470281181049807
+		}
+	}
+]
