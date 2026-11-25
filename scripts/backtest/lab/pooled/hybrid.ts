@@ -56,27 +56,56 @@ export class PooledPriorOpr extends KalmanOpr {
 
 export class HeteroOpr extends KalmanOpr {
 	hetero: number;
+	imbPred: number;
+	imbFit: number;
 
-	constructor(name: string, p: OprParams, hetero: number) {
+	constructor(name: string, p: OprParams, hetero: number, imbPred = 0, imbFit = 0) {
 		super(name, p);
 		this.hetero = hetero;
+		this.imbPred = imbPred;
+		this.imbFit = imbFit;
+	}
+
+	predict(m: PMatch, ctx: Ctx): Pred {
+		const out = super.predict(m, ctx);
+		const c = this.imbPred;
+		if (c === 0) return out;
+		const gap = (teams: number[], score: boolean) =>
+			teams.length === 2
+				? Math.abs(this.value(teams[0], ctx, score) - this.value(teams[1], ctx, score))
+				: 0;
+		return {
+			...out,
+			red: out.red + c * gap(m.red, false),
+			blue: out.blue + c * gap(m.blue, false),
+			redScore: out.redScore + c * gap(m.red, true),
+			blueScore: out.blueScore + c * gap(m.blue, true)
+		};
 	}
 
 	observe(teams: number[], y: number, ctx: Ctx): void {
 		const n = this.n;
 		const split = this.split();
 		const idx = teams.map((t) => this.index.get(t)!);
+		const h = idx.map(() => 1);
+		if (this.imbFit !== 0 && idx.length === 2) {
+			const sgn = Math.sign(this.nu[idx[0]] - this.nu[idx[1]]);
+			h[0] = 1 + this.imbFit * sgn;
+			h[1] = 1 - this.imbFit * sgn;
+		}
 		const ph = this.ph;
 		ph.fill(0);
-		for (const i of idx) for (let k = 0; k < n; k++) ph[k] += this.P[i * n + k];
+		idx.forEach((i, j) => {
+			for (let k = 0; k < n; k++) ph[k] += h[j] * this.P[i * n + k];
+		});
 		let hph = 0;
 		let pred = 0;
 		let predNu = 0;
-		for (const i of idx) {
-			hph += ph[i];
-			pred += this.mu[i];
-			predNu += this.nu[i];
-		}
+		idx.forEach((i, j) => {
+			hph += h[j] * ph[i];
+			pred += h[j] * this.mu[i];
+			predNu += h[j] * this.nu[i];
+		});
 		const noise =
 			ctx.mean > 0 ? Math.min(Math.max(predNu / ctx.mean, 0.25), 4) ** this.hetero : 1;
 		const s = hph + noise;
@@ -92,9 +121,11 @@ export class HeteroOpr extends KalmanOpr {
 		if (!split) return;
 		const sh = this.sh;
 		sh.fill(0);
-		for (const i of idx) for (let k = 0; k < n; k++) sh[k] += this.S[i * n + k];
+		idx.forEach((i, j) => {
+			for (let k = 0; k < n; k++) sh[k] += h[j] * this.S[i * n + k];
+		});
 		let ss = noise;
-		for (const i of idx) ss += sh[i];
+		idx.forEach((i, j) => (ss += h[j] * sh[i]));
 		for (let k = 0; k < n; k++) this.nu[k] += (sh[k] / ss) * residNu;
 		for (let a = 0; a < n; a++) {
 			const fa = sh[a] / ss;

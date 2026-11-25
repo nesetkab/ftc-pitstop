@@ -4,7 +4,7 @@ import { Blend, KalmanOpr, type Model, type OprParams } from '../../models.ts';
 import { HeteroOpr, PlayoffShift, PooledPriorOpr } from './hybrid.ts';
 import { POOLED_BASE, PooledOpr, type PooledParams } from './model.ts';
 
-export type Extra = Partial<PooledParams> & { mix?: number; w?: number; alt?: Partial<OprParams>; shift?: number; het?: number };
+export type Extra = Partial<PooledParams> & { mix?: number; w?: number; alt?: Partial<OprParams>; shift?: number; het?: number; imb?: number; imbF?: number };
 
 const SHIPPED = (
 	JSON.parse(readFileSync(join(import.meta.dirname, '..', '..', 'params.json'), 'utf8')) as {
@@ -26,6 +26,8 @@ export const SHIPPED_HET: Partial<OprParams> = { q: 0.2 };
 
 export const HET: Partial<PooledParams> = { ...TUNED, qMatch: 0.02, hetero: 0.5, heteroPool: 1 };
 
+export const IMB: Partial<PooledParams> = { ...HET, imbPred: 0.2, imbFit: 0.1 };
+
 const pooled = (name: string, p: Partial<PooledParams>) => (x: Extra) =>
 	new PooledOpr(name, { ...POOLED_BASE, ...p, ...x });
 
@@ -37,6 +39,7 @@ export const VARIANTS: Record<string, (x: Extra) => Model> = {
 	'pooled-total': pooled('pooled-total', { ...TUNED, target: 'total' }),
 	'pooled-huber': pooled('pooled-huber', { ...TUNED, huber: 2 }),
 	'pooled-het': pooled('pooled-het', HET),
+	'pooled-imb': pooled('pooled-imb', IMB),
 	'pooled-pen': pooled('pooled-pen', { ...TUNED, penW: 0.5 }),
 	'pooled-off': pooled('pooled-off', { ...TUNED, offW: 0.5 }),
 	hybrid: (x) =>
@@ -55,12 +58,33 @@ export const VARIANTS: Record<string, (x: Extra) => Model> = {
 		),
 	'shipped-shift': (x) => new PlayoffShift('shipped-shift', new KalmanOpr('a', SHIPPED), x.shift ?? 0),
 	'shipped-hetero': (x) =>
-		new HeteroOpr('shipped-hetero', { ...SHIPPED, ...SHIPPED_HET, ...(x as Partial<OprParams>) }, x.het ?? 0.75),
+		new HeteroOpr(
+			'shipped-hetero',
+			{ ...SHIPPED, ...SHIPPED_HET, ...(x as Partial<OprParams>) },
+			x.het ?? 0.75,
+			x.imb ?? 0,
+			x.imbF ?? 0
+		),
 	'blend-het': (x) =>
 		new Blend(
 			'blend-het',
 			new HeteroOpr('a', { ...SHIPPED, ...SHIPPED_HET }, x.het ?? 0.75),
 			new PooledOpr('b', { ...POOLED_BASE, ...HET, ...x }),
+			x.w ?? 0.5
+		),
+	'shipped-imb': (x) =>
+		new HeteroOpr(
+			'shipped-imb',
+			{ ...SHIPPED, ...SHIPPED_HET, ...(x as Partial<OprParams>) },
+			x.het ?? 0.75,
+			x.imb ?? 0.2,
+			x.imbF ?? 0.1
+		),
+	'blend-imb': (x) =>
+		new Blend(
+			'blend-imb',
+			new HeteroOpr('a', { ...SHIPPED, ...SHIPPED_HET }, 0.75, x.imb ?? 0.2, x.imbF ?? 0.1),
+			new PooledOpr('b', { ...POOLED_BASE, ...IMB, ...x }),
 			x.w ?? 0.5
 		),
 	'blend-ctrl': (x) =>
