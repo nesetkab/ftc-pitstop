@@ -157,11 +157,7 @@
 
 <EventSections />
 
-<PageHeader
-	title="Events"
-	meta="{integer(data.total)} events this season."
-	status={data.stale ? staleLine : undefined}
-/>
+<PageHeader title="Events" status={data.stale ? staleLine : undefined} />
 
 {#snippet staleLine()}
 	The event list couldn't be refreshed. <StaleNotice
