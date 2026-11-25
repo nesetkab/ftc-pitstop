@@ -101,20 +101,24 @@ export class Ctx {
 	cv(fitPredict: (trainRows: Int32Array) => (r: number) => number): {
 		cv: number;
 		p: Float64Array;
+		oof: Float64Array;
 	} {
 		const p = new Float64Array(this.rec.n);
+		const oof = new Float64Array(this.rec.n);
 		let total = 0;
 		for (const s of TRAIN) {
 			const g = fitPredict(this.trainExcept(s));
 			const rows = this.trainBySeason.get(s)!;
 			for (let i = 0; i < rows.length; i++) {
 				const r = rows[i];
-				total += (g(r) - this.rec.outcome[r]) ** 2;
+				oof[r] = g(r);
+				total += (oof[r] - this.rec.outcome[r]) ** 2;
 			}
 		}
 		const g = fitPredict(this.train);
 		for (let r = 0; r < this.rec.n; r++) p[r] = g(r);
-		return { cv: total / this.train.length, p };
+		for (const r of this.test) oof[r] = p[r];
+		return { cv: total / this.train.length, p, oof };
 	}
 
 	row(name: string, p: Float64Array, cv?: number): Row {

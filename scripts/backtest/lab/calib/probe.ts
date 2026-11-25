@@ -35,7 +35,13 @@ export const FEATURES = [
 	'evResN',
 	'evResSS',
 	'seResN',
-	'seResSS'
+	'seResSS',
+	'redUnplayed',
+	'blueUnplayed',
+	'redLoUnplayed',
+	'blueLoUnplayed',
+	'redLoNew',
+	'blueLoNew'
 ] as const;
 
 export const F = Object.fromEntries(FEATURES.map((k, i) => [k, i])) as Record<
@@ -150,6 +156,17 @@ export class ProbeOpr extends KalmanOpr {
 		f[F.evResSS] = this.evRes.ss;
 		f[F.seResN] = this.seRes.n;
 		f[F.seResSS] = this.seRes.ss;
+		const unplayed = (ts: number[]) => ts.filter((t) => this.played[this.index.get(t)!] === 0).length;
+		f[F.redUnplayed] = unplayed(m.red);
+		f[F.blueUnplayed] = unplayed(m.blue);
+		const lowest = (ts: number[]) =>
+			ts.reduce((a, t) => (this.value(t, ctx, false) < this.value(a, ctx, false) ? t : a));
+		const rl = lowest(m.red);
+		const bl = lowest(m.blue);
+		f[F.redLoUnplayed] = this.played[this.index.get(rl)!] === 0 ? 1 : 0;
+		f[F.blueLoUnplayed] = this.played[this.index.get(bl)!] === 0 ? 1 : 0;
+		f[F.redLoNew] = this.teams.has(rl) ? 0 : 1;
+		f[F.blueLoNew] = this.teams.has(bl) ? 0 : 1;
 		this.features.set(`${this.season}:${m.key}`, f);
 		return pred;
 	}
