@@ -243,6 +243,7 @@
 		lede={lede ? ledeLine : undefined}
 		status={scheduled || started ? statusLine : undefined}
 		actions={headerActions}
+		compact={section !== ''}
 	/>
 	{#if scheduled || started}
 		<Tabs {tabs} {current} label="Event" />

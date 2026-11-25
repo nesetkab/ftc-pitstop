@@ -7,12 +7,13 @@
 		lede?: Snippet;
 		status?: Snippet;
 		actions?: Snippet;
+		compact?: boolean;
 	}
 
-	let { title, meta, lede, status, actions }: Props = $props();
+	let { title, meta, lede, status, actions, compact = false }: Props = $props();
 </script>
 
-<header class="page-header">
+<header class={['page-header', { compact }]}>
 	<h1>{title}</h1>
 	{#if meta}
 		<p class="meta">{meta}</p>
@@ -93,6 +94,11 @@
 	}
 
 	@media (max-width: 600px) {
+		.compact > .meta,
+		.compact > .lede {
+			display: none;
+		}
+
 		.page-header > .actions:has(> :global(:nth-child(3))) {
 			display: grid;
 			grid-template-columns: repeat(2, minmax(0, 1fr));
