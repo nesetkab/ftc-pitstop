@@ -280,7 +280,7 @@
 
 	{#if update}
 		<div class="foot">
-			<Button onclick={add}>Add battery</Button>
+			<Button icon="plus" onclick={add}>Add battery</Button>
 		</div>
 	{/if}
 </section>

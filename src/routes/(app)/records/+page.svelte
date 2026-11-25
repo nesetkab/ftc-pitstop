@@ -11,6 +11,7 @@
 		RECORDS_CSV_LIMIT,
 		recordQuery
 	} from '#lib/components/records/records.ts';
+	import DownloadLink from '#lib/ui/DownloadLink.svelte';
 	import Pagination from '#lib/ui/Pagination.svelte';
 	import { integer } from '#lib/format/index.ts';
 	import { SEASON_NAME, siteTitle } from '#lib/seo.ts';
@@ -109,7 +110,7 @@
 	</p>
 
 	<p class="csv">
-		<a href="/records.csv{recordQuery({ ...data.filters, page: 1 })}" download>Download CSV</a>
+		<DownloadLink href="/records.csv{recordQuery({ ...data.filters, page: 1 })}" />
 		{#if data.total > RECORDS_CSV_LIMIT}
 			<span class="faint">The top {integer(RECORDS_CSV_LIMIT)} scores for these filters.</span>
 		{/if}

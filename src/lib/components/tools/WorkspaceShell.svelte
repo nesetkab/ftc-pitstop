@@ -92,7 +92,7 @@
 		Check the connection and try again.
 	</EmptyState>
 	<div>
-		<Button onclick={open}>Try again</Button>
+		<Button icon="refresh" onclick={open}>Try again</Button>
 	</div>
 {:else}
 	<PageHeader

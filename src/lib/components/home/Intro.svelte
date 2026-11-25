@@ -3,6 +3,7 @@
 	import { follows, readFollows } from '#lib/components/follow/follow.svelte.ts';
 	import { SEASON_NAME } from '#lib/seo.ts';
 	import { dismissHint, INTRO_HINT, readHints, showIntro } from '#lib/ui/hints.ts';
+	import Icon from '#lib/ui/Icon.svelte';
 
 	let mounted = $state(false);
 	let hidden = $state(false);
@@ -38,7 +39,7 @@
 			<a href="/advancement">advancement tracker</a> and
 			<a href="/events/strength">event strength</a> for every event.
 		</p>
-		<button type="button" class="hide" onclick={hide}>Hide</button>
+		<button type="button" class="hide" onclick={hide}><Icon name="close" size={12} />Hide</button>
 	</section>
 {/if}
 
@@ -80,6 +81,9 @@
 	}
 
 	.hide {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 		margin-top: 8px;
 		padding: 0;
 		border: 0;
@@ -107,7 +111,6 @@
 
 	@media (pointer: coarse) {
 		.hide {
-			display: inline-block;
 			margin-block: -10px;
 			padding-block: 10px;
 			margin-inline: -8px;

@@ -559,7 +559,7 @@
 
 			{#if editable}
 				<div class="ctl-row">
-					<Button variant="secondary" onclick={newPlan}>New plan</Button>
+					<Button variant="secondary" icon="plus" onclick={newPlan}>New plan</Button>
 					{#if plan}
 						<button type="button" class="ctl-btn" onclick={copyPlan}>Duplicate</button>
 						<button type="button" class="ctl-btn plain" onclick={deletePlan}>

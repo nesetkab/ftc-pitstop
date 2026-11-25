@@ -1,12 +1,14 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import Icon, { type IconName } from './Icon.svelte';
 
 	interface Props {
 		label: string;
+		icon?: IconName;
 		children: Snippet<[close: () => void]>;
 	}
 
-	let { label, children }: Props = $props();
+	let { label, icon, children }: Props = $props();
 
 	let menu = $state<HTMLDetailsElement>();
 	let summary = $state<HTMLElement>();
@@ -48,7 +50,9 @@
 <svelte:document {onclick} />
 
 <details class="menu" bind:this={menu}>
-	<summary bind:this={summary}>{label}</summary>
+	<summary bind:this={summary}>
+		{#if icon}<Icon name={icon} size={14} />{/if}{label}
+	</summary>
 	<div class="panel">{@render children(close)}</div>
 </details>
 
@@ -61,7 +65,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 8px;
+		gap: 6px;
 		min-height: var(--control-h);
 		padding: 8px 12px;
 		border: 1px solid var(--line-2);
@@ -80,6 +84,7 @@
 	summary::after {
 		content: '';
 		width: 5px;
+		margin-left: 2px;
 		height: 5px;
 		margin-top: -3px;
 		border-right: 1.5px solid var(--text-2);

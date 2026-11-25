@@ -8,7 +8,7 @@
 	let { number }: Props = $props();
 </script>
 
-<Menu label="Pit">
+<Menu label="Pit" icon="tv">
 	{#snippet children(close)}
 		<ul>
 			<li>

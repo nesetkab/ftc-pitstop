@@ -208,7 +208,13 @@
 		note="Every match at this event with estimated start times. Subscribed calendars update as the day runs."
 	/>
 	{#if stream}
-		<Button variant="secondary" href={stream} target="_blank" rel="noopener noreferrer">
+		<Button
+			variant="secondary"
+			icon="video"
+			href={stream}
+			target="_blank"
+			rel="noopener noreferrer"
+		>
 			Watch the stream
 		</Button>
 	{/if}

@@ -57,7 +57,7 @@
 					{ value: '1', label: 'One per page', href: query({ per: '1' }) }
 				]}
 			/>
-			<Button onclick={() => window.print()}>Print</Button>
+			<Button icon="print" onclick={() => window.print()}>Print</Button>
 		</div>
 	</div>
 

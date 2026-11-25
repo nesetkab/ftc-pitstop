@@ -14,15 +14,15 @@
 {#if pages > 1}
 	<nav class="pager" aria-label="Pages">
 		{#if page > 1}
-			<Button variant="secondary" href={href(page - 1)} rel="prev">Previous</Button>
+			<Button variant="secondary" icon="prev" href={href(page - 1)} rel="prev">Previous</Button>
 		{:else}
-			<Button variant="secondary" disabled>Previous</Button>
+			<Button variant="secondary" icon="prev" disabled>Previous</Button>
 		{/if}
 		<span class="n">Page {integer(page)} of {integer(pages)}</span>
 		{#if page < pages}
-			<Button variant="secondary" href={href(page + 1)} rel="next">Next</Button>
+			<Button variant="secondary" iconEnd="next" href={href(page + 1)} rel="next">Next</Button>
 		{:else}
-			<Button variant="secondary" disabled>Next</Button>
+			<Button variant="secondary" iconEnd="next" disabled>Next</Button>
 		{/if}
 	</nav>
 {/if}

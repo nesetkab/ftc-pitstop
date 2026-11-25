@@ -13,6 +13,11 @@
 	$effect(() => syncFollows());
 </script>
 
-<Button variant={following ? 'secondary' : 'primary'} onclick={() => toggleFollow(number)}>
+<Button
+	variant={following ? 'secondary' : 'primary'}
+	icon={following ? 'star-filled' : 'star'}
+	aria-pressed={following}
+	onclick={() => toggleFollow(number)}
+>
 	{following ? 'Following' : 'Follow'}
 </Button>

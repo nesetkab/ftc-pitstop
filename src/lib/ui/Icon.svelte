@@ -1,5 +1,27 @@
 <script lang="ts" module>
-	export type IconName = 'search' | 'team' | 'event' | 'place' | 'recent' | 'close' | 'enter';
+	export type IconName =
+		| 'search'
+		| 'team'
+		| 'event'
+		| 'place'
+		| 'recent'
+		| 'close'
+		| 'enter'
+		| 'sun'
+		| 'moon'
+		| 'system'
+		| 'star'
+		| 'star-filled'
+		| 'compare'
+		| 'tv'
+		| 'video'
+		| 'download'
+		| 'print'
+		| 'plus'
+		| 'info'
+		| 'refresh'
+		| 'prev'
+		| 'next';
 </script>
 
 <script lang="ts">
@@ -43,6 +65,49 @@
 	{:else if name === 'enter'}
 		<path d="M12.5 3.5v3.5a2 2 0 0 1-2 2h-7" />
 		<path d="M6 6.5 3.5 9 6 11.5" />
+	{:else if name === 'sun'}
+		<circle cx="8" cy="8" r="2.75" />
+		<path
+			d="M8 1.75v1.5M8 12.75v1.5M1.75 8h1.5M12.75 8h1.5M3.6 3.6l1.05 1.05M11.35 11.35l1.05 1.05M3.6 12.4l1.05-1.05M11.35 4.65l1.05-1.05"
+		/>
+	{:else if name === 'moon'}
+		<path d="M13.25 9.5A5.5 5.5 0 1 1 6.5 2.75a4.5 4.5 0 0 0 6.75 6.75z" />
+	{:else if name === 'system'}
+		<rect x="2" y="2.75" width="12" height="8.5" rx="1.5" />
+		<path d="M5.5 13.75h5M8 11.25v2.5" />
+	{:else if name === 'star' || name === 'star-filled'}
+		<path
+			d="M8 2.25l1.75 3.6 3.95.55-2.85 2.75.7 3.9L8 11.2l-3.55 1.85.7-3.9L2.3 6.4l3.95-.55z"
+			fill={name === 'star-filled' ? 'currentColor' : 'none'}
+		/>
+	{:else if name === 'compare'}
+		<path
+			d="M2.75 5.25h10.5M10.5 2.5l2.75 2.75L10.5 8M13.25 10.75H2.75M5.5 8l-2.75 2.75L5.5 13.5"
+		/>
+	{:else if name === 'tv'}
+		<rect x="1.75" y="2.75" width="12.5" height="8.75" rx="1.5" />
+		<path d="M5.5 14h5" />
+	{:else if name === 'video'}
+		<rect x="1.75" y="3.25" width="12.5" height="9.5" rx="2" />
+		<path d="M6.75 6v4l3.5-2z" />
+	{:else if name === 'download'}
+		<path d="M8 2.5v8M4.75 7.25 8 10.5l3.25-3.25M3 13.5h10" />
+	{:else if name === 'print'}
+		<path d="M4.5 6V2.5h7V6" />
+		<rect x="2" y="6" width="12" height="5.5" rx="1.25" />
+		<path d="M4.5 9.5h7v4h-7z" />
+	{:else if name === 'plus'}
+		<path d="M8 3v10M3 8h10" />
+	{:else if name === 'info'}
+		<circle cx="8" cy="8" r="5.75" />
+		<path d="M8 7.25v3.75M8 5h.01" />
+	{:else if name === 'refresh'}
+		<path d="M13.25 8a5.25 5.25 0 1 1-1.55-3.7" />
+		<path d="M13.25 2.5v3h-3" />
+	{:else if name === 'prev'}
+		<path d="M10 3.5 5.5 8l4.5 4.5" />
+	{:else if name === 'next'}
+		<path d="M6 3.5 10.5 8 6 12.5" />
 	{/if}
 </svg>
 

@@ -2,6 +2,7 @@
 	import { tick } from 'svelte';
 	import LeaderboardFilters from '#lib/components/leaderboard/LeaderboardFilters.svelte';
 	import LeaderboardTable from '#lib/components/leaderboard/LeaderboardTable.svelte';
+	import DownloadLink from '#lib/ui/DownloadLink.svelte';
 	import Pagination from '#lib/ui/Pagination.svelte';
 	import { hasFilters, queryString } from '#lib/components/leaderboard/leaderboard.ts';
 	import { integer } from '#lib/format/index.ts';
@@ -107,7 +108,7 @@
 {/if}
 
 {#if data.total > 0}
-	<p class="csv"><a href={csvHref} download>Download CSV</a></p>
+	<p class="csv"><DownloadLink href={csvHref} /></p>
 {/if}
 
 <style>

@@ -17,7 +17,7 @@
 	);
 </script>
 
-<Menu {label}>
+<Menu {label} icon="event">
 	{#snippet children(close)}
 		<p class="note">{note}</p>
 		<ul>
