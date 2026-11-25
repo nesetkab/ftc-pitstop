@@ -45,7 +45,11 @@ export class LiveOpr implements Model {
 	value = new Map<number, number>();
 	dirty = false;
 
-	constructor(name: string, fallback: OprFallback, opts: { total?: boolean; playoffs?: boolean } = {}) {
+	constructor(
+		name: string,
+		fallback: OprFallback,
+		opts: { total?: boolean; playoffs?: boolean } = {}
+	) {
 		this.name = name;
 		this.fallback = fallback;
 		this.total = opts.total ?? false;
@@ -83,7 +87,8 @@ export class LiveOpr implements Model {
 	solve(): void {
 		const k = this.order.length;
 		const ata = new Float64Array(k * k);
-		for (let a = 0; a < k; a++) for (let b = 0; b < k; b++) ata[a * k + b] = this.ata[a * this.cap + b];
+		for (let a = 0; a < k; a++)
+			for (let b = 0; b < k; b++) ata[a * k + b] = this.ata[a * this.cap + b];
 		const x = minNormSolve(ata, this.atb.subarray(0, k), k);
 		this.value = new Map(this.order.map((t, i) => [t, x[i]]));
 		this.dirty = false;
@@ -383,7 +388,14 @@ export class SeasonOpr implements Model {
 	}
 
 	predict(m: PMatch, ctx: Ctx): Pred {
-		if (!this.active) return { red: ctx.mean, blue: ctx.mean, varFactor: 1, redScore: ctx.mean, blueScore: ctx.mean };
+		if (!this.active)
+			return {
+				red: ctx.mean,
+				blue: ctx.mean,
+				varFactor: 1,
+				redScore: ctx.mean,
+				blueScore: ctx.mean
+			};
 		const red = m.red.reduce((a, t) => a + this.team(t, ctx), 0);
 		const blue = m.blue.reduce((a, t) => a + this.team(t, ctx), 0);
 		return { red, blue, varFactor: 1, redScore: red, blueScore: blue };

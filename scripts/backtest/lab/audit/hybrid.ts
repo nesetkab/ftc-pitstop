@@ -49,6 +49,7 @@ models.forEach((m, k) => {
 	] as const) {
 		const map = fitMapping(rec, k, rows, SIMPLE);
 		const prob = (r: number) => probAt(rec, k, r, map);
-		for (const [name, f] of sets) console.log(m.name.padEnd(32), label.padEnd(15), name.padEnd(16), stats(prob, f));
+		for (const [name, f] of sets)
+			console.log(m.name.padEnd(32), label.padEnd(15), name.padEnd(16), stats(prob, f));
 	}
 });
