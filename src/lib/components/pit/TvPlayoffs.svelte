@@ -6,7 +6,7 @@
 	import NextHero from './NextHero.svelte';
 	import Stage from './Stage.svelte';
 	import TeamTag from './TeamTag.svelte';
-	import { lastResultItem, matchItems, playoffResult, type Fact } from './copy.ts';
+	import { lastResultItem, matchItems, nextMatchLabel, playoffResult, type Fact } from './copy.ts';
 	import type { QueueCall } from './queue.ts';
 	import type { PitView } from './view.ts';
 
@@ -50,7 +50,7 @@
 					{timeZone}
 					delaySeconds={view.delaySeconds}
 					showRp={false}
-					label={playoff?.position ? `Next match · ${playoff.position}` : 'Next match'}
+					label={nextMatchLabel(playoff?.position ?? null)}
 				/>
 			</Stage>
 		{:else}
@@ -74,7 +74,7 @@
 			</ul>
 			<Facts {facts} />
 		{:else}
-			<p class="sub">{view.team} is not on a playoff alliance.</p>
+			<p class="sub">{view.team} isn't on a playoff alliance.</p>
 		{/if}
 		{#if playoff && playoff.matches.length > 0}
 			<h2 class="tv-label">Our playoff matches</h2>

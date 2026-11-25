@@ -298,6 +298,13 @@ export function eventFacts(view: PitView): Fact[] {
 	return facts.slice(0, 6);
 }
 
+export function nextMatchLabel(position: string | null): string {
+	if (!position) return 'Next match';
+	if (position === 'Finals') return 'Next match in the finals';
+	if (/^(Upper|Lower) bracket/.test(position)) return `Next match in ${position.toLowerCase()}`;
+	return `Next match, ${position}`;
+}
+
 export function playoffResult(view: PitView): string | null {
 	const playoff = view.playoff;
 	if (!playoff) return view.standings.length > 0 ? 'Not in the playoffs' : null;

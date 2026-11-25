@@ -6,7 +6,7 @@
 	import NextHero from './NextHero.svelte';
 	import RankTable from './RankTable.svelte';
 	import StreamPlayer from './StreamPlayer.svelte';
-	import { eventFacts, matchItems } from './copy.ts';
+	import { eventFacts, matchItems, nextMatchLabel } from './copy.ts';
 	import type { QueueCall } from './queue.ts';
 	import type { PitView } from './view.ts';
 
@@ -23,9 +23,7 @@
 	const next = $derived(view.next);
 	const rankLabel = $derived(view.rankedAfter ? `Rankings after ${view.rankedAfter}` : 'Rankings');
 	const playoffLabel = $derived(
-		next?.level === 'playoff' && view.playoff?.position
-			? `Next match · ${view.playoff.position}`
-			: 'Next match'
+		nextMatchLabel(next?.level === 'playoff' ? (view.playoff?.position ?? null) : null)
 	);
 </script>
 

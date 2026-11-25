@@ -158,7 +158,7 @@ describe('TvScreen', () => {
 		const content = text(container);
 		expect(container.querySelector('[data-phase="playoffs"]')).not.toBeNull();
 		expect(content).toContain('M3');
-		expect(content).toContain('Upper bracket round 2');
+		expect(content).toContain('Next match in upper bracket round 2');
 		expect(content).toContain('Alliance 5');
 		expect(content).toContain('Playoff record 1-0');
 	});

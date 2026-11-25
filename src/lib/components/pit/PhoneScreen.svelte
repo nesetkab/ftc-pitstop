@@ -26,6 +26,7 @@
 		heroText,
 		liveText,
 		matchItem,
+		nextMatchLabel,
 		phoneDetail,
 		playoffResult,
 		qualsDoneText,
@@ -224,9 +225,7 @@
 			{:else if next && text && view.phase !== 'upcoming'}
 				<section class={['next', { called }]}>
 					<span class="muted">
-						Next match{next.level === 'playoff' && view.playoff?.position
-							? ` · ${view.playoff.position}`
-							: ''}
+						{nextMatchLabel(next.level === 'playoff' ? (view.playoff?.position ?? null) : null)}
 					</span>
 					<div class="q">
 						<b><Swap value={next.label} /></b>

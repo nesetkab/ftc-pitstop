@@ -30,7 +30,6 @@
 >
 	<b>{headline}</b>
 	<span>{label}, {alliance} alliance</span>
-	<small>Tap to close</small>
 </button>
 
 <style>
@@ -60,15 +59,6 @@
 	span {
 		font-size: 2.2em;
 		font-weight: 500;
-	}
-
-	small {
-		position: absolute;
-		bottom: 2em;
-		left: 3.4em;
-		font-size: 0.9em;
-		font-weight: 500;
-		opacity: 0.7;
 	}
 
 	.takeover:focus-visible {

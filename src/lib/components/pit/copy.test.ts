@@ -3,6 +3,7 @@ import { replayBundle } from '#lib/game/replay.ts';
 import {
 	awardName,
 	fieldLine,
+	nextMatchLabel,
 	queueCountdown,
 	resultLine,
 	teamsLine,
@@ -82,5 +83,14 @@ describe('awardName', () => {
 		expect(awardName('Innovate Award sponsored by RTX 2nd place')).toBe('Innovate Award 2nd place');
 		expect(awardName('Winning Alliance - Captain')).toBe('Winning alliance captain');
 		expect(awardName('Control Award')).toBe('Control Award');
+	});
+});
+
+describe('nextMatchLabel', () => {
+	it('names the playoff round in plain words', () => {
+		expect(nextMatchLabel(null)).toBe('Next match');
+		expect(nextMatchLabel('Upper bracket round 2')).toBe('Next match in upper bracket round 2');
+		expect(nextMatchLabel('Finals')).toBe('Next match in the finals');
+		expect(nextMatchLabel('Semifinal 1')).toBe('Next match, Semifinal 1');
 	});
 });
