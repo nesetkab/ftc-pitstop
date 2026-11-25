@@ -3,8 +3,14 @@ import { join } from 'node:path';
 import { Blend, KalmanOpr, type Model, type OprParams } from '../../models.ts';
 import { HeteroOpr, PlayoffShift, PooledPriorOpr } from './hybrid.ts';
 import { POOLED_BASE, PooledOpr, type PooledParams } from './model.ts';
+import { ImbRobotOpr } from './robotimb.ts';
+import type { RoprOpts } from '../robot/ropr.ts';
 
 export type Extra = Partial<PooledParams> & { mix?: number; w?: number; alt?: Partial<OprParams>; shift?: number; het?: number; imb?: number; imbF?: number };
+
+const ROBOT_HET = JSON.parse(
+	readFileSync(join(import.meta.dirname, '..', 'robot', 'params', 'het.json'), 'utf8')
+) as RoprOpts;
 
 const SHIPPED = (
 	JSON.parse(readFileSync(join(import.meta.dirname, '..', '..', 'params.json'), 'utf8')) as {
@@ -84,6 +90,15 @@ export const VARIANTS: Record<string, (x: Extra) => Model> = {
 		new Blend(
 			'blend-imb',
 			new HeteroOpr('a', { ...SHIPPED, ...SHIPPED_HET }, 0.75, x.imb ?? 0.2, x.imbF ?? 0.1),
+			new PooledOpr('b', { ...POOLED_BASE, ...IMB, ...x }),
+			x.w ?? 0.5
+		),
+	'robot-het': () => new ImbRobotOpr('robot-het', ROBOT_HET, 0, 0),
+	'robot-imb': (x) => new ImbRobotOpr('robot-imb', ROBOT_HET, x.imb ?? 0.2, x.imbF ?? 0.1),
+	'blend-robot': (x) =>
+		new Blend(
+			'blend-robot',
+			new ImbRobotOpr('a', ROBOT_HET, x.imb ?? 0.2, x.imbF ?? 0.1),
 			new PooledOpr('b', { ...POOLED_BASE, ...IMB, ...x }),
 			x.w ?? 0.5
 		),

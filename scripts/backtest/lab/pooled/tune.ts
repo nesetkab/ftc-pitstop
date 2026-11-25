@@ -1,7 +1,8 @@
 import { run } from '../../engine.ts';
 import { rowsOf, trainBrier } from '../../metrics.ts';
 import type { Model } from '../../models.ts';
-import { ENGINE, QUICK_FIT, seasons, shipped } from '../harness.ts';
+import { ENGINE, QUICK_FIT, shipped } from '../harness.ts';
+import { data as robotData } from '../robot/setup.ts';
 import { make } from './variants.ts';
 import type { Extra } from './variants.ts';
 
@@ -12,7 +13,7 @@ const list = (flag('seasons') ?? '2024,2025').split(',').map(Number);
 const space = JSON.parse(flag('space') ?? '{}') as Record<string, unknown[]>;
 const passes = Number(flag('passes') ?? 2);
 let best = JSON.parse(flag('extra') ?? '{}') as Extra;
-const data = await seasons(list);
+const data = await robotData(list);
 
 function losses(models: Model[]): number[] {
 	const t0 = Date.now();
