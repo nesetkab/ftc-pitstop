@@ -13,6 +13,9 @@ export type PooledParams = {
 	halfLife: number;
 	drift: number;
 	playoffW: number;
+	offW: number;
+	penW: number;
+	penLam: number;
 	kappa: number;
 	block: boolean;
 	q: number;
@@ -37,6 +40,9 @@ export const POOLED_BASE: PooledParams = {
 	halfLife: Infinity,
 	drift: 0.25,
 	playoffW: 1,
+	offW: 1,
+	penW: 0,
+	penLam: 10,
 	kappa: 1,
 	block: true,
 	q: 0,
@@ -56,6 +62,7 @@ type Pending = {
 	po: number;
 	teams: number[];
 	y: number;
+	pen: number;
 };
 
 const LN2 = Math.LN2;
@@ -148,6 +155,9 @@ export class PooledOpr implements Model {
 	ra = new Int32Array(1024);
 	rb = new Int32Array(1024);
 	ry = new Float64Array(1024);
+	rpen = new Float64Array(1024);
+	c = new Float64Array(0);
+	penPrior = 0;
 	rday = new Int32Array(1024);
 	rmean = new Float64Array(1024);
 	rpo = new Uint8Array(1024);
@@ -188,6 +198,7 @@ export class PooledOpr implements Model {
 		this.lastDay = [];
 		this.x = new Float64Array(0);
 		this.xs = new Float64Array(0);
+		this.c = new Float64Array(0);
 		this.rows = 0;
 		this.pending = [];
 		this.solvedDay = -Infinity;
@@ -233,6 +244,7 @@ export class PooledOpr implements Model {
 			this.ra = grow(this.ra, size);
 			this.rb = grow(this.rb, size);
 			this.ry = grow(this.ry, size);
+			this.rpen = grow(this.rpen, size);
 			this.rday = grow(this.rday, size);
 			this.rmean = grow(this.rmean, size);
 			this.rpo = grow(this.rpo, size);
@@ -241,6 +253,7 @@ export class PooledOpr implements Model {
 			this.ra[k] = a;
 			this.rb[k] = b;
 			this.ry[k] = r.y;
+			this.rpen[k] = r.pen;
 			this.rday[k] = r.day;
 			this.rmean[k] = r.mean;
 			this.rpo[k] = r.po;
@@ -339,7 +352,8 @@ export class PooledOpr implements Model {
 		for (let pass = 0; pass < passes; pass++) {
 			for (let r = 0; r < R; r++) {
 				let w = decay > 0 ? Math.exp(-decay * (day - this.rday[r])) : 1;
-				if (this.rpo[r]) w *= p.playoffW;
+				if (this.rpo[r] & 1) w *= p.playoffW;
+				if (this.rpo[r] & 2) w *= p.offW;
 				this.w[r] = w * robust[r];
 				const m = this.rmean[r];
 				ys[r] = m > 0 && ctx.mean > 0 ? this.ry[r] * (ctx.mean / m) ** p.drift : this.ry[r];
@@ -367,6 +381,7 @@ export class PooledOpr implements Model {
 			}
 			this.pcg(lam, rhs, this.x);
 			this.pcg(lam, rhsS, this.xs);
+			if (pass === passes - 1 && p.penW > 0) this.solvePen(N);
 			if (pass === passes - 1) break;
 			let sw = 0;
 			let swr = 0;
@@ -385,6 +400,43 @@ export class PooledOpr implements Model {
 				robust[r] = z > 1 ? 1 / z : 1;
 			}
 		}
+	}
+
+	solvePen(N: number): void {
+		const R = this.rows;
+		let sw = 0;
+		let sp = 0;
+		for (let r = 0; r < R; r++) {
+			sw += this.w[r];
+			sp += this.w[r] * this.rpen[r];
+		}
+		this.penPrior = sw > 0 ? sp / sw / 2 : 0;
+		const lam = new Float64Array(N).fill(this.p.penLam);
+		const rhs = new Float64Array(N).fill(this.p.penLam * this.penPrior);
+		const diag = new Float64Array(N).fill(this.p.penLam);
+		for (let r = 0; r < R; r++) {
+			const a = this.ra[r];
+			const b = this.rb[r];
+			const wp = this.w[r] * this.rpen[r];
+			diag[a] += this.w[r];
+			rhs[a] += wp;
+			if (b >= 0) {
+				diag[b] += this.w[r];
+				rhs[b] += wp;
+			}
+		}
+		const saved = this.diag;
+		this.diag = diag;
+		const c = new Float64Array(N);
+		for (let t = 0; t < N; t++) c[t] = t < this.c.length ? this.c[t] : this.penPrior;
+		this.pcg(lam, rhs, c);
+		this.c = c;
+		this.diag = saved;
+	}
+
+	pen(team: number): number {
+		const g = this.ids.get(team)!;
+		return g < this.c.length ? this.c[g] : this.penPrior;
 	}
 
 	lastSolveMean = 0;
@@ -415,6 +467,7 @@ export class PooledOpr implements Model {
 		const teams = eventTeams(event);
 		for (const t of teams) this.ensure(t);
 		this.currentEnd = dayNumber(event.end);
+		this.currentOfficial = event.official;
 		if (ctx.day > this.solvedDay) this.solve(ctx.day, ctx);
 		else this.extend();
 		const n = teams.length;
@@ -518,6 +571,10 @@ export class PooledOpr implements Model {
 			idx.push(i);
 			sign.push(-1);
 		}
+		if (this.p.penW > 0) {
+			for (const t of m.red) blue += this.p.penW * this.pen(t);
+			for (const t of m.blue) red += this.p.penW * this.pen(t);
+		}
 		let v = 0;
 		for (let a = 0; a < idx.length; a++)
 			for (let b = 0; b < idx.length; b++) v += sign[a] * sign[b] * this.P[idx[a] * n + idx[b]];
@@ -553,6 +610,7 @@ export class PooledOpr implements Model {
 	}
 
 	currentEnd = 0;
+	currentOfficial = true;
 
 	update(m: PMatch, ctx: Ctx): void {
 		const n = this.n;
@@ -563,7 +621,8 @@ export class PooledOpr implements Model {
 				this.S[i * n + i] += p.scoreQ;
 			}
 		}
-		const noise = m.playoff ? 1 / p.playoffW : 1;
+		const flags = (m.playoff ? 1 : 0) | (this.currentOfficial ? 0 : 2);
+		const noise = 1 / ((m.playoff ? p.playoffW : 1) * (this.currentOfficial ? 1 : p.offW));
 		for (const [ok, teams, red] of [
 			[m.redOk, m.redUpd, true],
 			[m.blueOk, m.blueUpd, false]
@@ -575,9 +634,10 @@ export class PooledOpr implements Model {
 				end: this.currentEnd,
 				day: ctx.day,
 				mean: ctx.mean,
-				po: m.playoff ? 1 : 0,
+				po: flags,
 				teams: teams.slice(0, 2),
-				y
+				y,
+				pen: Math.max(0, red ? m.blueTotal - m.blueNp : m.redTotal - m.redNp)
 			});
 		}
 		for (const t of [...m.redUpd, ...m.blueUpd]) this.played[this.index.get(t)!]++;

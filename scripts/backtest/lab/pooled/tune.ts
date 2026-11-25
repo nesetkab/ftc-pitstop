@@ -3,7 +3,7 @@ import { rowsOf, trainBrier } from '../../metrics.ts';
 import type { Model } from '../../models.ts';
 import { ENGINE, QUICK_FIT, seasons, shipped } from '../harness.ts';
 import { make } from './variants.ts';
-import type { PooledParams } from './model.ts';
+import type { Extra } from './variants.ts';
 
 const args = process.argv.slice(2);
 const flag = (k: string) => args.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3);
@@ -11,7 +11,7 @@ const base = flag('base') ?? 'pooled';
 const list = (flag('seasons') ?? '2024,2025').split(',').map(Number);
 const space = JSON.parse(flag('space') ?? '{}') as Record<string, unknown[]>;
 const passes = Number(flag('passes') ?? 2);
-let best = JSON.parse(flag('extra') ?? '{}') as Partial<PooledParams>;
+let best = JSON.parse(flag('extra') ?? '{}') as Extra;
 const data = await seasons(list);
 
 function losses(models: Model[]): number[] {
@@ -30,12 +30,12 @@ for (let pass = 0; pass < passes; pass++) {
 	let improved = false;
 	for (const [key, values] of Object.entries(space)) {
 		const options = values.map((v) => ({ ...best, [key]: v }));
-		const ls = losses(options.map((o) => make(base, o as Partial<PooledParams>)));
+		const ls = losses(options.map((o) => make(base, o as Extra)));
 		const i = ls.indexOf(Math.min(...ls));
 		console.log(`${key}: ${values.map((v, j) => `${v}=${ls[j].toFixed(5)}`).join(' ')}`);
 		if (ls[i] < bestLoss - 1e-6) {
 			bestLoss = ls[i];
-			best = options[i] as Partial<PooledParams>;
+			best = options[i] as Extra;
 			improved = true;
 		}
 	}
