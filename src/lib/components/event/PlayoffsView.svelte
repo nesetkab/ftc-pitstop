@@ -33,9 +33,7 @@
 </script>
 
 {#if bundle.alliances.length === 0 && playoffMatches.length === 0}
-	<EmptyState title="Alliances haven't been picked yet.">
-		Alliances and the playoff bracket show here after alliance selection.
-	</EmptyState>
+	<EmptyState title="Alliances and the bracket show here after alliance selection." />
 {:else}
 	{#if bundle.alliances.length > 0}
 		<section class="panel" aria-labelledby="alliances-title">
@@ -48,9 +46,6 @@
 				odds={showOdds ? odds : null}
 				{followed}
 			/>
-			{#if showOdds}
-				<p class="note">Chances to win the event play out the rest of the bracket using aOPR.</p>
-			{/if}
 		</section>
 	{/if}
 	{#if bracket}

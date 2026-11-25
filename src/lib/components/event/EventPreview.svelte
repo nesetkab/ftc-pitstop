@@ -13,7 +13,6 @@
 	import { weekday } from './dates.ts';
 	import { placeName } from '#lib/format/places.ts';
 	import RangeBar from './RangeBar.svelte';
-	import Legend from '#lib/ui/Legend.svelte';
 
 	type RatingWithRange = TeamRating & { sd?: number };
 
@@ -110,9 +109,7 @@
 </script>
 
 {#if quals.length === 0}
-	<EmptyState title="The match schedule hasn't been posted yet.">
-		This page and your pit display fill in on their own once it is.
-	</EmptyState>
+	<EmptyState title="The match schedule hasn't been posted yet." />
 {:else}
 	<EmptyState title="Qualification matches haven't started yet.">
 		{scheduleLine} <a href="/events/{code}/schedule">See the schedule</a>.
@@ -195,14 +192,4 @@
 			{/each}
 		</tbody>
 	</Table>
-	{#if rated}
-		<Legend>
-			Starting aOPR is the rating each team brings into this event. Teams with BIOBUZZ matches start
-			from their own results. Teams without start from last season's results.
-			{#if projected && spots > 0}
-				Expected rank and top {spots} chance play out the posted schedule thousands of times, so they
-				also reflect who each team is paired with and against. The top {spots} become alliance captains.
-			{/if}
-		</Legend>
-	{/if}
 {/if}
