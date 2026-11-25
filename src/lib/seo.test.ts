@@ -124,5 +124,10 @@ describe('search text', () => {
 		expect(regionDescription({ name: 'Wyoming', teams: 1, events: 1, done: 0, top: null })).toBe(
 			'The Wyoming FTC region in the 2026-27 BIOBUZZ season: 1 event, 0 played, 1 team. Top teams, live and upcoming events, advancement and the best scores.'
 		);
+		expect(
+			regionDescription({ name: 'United Kingdom', teams: null, events: 4, done: 1, top: null })
+		).toBe(
+			'The United Kingdom FTC region in the 2026-27 BIOBUZZ season: 4 events, 1 played. Top teams, live and upcoming events, advancement and the best scores.'
+		);
 	});
 });

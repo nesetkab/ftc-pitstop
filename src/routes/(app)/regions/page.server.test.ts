@@ -241,6 +241,17 @@ describe('regions list', () => {
 		expect(setHeaders).toHaveBeenCalledWith({ 'cache-control': CACHE_CONTROL.short });
 	});
 
+	it('leaves the team count unknown when no event in a region lists its teams', async () => {
+		const known = Object.entries(rosters).filter(([code]) => code !== 'CAONQ');
+		server.loadRosters.mockResolvedValue({
+			...Object.fromEntries(known),
+			USCALAQ: { registered: [], played: [] }
+		});
+		const { regions } = await listCall().result;
+		const count = (code: string) => regions.find((region) => region.code === code)?.teams;
+		expect([count('USAZ'), count('USCALA'), count('CAON')]).toEqual([4, null, null]);
+	});
+
 	it('asks for a retry when the event list is down', async () => {
 		server.loadSeasonEvents.mockRejectedValue(new Error('offline'));
 		await expect(listCall().result).rejects.toMatchObject({ status: 503 });

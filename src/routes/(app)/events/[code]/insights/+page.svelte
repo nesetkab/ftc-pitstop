@@ -38,7 +38,7 @@
 {#if !averages.event}
 	<EmptyState title="Insights show here once matches are played." action={teams} />
 {:else}
-	<section class="panel averages" aria-labelledby="averages-title">
+	<section class="panel" aria-labelledby="averages-title">
 		<h2 class="sec-title" id="averages-title">Average alliance score</h2>
 		<InsightAverages {...averages} />
 	</section>
@@ -69,10 +69,6 @@
 		gap: var(--space-title);
 		align-content: start;
 		min-width: 0;
-	}
-
-	.averages {
-		max-width: 760px;
 	}
 
 	.panel + .panel {

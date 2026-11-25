@@ -78,7 +78,7 @@
 	}
 
 	tr.chosen td {
-		background: var(--surface);
+		background: var(--accent-wash);
 	}
 
 	@media (max-width: 640px) {
