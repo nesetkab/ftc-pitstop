@@ -43,7 +43,6 @@
 	}
 }
 
-:root[data-theme='dark'],
 [data-theme='dark'] {
 	--bg: #131313;
 	--surface: #1c1c1c;
@@ -224,10 +223,6 @@ kbd {
 	outline-offset: 2px;
 }
 
-.n {
-	font-variant-numeric: tabular-nums;
-}
-
 .muted {
 	color: var(--text-2);
 }
@@ -271,6 +266,31 @@ kbd {
 @keyframes ps-fade {
 	from {
 		opacity: 0;
+	}
+}
+
+@keyframes ps-in {
+	from {
+		opacity: 0;
+		translate: 0 7px;
+	}
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	#main[data-go] > * {
+		animation: ps-in 0.26s ease-out backwards;
+	}
+
+	#main[data-go] > :nth-child(n + 2) {
+		animation-delay: 40ms;
+	}
+
+	#main[data-go] > :nth-child(n + 3) {
+		animation-delay: 80ms;
+	}
+
+	#main[data-go='tab'] > :not(.tab-row ~ *) {
+		animation: none;
 	}
 }
 

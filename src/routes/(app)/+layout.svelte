@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { Component } from 'svelte';
+	import { onMount, type Component } from 'svelte';
+	import { beforeNavigate, onNavigate, type NavigationTarget } from '$app/navigation';
 	import AppBar from '#lib/ui/AppBar.svelte';
 	import NavProgress from '#lib/ui/NavProgress.svelte';
 	import ThemeSwitch from '#lib/ui/ThemeSwitch.svelte';
@@ -8,7 +9,64 @@
 
 	let { children }: LayoutProps = $props();
 
+	const EVENT = /^\/\(app\)\/events\/\[code\](?!\/matches)/;
+
 	let SearchDialog = $state<Component<{ open?: boolean }>>();
+	let Skeleton = $state<Component<{ route: string | null; tab: boolean }>>();
+	let wait = $state<{ route: string | null; tab: boolean } | null>(null);
+	let main = $state<HTMLElement>();
+	let pending: object | null = null;
+	let settle: ReturnType<typeof setTimeout>;
+
+	function still() {
+		clearTimeout(settle);
+		settle = setTimeout(() => main?.removeAttribute('data-go'), 500);
+	}
+
+	function moved(
+		from: NavigationTarget | null,
+		to: NavigationTarget | null
+	): to is NavigationTarget {
+		return !!to?.route.id?.startsWith('/(app)') && from?.url.pathname !== to.url.pathname;
+	}
+
+	function sameEvent(from: NavigationTarget | null, to: NavigationTarget) {
+		return (
+			from?.params?.code === to.params?.code &&
+			EVENT.test(from?.route.id ?? '') &&
+			EVENT.test(to.route.id ?? '')
+		);
+	}
+
+	onMount(still);
+
+	beforeNavigate(({ from, to, complete }) => {
+		if (!moved(from, to)) return;
+		const token = (pending = {});
+		const next = { route: to.route.id, tab: sameEvent(from, to) };
+		setTimeout(() => {
+			if (pending === token) wait = next;
+		}, 150);
+		complete.catch(() => {
+			if (pending === token) wait = pending = null;
+		});
+	});
+
+	onNavigate(({ from, to }) => {
+		wait = pending = null;
+		if (!main || !moved(from, to)) return;
+		main.dataset.go = sameEvent(from, to) ? 'tab' : '';
+		still();
+	});
+
+	function loadSkeleton() {
+		import('#lib/ui/PageSkeleton.svelte').then((module) => (Skeleton = module.default));
+	}
+
+	$effect(() => {
+		if (wait) loadSkeleton();
+	});
+
 	let loading: Promise<void> | undefined;
 
 	function loadSearch() {
@@ -29,11 +87,15 @@
 	});
 
 	$effect(() => {
+		const idle = () => {
+			loadSearch();
+			loadSkeleton();
+		};
 		if ('requestIdleCallback' in window) {
-			const handle = requestIdleCallback(loadSearch, { timeout: 4000 });
+			const handle = requestIdleCallback(idle, { timeout: 4000 });
 			return () => cancelIdleCallback(handle);
 		}
-		const timer = setTimeout(loadSearch, 2000);
+		const timer = setTimeout(idle, 2000);
 		return () => clearTimeout(timer);
 	});
 </script>
@@ -45,7 +107,10 @@
 <div class="shell">
 	<a class="skip" href="#main">Skip to content</a>
 	<AppBar onsearch={() => (searchDialog.open = true)} />
-	<main id="main" tabindex="-1">
+	<main id="main" tabindex="-1" data-go="" bind:this={main}>
+		{#if wait && Skeleton}
+			<Skeleton {...wait} />
+		{/if}
 		{@render children()}
 	</main>
 	<footer>

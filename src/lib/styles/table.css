@@ -3,7 +3,6 @@ table.t {
 	border-collapse: separate;
 	border-spacing: 0;
 	font-size: 14px;
-	font-variant-numeric: tabular-nums;
 }
 
 table.t caption {
