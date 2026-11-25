@@ -122,7 +122,7 @@ export const CANDIDATES: Candidate[] = [
 	},
 	{
 		id: 'opr-map',
-		label: 'OPR with priors from earlier events (shipped until December 2026)',
+		label: 'OPR with priors from earlier events (shipped until November 2026)',
 		family: 'opr',
 		base: MAP_BASE,
 		space: {

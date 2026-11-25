@@ -27,7 +27,7 @@ On held-out 2026 it beats the model it replaces by 0.00852 Brier (standard error
 | OPR, this event only, last event fallback     | 0.1939        | 0.5698     | 71.1%     | 27.1     | 0.2010     | 66.1%         | 17.1     |
 | Ridge OPR toward the season mean              | 0.1850        | 0.5492     | 70.0%     | 28.4     | 0.1871     | 69.1%         | 15.7     |
 | **Robot OPR (shipped)**                       | **0.1597**    | **0.4882** | **76.2%** | **23.4** | **0.1623** | **75.3%**     | **13.6** |
-| OPR with priors (shipped until December 2026) | 0.1631        | 0.4971     | 75.5%     | 23.3     | 0.1708     | 73.8%         | 13.8     |
+| OPR with priors (shipped until November 2026) | 0.1631        | 0.4971     | 75.5%     | 23.3     | 0.1708     | 73.8%         | 13.8     |
 | EPA, no reset between events                  | 0.1648        | 0.5016     | 75.3%     | 24.3     | 0.1736     | 73.2%         | 14.3     |
 | EPA, partial reset at each event              | 0.1645        | 0.5007     | 75.3%     | 24.4     | 0.1737     | 73.1%         | 14.4     |
 
