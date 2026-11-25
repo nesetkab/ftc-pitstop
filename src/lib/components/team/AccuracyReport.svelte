@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { longDate } from '#lib/format/index.ts';
+	import { fixed, longDate, pct } from '#lib/format/index.ts';
+	import Lede from '#lib/ui/Lede.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import { seasonRange, type AccuracyReport } from './accuracy.ts';
 	import QueueEstimates from './QueueEstimates.svelte';
@@ -25,12 +26,30 @@
 		DESCRIPTIONS[report.chosen.id] ??
 			`PitStop predicts matches with this model: ${report.chosen.label}.`
 	);
+	const headline = $derived(
+		[...report.seasons]
+			.filter((season) => season.split === 'test' && season.models[report.chosen.id])
+			.sort((a, b) => b.season - a.season)[0]
+	);
+	const headlineMetrics = $derived(headline ? headline.models[report.chosen.id] : null);
 	const hasCalibration = $derived(
 		Boolean(report.calibration?.validation?.length || report.calibration?.test?.length)
 	);
 </script>
 
-<PageHeader title="Prediction accuracy" />
+<PageHeader title="Prediction accuracy">
+	{#snippet lede()}
+		{#if headline && headlineMetrics}
+			<Lede
+				lead="Picked the winner in {pct(
+					headlineMetrics.accuracy
+				)} of {headline.season} matches it was not tuned on."
+				rest="Scores were off by {fixed(headlineMetrics.mae)} points per alliance on average."
+				aria-label="Summary"
+			/>
+		{/if}
+	{/snippet}
+</PageHeader>
 
 {#if sample}
 	<p class="sample">Sample numbers. The full backtest is not part of this build.</p>

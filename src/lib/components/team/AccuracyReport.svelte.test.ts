@@ -28,6 +28,13 @@ function cells(row: HTMLElement): string[] {
 }
 
 describe('accuracy page', () => {
+	it('opens with how often the chosen model picked the winner on untuned matches', () => {
+		show();
+		expect(screen.getByLabelText('Summary')).toHaveTextContent(
+			'Picked the winner in 73% of 2026 matches it was not tuned on. Scores were off by 14.3 points per alliance on average.'
+		);
+	});
+
 	it('explains the method and how the data was split', () => {
 		show();
 		const method = section('Method');
