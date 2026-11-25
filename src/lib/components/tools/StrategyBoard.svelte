@@ -867,4 +867,9 @@
 			height: 30px;
 		}
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		.entry {
+			font-size: 16px;
+		}
+	}
 </style>

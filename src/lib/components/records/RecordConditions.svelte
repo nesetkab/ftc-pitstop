@@ -294,4 +294,9 @@
 			grid-column: 1 / 3;
 		}
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		.number {
+			font-size: 16px;
+		}
+	}
 </style>

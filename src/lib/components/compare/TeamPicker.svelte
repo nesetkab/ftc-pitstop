@@ -217,4 +217,9 @@
 			line-height: 20px;
 		}
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		.add :global(.field) {
+			font-size: 16px;
+		}
+	}
 </style>

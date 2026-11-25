@@ -127,4 +127,10 @@
 	.address :global(.field::placeholder) {
 		color: var(--text-3);
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		.address,
+		.address :global(.field) {
+			font-size: 16px;
+		}
+	}
 </style>

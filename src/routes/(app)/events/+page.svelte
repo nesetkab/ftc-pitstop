@@ -437,4 +437,9 @@
 			min-height: 40px;
 		}
 	}
+	@media (pointer: coarse), (max-width: 600px) {
+		input {
+			font-size: 16px;
+		}
+	}
 </style>
