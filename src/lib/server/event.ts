@@ -251,6 +251,7 @@ export function createLoaders(deps: LoaderDeps) {
 	const misses = new LruMap<number>(500);
 	const listRetryAt = { scout: 0, ftc: 0 };
 	const codeSets = new WeakMap<object, Set<string>>();
+	const building = new Map<string, Promise<LoadedBundle>>();
 
 	function rememberMiss(key: string) {
 		misses.set(key, now() + MISS_MS);
@@ -416,6 +417,14 @@ export function createLoaders(deps: LoaderDeps) {
 
 	async function loadEventBundle(input: string): Promise<LoadedBundle> {
 		const code = normalizeEventCode(input);
+		const running = building.get(code);
+		if (running) return running;
+		const task = buildEventBundle(code).finally(() => building.delete(code));
+		building.set(code, task);
+		return task;
+	}
+
+	async function buildEventBundle(code: string): Promise<LoadedBundle> {
 		const time = now();
 		const begun = performance.now();
 		if (recentlyMissed(`event:${code}`) || !(await isKnownEvent(code))) {

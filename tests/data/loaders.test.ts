@@ -50,6 +50,21 @@ const paths = (calls: { url: string }[]) =>
 	calls.map((call) => call.url.replace('https://ftc-api.firstinspires.org/v2.0/2026/', ''));
 
 describe('loadEventBundle', () => {
+	it('builds one bundle for calls that arrive together', async () => {
+		const data = setup({
+			now: '2026-11-19T12:00:00Z',
+			scout: { EventsSearch: scoutSeasonList('USAZGIQ', 'USAZCMP') }
+		});
+		const [first, second] = await Promise.all([
+			data.loadEventBundle('USAZGIQ'),
+			data.loadEventBundle('usazgiq')
+		]);
+		expect(second).toBe(first);
+		const third = await data.loadEventBundle('USAZGIQ');
+		expect(third).not.toBe(first);
+		expect(third.matches).toEqual(first.matches);
+	});
+
 	it('builds the full bundle for a finished event', async () => {
 		const data = setup({
 			now: '2026-11-19T12:00:00Z',
