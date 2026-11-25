@@ -30,7 +30,7 @@
 			<dt>aOPR by event</dt>
 			<dd class="trend">
 				<TrendSpark points={trend} width={150} height={44} />
-				<small>{signed(change)} since first</small>
+				<small>{signed(change)} since first event</small>
 			</dd>
 		</div>
 	{/if}
@@ -62,7 +62,7 @@
 	{/if}
 	<div>
 		<dt>Qual record</dt>
-		<dd title="Qualification matches at every event this season. Playoffs are not counted.">
+		<dd>
 			{#if stats.record}
 				{record(stats.record.wins, stats.record.losses, stats.record.ties)}
 				<small>in {stats.events} {stats.events === 1 ? 'event' : 'events'}</small>

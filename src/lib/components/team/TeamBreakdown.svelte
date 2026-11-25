@@ -99,11 +99,7 @@
 		{/each}
 	</tbody>
 </Table>
-<Legend>
-	aOPR for each part of the score. Hive, flower, garden and park are teleop points.
-	{#if comparison.length > 0}Season percentile is the share of teams this season with a lower value.{/if}
-	{#if events.length > 1}Bold marks the team's best event for that part.{/if}
-</Legend>
+<Legend>Hive, flower, garden and park are part of teleop.</Legend>
 
 <style>
 	tbody th {

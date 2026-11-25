@@ -68,10 +68,7 @@
 </script>
 
 <div class="body">
-	<p class="note">
-		Live images of this team’s numbers for a website, a GitHub README or a sponsor deck. They update
-		about once an hour.
-	</p>
+	<p class="note">These images show this team’s latest numbers and update about once an hour.</p>
 	<div class="pick">
 		<label class="ctl-label" for={selectId}>Badge</label>
 		<select id={selectId} class="ctl-select" value={kind} onchange={choose}>
@@ -112,10 +109,6 @@
 			</div>
 		{/each}
 	</dl>
-	<p class="note">
-		The HTML version swaps to the dark badge when the reader’s system is in dark mode. Add
-		<code>?theme=dark</code> to any image URL for the dark one.
-	</p>
 </div>
 
 <style>

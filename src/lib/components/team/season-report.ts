@@ -373,7 +373,7 @@ function consistencyTakeaways(scores: number[]): Candidate[] {
 		return [
 			{
 				weight: 50,
-				text: `Consistent: ${close} of ${scores.length} alliance scores within ${integer(band)} points of the ${integer(average)} average`
+				text: `Scores steadily, with ${close} of ${scores.length} matches within ${integer(band)} points of the ${integer(average)} average`
 			}
 		];
 	}
@@ -381,7 +381,7 @@ function consistencyTakeaways(scores: number[]): Candidate[] {
 		return [
 			{
 				weight: 52,
-				text: `Uneven scores: from ${integer(Math.min(...scores))} to ${integer(Math.max(...scores))} across ${scores.length} matches`
+				text: `Scores swing a lot, from ${integer(Math.min(...scores))} to ${integer(Math.max(...scores))} across ${scores.length} matches`
 			}
 		];
 	}
