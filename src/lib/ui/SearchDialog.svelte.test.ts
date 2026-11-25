@@ -196,13 +196,14 @@ describe('SearchDialog', () => {
 		expect(dialog).not.toHaveAttribute('open');
 	});
 
-	it('shows result details next to the name', async () => {
+	it('shows the place or dates next to the name and bolds the match', async () => {
 		setup(async () => [
-			{ type: 'team', label: '3747 The Hive', meta: '80.0 OPR · #3', href: '/teams/3747' },
-			{ type: 'event', label: 'Butte', meta: 'Live', live: true, href: '/events/USMTBUQ' }
+			{ type: 'team', label: '3747 The Hive', aside: 'Sandy, Utah', href: '/teams/3747' },
+			{ type: 'event', label: 'Butte', aside: 'Day 2 of 2', live: true, href: '/events/USMTBUQ' }
 		]);
 		await openAndType('hive');
-		expect(screen.getByText('80.0 OPR · #3')).toBeInTheDocument();
-		expect(screen.getByText('Live')).toHaveClass('live');
+		expect(screen.getByText('Sandy, Utah')).toBeInTheDocument();
+		expect(screen.getByText('Day 2 of 2')).toHaveClass('live');
+		expect(screen.getByText('Hive').tagName).toBe('MARK');
 	});
 });

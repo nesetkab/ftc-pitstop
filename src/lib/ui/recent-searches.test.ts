@@ -53,6 +53,21 @@ describe('recent searches', () => {
 		expect(readRecent()).toHaveLength(1);
 	});
 
+	it('keeps the place or dates but not a live day count', () => {
+		rememberRecent({ ...team(1), aside: 'Gilbert, Arizona' });
+		rememberRecent({
+			type: 'event',
+			label: 'Butte',
+			aside: 'Day 2 of 2',
+			live: true,
+			href: '/events/USMTBUQ'
+		});
+		expect(readRecent()).toEqual([
+			{ type: 'event', label: 'Butte', sublabel: null, href: '/events/USMTBUQ' },
+			{ ...team(1), aside: 'Gilbert, Arizona' }
+		]);
+	});
+
 	it('ignores broken or foreign entries', () => {
 		expect(parseRecent('not json')).toEqual([]);
 		expect(parseRecent('{"a":1}')).toEqual([]);

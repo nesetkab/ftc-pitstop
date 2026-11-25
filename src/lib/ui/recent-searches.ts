@@ -11,15 +11,18 @@ function isRecent(value: unknown): value is SearchResult {
 		typeof entry.label === 'string' &&
 		typeof entry.href === 'string' &&
 		/^\/(teams|events)\/[A-Za-z0-9]+$/.test(entry.href) &&
-		(entry.sublabel == null || typeof entry.sublabel === 'string')
+		(entry.sublabel == null || typeof entry.sublabel === 'string') &&
+		(entry.aside == null || typeof entry.aside === 'string')
 	);
 }
 
 function stored(result: SearchResult): SearchResult {
+	const aside = result.live ? null : result.aside;
 	return {
 		type: result.type,
 		label: result.label,
 		sublabel: result.sublabel ?? null,
+		...(aside ? { aside } : {}),
 		href: result.href
 	};
 }
