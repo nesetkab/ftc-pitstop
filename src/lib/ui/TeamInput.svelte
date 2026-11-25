@@ -192,6 +192,7 @@
 		right: 0;
 		left: 0;
 		z-index: 5;
+		container-type: inline-size;
 		display: grid;
 		padding: 4px;
 		border: 1px solid var(--line-2);
@@ -232,12 +233,17 @@
 
 	.hit-name,
 	.place {
+		min-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
-	.place {
+	.hit-name {
 		flex: 0 1 auto;
+	}
+
+	.place {
+		flex: 0 1000 auto;
 		font-size: 13px;
 		color: var(--text-3);
 	}
@@ -246,6 +252,12 @@
 		padding: 7px 8px;
 		font-size: 13px;
 		color: var(--text-2);
+	}
+
+	@container (max-width: 260px) {
+		.place {
+			display: none;
+		}
 	}
 
 	@media (max-width: 480px) {

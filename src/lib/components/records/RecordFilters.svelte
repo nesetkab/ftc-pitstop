@@ -126,7 +126,7 @@
 	}
 
 	.team :global(.field) {
-		width: 168px;
+		width: 200px;
 		padding: 7px 10px;
 		border: 1px solid var(--line-2);
 		border-radius: var(--radius-control);
