@@ -25,6 +25,8 @@ export type PooledParams = {
 	imbPred: number;
 	imbFit: number;
 	floor: number;
+	imbPow: number;
+	imbScore: number;
 	kappa: number;
 	block: boolean;
 	q: number;
@@ -61,6 +63,8 @@ export const POOLED_BASE: PooledParams = {
 	imbPred: 0,
 	imbFit: 0,
 	floor: -Infinity,
+	imbPow: 1,
+	imbScore: NaN,
 	kappa: 1,
 	block: true,
 	q: 0,
@@ -625,14 +629,18 @@ export class PooledOpr implements Model {
 		}
 		const c = this.p.imbPred;
 		if (c !== 0) {
+			const half = Math.max(ctx.mean / 2, 1e-6);
+			const pw = this.p.imbPow;
 			const gap = (teams: number[], v: Float64Array) =>
 				teams.length === 2
-					? Math.abs(v[this.index.get(teams[0])!] - v[this.index.get(teams[1])!])
+					? half *
+						(Math.abs(v[this.index.get(teams[0])!] - v[this.index.get(teams[1])!]) / half) ** pw
 					: 0;
+			const cs = Number.isNaN(this.p.imbScore) ? c : this.p.imbScore;
 			red += c * gap(m.red, this.mu);
 			blue += c * gap(m.blue, this.mu);
-			redScore += c * gap(m.red, this.nu);
-			blueScore += c * gap(m.blue, this.nu);
+			redScore += cs * gap(m.red, this.nu);
+			blueScore += cs * gap(m.blue, this.nu);
 		}
 		if (this.p.penW > 0) {
 			for (const t of m.red) blue += this.p.penW * this.pen(t);
