@@ -4,8 +4,10 @@ import { loadBreakdowns } from '../../breakdowns.server.ts';
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
-	const { breakdowns } = await loadBreakdowns(event);
-	const entry = await loadEventAnalysisEntry(event.params.code).catch(() => null);
+	const [{ breakdowns }, entry] = await Promise.all([
+		loadBreakdowns(event),
+		loadEventAnalysisEntry(event.params.code).catch(() => null)
+	]);
 	const key = event.params.key.toLowerCase();
 	return { breakdowns, oprShifts: entry ? oprShifts(entry.analysis.ratings, key) : null };
 };
