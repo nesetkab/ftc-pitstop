@@ -24,6 +24,7 @@ export type PooledParams = {
 	hetVar: number;
 	imbPred: number;
 	imbFit: number;
+	floor: number;
 	kappa: number;
 	block: boolean;
 	q: number;
@@ -59,6 +60,7 @@ export const POOLED_BASE: PooledParams = {
 	hetVar: 0,
 	imbPred: 0,
 	imbFit: 0,
+	floor: -Infinity,
 	kappa: 1,
 	block: true,
 	q: 0,
@@ -606,17 +608,18 @@ export class PooledOpr implements Model {
 		let blue = 0;
 		let redScore = 0;
 		let blueScore = 0;
+		const f = (this.p.floor * ctx.mean) / 2;
 		for (const t of m.red) {
 			const i = this.index.get(t)!;
-			red += this.mu[i];
-			redScore += this.nu[i];
+			red += Math.max(this.mu[i], f);
+			redScore += Math.max(this.nu[i], f);
 			idx.push(i);
 			sign.push(1);
 		}
 		for (const t of m.blue) {
 			const i = this.index.get(t)!;
-			blue += this.mu[i];
-			blueScore += this.nu[i];
+			blue += Math.max(this.mu[i], f);
+			blueScore += Math.max(this.nu[i], f);
 			idx.push(i);
 			sign.push(-1);
 		}
