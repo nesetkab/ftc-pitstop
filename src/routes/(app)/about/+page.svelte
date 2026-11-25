@@ -6,8 +6,8 @@
 		ABOUT_TITLE,
 		type AboutSectionId
 	} from '#lib/components/about/sections.ts';
-	import { DEEP, TOP } from '#lib/components/event/strength.ts';
-	import { BUNDLE_INTERVAL, QUEUE_INTERVAL } from '#lib/components/pit/poll.ts';
+	import { TOP } from '#lib/components/event/strength.ts';
+	import { BUNDLE_INTERVAL } from '#lib/components/pit/poll.ts';
 	import { QUEUE_EARLIEST, QUEUE_MATCHES_AHEAD } from '#lib/components/pit/queue.ts';
 	import { GLOSSARY, termId } from '#lib/format/glossary.ts';
 	import { fixed, integer } from '#lib/format/number.ts';
@@ -95,82 +95,74 @@
 			{@render heading('opr')}
 			<p>
 				aOPR, adjusted OPR, is PitStop’s version of OPR, short for offensive power rating. It is an
-				estimate of how many points a team adds to its alliance’s score in a typical match. It is
-				the number most of PitStop is built on.
+				estimate of how many points a team adds to its alliance’s score in a typical match.
 			</p>
 			<p>
 				Most of the score is only reported per alliance, so aOPR works backwards. Across every
 				match, it finds the set of team numbers that best explains all the alliance scores at once.
-				PitStop leaves penalty points out, so a team gets no credit for fouls the other alliance
-				committed.
 			</p>
 			<p>
-				Some points are scored by one robot on its own, like leaving and parking, and FIRST records
-				those per robot. Each team gets those points directly. Only the rest of the score is split
-				between partners. A team’s aOPR is its own robot points plus its share of the rest.
+				FIRST records some points per robot, like leaving and parking. Each team gets those points
+				directly, and only the rest of the score is split between partners.
 			</p>
 			<p>
-				aOPR never goes below zero. A team cannot take points away from its own alliance, so a
-				rating that would drift negative is eased back toward zero. That keeps a weak team with
-				strong partners from being blamed for points it never cost them.
+				aOPR never goes below zero, because a team cannot take points away from its own alliance.
+				That keeps a weak team with strong partners from being blamed for points it never cost them.
 			</p>
 			<p>
 				A handful of matches is not enough to tell teams apart, so each team starts from a guess
-				based on its earlier events this season and its last three seasons, with last season
-				counting most. The matches at the current event take over quickly. Older information counts
-				for less, and less again for a team that has been away for weeks, because robots change
-				between events.
+				based on its earlier events this season and its last three seasons. The matches at the
+				current event take over quickly. Older results count for less, because robots change between
+				events.
 			</p>
 			<p>
 				That is why aOPR will not match the OPR on FTCScout. FTCScout shows classic OPR, solved from
 				qualification matches alone with no starting guess. PitStop also counts playoff matches,
-				credits robot points directly and starts each team from a guess. Both leave penalty points
-				out.
+				credits robot points directly and starts each team from a guess.
 			</p>
 			<p>
-				PitStop uses this version because it tested best. Every traditional FTC event from 2021 to
-				2026 was replayed, predicting each match from only the matches before it. It did better than
-				plain OPR with starting guesses, the version PitStop used before, and several versions of
-				EPA, in every season. The <a href="/accuracy">accuracy page</a> has the full results.
+				PitStop uses this version because it predicted past matches best. Every traditional FTC
+				event from 2021 to 2026 was replayed, predicting each match from only the matches before it.
+				It beat PitStop’s earlier OPR model and several versions of EPA in every season. The
+				<a href="/accuracy">accuracy page</a> has the full results.
 			</p>
 			<p>
 				The same method runs on each part of the score, which gives auto aOPR, hive aOPR, tips aOPR
-				and the rest. The point parts are scaled to add up to total aOPR. Tips are a count, not
-				points, so they are left as they are. Every variant is listed in the <a href="#glossary"
-					>glossary</a
-				>.
+				and the rest. The point parts add up to total aOPR.
 			</p>
 		</section>
 
 		<section id="rankings" aria-labelledby="rankings-title">
 			{@render heading('rankings')}
 			<p>
-				Official rankings come straight from FIRST. PitStop does not reorder them.
+				Official rankings come straight from FIRST, and PitStop does not reorder them.
 				<dfn>RS</dfn>, the ranking score, is a team’s average ranking points per match, and it
 				decides the order. <dfn>TBP</dfn>, tiebreaker points, is the average match score without
-				penalties, and it separates teams with the same RS. A match a team was disqualified from or
-				did not show up for counts as zero for both.
+				fouls, and it separates teams with the same RS. A match a team was disqualified from or did
+				not show up for counts as zero for both.
 			</p>
 			<p>
-				League meets show league rankings, which use each team’s best 10 league matches so far.
-				There RS and TBP are totals over those matches divided by 10, so they start low and climb as
-				the league goes on. The record counts the same matches.
+				League meets use each team’s best 10 league matches so far. There RS and TBP are totals over
+				those matches divided by 10, so they start low and climb as the league goes on.
 			</p>
 			<p>
-				When FIRST’s rankings are down and PitStop falls back to FTCScout, it works the rankings out
-				from the match results with FIRST’s rules, so disqualified and missed matches still count as
-				zero. Only the current event is loaded then, so after a league’s first meet those rankings
-				leave out earlier meets and show plain per-match averages.
+				When FIRST’s rankings are down, PitStop works them out from the match results with FIRST’s
+				rules.
 			</p>
 			<p>
-				On team pages, the season record adds up qualification matches from every event. Playoff
-				matches are not counted.
+				On team pages, the season record counts qualification matches from every event, but not
+				playoffs.
 			</p>
 			<p>
-				<dfn>NP</dfn> means non-penalty: an alliance’s score with the other alliance’s foul points taken
-				out. NP avg, NP max and NP min describe the scores of the alliances a team played on, and spread
-				shows how much those scores move around from match to match. A high NP avg with a small spread
-				is a team you can count on.
+				PitStop leaves out the points an alliance gets from the other alliance’s fouls, so a team
+				gets no credit for its opponents’ mistakes. aOPR and <dfn>NP</dfn>, or non-penalty, scores
+				work this way. Predicted scores add back the foul points each opponent tends to give away,
+				so they can be compared with the final score.
+			</p>
+			<p>
+				NP avg, NP max and NP min describe the scores of the alliances a team played on, and spread
+				shows how much those scores move from match to match. A high NP avg with a small spread is a
+				team you can count on.
 			</p>
 		</section>
 
@@ -197,41 +189,36 @@
 			</dl>
 			<p>
 				That is at most {maxRp} ranking points per match. PitStop predicts each bonus before the match.
-				The Swarm chance combines each robot’s record of leaving and parking with the alliance’s predicted
-				leave and park points. The Pollinator chances treat tips aOPR as an expected count and ask how
-				likely the alliance is to reach each threshold. Both were fitted to this season’s results, and
-				the
-				<a href="/accuracy">accuracy page</a> shows how close they come on those same matches.
+				The Swarm chance uses each robot’s record of leaving and parking. The Pollinator chances use the
+				alliance’s tips aOPR. Both were fitted to this season’s results.
 			</p>
 		</section>
 
 		<section id="predictions" aria-labelledby="predictions-title">
 			{@render heading('predictions')}
 			<p>
-				For a match that has not been played, each alliance’s predicted score adds up its two teams’
-				aOPRs and the foul points the other alliance tends to give away.
+				For a match that has not been played, each alliance’s predicted score starts from its two
+				teams’ aOPRs.
 			</p>
 			<p>
 				A strong robot can carry a weaker partner, so an alliance with one much stronger team tends
 				to score more than its two aOPRs add up to. PitStop adds a fifth of the gap between the two
-				partners, measured on the points they score together.
+				partners.
 			</p>
 			<p>
-				The win chance comes from the gap between the two alliances’ ratings, turned into a
-				percentage by an S-shaped curve fitted to the 2021 to 2025 seasons. The curve stays closer
-				to 50/50 when the model is unsure about the teams, like early in an event, and in
-				high-scoring matches, where the same gap decides less. An evenly matched game has about a
-				{tieChance}% chance of a tie.
+				The win chance comes from the gap between the two alliances’ ratings, fitted to the 2021 to
+				2025 seasons. It stays closer to 50/50 early in an event, when the model knows less about
+				the teams, and in high-scoring matches, where the same gap decides less. An evenly matched
+				game has about a {tieChance}% chance of a tie.
 			</p>
 			<p>
 				A 70% win chance means the favorite should lose about 3 times in 10. Upsets are expected,
-				not mistakes. Replayed on past seasons, the predicted chances lined up with how often teams
-				actually won to within a few percentage points.
+				not mistakes.
 			</p>
 			<p>
 				Teams with no history this season are treated as weaker than average when picking a winner,
-				because that is what the past data shows. For predicted points, a separate estimate without
-				that penalty is used, so new teams’ scores do not come out too low.
+				because that is what past seasons show. That undersells a strong first-year team until it
+				has played a few matches.
 			</p>
 			<p>
 				Rank projections and playoff odds play out the rest of the schedule {integer(SIMULATIONS)}
@@ -243,37 +230,30 @@
 			{@render heading('match-impact')}
 			<h3>What’s at stake</h3>
 			<p>
-				Shown on upcoming qualification matches at events with playoffs. For each team in the match,
-				it gives the chance to finish high enough to be an alliance captain: as things stand now, if
-				they win, and if they lose. PitStop gets these by playing out the rest of the qualification
-				schedule many times, once with this match forced to each result. The wider the gap between
-				the win and loss numbers, the more the match matters to that team.
+				This shows on upcoming qualification matches at events with playoffs. For each team, it
+				gives the chance to finish high enough to be an alliance captain as things stand, with a win
+				and with a loss. The wider the gap between the win and loss numbers, the more the match
+				matters to that team.
 			</p>
 			<h3>What this match changed</h3>
 			<p>
-				Shown on played qualification matches. It lists each team’s rank and aOPR just before and
-				just after the match, so you can see who moved and by how much.
+				This shows on played qualification matches. It lists each team’s rank and aOPR just before
+				and just after the match.
 			</p>
 		</section>
 
 		<section id="queue-times" aria-labelledby="queue-times-title">
 			{@render heading('queue-times')}
 			<p>
-				Events rarely run to the printed schedule. PitStop estimates when each match will start from
-				how the event is actually running: it measures the gaps between the last several matches
-				played, ignores breaks, and moves the rest of the schedule along at that pace. Scheduled
-				breaks, like lunch and overnight, are kept.
+				Events rarely run to the printed schedule. PitStop measures the gaps between the last
+				several matches and moves the rest of the schedule along at that pace. Scheduled breaks,
+				like lunch, are kept.
 			</p>
 			<p>
 				Your queue time is the estimated start of the match {AHEAD_WORDS[QUEUE_MATCHES_AHEAD] ??
 					QUEUE_MATCHES_AHEAD}
 				before yours, but never more than {queueLead} minutes before your own match is expected to start.
-				At events that use Nexus for queueing, Nexus’s own queue times and calls, like now queuing and
-				on deck, come first.
-			</p>
-			<p>
-				The <a href="/accuracy">accuracy page</a> shows how close the start time estimates came on this
-				season’s events, next to the printed schedule.
+				At events that use Nexus for queueing, Nexus’s own queue times and calls come first.
 			</p>
 		</section>
 
@@ -281,19 +261,16 @@
 			{@render heading('event-strength')}
 			<p>
 				<dfn>Strength</dfn> is how tough an event’s field is: the average season aOPR of the {TOP} best
-				rated teams there. The top of the field decides who wins and advances, so a few strong teams count
-				for more than a long tail of new ones.
+				rated teams there. The top of the field decides who wins and advances, so it counts for more than
+				a long tail of new teams.
 			</p>
 			<p>
-				Before and during an event, it uses every registered team. Once the event is over, it uses
-				only the teams that played. Every team is measured by its current season aOPR, so a past
-				event’s strength moves as its teams improve. Teams with no matches yet have no aOPR and are
-				left out.
+				Every team is measured by its current season aOPR, so a past event’s strength moves as its
+				teams improve. Teams with no matches yet are left out.
 			</p>
 			<p>
 				An event needs at least {TOP} rated teams to get a strength. The
-				<a href="/events/strength">strongest events</a> page ranks every event this season, and also
-				shows the top {DEEP} average and the average over every rated team.
+				<a href="/events/strength">strongest events</a> page ranks every event this season.
 			</p>
 		</section>
 
@@ -310,9 +287,8 @@
 				<div>
 					<dt><a href="https://ftcscout.org">FTCScout</a></dt>
 					<dd>
-						Season-wide match history behind season aOPR and world ranks, the season’s event list,
-						and a backup when the FIRST API is slow or down. Event pages say when they are showing
-						FTCScout data.
+						Season match history behind season aOPR and world ranks, and a backup when FIRST is slow
+						or down.
 					</dd>
 				</div>
 				<div>
@@ -330,17 +306,9 @@
 				</div>
 			</dl>
 			<p>
-				During a live event, PitStop checks FIRST for new scores and rankings every 15 to 20
-				seconds, and open event pages refresh themselves every 30 seconds. Pit screens check for new
-				results every {BUNDLE_INTERVAL / 1000} seconds and queue status every {QUEUE_INTERVAL /
+				During a live event, event pages refresh every 30 seconds and pit screens every {BUNDLE_INTERVAL /
 					1000} seconds. Season ratings are rebuilt about once an hour. Scores appear once the event’s
 				scorekeeper sends them to FIRST, so a short delay after a match ends is normal.
-			</p>
-			<p>
-				Teams can show their numbers on a website or GitHub README with a badge, an image at
-				<code>/badge/NUMBER.svg</code>. The Badges section at the bottom of each team page has
-				copy-paste code. Badges are cached for up to an hour, so they can trail the team page a
-				little.
 			</p>
 		</section>
 
@@ -348,13 +316,13 @@
 			{@render heading('impossible-scores')}
 			<p>
 				Now and then a score is entered wrong. In one case a real match was recorded as 7,308 to
-				8,355. Because aOPR solves every match at an event together, a single bad score can throw
-				off every team at that event, and even the season-wide numbers.
+				8,355. Because aOPR solves every match at an event together, one bad score can throw off
+				every team there.
 			</p>
 			<p>
-				So PitStop leaves a match out of its ratings and predictions when an alliance total is above
-				{PLAUSIBLE_SCORE}, or when auto and teleop points do not add up to the non-penalty score.
-				The match still appears in results with its official score. It just does not feed the model.
+				So PitStop leaves a match out of its ratings when an alliance total is above {PLAUSIBLE_SCORE},
+				or when auto and teleop points do not add up to the NP score. The match still appears in
+				results with its official score.
 			</p>
 		</section>
 
@@ -367,24 +335,12 @@
 					get spread across the teams involved.
 				</li>
 				<li>
-					Robot credit only covers points FIRST records per robot, like leaving and parking. Matches
-					without that detail still count, with the whole score split between partners.
-				</li>
-				<li>
 					Early in an event, ratings lean on earlier events and last season. A team that rebuilt its
 					robot will look off for its first few matches.
 				</li>
 				<li>
-					Win chances ignore fouls. They were tested and turned out too random to predict per team.
-				</li>
-				<li>
-					The ratings and win chances were tuned on 2021 to 2025 only, and this season was held out
-					to test them. {GAME_NAME} is new, so ranking point chances, the tie rate and the score spread
-					had to be fitted on this season’s matches. They will settle as more matches are played.
-				</li>
-				<li>
-					Teams with no history are assumed to be weaker than average. That is usually right, but it
-					undersells a strong first-year team until it has played a few matches.
+					{GAME_NAME} is new, so ranking point chances and the tie rate were fitted on this season’s matches.
+					They will settle as more matches are played.
 				</li>
 				<li>
 					The numbers are only as good as what is entered at the event. Corrected scores show up on
@@ -399,10 +355,7 @@
 
 		<section id="glossary" aria-labelledby="glossary-title">
 			{@render heading('glossary')}
-			<p>
-				Every short label used in PitStop’s tables. Hover over one in a table to see it, or tap it
-				to come here.
-			</p>
+			<p>Every short label used in PitStop’s tables.</p>
 			<dl class="glossary">
 				{#each glossary as [term, text] (term)}
 					<div id={termId(term)}>
