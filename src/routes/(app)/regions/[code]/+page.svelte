@@ -92,7 +92,6 @@
 		{#if data.updated}
 			<StaleNotice updated={data.updated} staleAfter={86400} prefix="Ratings updated" />.
 		{/if}
-		<a href="/events?region={code}">All events</a> ·
 		<a href="/events/strength?region={code}">Event strength</a>
 	{/snippet}
 </PageHeader>
@@ -144,7 +143,7 @@
 <section aria-labelledby="events-title">
 	<div class="head">
 		<h2 class="sec-title" id="events-title">Events</h2>
-		<a href="/events?region={code}">Open in the event list</a>
+		<a href="/events?region={code}">All events in {region.name}</a>
 	</div>
 	{#if data.events.live.length > 0}
 		<h3 class="group">Today</h3>
