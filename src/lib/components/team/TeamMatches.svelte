@@ -8,6 +8,7 @@
 	import TeamChip from '#lib/ui/TeamChip.svelte';
 	import { shortRange } from '#lib/format/time.ts';
 	import type { MatchOutcome, TeamMatchEvent, TeamMatchParts } from './matches.ts';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	interface Props {
 		events: TeamMatchEvent[];
@@ -109,10 +110,10 @@
 		</details>
 	{/each}
 </div>
-<p class="note">
+<Legend>
 	Scores include points from fouls. The points columns are for this team's alliance. Hive, flower,
 	garden and park are teleop points.
-</p>
+</Legend>
 
 <style>
 	.events {

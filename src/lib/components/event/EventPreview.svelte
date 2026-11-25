@@ -13,6 +13,7 @@
 	import { weekday } from './dates.ts';
 	import { placeName } from '#lib/format/places.ts';
 	import RangeBar from './RangeBar.svelte';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	type RatingWithRange = TeamRating & { sd?: number };
 
@@ -195,13 +196,13 @@
 		</tbody>
 	</Table>
 	{#if rated}
-		<p class="note">
+		<Legend>
 			Starting OPR is the rating each team brings into this event. Teams with BIOBUZZ matches start
 			from their own results. Teams without start from last season's results.
 			{#if projected && spots > 0}
 				Expected rank and top {spots} chance play out the posted schedule thousands of times, so they
 				also reflect who each team is paired with and against. The top {spots} become alliance captains.
 			{/if}
-		</p>
+		</Legend>
 	{/if}
 {/if}

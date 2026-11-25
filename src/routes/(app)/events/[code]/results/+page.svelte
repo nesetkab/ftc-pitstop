@@ -4,6 +4,7 @@
 	import { withBreakdowns } from '#lib/game/breakdowns.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import type { PageProps } from './$types';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -21,10 +22,10 @@
 		followed={view.followed}
 		bind:order
 	/>
-	<p class="note">
+	<Legend>
 		Hive is tips plus pollen and nectar scored in the hive. Fouls are points from the other
 		alliance's fouls. Totals include fouls.
-	</p>
+	</Legend>
 {:else}
 	<EmptyState title="No results yet.">Scores show here as soon as matches are played.</EmptyState>
 {/if}

@@ -19,6 +19,7 @@
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import type { PageProps } from './$types';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -99,10 +100,10 @@
 			<section class="panel" aria-labelledby="parts-title">
 				<h2 class="sec-title" id="parts-title">Part by part</h2>
 				<PartTable red={simulation.red} blue={simulation.blue} />
-				<p class="note">
+				<Legend>
 					Expected points per match. A team's share shows when it brings most of its alliance's
 					points in a part. Tips are counts, not points.
-				</p>
+				</Legend>
 			</section>
 		</div>
 
@@ -125,14 +126,16 @@
 		</div>
 	</div>
 
-	<p class="note">
-		Numbers are each team's current season rating. Chances are for one qualification match.
-		{#if fresh.length > 0}
+	{#if fresh.length > 0}
+		<p class="note">
 			No matches yet this season for {fresh.map((team) => team.number).join(', ')}, so
 			{fresh.length === 1 ? 'its numbers start' : 'their numbers start'} from last season or a typical
 			new team.
-		{/if}
-	</p>
+		</p>
+	{/if}
+	<Legend>
+		Numbers are each team's current season rating. Chances are for one qualification match.
+	</Legend>
 {:else if full && !data.ready}
 	<EmptyState title="Season ratings are still loading.">
 		Reload in a minute to see the prediction for {matchup}.

@@ -8,6 +8,7 @@
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import type { PageProps } from './$types';
+	import Legend from '#lib/ui/Legend.svelte';
 
 	let { data }: PageProps = $props();
 
@@ -40,16 +41,17 @@
 	<section class="panel averages" aria-labelledby="averages-title">
 		<h2 class="sec-title" id="averages-title">Average alliance score</h2>
 		<InsightAverages {...averages} />
-		<p class="note">
+		{#if !averages.season}
+			<p class="note">The season comparison shows once season data has loaded.</p>
+		{/if}
+		<Legend>
 			From {integer(averages.event.count)} alliance scores. Scores leave out points from the other alliance's
 			fouls. Tips is a count, not points.
 			{#if averages.season}
 				Season is every alliance score this season. Vs season compares this event's {basis} average with
 				it.
-			{:else}
-				The season comparison shows once season data has loaded.
 			{/if}
-		</p>
+		</Legend>
 	</section>
 
 	<section class="panel" aria-labelledby="scores-title">
@@ -58,7 +60,7 @@
 			<Segmented label="Match type" options={levels} value={data.filters.level} />
 		</div>
 		<InsightsTable {code} rows={data.rows} filters={data.filters} followed={view.followed} />
-		<p class="note">Each match counts twice, once for each alliance.</p>
+		<Legend>Each match counts twice, once for each alliance.</Legend>
 		<p class="links">
 			{#if hidden > 0}
 				<a href="{base}{insightQuery({ ...data.filters, all: true })}" data-sveltekit-noscroll

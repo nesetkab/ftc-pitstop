@@ -5,6 +5,7 @@
 	import type { EventBundle } from '#lib/types.ts';
 	import DownloadLink from '#lib/ui/DownloadLink.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Legend from '#lib/ui/Legend.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import ColumnMenu from './ColumnMenu.svelte';
 	import { quals } from './matches.ts';
@@ -98,7 +99,7 @@
 		return query || path || '?';
 	}
 
-	const note = $derived(
+	const caveat = $derived(
 		[
 			elsewhere
 				? "These are league rankings, so they include teams that didn't play at this meet."
@@ -108,7 +109,14 @@
 				: null,
 			meetOnly
 				? `FIRST's rankings aren't loading, so these count this event's matches only. FIRST's league rankings also add each team's best ${LEAGUE_MATCHES} matches from earlier meets.`
-				: null,
+				: null
+		]
+			.filter(Boolean)
+			.join(' ')
+	);
+
+	const note = $derived(
+		[
 			shown.has('rs') && !league ? 'RS is the average ranking points per match.' : null,
 			shown.has('tbp') && !league
 				? 'TBP is the average match score without penalties. Matches a team was disqualified from or missed count as zero.'
@@ -145,12 +153,12 @@
 	{/if}
 	{#if active === 'rp' && rp}
 		<RpSources {rp} rankings={bundle.rankings} teams={bundle.teams} {followed} {eventCode} />
-		<p class="note">
+		<Legend>
 			Share of each team's qualification matches where its alliance won or earned each bonus ranking
 			point. Swarm takes {RP_THRESHOLDS.swarm} leave and park points, Pollinator 1 takes {RP_THRESHOLDS.pollinator1}
 			tips and Pollinator 2 takes {RP_THRESHOLDS.pollinator2}. Bonus RS is bonus ranking points per
 			match, the part of RS that doesn't depend on winning.
-		</p>
+		</Legend>
 	{:else if active === 'schedule'}
 		<StrengthTable
 			title={strengthTitle}
@@ -160,11 +168,11 @@
 			{followed}
 			{eventCode}
 		/>
-		<p class="note">
+		<Legend>
 			Partners' and opponents' OPR are averages over the matches each team has played{remaining > 0
 				? ' so far'
 				: ''}. Difference is partners minus opponents, so a team above zero had the easier schedule.
-		</p>
+		</Legend>
 	{:else}
 		<RankingsTable
 			{rows}
@@ -178,7 +186,8 @@
 			{followed}
 			{eventCode}
 		/>
-		<p class="note">{note}</p>
+		{#if caveat}<p class="note">{caveat}</p>{/if}
+		{#if note}<Legend>{note}</Legend>{/if}
 		{#if csvHref}
 			<p class="csv"><DownloadLink href="{csvHref}{query}" /></p>
 		{/if}
