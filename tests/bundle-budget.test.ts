@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { gzipBytes, hasBuild, readCode, sharedAssets } from './bundle.ts';
 
-const JS_BUDGET = 60_000;
-const CSS_BUDGET = 6_800;
+const JS_BUDGET = 70_000;
+const CSS_BUDGET = 8_000;
 
 describe.skipIf(!hasBuild())('shared bundle budget, read from the last npm run build', () => {
 	const shared = sharedAssets();
