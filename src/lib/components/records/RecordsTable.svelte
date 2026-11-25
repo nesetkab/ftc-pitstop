@@ -318,7 +318,7 @@
 		}
 
 		.event {
-			max-width: 52vw;
+			max-width: calc(100vw - 188px);
 		}
 
 		.name {
