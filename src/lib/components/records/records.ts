@@ -23,7 +23,13 @@ export const RECORD_PARTS = [
 	{ key: 'teleop', label: PART_LABELS.teleop },
 	{ key: 'hive', label: PART_LABELS.hive },
 	{ key: 'flower', label: PART_LABELS.flower },
-	{ key: 'garden', label: PART_LABELS.garden }
+	{ key: 'garden', label: PART_LABELS.garden },
+	{ key: 'park', label: PART_LABELS.park }
+] as const;
+
+export const RECORD_GROUPS = [
+	{ label: 'Match score', parts: ['total', 'auto', 'teleop'] },
+	{ label: 'Teleop points', parts: ['hive', 'flower', 'garden', 'park'] }
 ] as const;
 
 export type RecordPart = (typeof RECORD_PARTS)[number]['key'];

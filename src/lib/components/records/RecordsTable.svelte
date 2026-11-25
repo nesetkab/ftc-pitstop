@@ -6,6 +6,7 @@
 	import Table from '#lib/ui/Table.svelte';
 	import {
 		clearedRecords,
+		RECORD_GROUPS,
 		RECORD_PARTS,
 		recordQuery,
 		type RankedRecord,
@@ -17,21 +18,19 @@
 		rows: RankedRecord[];
 		filters: RecordFilters;
 		names: { teams: Record<number, string>; events: Record<string, string> };
-		sortable?: boolean;
-		compact?: boolean;
-		caption?: string;
 	}
 
-	let {
-		rows,
-		filters,
-		names,
-		sortable = true,
-		compact = false,
-		caption = 'Highest alliance scores this season'
-	}: Props = $props();
+	let { rows, filters, names }: Props = $props();
 
 	const followed = $derived(new Set(follows.teams));
+
+	const columns = RECORD_GROUPS.flatMap((group) =>
+		group.parts.map((key, index) => ({
+			key,
+			label: RECORD_PARTS.find((part) => part.key === key)?.label ?? key,
+			first: index === 0 && group !== RECORD_GROUPS[0]
+		}))
+	);
 
 	$effect(() => syncFollows());
 
@@ -45,31 +44,31 @@
 		<a href={clearedRecords(filters)}>Clear filters</a>
 	</EmptyState>
 {:else}
-	<Table>
-		<caption class="visually-hidden">{caption}</caption>
+	<Table class="records">
+		<caption class="visually-hidden">Highest alliance scores this season</caption>
 		<thead>
+			<tr class="groups">
+				<td></td>
+				{#each RECORD_GROUPS as group, index (group.label)}
+					<th class={['group', { sep: index > 0 }]} scope="colgroup" colspan={group.parts.length}
+						>{group.label}</th
+					>
+				{/each}
+				<td colspan="4"></td>
+			</tr>
 			<tr>
 				<th class="l" scope="col">Rank</th>
-				{#each RECORD_PARTS as part (part.key)}
-					{@const active = filters.part === part.key}
+				{#each columns as column (column.key)}
+					{@const active = filters.part === column.key}
 					<th
 						scope="col"
-						class={{
-							optional: compact && part.key !== 'total',
-							extra: part.key !== 'total' && !active,
-							active
-						}}
+						class={{ extra: column.key !== 'total' && !active, sep: column.first, active }}
 						aria-sort={active ? 'descending' : undefined}
 					>
-						{#if sortable}
-							<a class="sort-link" href={sortHref(part.key)} data-sveltekit-reset="false">
-								<Term label={part.label} nested />{#if active}<span aria-hidden="true">
-										↓</span
-									>{/if}
-							</a>
-						{:else}
-							<Term label={part.label} />
-						{/if}
+						<a class="sort-link" href={sortHref(column.key)} data-sveltekit-reset="false"
+							><Term label={column.label} nested /><span class="arrow" aria-hidden="true">↓</span
+							></a
+						>
 					</th>
 				{/each}
 				<th class="l" scope="col">Alliance</th>
@@ -79,16 +78,19 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each rows as row (`${row.event}:${row.key}:${row.alliance}`)}
+			{#each rows as row, index (`${row.event}:${row.key}:${row.alliance}`)}
 				<tr class:me={row.teams.some((team) => followed.has(team))}>
-					<td class="l">{integer(row.rank)}</td>
-					{#each RECORD_PARTS as part (part.key)}
+					<td class={['l rank', { tied: index > 0 && rows[index - 1].rank === row.rank }]}
+						>{integer(row.rank)}</td
+					>
+					{#each columns as column (column.key)}
 						<td
 							class={{
-								optional: compact && part.key !== 'total',
-								extra: part.key !== 'total' && filters.part !== part.key,
-								strong: filters.part === part.key
-							}}>{integer(row[part.key])}</td
+								extra: column.key !== 'total' && filters.part !== column.key,
+								sep: column.first,
+								active: filters.part === column.key,
+								total: column.key === 'total'
+							}}>{integer(row[column.key])}</td
 						>
 					{/each}
 					<td class={['l team', { bare: filters.part !== 'total' }]}>
@@ -108,7 +110,9 @@
 						>
 						<span class="date">{shortDate(row.day)}</span>
 						<a class="phone" href="/events/{row.event}/matches/{row.key}"
-							>{row.label} {row.alliance === 'red' ? 'Red' : 'Blue'}</a
+							>{row.label}
+							<span class={['side', row.alliance]}>{row.alliance === 'red' ? 'Red' : 'Blue'}</span
+							></a
 						>
 					</td>
 					<td class="l opt">
@@ -122,21 +126,57 @@
 {/if}
 
 <style>
+	:global(.records) {
+		--sort-hint: '';
+	}
+
 	th a {
 		color: inherit;
 	}
 
-	th.active {
-		color: var(--text);
+	.arrow {
+		margin-left: 3px;
+		opacity: 0.35;
 	}
 
-	td.strong {
+	th.active {
+		color: var(--text);
 		font-weight: 600;
+	}
+
+	th.active .arrow {
+		opacity: 1;
+	}
+
+	thead th.active,
+	tbody tr:not(.me) td.active {
+		background: var(--surface);
+	}
+
+	tbody td {
+		padding-block: 6px;
+		line-height: 1.3;
+	}
+
+	td.total,
+	td.active {
+		font-weight: 600;
+	}
+
+	td.rank {
+		color: var(--text-2);
+	}
+
+	td.rank.tied {
+		color: transparent;
+	}
+
+	.muted {
+		color: var(--text-2);
 	}
 
 	.teams {
 		display: grid;
-		gap: 2px;
 	}
 
 	.teams a {
@@ -179,7 +219,7 @@
 	}
 
 	.side {
-		margin-left: 6px;
+		margin-left: 4px;
 		font-size: 12.5px;
 	}
 
@@ -192,8 +232,13 @@
 	}
 
 	@media (max-width: 900px) {
-		.extra {
+		.extra,
+		.groups {
 			display: none;
+		}
+
+		.sep {
+			border-left: 0;
 		}
 	}
 
