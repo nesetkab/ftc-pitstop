@@ -70,6 +70,15 @@ describe('Gilbert qualifier 2026 (USAZGIQ)', () => {
 		expect(final.red.score).toBeCloseTo(107.08, 2);
 	});
 
+	it('never shows a scoring part below zero', () => {
+		const ev = rateSeason([event]).events.get('USAZGIQ')!;
+		for (const r of ev.ratings) {
+			for (const part of ['auto', 'hive', 'flower', 'garden', 'park', 'tips'] as const) {
+				expect(r.components[part]).toBeGreaterThanOrEqual(0);
+			}
+		}
+	});
+
 	it('estimates the first match after lunch at its scheduled time', () => {
 		const quals = event.matches
 			.filter((m) => m.level === 'qual')

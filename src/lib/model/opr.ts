@@ -35,7 +35,8 @@ const DETAIL_KEY: Record<Component, keyof AllianceDetail> = {
 	fouls: 'fouls'
 };
 
-const OWN_SCALE = new Set<number>([COMPONENTS.indexOf('tips'), COMPONENTS.indexOf('fouls')]);
+const TIPS = COMPONENTS.indexOf('tips');
+const OWN_SCALE = new Set<number>([TIPS, COMPONENTS.indexOf('fouls')]);
 const SPLIT = (['auto', 'hive', 'flower', 'garden', 'park'] as const).map((c) =>
 	COMPONENTS.indexOf(c)
 );
@@ -125,7 +126,7 @@ export const OPR_PARAMS: OprParams = {
 	width: 0.25
 };
 
-export const MODEL_VERSION = 3;
+export const MODEL_VERSION = 4;
 
 export const HISTORY = [1, 0.45, 0.15];
 
@@ -718,10 +719,10 @@ export class EventRater {
 	}
 
 	private part(i: number, k: number): number {
-		const v = this.mu[k][i];
-		if (!POINT_PARTS.has(k)) return v;
+		if (!POINT_PARTS.has(k)) return k === TIPS ? Math.max(this.mu[k][i], 0) : this.mu[k][i];
+		const v = Math.max(this.mu[k][i], 0);
 		let total = 0;
-		for (const c of SPLIT) total += this.mu[c][i];
+		for (const c of SPLIT) total += Math.max(this.mu[c][i], 0);
 		return total > 0 ? v * (this.opr(i) / total) : v;
 	}
 
