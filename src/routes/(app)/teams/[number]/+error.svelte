@@ -20,7 +20,8 @@
 
 <PageHeader {title} {meta}>
 	{#snippet actions()}
-		<Button onclick={() => (searchDialog.open = true)}>Search teams and events</Button>
+		<Button icon="search" onclick={() => (searchDialog.open = true)}>Search teams and events</Button
+		>
 		<Button variant="secondary" href="/leaderboards">Leaderboards</Button>
 	{/snippet}
 </PageHeader>

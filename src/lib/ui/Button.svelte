@@ -1,20 +1,32 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import type { HTMLAnchorAttributes, HTMLButtonAttributes } from 'svelte/elements';
+	import Icon, { type IconName } from './Icon.svelte';
 
 	type Variant = 'primary' | 'secondary';
 	type LinkProps = HTMLAnchorAttributes & { href: string };
 	type ButtonProps = HTMLButtonAttributes & { href?: undefined };
-	type Props = (LinkProps | ButtonProps) & { variant?: Variant; children: Snippet };
+	type Props = (LinkProps | ButtonProps) & {
+		variant?: Variant;
+		icon?: IconName;
+		iconEnd?: IconName;
+		children: Snippet;
+	};
 
-	let { variant = 'primary', children, class: className, ...rest }: Props = $props();
+	let { variant = 'primary', icon, iconEnd, children, class: className, ...rest }: Props = $props();
 </script>
 
+{#snippet content()}
+	{#if icon}<Icon name={icon} size={14} />{/if}
+	{@render children()}
+	{#if iconEnd}<Icon name={iconEnd} size={14} />{/if}
+{/snippet}
+
 {#if rest.href !== undefined}
-	<a class={['btn', variant, className]} {...rest as HTMLAnchorAttributes}>{@render children()}</a>
+	<a class={['btn', variant, className]} {...rest as HTMLAnchorAttributes}>{@render content()}</a>
 {:else}
 	<button class={['btn', variant, className]} type="button" {...rest as HTMLButtonAttributes}>
-		{@render children()}
+		{@render content()}
 	</button>
 {/if}
 

@@ -3,6 +3,7 @@
 	import { RP_THRESHOLDS } from '#lib/game/biobuzz.ts';
 	import { LEAGUE_MATCHES } from '#lib/game/rankings.ts';
 	import type { EventBundle } from '#lib/types.ts';
+	import DownloadLink from '#lib/ui/DownloadLink.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import ColumnMenu from './ColumnMenu.svelte';
@@ -179,7 +180,7 @@
 		/>
 		<p class="note">{note}</p>
 		{#if csvHref}
-			<p class="csv"><a href="{csvHref}{query}" download>Download CSV</a></p>
+			<p class="csv"><DownloadLink href="{csvHref}{query}" /></p>
 		{/if}
 	{/if}
 {/if}
@@ -217,13 +218,5 @@
 
 	.csv {
 		font-size: 14px;
-	}
-
-	@media (pointer: coarse) {
-		.csv a {
-			display: inline-block;
-			margin-block: -10px;
-			padding-block: 10px;
-		}
 	}
 </style>

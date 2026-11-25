@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import { dismissHint, readHints, type HintId } from './hints.ts';
+	import Icon from './Icon.svelte';
 
 	interface Props {
 		id: HintId;
@@ -24,7 +25,7 @@
 {#if visible}
 	<p class="hint">
 		<span>{@render children()}</span>
-		<button type="button" onclick={hide}>Hide</button>
+		<button type="button" onclick={hide}><Icon name="close" size={12} />Hide</button>
 	</p>
 {/if}
 
@@ -45,18 +46,21 @@
 	}
 
 	button {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
 		padding: 0;
 		border: 0;
 		background: none;
 		color: var(--text-3);
 		font: inherit;
 		font-size: 13px;
-		text-decoration: underline;
-		text-underline-offset: 2px;
 	}
 
 	button:hover {
 		color: var(--text);
+		text-decoration: underline;
+		text-underline-offset: 2px;
 	}
 
 	@media (pointer: coarse) {

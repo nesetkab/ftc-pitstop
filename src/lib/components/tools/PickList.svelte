@@ -4,6 +4,7 @@
 	import UndoBar from '#lib/components/tools/UndoBar.svelte';
 	import Button from '#lib/ui/Button.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Icon from '#lib/ui/Icon.svelte';
 	import type { SearchFn } from '#lib/ui/search.svelte.ts';
 	import TeamInput from '#lib/ui/TeamInput.svelte';
 	import { parseEventCode, parseTeamNumber } from '#lib/workspace/code.ts';
@@ -529,7 +530,7 @@
 				describedby={error ? `${id}-error` : undefined}
 				onpick={addTeam}
 			/>
-			<Button type="submit">Add team</Button>
+			<Button icon="plus" type="submit">Add team</Button>
 		</form>
 		{#if error}
 			<p id="{id}-error" class="ctl-error" role="alert">{error}</p>
@@ -569,7 +570,9 @@
 				<button type="button" class="ctl-btn" onclick={copyText}>
 					{copied ? 'Copied' : 'Copy as text'}
 				</button>
-				<button type="button" class="ctl-btn" onclick={downloadCsv}>Download CSV</button>
+				<button type="button" class="ctl-btn" onclick={downloadCsv}
+					><Icon name="download" size={14} />Download CSV</button
+				>
 			</div>
 		{/if}
 	{/if}

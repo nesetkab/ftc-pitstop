@@ -112,7 +112,7 @@
 			maxlength="160"
 			bind:value={draft}
 		/>
-		<Button {variant} type="submit">Add item</Button>
+		<Button {variant} icon="plus" type="submit">Add item</Button>
 	</form>
 {/snippet}
 
@@ -227,7 +227,7 @@
 
 		{#if update}
 			<div class="ctl-row">
-				<Button onclick={reset}>Reset for next match</Button>
+				<Button icon="refresh" onclick={reset}>Reset for next match</Button>
 				<Button variant="secondary" aria-pressed={editing} onclick={() => (editing = !editing)}>
 					{editing ? 'Done editing' : 'Edit items'}
 				</Button>

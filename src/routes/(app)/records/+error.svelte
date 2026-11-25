@@ -13,6 +13,6 @@
 	meta="The records could not be loaded. Try again in a moment."
 >
 	{#snippet actions()}
-		<Button variant="secondary" href="/records">Try again</Button>
+		<Button variant="secondary" icon="refresh" href="/records">Try again</Button>
 	{/snippet}
 </PageHeader>

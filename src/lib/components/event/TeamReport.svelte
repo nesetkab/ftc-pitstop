@@ -100,7 +100,7 @@
 		{#if !compact}
 			<div class="actions">
 				<Button variant="secondary" href="/teams/{report.team}">Season page</Button>
-				<Button variant="secondary" onclick={() => window.print()}>Print</Button>
+				<Button variant="secondary" icon="print" onclick={() => window.print()}>Print</Button>
 			</div>
 		{/if}
 	</header>

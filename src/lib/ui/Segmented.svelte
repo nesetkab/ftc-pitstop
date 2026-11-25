@@ -1,8 +1,11 @@
 <script lang="ts" generics="T extends string">
+	import Icon, { type IconName } from './Icon.svelte';
+
 	interface Option {
 		value: T;
 		label: string;
 		href?: string;
+		icon?: IconName;
 	}
 
 	interface Props {
@@ -23,7 +26,10 @@
 			<a
 				href={option.href}
 				aria-current={option.value === value ? 'page' : undefined}
-				data-sveltekit-noscroll>{option.label}</a
+				aria-label={option.icon ? option.label : undefined}
+				title={option.icon ? option.label : undefined}
+				data-sveltekit-noscroll
+				>{#if option.icon}<Icon name={option.icon} />{:else}{option.label}{/if}</a
 			>
 		{/each}
 	</nav>
@@ -32,10 +38,13 @@
 		{#each options as option (option.value)}
 			<button
 				type="button"
+				class:icon={option.icon}
 				aria-pressed={option.value === value}
+				aria-label={option.icon ? option.label : undefined}
+				title={option.icon ? option.label : undefined}
 				onclick={() => onselect?.(option.value)}
 			>
-				{option.label}
+				{#if option.icon}<Icon name={option.icon} />{:else}{option.label}{/if}
 			</button>
 		{/each}
 	</div>
@@ -63,6 +72,12 @@
 		font: 500 13px/1 var(--font);
 		text-decoration: none;
 		white-space: nowrap;
+	}
+
+	button.icon {
+		justify-content: center;
+		min-width: calc(var(--control-h) - 2px);
+		padding: 0;
 	}
 
 	button + button,

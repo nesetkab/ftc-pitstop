@@ -61,7 +61,9 @@
 	{#snippet actions()}
 		<div class="team-actions">
 			<FollowButton number={view.team.number} />
-			<Button variant="secondary" href="/compare?teams={view.team.number}">Compare</Button>
+			<Button variant="secondary" icon="compare" href="/compare?teams={view.team.number}"
+				>Compare</Button
+			>
 			<PitScreens number={view.team.number} />
 			<CalendarMenu
 				label="Calendar"

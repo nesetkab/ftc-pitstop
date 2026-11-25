@@ -4,6 +4,7 @@
 	import { insightQuery } from '#lib/components/event/insights.ts';
 	import InsightsTable from '#lib/components/event/InsightsTable.svelte';
 	import { integer } from '#lib/format/index.ts';
+	import DownloadLink from '#lib/ui/DownloadLink.svelte';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
 	import Segmented from '#lib/ui/Segmented.svelte';
 	import type { PageProps } from './$types';
@@ -65,7 +66,7 @@
 				>
 			{/if}
 			{#if data.total > 0}
-				<a href={csvHref} download>Download CSV</a>
+				<DownloadLink href={csvHref} />
 			{/if}
 		</p>
 	</section>
