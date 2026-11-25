@@ -30,21 +30,32 @@ console.log('\npaired 2026 gap (row minus column), se in brackets');
 console.log(''.padEnd(18), ...models.slice(1).map((m) => m.name.slice(0, 16).padStart(19)));
 const gaps = models.map((m, k) => {
 	const row = models.slice(1).map((_, j) => pairedGap(rec, k, j + 1, maps[k], maps[j + 1], test));
-	console.log(m.name.slice(0, 18).padEnd(18), ...row.map((g) => `${g.diff.toFixed(5)} [${g.se.toFixed(5)}]`.padStart(19)));
+	console.log(
+		m.name.slice(0, 18).padEnd(18),
+		...row.map((g) => `${g.diff.toFixed(5)} [${g.se.toFixed(5)}]`.padStart(19))
+	);
 	return row[0];
 });
 
 const loso: Record<number, number[]> = {};
-if (args.includes('--loso')) console.log('\nleave-one-season-out (mapping fit on the other train seasons)');
-if (args.includes('--loso')) console.log('season'.padEnd(8), ...models.map((m) => m.name.slice(0, 12).padStart(13)));
+if (args.includes('--loso'))
+	console.log('\nleave-one-season-out (mapping fit on the other train seasons)');
+if (args.includes('--loso'))
+	console.log('season'.padEnd(8), ...models.map((m) => m.name.slice(0, 12).padStart(13)));
 for (const s of args.includes('--loso') ? TRAIN : []) {
 	const rows = rowsOf(rec, (r) => rec.season[r] !== s && TRAIN.includes(rec.season[r]));
-	loso[s] = models.map((_, k) => score(rec, k, fitMapping(rec, k, rows, FULL_FIT), (r) => rec.season[r] === s).brier);
+	loso[s] = models.map(
+		(_, k) => score(rec, k, fitMapping(rec, k, rows, FULL_FIT), (r) => rec.season[r] === s).brier
+	);
 	console.log(String(s).padEnd(8), ...loso[s].map((b) => b.toFixed(5).padStart(13)));
 }
 
 const odd = await load(2026);
-const sums = { all: { n: 0, odd: 0, ours: models.map(() => 0) }, quals: { n: 0, odd: 0, ours: models.map(() => 0) }, playoffs: { n: 0, odd: 0, ours: models.map(() => 0) } };
+const sums = {
+	all: { n: 0, odd: 0, ours: models.map(() => 0) },
+	quals: { n: 0, odd: 0, ours: models.map(() => 0) },
+	playoffs: { n: 0, odd: 0, ours: models.map(() => 0) }
+};
 for (let r = 0; r < rec.n; r++) {
 	if (!test(r)) continue;
 	const o = odd.get(rec.keys[r]);
@@ -57,9 +68,19 @@ for (let r = 0; r < rec.n; r++) {
 	}
 }
 console.log('\nvs oddbot on their 2026 matches');
-console.log('group'.padEnd(10), 'n'.padStart(6), 'oddbot'.padStart(8), ...models.map((m) => m.name.slice(0, 12).padStart(13)));
+console.log(
+	'group'.padEnd(10),
+	'n'.padStart(6),
+	'oddbot'.padStart(8),
+	...models.map((m) => m.name.slice(0, 12).padStart(13))
+);
 for (const [g, a] of Object.entries(sums))
-	console.log(g.padEnd(10), String(a.n).padStart(6), (a.odd / a.n).toFixed(4).padStart(8), ...a.ours.map((v) => (v / a.n).toFixed(4).padStart(13)));
+	console.log(
+		g.padEnd(10),
+		String(a.n).padStart(6),
+		(a.odd / a.n).toFixed(4).padStart(8),
+		...a.ours.map((v) => (v / a.n).toFixed(4).padStart(13))
+	);
 
 const dir = join(import.meta.dirname, 'results');
 await mkdir(dir, { recursive: true });

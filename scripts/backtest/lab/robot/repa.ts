@@ -170,15 +170,17 @@ export class RobotEpa implements Model {
 		let out = v(st[0]);
 		let k = 1;
 		if (this.robot) out += v(st[k++]);
-		if (this.auto) out += this.gateOf(team, ctx) * v(st[k++]);
+		if (this.auto) out += this.gateOf(team, ctx) * v(st[k]);
 		return out;
 	}
 
 	predict(m: PMatch, ctx: Ctx): Pred {
-		const side = (ts: number[], score: boolean) => ts.reduce((a, t) => a + this.value(t, ctx, score), 0);
+		const side = (ts: number[], score: boolean) =>
+			ts.reduce((a, t) => a + this.value(t, ctx, score), 0);
 		let varFactor = 1;
 		if (this.o.unc) {
-			for (const t of [...m.red, ...m.blue]) varFactor += this.o.unc / (1 + this.states(t, ctx)[0].n);
+			for (const t of [...m.red, ...m.blue])
+				varFactor += this.o.unc / (1 + this.states(t, ctx)[0].n);
 		}
 		return {
 			red: side(m.red, false),
@@ -195,10 +197,24 @@ export class RobotEpa implements Model {
 		const clip = (x: number) => (x > lim ? lim : x < -lim ? -lim : x);
 		const M = this.o.margin ?? 0;
 		const g = this.o.gate ?? 1;
-		type Work = { ts: number[]; pos: number[]; ok: boolean; err: number; errS: number; f: number; sd: Side | null | undefined };
+		type Work = {
+			ts: number[];
+			pos: number[];
+			ok: boolean;
+			err: number;
+			errS: number;
+			f: number;
+			sd: Side | null | undefined;
+		};
 		const restMean = this.means(ctx)[0];
 		const het = this.o.het ?? 0;
-		const prep = (all: number[], upd: number[], y: number, ok: boolean, sd: Side | null | undefined): Work => {
+		const prep = (
+			all: number[],
+			upd: number[],
+			y: number,
+			ok: boolean,
+			sd: Side | null | undefined
+		): Work => {
 			const pos = upd.map((t) => all.indexOf(t));
 			let target = y;
 			if (sd) {
@@ -226,7 +242,8 @@ export class RobotEpa implements Model {
 					}
 				}
 			}
-			const f = het !== 0 && restMean > 0 ? Math.min(Math.max(level / restMean, 0.25), 4) ** -het : 1;
+			const f =
+				het !== 0 && restMean > 0 ? Math.min(Math.max(level / restMean, 0.25), 4) ** -het : 1;
 			return { ts: upd, pos, ok, err: clip(target - pred), errS: clip(target - predS), f, sd };
 		};
 		const red = prep(m.red, m.redUpd, m.redNp, m.redOk, r.red2);

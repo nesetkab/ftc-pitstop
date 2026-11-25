@@ -4,7 +4,9 @@ import { RobotEpa, type EpaComp, type RepaOpts } from './repa.ts';
 import { RobotOpr, type RoprOpts } from './ropr.ts';
 import { BASE } from './setup.ts';
 
-type Variant = { start: Record<string, unknown>; make: (p: any, name: string) => Model };
+type Flat = Record<string, unknown>;
+
+type Variant = { start: Flat; make: (p: Flat, name: string) => Model };
 
 const direct: CompParams = { ...BASE };
 
@@ -23,8 +25,8 @@ export const EPA: EpaComp = {
 	rhoPrevScore: 0.7
 };
 
-const opr = (p: RoprOpts, name: string) => new RobotOpr(name, p);
-const epa = (p: RepaOpts, name: string) => new RobotEpa(name, p);
+const opr = (p: Flat, name: string) => new RobotOpr(name, p as RoprOpts);
+const epa = (p: Flat, name: string) => new RobotEpa(name, p as unknown as RepaOpts);
 const epaRobot = { ...EPA, k0: 0.3, kMin: 0.1 };
 
 export const VARIANTS: Record<string, Variant> = {
@@ -33,7 +35,15 @@ export const VARIANTS: Record<string, Variant> = {
 	het: { start: { rest: BASE, robot: direct, rVar: 0, het: 0, hist: [0, 0] }, make: opr },
 	auto: { start: { rest: BASE, robot: direct, auto: BASE, rVar: 0, hist: [0, 0] }, make: opr },
 	gate: {
-		start: { rest: BASE, robot: direct, auto: BASE, move: direct, gate: 0.5, rVar: 0, hist: [0, 0] },
+		start: {
+			rest: BASE,
+			robot: direct,
+			auto: BASE,
+			move: direct,
+			gate: 0.5,
+			rVar: 0,
+			hist: [0, 0]
+		},
 		make: opr
 	},
 	'epa-total': { start: { rest: EPA, margin: 0, clip: 4, unc: 0, hist: [0, 0] }, make: epa },

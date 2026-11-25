@@ -13,7 +13,11 @@ const stored = JSON.parse(
 ) as { candidates: Record<string, OprParams | EpaParams> };
 const opr = stored.candidates['opr-map'] as OprParams;
 const probe = new ProbeOpr('shipped', opr);
-const named = (id: string): Model => build(CANDIDATES.find((c) => c.id === id)!, stored.candidates[id]);
+const named = (id: string): Model =>
+	build(
+		CANDIDATES.find((c) => c.id === id)!,
+		stored.candidates[id]
+	);
 const models: Model[] = [
 	probe,
 	named('epa-reset'),

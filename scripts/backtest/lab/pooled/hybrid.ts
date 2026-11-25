@@ -106,8 +106,7 @@ export class HeteroOpr extends KalmanOpr {
 			pred += h[j] * this.mu[i];
 			predNu += h[j] * this.nu[i];
 		});
-		const noise =
-			ctx.mean > 0 ? Math.min(Math.max(predNu / ctx.mean, 0.25), 4) ** this.hetero : 1;
+		const noise = ctx.mean > 0 ? Math.min(Math.max(predNu / ctx.mean, 0.25), 4) ** this.hetero : 1;
 		const s = hph + noise;
 		const resid = y - pred;
 		const residNu = y - predNu;

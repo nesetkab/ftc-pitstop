@@ -2,7 +2,14 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { build, CANDIDATES } from '../../candidates.ts';
 import { run } from '../../engine.ts';
-import { KalmanOpr, type Ctx, type EpaParams, type Model, type OprParams, type Pred } from '../../models.ts';
+import {
+	KalmanOpr,
+	type Ctx,
+	type EpaParams,
+	type Model,
+	type OprParams,
+	type Pred
+} from '../../models.ts';
 import type { PMatch } from '../../prep.ts';
 import { ALL, ENGINE } from '../harness.ts';
 import { RobotOpr, type RoprOpts } from '../robot/ropr.ts';
@@ -42,7 +49,10 @@ const het = JSON.parse(
 const probe = new ProbeOpr('shipped', opr);
 const robot = new RobotProbe('robot-het', het);
 const named = (id: string): Model =>
-	build(CANDIDATES.find((c) => c.id === id)!, stored.candidates[id]);
+	build(
+		CANDIDATES.find((c) => c.id === id)!,
+		stored.candidates[id]
+	);
 const models: Model[] = [
 	probe,
 	robot,

@@ -10,14 +10,16 @@ type Flat = Record<string, unknown>;
 const DIR = join(import.meta.dirname, 'params');
 
 function get(p: Flat, path: string): number {
-	return (path.split('.').reduce((o: any, k) => o?.[k], p) as number) ?? 0;
+	return (
+		(path.split('.').reduce<unknown>((o, k) => (o as Flat | undefined)?.[k], p) as number) ?? 0
+	);
 }
 
 function set(p: Flat, path: string, v: number): Flat {
 	const out = structuredClone(p);
 	const keys = path.split('.');
-	let o: any = out;
-	for (const k of keys.slice(0, -1)) o = o[k];
+	let o = out;
+	for (const k of keys.slice(0, -1)) o = o[k] as Flat;
 	if (Array.isArray(o) || keys.length === 1 || typeof o === 'object') o[keys[keys.length - 1]] = v;
 	return out;
 }
@@ -31,7 +33,8 @@ function grid(path: string, x: number): number[] {
 	let vals: number[];
 	if (name === 'huber') vals = [0, 1.5, 2, 2.5, 3, 4];
 	else if (name === 'dead') vals = [0.25, 0.5, 0.75, 1];
-	else if (name === 'qLeague') vals = [0.25, 0.5, 0.75, 1, 1.5, 2.5].map((f) => r(Math.max(x, 0.25) * f));
+	else if (name === 'qLeague')
+		vals = [0.25, 0.5, 0.75, 1, 1.5, 2.5].map((f) => r(Math.max(x, 0.25) * f));
 	else if (['lamNew', 'lamPrev', 'robotNoise', 'k0', 'kMin', 'tau', 'clip', 'kNew'].includes(name))
 		vals = mult([0.6, 0.8, 1, 1.25, 1.6]);
 	else if (['q', 'qWeek', 'qMatch', 'wk', 'scoreCommon', 'scoreQ'].includes(name))

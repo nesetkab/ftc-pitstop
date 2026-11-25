@@ -37,8 +37,22 @@ for (const pair of process.argv.slice(3)) {
 	const test = Array.from(ctx.test);
 	console.log(`${a} vs ${b}`);
 	console.log('  2026 all     ', gap(pa, pb, test));
-	console.log('  2026 quals   ', gap(pa, pb, test.filter((r) => !ctx.rec.playoff[r])));
-	console.log('  2026 playoffs', gap(pa, pb, test.filter((r) => ctx.rec.playoff[r])));
+	console.log(
+		'  2026 quals   ',
+		gap(
+			pa,
+			pb,
+			test.filter((r) => !ctx.rec.playoff[r])
+		)
+	);
+	console.log(
+		'  2026 playoffs',
+		gap(
+			pa,
+			pb,
+			test.filter((r) => ctx.rec.playoff[r])
+		)
+	);
 	console.log('  train oof    ', gap(pa, pb, ctx.train));
 	for (const s of [2021, 2022, 2023, 2024, 2025])
 		console.log(`  oof ${s}     `, gap(pa, pb, ctx.trainBySeason.get(s)!));

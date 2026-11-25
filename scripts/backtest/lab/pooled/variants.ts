@@ -6,7 +6,15 @@ import { POOLED_BASE, PooledOpr, type PooledParams } from './model.ts';
 import { ImbRobotOpr } from './robotimb.ts';
 import type { RoprOpts } from '../robot/ropr.ts';
 
-export type Extra = Partial<PooledParams> & { mix?: number; w?: number; alt?: Partial<OprParams>; shift?: number; het?: number; imb?: number; imbF?: number };
+export type Extra = Partial<PooledParams> & {
+	mix?: number;
+	w?: number;
+	alt?: Partial<OprParams>;
+	shift?: number;
+	het?: number;
+	imb?: number;
+	imbF?: number;
+};
 
 const ROBOT_HET = JSON.parse(
 	readFileSync(join(import.meta.dirname, '..', 'robot', 'params', 'het.json'), 'utf8')
@@ -62,7 +70,8 @@ export const VARIANTS: Record<string, (x: Extra) => Model> = {
 			new PooledOpr('b', { ...POOLED_BASE, ...TUNED, ...x }),
 			x.w ?? 0.5
 		),
-	'shipped-shift': (x) => new PlayoffShift('shipped-shift', new KalmanOpr('a', SHIPPED), x.shift ?? 0),
+	'shipped-shift': (x) =>
+		new PlayoffShift('shipped-shift', new KalmanOpr('a', SHIPPED), x.shift ?? 0),
 	'shipped-hetero': (x) =>
 		new HeteroOpr(
 			'shipped-hetero',

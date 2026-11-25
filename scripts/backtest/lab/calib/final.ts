@@ -51,7 +51,9 @@ function family(o: Opts) {
 		if (o.power) {
 			const e = x[idx.power];
 			const pm = (a: number, b: number) => 2 * ((a ** e + b ** e) / 2) ** (1 / e);
-			m = pm(Math.max(v[0], 1e-3), Math.max(v[1], 1e-3)) - pm(Math.max(v[2], 1e-3), Math.max(v[3], 1e-3));
+			m =
+				pm(Math.max(v[0], 1e-3), Math.max(v[1], 1e-3)) -
+				pm(Math.max(v[2], 1e-3), Math.max(v[3], 1e-3));
 		} else m = v[0] + v[1] - v[2] - v[3];
 		m += x[3] * (v[0] - v[1] - (v[2] - v[3]));
 		m *= half(r);
@@ -156,4 +158,7 @@ console.log();
 printRows(rows);
 const out = join(import.meta.dirname, 'results');
 await mkdir(out, { recursive: true });
-await writeFile(join(out, 'final.json'), `${JSON.stringify({ rows, fitted: fittedAll }, null, '\t')}\n`);
+await writeFile(
+	join(out, 'final.json'),
+	`${JSON.stringify({ rows, fitted: fittedAll }, null, '\t')}\n`
+);

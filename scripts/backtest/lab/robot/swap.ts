@@ -35,7 +35,7 @@ for (const s of process.argv.slice(2).map(Number)) {
 			for (const [teams, st, x] of sides) {
 				teams.forEach((t, i) => {
 					for (const swap of [0, 1]) {
-						const k = st[i] === 2 !== (swap === 1) ? 2 : 1;
+						const k = (st[i] === 2) !== (swap === 1) ? 2 : 1;
 						const v = robotOf(s, x, k);
 						const list = acc[swap].get(t) ?? [];
 						list.push(v.ra + v.re);
@@ -45,5 +45,11 @@ for (const s of process.argv.slice(2).map(Number)) {
 			}
 		}
 	}
-	console.log(s, 'R2 station1=robot1', share(acc[0]).toFixed(3), 'swapped', share(acc[1]).toFixed(3));
+	console.log(
+		s,
+		'R2 station1=robot1',
+		share(acc[0]).toFixed(3),
+		'swapped',
+		share(acc[1]).toFixed(3)
+	);
 }

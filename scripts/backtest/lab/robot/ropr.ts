@@ -136,7 +136,8 @@ export class RobotOpr implements Model {
 
 	predict(m: PMatch, ctx: Ctx): Pred {
 		const means = this.means(ctx);
-		for (const t of [...m.red, ...m.blue]) this.comps.forEach((c, k) => c.refresh(t, means[k], ctx.day));
+		for (const t of [...m.red, ...m.blue])
+			this.comps.forEach((c, k) => c.refresh(t, means[k], ctx.day));
 		const teams = [...m.red, ...m.blue];
 		const sign = [...m.red.map(() => 1), ...m.blue.map(() => -1)];
 		const idx = teams.map((t) => this.rest.at(t));
@@ -144,7 +145,12 @@ export class RobotOpr implements Model {
 		if (this.robot && this.o.rVar) v += this.o.rVar * this.robot.variance(idx, sign);
 		if (this.robotEnd && this.o.rVar) v += this.o.rVar * this.robotEnd.variance(idx, sign);
 		if (this.auto && this.o.aVar)
-			v += this.o.aVar * this.auto.variance(idx, teams.map((t, k) => sign[k] * this.gateOf(t)));
+			v +=
+				this.o.aVar *
+				this.auto.variance(
+					idx,
+					teams.map((t, k) => sign[k] * this.gateOf(t))
+				);
 		return {
 			red: this.side(m.red, false),
 			blue: this.side(m.blue, false),
@@ -185,7 +191,11 @@ export class RobotOpr implements Model {
 			if (this.auto) {
 				const anr = sd.auto - (this.robot ? sum(sd.ra) : 0);
 				const g = this.o.gate ?? 1;
-				this.auto.observe(idx, pos.map((p) => (sd.mv[p] ? 1 : g)), anr);
+				this.auto.observe(
+					idx,
+					pos.map((p) => (sd.mv[p] ? 1 : g)),
+					anr
+				);
 				rest -= anr;
 			}
 		} else {

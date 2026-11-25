@@ -20,13 +20,20 @@ const buckets: [string, (r: number) => boolean][] = [
 	['quals first-event 0', (r) => quals(r) && ctx.f(r, 'firstEvent') === 0],
 	['quals unplayed 0', (r) => quals(r) && unplayed(r) === 0],
 	['quals unplayed 4', (r) => quals(r) && unplayed(r) === 4],
-	['quals unplayed 0 first 4', (r) => quals(r) && unplayed(r) === 0 && ctx.f(r, 'firstEvent') === 4],
+	[
+		'quals unplayed 0 first 4',
+		(r) => quals(r) && unplayed(r) === 0 && ctx.f(r, 'firstEvent') === 4
+	],
 	['quals week<6', (r) => quals(r) && ctx.f(r, 'week') < 6],
 	['quals week>=6', (r) => quals(r) && ctx.f(r, 'week') >= 6]
 ];
 for (const [label, sel] of buckets) {
 	console.log(`\n${label}`);
-	console.log('season'.padEnd(8), 'n'.padStart(6), ...probs.map(([n]) => n.slice(0, 11).padStart(12)));
+	console.log(
+		'season'.padEnd(8),
+		'n'.padStart(6),
+		...probs.map(([n]) => n.slice(0, 11).padStart(12))
+	);
 	for (const s of ALL) {
 		let n = 0;
 		const b = probs.map(() => 0);

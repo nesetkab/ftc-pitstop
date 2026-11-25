@@ -106,8 +106,7 @@ export class ProbeOpr extends KalmanOpr {
 		const pred = super.predict(m, ctx);
 		const n = this.n;
 		const f = new Float64Array(FEATURES.length);
-		const mus = (ts: number[]) =>
-			ts.map((t) => this.value(t, ctx, false)).sort((a, b) => b - a);
+		const mus = (ts: number[]) => ts.map((t) => this.value(t, ctx, false)).sort((a, b) => b - a);
 		const r = mus(m.red);
 		const b = mus(m.blue);
 		f[F.redHi] = r[0];
@@ -156,7 +155,8 @@ export class ProbeOpr extends KalmanOpr {
 		f[F.evResSS] = this.evRes.ss;
 		f[F.seResN] = this.seRes.n;
 		f[F.seResSS] = this.seRes.ss;
-		const unplayed = (ts: number[]) => ts.filter((t) => this.played[this.index.get(t)!] === 0).length;
+		const unplayed = (ts: number[]) =>
+			ts.filter((t) => this.played[this.index.get(t)!] === 0).length;
 		f[F.redUnplayed] = unplayed(m.red);
 		f[F.blueUnplayed] = unplayed(m.blue);
 		const lowest = (ts: number[]) =>
@@ -203,6 +203,7 @@ export class ProbeOpr extends KalmanOpr {
 		this.sePen.ss += this.evPen.ss;
 		this.seRes.n += this.evRes.n;
 		this.seRes.ss += this.evRes.ss;
-		for (const [t, i] of this.index) if (this.played[i] > 0) this.events.set(t, (this.events.get(t) ?? 0) + 1);
+		for (const [t, i] of this.index)
+			if (this.played[i] > 0) this.events.set(t, (this.events.get(t) ?? 0) + 1);
 	}
 }

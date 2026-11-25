@@ -24,7 +24,8 @@ function cached(k: number) {
 		half[r] = ctx.rec.mean[r] / 2 || 1;
 		const red = ctx.pred(k, r, 0);
 		const blue = ctx.pred(k, r, 1);
-		lvl[r] = ctx.rec.mean[r] > 0 ? Math.min(Math.max((red + blue) / (2 * ctx.rec.mean[r]), 0.25), 4) : 1;
+		lvl[r] =
+			ctx.rec.mean[r] > 0 ? Math.min(Math.max((red + blue) / (2 * ctx.rec.mean[r]), 0.25), 4) : 1;
 		vf[r] = ctx.pred(k, r, 2);
 	}
 	return { h, half, lvl, vf };
@@ -41,9 +42,16 @@ function family(k: number, floor: boolean) {
 					floor: x[4],
 					width: Math.exp(x[5])
 				})
-			: c.h[o] + c.h[o + 1] - c.h[o + 2] - c.h[o + 3] + x[3] * (c.h[o] - c.h[o + 1] - (c.h[o + 2] - c.h[o + 3]));
+			: c.h[o] +
+				c.h[o + 1] -
+				c.h[o + 2] -
+				c.h[o + 3] +
+				x[3] * (c.h[o] - c.h[o + 1] - (c.h[o + 2] - c.h[o + 3]));
 		const s =
-			Math.exp(x[0]) * ctx.rec.sd[r] * Math.sqrt(c.vf[r] + Math.exp(x[1]) * ctx.rec.unc[r]) * c.lvl[r] ** x[2];
+			Math.exp(x[0]) *
+			ctx.rec.sd[r] *
+			Math.sqrt(c.vf[r] + Math.exp(x[1]) * ctx.rec.unc[r]) *
+			c.lvl[r] ** x[2];
 		return sigmoid(m / s);
 	};
 	return { x0, p };
@@ -152,15 +160,27 @@ if (hasRobot) {
 	const zs = L('shipped carry+floor');
 	stack('robot cf + shipped cf', [zr, zs]);
 	stack('robot cf + shipped cf + loose + epa', [zr, zs, loose, epa]);
-	stack('robot cf + shipped cf + loose + epa x ctx', [zr, zs, loose, epa, ...inter([zr, zs, loose, epa])]);
+	stack('robot cf + shipped cf + loose + epa x ctx', [
+		zr,
+		zs,
+		loose,
+		epa,
+		...inter([zr, zs, loose, epa])
+	]);
 }
 
 console.log();
 printRows(rows);
 const out = join(import.meta.dirname, 'results');
 await mkdir(out, { recursive: true });
-await writeFile(join(out, `best-${process.argv[2] ?? 'robot'}.json`), `${JSON.stringify({ rows, fitted }, null, '\t')}\n`);
+await writeFile(
+	join(out, `best-${process.argv[2] ?? 'robot'}.json`),
+	`${JSON.stringify({ rows, fitted }, null, '\t')}\n`
+);
 const keep = new Float64Array(n * oofs.size);
 [...oofs.values()].forEach((a, i) => keep.set(a, i * n));
 await writeFile(join(DIR, process.argv[2] ?? 'robot', 'oof.bin'), new Uint8Array(keep.buffer));
-await writeFile(join(DIR, process.argv[2] ?? 'robot', 'oof.json'), JSON.stringify([...oofs.keys()]));
+await writeFile(
+	join(DIR, process.argv[2] ?? 'robot', 'oof.json'),
+	JSON.stringify([...oofs.keys()])
+);

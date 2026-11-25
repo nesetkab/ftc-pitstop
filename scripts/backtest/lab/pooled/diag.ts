@@ -15,9 +15,13 @@ const maps = models.map((_, k) => fitMapping(rec, k, rows, QUICK_FIT));
 const test = rowsOf(rec, (r) => rec.season[r] === 2026);
 const insample = models.map((_, k) => fitMapping(rec, k, test, QUICK_FIT));
 
-const fresh = new Map<string, { zero: number; seasonNew: number; prevNew: number; minPlayed: number }>();
+const fresh = new Map<
+	string,
+	{ zero: number; seasonNew: number; prevNew: number; minPlayed: number }
+>();
 const lastSeason = new Set<number>();
-for (const e of data[ALL.indexOf(2025)]) for (const m of e.matches) for (const t of [...m.red, ...m.blue]) lastSeason.add(t);
+for (const e of data[ALL.indexOf(2025)])
+	for (const m of e.matches) for (const t of [...m.red, ...m.blue]) lastSeason.add(t);
 const seen = new Set<number>();
 for (const e of data[ALL.indexOf(2026)]) {
 	const played = new Map<number, number>();
@@ -37,7 +41,14 @@ for (const e of data[ALL.indexOf(2026)]) {
 }
 
 const odd = await load(2026);
-type Acc = { n: number; odd: number; ours: number[]; oddAcc: number; acc: number[]; decided: number };
+type Acc = {
+	n: number;
+	odd: number;
+	ours: number[];
+	oddAcc: number;
+	acc: number[];
+	decided: number;
+};
 const groups = new Map<string, Acc>();
 let cur = { y: 0, po: 0, pk: [] as number[] };
 const hit = (p: number, y: number) => (p === 0.5 ? 0.5 : p > 0.5 === (y === 1) ? 1 : 0);

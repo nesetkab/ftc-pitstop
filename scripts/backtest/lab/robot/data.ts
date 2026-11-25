@@ -27,8 +27,18 @@ const NAV_2022: Record<string, number> = { Terminal: 2, Signal: 10, TeamSignal: 
 const PROP_2023: Record<string, number> = { NoProp: 10, TeamProp: 20 };
 const EG_2023: Record<string, number> = { Backstage: 5, Rigging: 20 };
 const DRONE_2023: Record<number, number> = { 1: 30, 2: 20, 3: 10 };
-const AUTO_PARK_2024: Record<string, number> = { ObservationZone: 3, Ascent1: 3, Ascent2: 3, Ascent3: 3 };
-const DC_PARK_2024: Record<string, number> = { ObservationZone: 3, Ascent1: 3, Ascent2: 15, Ascent3: 30 };
+const AUTO_PARK_2024: Record<string, number> = {
+	ObservationZone: 3,
+	Ascent1: 3,
+	Ascent2: 3,
+	Ascent3: 3
+};
+const DC_PARK_2024: Record<string, number> = {
+	ObservationZone: 3,
+	Ascent1: 3,
+	Ascent2: 15,
+	Ascent3: 30
+};
 
 const num = (x: unknown) => (typeof x === 'number' ? x : x === true ? 1 : 0);
 const pick = (table: Record<string | number, number>, x: unknown) =>
@@ -81,7 +91,8 @@ export function allianceCheck(season: number, s: RobotRaw): [number, number] {
 		2025: ['autoLeavePoints', 'dcBasePoints'],
 		2026: ['autoLeavePoints', 'autoParkPoints', 'dcParkPoints']
 	};
-	const theirs = keys[season].reduce((t, k) => t + num(s[k]), 0) - (season === 2025 ? num(s.dcBaseBonus) : 0);
+	const theirs =
+		keys[season].reduce((t, k) => t + num(s[k]), 0) - (season === 2025 ? num(s.dcBaseBonus) : 0);
 	return [mine, theirs];
 }
 

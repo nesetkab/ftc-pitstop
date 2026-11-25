@@ -84,8 +84,7 @@ const VARIANTS: Variant[] = [
 	{
 		name: 'team consistency scale',
 		x0: [...base, 0],
-		p: (x, r, c) =>
-			sigmoid(c.m[r] / (scale2(x, r, c, 0) * (c.cons[r] / c.seResVar[r]) ** x[3]))
+		p: (x, r, c) => sigmoid(c.m[r] / (scale2(x, r, c, 0) * (c.cons[r] / c.seResVar[r]) ** x[3]))
 	},
 	{
 		name: 'margin-dependent shrink',

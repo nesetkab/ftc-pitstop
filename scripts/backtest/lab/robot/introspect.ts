@@ -1,11 +1,17 @@
 const API = 'https://api.ftcscout.org/graphql';
 
-type Field = { name: string; type: { kind: string; name: string | null; ofType: { name: string | null; kind: string } | null } };
+type Field = {
+	name: string;
+	type: { kind: string; name: string | null; ofType: { name: string | null; kind: string } | null };
+};
 
 async function fields(name: string): Promise<Field[]> {
 	const res = await fetch(API, {
 		method: 'POST',
-		headers: { 'content-type': 'application/json', 'user-agent': 'pitstop-backtest/1.0 (+https://ftcpitstop.com)' },
+		headers: {
+			'content-type': 'application/json',
+			'user-agent': 'pitstop-backtest/1.0 (+https://ftcpitstop.com)'
+		},
 		body: JSON.stringify({
 			query: `query T($name: String!) { __type(name: $name) { fields { name type { kind name ofType { name kind } } } } }`,
 			variables: { name }
@@ -20,6 +26,8 @@ for (const s of [2021, 2022, 2023, 2024, 2025, 2026]) {
 	const list = await fields(name);
 	console.log(
 		s,
-		list.map((f) => `${f.name}:${f.type.kind === 'NON_NULL' ? f.type.ofType?.name : f.type.name}`).join(' ')
+		list
+			.map((f) => `${f.name}:${f.type.kind === 'NON_NULL' ? f.type.ofType?.name : f.type.name}`)
+			.join(' ')
 	);
 }

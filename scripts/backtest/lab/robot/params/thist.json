@@ -13,9 +13,6 @@
 		"rhoNewScore": 0.5,
 		"rhoPrevScore": 0.7
 	},
-	"hist": [
-		0.45,
-		0.3
-	],
+	"hist": [0.45, 0.3],
 	"het": 0
 }

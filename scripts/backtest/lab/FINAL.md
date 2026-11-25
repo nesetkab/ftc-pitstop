@@ -19,13 +19,13 @@ Tuned on 2021-2025 only. The floor and width were swept for prediction only (bes
 
 ## Results (2026 held out, all matches incl. playoffs)
 
-| model | train | 2026 | acc | quals | playoffs | MAE | vs oddbot matches |
-|---|---|---|---|---|---|---|---|
-| shipped opr-map | 0.16778 | 0.17084 | 73.8% | 0.1731 | 0.1371 | 13.83 | 0.1708 |
-| RobotOpr (het) | 0.16479 | 0.1659 | | | | | |
-| robot-imb | 0.16400 | 0.16343 | 75.1% | 0.1652 | 0.1361 | 13.71 | 0.1634 |
-| **final** | **0.16370** | **0.16233** | **75.3%** | **0.1641** | **0.1358** | **13.59** | **0.1622** |
-| oddbot | | | | | | | 0.1645 (quals 0.1662, playoffs 0.1388) |
+| model           | train       | 2026        | acc       | quals      | playoffs   | MAE       | vs oddbot matches                      |
+| --------------- | ----------- | ----------- | --------- | ---------- | ---------- | --------- | -------------------------------------- |
+| shipped opr-map | 0.16778     | 0.17084     | 73.8%     | 0.1731     | 0.1371     | 13.83     | 0.1708                                 |
+| RobotOpr (het)  | 0.16479     | 0.1659      |           |            |            |           |                                        |
+| robot-imb       | 0.16400     | 0.16343     | 75.1%     | 0.1652     | 0.1361     | 13.71     | 0.1634                                 |
+| **final**       | **0.16370** | **0.16233** | **75.3%** | **0.1641** | **0.1358** | **13.59** | **0.1622**                             |
+| oddbot          |             |             |           |            |            |           | 0.1645 (quals 0.1662, playoffs 0.1388) |
 
 - **Final vs robot-imb on 2026**: −0.00110 ± 0.00018 (about −6 se). Vs shipped: −0.00852 ± 0.00067.
 - **Leave-one-season-out** (mapping refit on the other four train seasons): final beats robot-imb in all five seasons, 2021-2025.

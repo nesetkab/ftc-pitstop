@@ -72,8 +72,6 @@ export class OutcomeElo implements Model {
 	endEvent(): void {}
 
 	endSeason(): Map<number, number> {
-		return new Map(
-			[...this.teams].map(([t, s]) => [t, s.meanRef > 0 ? s.r / (s.meanRef / 2) : 1])
-		);
+		return new Map([...this.teams].map(([t, s]) => [t, s.meanRef > 0 ? s.r / (s.meanRef / 2) : 1]));
 	}
 }

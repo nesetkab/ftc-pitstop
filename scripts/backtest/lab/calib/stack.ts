@@ -57,7 +57,14 @@ function avg(label: string, keys: string[]) {
 			}
 			return s / train.length;
 		};
-		const w = softmax(nelderMead(loss, keys.map(() => 0), 0.5, 400).x);
+		const w = softmax(
+			nelderMead(
+				loss,
+				keys.map(() => 0),
+				0.5,
+				400
+			).x
+		);
 		console.log(label, w.map((v) => v.toFixed(3)).join(' '));
 		return (r: number) => keys.reduce((p, k, j) => p + w[j] * probs.get(k)![r], 0);
 	};

@@ -556,7 +556,7 @@ export class PooledOpr implements Model {
 			P = new Float64Array(n * n);
 			for (let i = 0; i < n; i++) {
 				const g = this.gidx[i];
-				P[i * n + i] = 1 / (this.diag[g]);
+				P[i * n + i] = 1 / this.diag[g];
 			}
 		}
 		if (p.kappa !== 1) {
@@ -584,7 +584,8 @@ export class PooledOpr implements Model {
 		const g = this.gidx[i];
 		if (!this.hist[i])
 			return { mu: (ctx.mean / 2) * this.rel[g], nu: (ctx.mean / 2) * this.relScore[g] };
-		const scale = this.solveMean > 0 && ctx.mean > 0 ? (ctx.mean / this.solveMean) ** this.p.drift : 1;
+		const scale =
+			this.solveMean > 0 && ctx.mean > 0 ? (ctx.mean / this.solveMean) ** this.p.drift : 1;
 		return { mu: this.x[g] * scale, nu: this.xs[g] * scale };
 	}
 

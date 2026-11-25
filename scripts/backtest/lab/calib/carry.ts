@@ -28,10 +28,7 @@ console.log('redLo rel quantiles', q('redLo'));
 type Variant = { name: string; x0: number[]; m: (x: number[], r: number) => number };
 
 const scale = (x: number[], r: number, c: Cols) =>
-	Math.exp(x[0]) *
-	c.sd[r] *
-	Math.sqrt(c.vf[r] + Math.exp(x[1]) * c.unc[r]) *
-	c.lvl[r] ** x[2];
+	Math.exp(x[0]) * c.sd[r] * Math.sqrt(c.vf[r] + Math.exp(x[1]) * c.unc[r]) * c.lvl[r] ** x[2];
 const base = [-0.9, -1.5, 0.37];
 const soft = (v: number, floor: number, w: number) =>
 	floor + w * Math.log1p(Math.exp((v - floor) / w));

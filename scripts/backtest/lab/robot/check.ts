@@ -9,7 +9,10 @@ const list = process.argv.slice(2).map(Number);
 for (const s of list) {
 	const path = join(ROBOT_ROOT, `${s}.json`);
 	if (s < 2026 && existsSync(path)) {
-		const data = JSON.parse(readFileSync(path, 'utf8')) as Record<string, [Record<string, unknown>, Record<string, unknown>]>;
+		const data = JSON.parse(readFileSync(path, 'utf8')) as Record<
+			string,
+			[Record<string, unknown>, Record<string, unknown>]
+		>;
 		let n = 0;
 		let bad = 0;
 		const examples: string[] = [];

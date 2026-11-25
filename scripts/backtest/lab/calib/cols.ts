@@ -91,8 +91,7 @@ export function columns(c: Ctx, k = 0): Cols {
 		const bc = c.f(r, 'blueCons');
 		out.cons[r] = Number.isFinite(rc) && Number.isFinite(bc) ? (rc + bc) / 2 : out.seResVar[r];
 		const sd = c.rec.sd[r] || 1;
-		out.carry[r] =
-			(c.f(r, 'redHi') - c.f(r, 'redLo') - (c.f(r, 'blueHi') - c.f(r, 'blueLo'))) / sd;
+		out.carry[r] = (c.f(r, 'redHi') - c.f(r, 'redLo') - (c.f(r, 'blueHi') - c.f(r, 'blueLo'))) / sd;
 		out.minPlayed[r] = c.f(r, 'minPlayed');
 		out.newTeams[r] = c.f(r, 'newToSeason');
 		out.first[r] = c.f(r, 'firstEvent');

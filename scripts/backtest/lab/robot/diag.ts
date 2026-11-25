@@ -13,7 +13,10 @@ type OddMatch = { id: number; played: boolean; pred: { pRed: number } | null; re
 function oddbot(): Map<string, number> {
 	const out = new Map<string, number>();
 	for (const f of readdirSync(ODD)) {
-		const e = JSON.parse(readFileSync(join(ODD, f), 'utf8')) as { code: string; matchList: OddMatch[] };
+		const e = JSON.parse(readFileSync(join(ODD, f), 'utf8')) as {
+			code: string;
+			matchList: OddMatch[];
+		};
 		for (const m of e.matchList) {
 			if (m.played && m.pred && m.redScore) out.set(`2026:${e.code}:${m.id}`, m.pred.pRed);
 		}
@@ -24,7 +27,9 @@ function oddbot(): Map<string, number> {
 function load(name: string): Record<string, unknown> {
 	const [base, file] = name.split('@');
 	try {
-		return JSON.parse(readFileSync(join(import.meta.dirname, 'params', `${file ?? base}.json`), 'utf8'));
+		return JSON.parse(
+			readFileSync(join(import.meta.dirname, 'params', `${file ?? base}.json`), 'utf8')
+		);
 	} catch {
 		return VARIANTS[base].start;
 	}
@@ -35,7 +40,14 @@ const seasons = await data(ALL);
 const models = [await shipped(), ...names.map((n) => VARIANTS[n.split('@')[0]].make(load(n), n))];
 const rec = run(seasons, models, ENGINE);
 const train = new Set(TRAIN);
-const maps = models.map((_, k) => fitMapping(rec, k, rowsOf(rec, (r) => train.has(rec.season[r])), FULL_FIT));
+const maps = models.map((_, k) =>
+	fitMapping(
+		rec,
+		k,
+		rowsOf(rec, (r) => train.has(rec.season[r])),
+		FULL_FIT
+	)
+);
 
 const fresh = new Map<string, number>();
 const info = new Map<string, { type: string; week: number }>();
@@ -81,11 +93,24 @@ for (let r = 0; r < rec.n; r++) {
 const cols = [...models.map((m) => m.name), 'oddbot'];
 console.log('group'.padEnd(30), 'n'.padStart(6), ...cols.map((c) => c.slice(0, 12).padStart(12)));
 for (const [g, a] of [...groups].sort((x, y) => x[0].localeCompare(y[0]))) {
-	console.log(g.padEnd(30), String(a.n).padStart(6), ...a.b.map((x) => (x / a.n).toFixed(4).padStart(12)));
+	console.log(
+		g.padEnd(30),
+		String(a.n).padStart(6),
+		...a.b.map((x) => (x / a.n).toFixed(4).padStart(12))
+	);
 }
 
 for (let k = 2; k < models.length; k++) {
 	const g = pairedGap(rec, k, 1, maps[k], maps[1], (r) => rec.season[r] === 2026);
-	const q = pairedGap(rec, k, 1, maps[k], maps[1], (r) => rec.season[r] === 2026 && rec.playoff[r] === 0);
-	console.log(`${models[k].name} vs ${models[1].name}: 2026 ${g.diff.toFixed(5)} +/- ${g.se.toFixed(5)}, quals ${q.diff.toFixed(5)} +/- ${q.se.toFixed(5)}`);
+	const q = pairedGap(
+		rec,
+		k,
+		1,
+		maps[k],
+		maps[1],
+		(r) => rec.season[r] === 2026 && rec.playoff[r] === 0
+	);
+	console.log(
+		`${models[k].name} vs ${models[1].name}: 2026 ${g.diff.toFixed(5)} +/- ${g.se.toFixed(5)}, quals ${q.diff.toFixed(5)} +/- ${q.se.toFixed(5)}`
+	);
 }

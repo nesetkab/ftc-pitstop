@@ -100,5 +100,7 @@ table('quals by oddbot confidence', (r) =>
 	quals(r) ? `p${Math.floor(Math.max(po[r], 1 - po[r]) * 10) / 10}` : null
 );
 table('quals by event size', (r) =>
-	quals(r) ? `t${String(Math.min(Math.floor(F(r, 'eventTeams') / 8) * 8, 40)).padStart(2, '0')}` : null
+	quals(r)
+		? `t${String(Math.min(Math.floor(F(r, 'eventTeams') / 8) * 8, 40)).padStart(2, '0')}`
+		: null
 );

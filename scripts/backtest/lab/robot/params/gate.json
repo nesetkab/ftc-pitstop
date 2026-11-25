@@ -28,10 +28,7 @@
 		"rhoPrevScore": 0.7
 	},
 	"rVar": 1,
-	"hist": [
-		0.45,
-		0.15
-	],
+	"hist": [0.45, 0.15],
 	"auto": {
 		"lamNew": 1.5,
 		"lamPrev": 2,

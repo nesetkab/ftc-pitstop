@@ -25,5 +25,15 @@ for (const [k, s] of [...by].sort((x, y) => x[0] - y[0])) {
 	const va = s.srr / s.n - ma * ma;
 	const vb = s.sbb / s.n - mb * mb;
 	const c = (s.srb / s.n - ma * mb) / Math.sqrt(va * vb);
-	console.log(k, s.n, 'corr', c.toFixed(3), 'bias', ma.toFixed(2), mb.toFixed(2), 'sd', Math.sqrt(va).toFixed(1));
+	console.log(
+		k,
+		s.n,
+		'corr',
+		c.toFixed(3),
+		'bias',
+		ma.toFixed(2),
+		mb.toFixed(2),
+		'sd',
+		Math.sqrt(va).toFixed(1)
+	);
 }

@@ -45,7 +45,7 @@ import { scheduleStrength } from '#lib/model/sos.ts';
 import { isPlayed, type ModelMatch } from '#lib/model/types.ts';
 import type { AllianceSelection, EventBundle, Match, Ranking } from '#lib/types.ts';
 
-export const MODEL = { id: 'opr-map', label: 'OPR' };
+export const MODEL = { id: 'robot-opr', label: 'OPR' };
 
 export type AnalyzeOptions = { now: number; sims?: number; pickSims?: number; seed?: number };
 

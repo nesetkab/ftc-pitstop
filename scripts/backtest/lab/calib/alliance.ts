@@ -52,8 +52,13 @@ export function carryFloorAt(ctx: Ctx, r: number, p: CarryFloor, k = 0): number 
 	const blue = ctx.pred(k, r, 1);
 	const [rh, rl, bh, bl] = hiLo(ctx, r, k > 0);
 	const m = allianceMargin([rh, bh], [rl, bl], half, p);
-	const lvl = ctx.rec.mean[r] > 0 ? Math.min(Math.max((red + blue) / (2 * ctx.rec.mean[r]), 0.25), 4) : 1;
-	const s = p.kappa * ctx.rec.sd[r] * Math.sqrt(ctx.pred(k, r, 2) + p.eta * ctx.rec.unc[r]) * lvl ** p.gamma;
+	const lvl =
+		ctx.rec.mean[r] > 0 ? Math.min(Math.max((red + blue) / (2 * ctx.rec.mean[r]), 0.25), 4) : 1;
+	const s =
+		p.kappa *
+		ctx.rec.sd[r] *
+		Math.sqrt(ctx.pred(k, r, 2) + p.eta * ctx.rec.unc[r]) *
+		lvl ** p.gamma;
 	return sigmoid(m / s);
 }
 

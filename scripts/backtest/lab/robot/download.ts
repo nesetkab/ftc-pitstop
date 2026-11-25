@@ -148,10 +148,13 @@ async function season(s: number): Promise<void> {
 		}
 		for (const e of events) {
 			for (const m of e.matches) {
-				if (m.scores?.red && m.scores.blue) out[`${e.code}:${m.id}`] = [m.scores.red, m.scores.blue];
+				if (m.scores?.red && m.scores.blue)
+					out[`${e.code}:${m.id}`] = [m.scores.red, m.scores.blue];
 			}
 		}
-		console.log(`  ${s} ${group[0].start}: ${events.length} events, total ${Object.keys(out).length}`);
+		console.log(
+			`  ${s} ${group[0].start}: ${events.length} events, total ${Object.keys(out).length}`
+		);
 	}
 	await writeFile(path, JSON.stringify(out));
 	console.log(`${s}: ${Object.keys(out).length} matches`);
