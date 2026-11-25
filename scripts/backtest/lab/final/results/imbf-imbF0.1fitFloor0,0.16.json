@@ -1,0 +1,46 @@
+[
+	{
+		"name": "i0.15 rest none",
+		"brier": null,
+		"mae": null,
+		"map": {
+			"link": "probit",
+			"kappa": 1,
+			"eta": 0,
+			"gamma": 0
+		}
+	},
+	{
+		"name": "i0.15 rest f0.1 w0.16",
+		"brier": null,
+		"mae": null,
+		"map": {
+			"link": "probit",
+			"kappa": 1,
+			"eta": 0,
+			"gamma": 0
+		}
+	},
+	{
+		"name": "i0.2 rest none",
+		"brier": null,
+		"mae": null,
+		"map": {
+			"link": "probit",
+			"kappa": 1,
+			"eta": 0,
+			"gamma": 0
+		}
+	},
+	{
+		"name": "i0.2 rest f0.1 w0.16",
+		"brier": null,
+		"mae": null,
+		"map": {
+			"link": "probit",
+			"kappa": 1,
+			"eta": 0,
+			"gamma": 0
+		}
+	}
+]
