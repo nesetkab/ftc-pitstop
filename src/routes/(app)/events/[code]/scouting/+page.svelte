@@ -37,8 +37,7 @@
 {:else}
 	<div class="bar">
 		<p class="lead">
-			One report per team, {reports.length} teams. Prints {per === '1' ? 'one team' : 'two teams'} per
-			page with room for notes.
+			One report per team. Prints {per === '1' ? 'one team' : 'two teams'} per page with room for notes.
 		</p>
 		<div class="controls">
 			<Segmented
