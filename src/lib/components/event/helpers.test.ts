@@ -211,7 +211,7 @@ describe('event meta', () => {
 describe('awards', () => {
 	it('explains that league meets give no awards', () => {
 		expect(noAwardsText('LeagueMeet').title).toBe("League meets don't give awards.");
-		expect(noAwardsText('Qualifier').title).toBe('No awards yet.');
+		expect(noAwardsText('Qualifier').title).toBe('No awards have been announced yet.');
 	});
 
 	it('groups placements and alliance roles and skips awards not given', () => {

@@ -15,9 +15,7 @@
 </script>
 
 {#if bundle.matches.length === 0}
-	<EmptyState title="The match schedule hasn't been posted yet.">
-		This page fills in on its own once it is.
-	</EmptyState>
+	<EmptyState title="The match schedule hasn't been posted yet." />
 {:else}
 	{#key `${bundle.event.code}:${page.url.search}`}
 		<LiveNow

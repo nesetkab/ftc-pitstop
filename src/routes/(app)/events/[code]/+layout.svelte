@@ -202,7 +202,7 @@
 	<CalendarMenu
 		path="{base}/calendar.ics"
 		filename="{event.code}.ics"
-		note="Every match at this event with estimated start times. Subscribed calendars update as the day runs."
+		note="Every match at this event, with estimated start times. Subscribed calendars update during the day."
 	/>
 	{#if stream}
 		<Button

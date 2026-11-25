@@ -15,6 +15,8 @@
 
 {#if given}
 	<AwardsList awards={bundle.awards} teams={bundle.teams} followed={view.followed} />
-{:else}
+{:else if empty.body}
 	<EmptyState title={empty.title}>{empty.body}</EmptyState>
+{:else}
+	<EmptyState title={empty.title} />
 {/if}

@@ -137,7 +137,7 @@ export function eventRank(ranked: RankedStrength | null, code: string): EventRan
 }
 
 export function strengthLine({ rank, top, total }: EventRank): string {
-	return `${ordinal(rank)} of ${integer(total)} events this season (top-${TOP} avg aOPR ${fixed(top)})`;
+	return `${ordinal(rank)} of ${integer(total)} events this season, with a top-${TOP} average aOPR of ${fixed(top)}`;
 }
 
 export function strengthDetail(strength: EventStrength): StrengthDetail {

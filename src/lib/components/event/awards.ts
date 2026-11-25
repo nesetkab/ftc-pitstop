@@ -107,12 +107,12 @@ export function groupAwards(awards: Award[]): AwardGroup[] {
 	return result;
 }
 
-export function noAwardsText(type: EventType): { title: string; body: string } {
+export function noAwardsText(type: EventType): { title: string; body?: string } {
 	if (type === 'LeagueMeet') {
 		return {
 			title: "League meets don't give awards.",
 			body: 'Awards are handed out at the league tournament.'
 		};
 	}
-	return { title: 'No awards yet.', body: "Awards show here once they're announced." };
+	return { title: 'No awards have been announced yet.' };
 }

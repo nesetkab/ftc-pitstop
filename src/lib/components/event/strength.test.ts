@@ -134,7 +134,7 @@ describe('the season index', () => {
 
 	it('describes an event in one line', () => {
 		expect(strengthLine({ rank: 12, top: 64.24, total: 390 })).toBe(
-			'12th of 390 events this season (top-8 avg aOPR 64.2)'
+			'12th of 390 events this season, with a top-8 average aOPR of 64.2'
 		);
 	});
 

@@ -9,11 +9,6 @@
 
 	const view = getEventView();
 	const bundle = $derived(data.bundle);
-	const note = $derived(
-		data.season
-			? `${bundle.teams.length} teams. Season aOPR and world rank cover every BIOBUZZ match played so far.`
-			: `${bundle.teams.length} teams.`
-	);
 	const ratings = $derived(
 		data.analysis && data.analysis.ratings.length > 0 ? data.analysis.ratings : null
 	);
@@ -38,8 +33,7 @@
 		eventCode={bundle.event.code}
 	/>
 	<p class="note">
-		{note} Open a team for its scouting report, or
-		<a href="/events/{bundle.event.code}/scouting">print reports for every team</a>.
+		<a href="/events/{bundle.event.code}/scouting">Print scouting reports for every team</a>
 	</p>
 {/if}
 
