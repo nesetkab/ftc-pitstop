@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { updated } from '$app/state';
-	import { pitAnalysis } from '#lib/components/pit/analysis.remote.ts';
+	import { analysisLoader } from '#lib/components/pit/analysis-loader.ts';
 	import { reloadDue, reloadOntoNewBuild, watchDeploys } from '#lib/components/pit/deploy.ts';
 	import { PitAlerts } from '#lib/components/pit/notify.svelte.ts';
 	import PhoneScreen from '#lib/components/pit/PhoneScreen.svelte';
-	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
+	import { PitSession } from '#lib/components/pit/session.svelte.ts';
 	import {
 		parseRankMemory,
 		postedQuals,
@@ -28,7 +28,7 @@
 					queue: data.queue,
 					nexus: data.nexus,
 					replay: data.replay,
-					loadAnalysis: analysisLoader((request) => pitAnalysis(request)),
+					loadAnalysis: analysisLoader(),
 					pollHidden: () => alerts.enabled
 				})
 			: null

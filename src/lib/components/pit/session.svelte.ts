@@ -3,18 +3,12 @@ import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayClock, type ReplaySettings } from '#lib/game/replay.ts';
 import type { EventBundle, QueueStatusSnapshot } from '#lib/types.ts';
+import type { AnalysisLoader } from './analysis-loader.ts';
 import { PitFeed } from './feed.svelte.ts';
 import { connection as connectionState, isStale } from './poll.ts';
 import { queueCall } from './queue.ts';
-import { bundleSignature, pitView } from './view.ts';
-
-export interface AnalysisRequest {
-	code: string;
-	at: number | null;
-	version: string;
-}
-
-export type AnalysisLoader = (request: AnalysisRequest) => Promise<EventAnalysis | null>;
+import { bundleSignature } from './progress.ts';
+import { pitView } from './view.ts';
 
 export interface SessionOptions {
 	team: number;
@@ -27,19 +21,6 @@ export interface SessionOptions {
 	loadAnalysis?: AnalysisLoader;
 	fetch?: typeof fetch;
 	pollHidden?: () => boolean;
-}
-
-export function analysisLoader(
-	replay: AnalysisLoader,
-	fetcher: typeof fetch = fetch
-): AnalysisLoader {
-	return async (request) => {
-		if (request.at !== null) return replay(request);
-		const version = encodeURIComponent(request.version);
-		const response = await fetcher(`/api/events/${request.code}/analysis?v=${version}`);
-		if (!response.ok) throw new Error(`Analysis returned ${response.status}`);
-		return (await response.json()) as EventAnalysis;
-	};
 }
 
 const LIVE = new Set(['quals', 'selection', 'playoffs']);

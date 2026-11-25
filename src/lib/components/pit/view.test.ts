@@ -3,19 +3,12 @@ import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
 import { time } from '#lib/format/time.ts';
-import {
-	absentText,
-	delayText,
-	heroText,
-	liveText,
-	matchItems,
-	playoffResult,
-	shortDelay,
-	untilText
-} from './copy.ts';
+import { absentText, heroText, liveText, matchItems, playoffResult, untilText } from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
-import { bundleSignature, pitView, rankWindow } from './view.ts';
+import { delayText, shortDelay } from './delay.ts';
+import { bundleSignature } from './progress.ts';
+import { pitView, rankWindow } from './view.ts';
 
 const TEAM = 14624;
 const ZONE = 'America/Phoenix';

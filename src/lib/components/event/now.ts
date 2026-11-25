@@ -11,7 +11,7 @@ import {
 	postTime,
 	standings,
 	type AllianceStanding
-} from '#lib/components/pit/view.ts';
+} from '#lib/components/pit/progress.ts';
 import { hasPlayoffs } from '#lib/game/event-types.ts';
 import { allianceCountFor } from '#lib/model/bracket.ts';
 import type {

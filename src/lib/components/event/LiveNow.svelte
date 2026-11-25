@@ -1,9 +1,8 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import type { EventAnalysis } from '#lib/analysis/types.ts';
-	import { pitAnalysis } from '#lib/components/pit/analysis.remote.ts';
-	import { delayText } from '#lib/components/pit/copy.ts';
-	import { analysisLoader } from '#lib/components/pit/session.svelte.ts';
+	import { analysisLoader } from '#lib/components/pit/analysis-loader.ts';
+	import { delayText } from '#lib/components/pit/delay.ts';
 	import { fixed } from '#lib/format/number.ts';
 	import { pct } from '#lib/format/pct.ts';
 	import { time, timeWithSeconds } from '#lib/format/time.ts';
@@ -40,7 +39,7 @@
 				analysis,
 				replay,
 				reload: () => reload(),
-				loadAnalysis: analysisLoader((request) => pitAnalysis(request))
+				loadAnalysis: analysisLoader()
 			})
 	);
 

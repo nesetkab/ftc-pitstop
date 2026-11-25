@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { untrack } from 'svelte';
 	import { page, updated } from '$app/state';
-	import { pitAnalysis } from '#lib/components/pit/analysis.remote.ts';
+	import { analysisLoader } from '#lib/components/pit/analysis-loader.ts';
 	import { reloadDue, reloadOntoNewBuild, watchDeploys } from '#lib/components/pit/deploy.ts';
-	import { analysisLoader, PitSession } from '#lib/components/pit/session.svelte.ts';
+	import { PitSession } from '#lib/components/pit/session.svelte.ts';
 	import TvMessage from '#lib/components/pit/TvMessage.svelte';
 	import TvScreen from '#lib/components/pit/TvScreen.svelte';
 	import { keepAwake } from '#lib/components/pit/wake.ts';
@@ -21,7 +21,7 @@
 					queue: data.queue,
 					nexus: data.nexus,
 					replay: data.replay,
-					loadAnalysis: analysisLoader((request) => pitAnalysis(request))
+					loadAnalysis: analysisLoader()
 				})
 			: null
 	);

@@ -46,6 +46,14 @@ export function sharedAssets(output = OUTPUT) {
 	};
 }
 
+export function pageAssets(component: string, output = OUTPUT): string[] {
+	const nodesDir = join(output, 'server/nodes');
+	const node = readdirSync(nodesDir)
+		.map((file) => readNode(join(nodesDir, file)))
+		.find((entry) => entry.component === component);
+	return node?.imports ?? [];
+}
+
 function read(file: string, output: string): Buffer {
 	return readFileSync(join(output, 'client', file));
 }
