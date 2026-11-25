@@ -37,7 +37,8 @@
 	const stream = $derived(eventStream(event));
 	const withPlayoffs = $derived(hasPlayoffs(event.type) || bundle.alliances.length > 0);
 	const onMatchPage = $derived(page.route.id?.includes('/matches/') ?? false);
-	const status = $derived(eventStatus(event, Date.now()));
+	let now = $state(Date.now());
+	const status = $derived(eventStatus(event, now));
 	const live = $derived(status === 'live');
 	const every = $derived(bundle.phase === 'done' ? DONE_REFRESH_MS : REFRESH_MS);
 	const showUpdated = $derived(bundle.phase !== 'done' || bundle.stale);
@@ -169,6 +170,12 @@
 	});
 
 	$effect(() => watchFollows((teams) => (followed = new Set(teams))));
+
+	$effect(() => {
+		if (status === 'done') return;
+		const timer = setInterval(() => (now = Date.now()), 60_000);
+		return () => clearInterval(timer);
+	});
 
 	$effect(() => {
 		if (!live || section === 'now') return;
