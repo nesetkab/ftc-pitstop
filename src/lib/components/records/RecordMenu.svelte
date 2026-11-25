@@ -138,9 +138,10 @@
 		animation: ps-pop 160ms ease-out;
 	}
 
-	@media (pointer: coarse) {
+	@media (pointer: coarse), (max-width: 640px) {
 		.trigger {
 			min-height: 40px;
+			font-size: 14px;
 		}
 	}
 </style>

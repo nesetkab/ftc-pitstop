@@ -75,16 +75,17 @@
 	</ul>
 {/if}
 
-{#if data.total > 0}
-	<p class="count" aria-live="polite">
-		{integer(data.total)} alliance scores
-		{#if hasRecordFilters(data.filters)}
-			<a href={clearedRecords(data.filters)}>Clear filters</a>
-		{/if}
-	</p>
-{/if}
-
-<RecordTable rows={data.rows} filters={data.filters} names={data.names} />
+<div class="results">
+	{#if data.total > 0}
+		<p class="count" aria-live="polite">
+			{integer(data.total)} alliance scores
+			{#if hasRecordFilters(data.filters)}
+				<a href={clearedRecords(data.filters)}>Clear filters</a>
+			{/if}
+		</p>
+	{/if}
+	<RecordTable rows={data.rows} filters={data.filters} names={data.names} />
+</div>
 
 <Pagination
 	page={data.page}
@@ -112,6 +113,11 @@
 
 	.controls > :global(form) {
 		flex: 0 1 auto;
+	}
+
+	.results {
+		display: grid;
+		gap: 10px;
 	}
 
 	.count {

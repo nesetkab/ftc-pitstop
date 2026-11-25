@@ -45,9 +45,9 @@
 	const columns = $derived<Column<RankedRecord>[]>([
 		{ key: 'rank', label: 'Rank', numeric: true, text: (row) => integer(row.rank), class: 'rank' },
 		...recordColumns(filters.part).map(statColumn),
-		{ key: 'alliance', label: 'Alliance', cell: alliance, fill: true, class: 'who' },
-		{ key: 'event', label: 'Event', cell: event, hide: 'phone' },
-		{ key: 'match', label: 'Match', cell: match, hide: 'phone' }
+		{ key: 'alliance', label: 'Alliance', cell: alliance, class: 'who' },
+		{ key: 'match', label: 'Match', cell: match, hide: 'phone', class: 'when' },
+		{ key: 'event', label: 'Event', cell: event, hide: 'phone', fill: true }
 	]);
 
 	function href(next: SortState) {
@@ -128,7 +128,11 @@
 	}
 
 	.records :global(:is(th, td).who) {
-		padding-left: 18px;
+		padding-left: 20px;
+	}
+
+	.records :global(:is(th, td).when) {
+		padding-inline: 16px;
 	}
 
 	.teams {
@@ -201,11 +205,12 @@
 		}
 
 		.records :global(td) {
-			vertical-align: top;
+			padding-block: 9px;
+			vertical-align: baseline;
 		}
 
 		.records :global(td.num.active) {
-			font-size: 16px;
+			font-size: 15px;
 		}
 
 		.records :global(:is(td, th).who) {
@@ -221,6 +226,7 @@
 
 		.records .brief {
 			display: block;
+			margin-top: 2px;
 			overflow: hidden;
 			text-overflow: ellipsis;
 			font-size: 13px;

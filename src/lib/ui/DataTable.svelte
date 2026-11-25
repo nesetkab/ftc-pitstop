@@ -107,7 +107,7 @@
 	th.num,
 	td.num {
 		width: 1%;
-		padding-inline: 12px;
+		padding-inline: 10px;
 		font-variant-numeric: tabular-nums;
 	}
 
@@ -169,8 +169,8 @@
 	}
 
 	tbody td {
-		padding-block: 8px;
-		line-height: 1.35;
+		padding-block: 7px;
+		line-height: 1.3;
 	}
 
 	@media (hover: none) {
