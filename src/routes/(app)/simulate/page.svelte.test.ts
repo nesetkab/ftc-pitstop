@@ -112,9 +112,9 @@ describe('simulate page', () => {
 
 	it('shows the odds, the range, the parts and the notes', () => {
 		show();
-		expect(
-			screen.getByText('Red is favored: it wins 81% of the time, Blue 17%, tie 2%.')
-		).toBeInTheDocument();
+		expect(screen.getByLabelText('Verdict')).toHaveTextContent(
+			'Red is favored. It wins 81% of the time, Blue 17%, tie 2%.'
+		);
 		expect(screen.getByText(/Red 104 to 144, Blue 56 to 96/)).toBeInTheDocument();
 		const parts = screen.getByRole('table', { name: 'Predicted points by part for each alliance' });
 		const autoRow = within(parts).getByRole('row', { name: /Auto/ });

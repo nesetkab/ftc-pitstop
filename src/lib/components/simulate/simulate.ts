@@ -188,14 +188,23 @@ export function decisionNotes(
 	return notes.filter((note): note is string => note !== null).slice(0, MAX_NOTES);
 }
 
-export function headline(simulation: Pick<Simulation, 'forecast'>): string {
+export function headline(simulation: Pick<Simulation, 'forecast'>): {
+	lead: string;
+	rest: string;
+} {
 	const { red, blue, tie } = simulation.forecast;
 	const tieText = tie >= 0.005 ? `, tie ${pct(tie)}` : '';
 	if (Math.abs(red.win - blue.win) < CLOSE_WIN) {
-		return `Too close to call: Red wins ${pct(red.win)}, Blue ${pct(blue.win)}${tieText}.`;
+		return {
+			lead: 'Too close to call.',
+			rest: `Red wins ${pct(red.win)}, Blue ${pct(blue.win)}${tieText}.`
+		};
 	}
 	const favorite = red.win > blue.win ? 'Red' : 'Blue';
 	const [first, second] = red.win > blue.win ? [red, blue] : [blue, red];
 	const other = favorite === 'Red' ? 'Blue' : 'Red';
-	return `${favorite} is favored: it wins ${pct(first.win)} of the time, ${other} ${pct(second.win)}${tieText}.`;
+	return {
+		lead: `${favorite} is favored.`,
+		rest: `It wins ${pct(first.win)} of the time, ${other} ${pct(second.win)}${tieText}.`
+	};
 }

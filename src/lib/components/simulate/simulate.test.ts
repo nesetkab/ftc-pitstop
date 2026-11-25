@@ -127,11 +127,13 @@ describe('where the match is decided', () => {
 	});
 
 	it('sums the odds up in one line', () => {
-		expect(headline({ forecast: forecast(0.64, 0.34) })).toBe(
-			'Red is favored: it wins 64% of the time, Blue 34%, tie 2%.'
-		);
-		expect(headline({ forecast: forecast(0.45, 0.53) })).toBe(
-			'Too close to call: Red wins 45%, Blue 53%, tie 2%.'
-		);
+		expect(headline({ forecast: forecast(0.64, 0.34) })).toEqual({
+			lead: 'Red is favored.',
+			rest: 'It wins 64% of the time, Blue 34%, tie 2%.'
+		});
+		expect(headline({ forecast: forecast(0.45, 0.53) })).toEqual({
+			lead: 'Too close to call.',
+			rest: 'Red wins 45%, Blue 53%, tie 2%.'
+		});
 	});
 });

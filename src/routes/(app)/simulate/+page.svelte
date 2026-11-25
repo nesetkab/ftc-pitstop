@@ -15,6 +15,7 @@
 	import { integer } from '#lib/format/index.ts';
 	import { siteTitle } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import Lede from '#lib/ui/Lede.svelte';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import PredictionCard from '#lib/ui/PredictionCard.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
@@ -82,7 +83,8 @@
 {/if}
 
 {#if simulation}
-	<p class="headline">{headline(simulation)}</p>
+	{@const verdict = headline(simulation)}
+	<Lede lead={verdict.lead} rest={verdict.rest} aria-label="Verdict" />
 
 	<div class="layout">
 		<div class="panel wide">
@@ -160,14 +162,6 @@
 	.missing {
 		font-size: 14px;
 		color: var(--text-2);
-	}
-
-	.headline {
-		max-width: 68ch;
-		margin: 0;
-		font-size: 17px;
-		font-weight: 500;
-		color: var(--text);
 	}
 
 	.layout {
