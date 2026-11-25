@@ -42,6 +42,7 @@
 	import { sideOf } from '#lib/components/event/matches.ts';
 	import { lastMatch, moveText, type RankMemory } from './standing.ts';
 	import StreamPlayer from './StreamPlayer.svelte';
+	import Swap from '#lib/ui/Swap.svelte';
 	import type { PitView } from './view.ts';
 
 	interface Props {
@@ -227,11 +228,11 @@
 							: ''}
 					</span>
 					<div class="q">
-						<b>{next.label}</b>
+						<b><Swap value={next.label} /></b>
 						<AllianceChip alliance={next.alliance} />
 					</div>
 					<span class={['big', { urgent: text.urgent }]}>
-						{text.headline}
+						<Swap value={text.headline} />
 						{#if countdown}<small>{countdown}</small>{/if}
 					</span>
 					{#if called}
@@ -342,9 +343,9 @@
 				<section class="last">
 					<span class="muted">Last match</span>
 					<div class="q">
-						<b>{last.label}</b>
+						<b><Swap value={last.label} /></b>
 						<span class={['result', last.outcome]}>
-							{resultLine(last.outcome, last.ours, last.theirs)}
+							<Swap value={resultLine(last.outcome, last.ours, last.theirs)} />
 						</span>
 					</div>
 					<span class="muted">
@@ -584,6 +585,9 @@
 	.next {
 		display: grid;
 		gap: 4px;
+		transition:
+			background-color 300ms ease-out,
+			color 300ms ease-out;
 	}
 
 	.next .muted {
@@ -682,6 +686,10 @@
 		font-weight: 400;
 		text-overflow: ellipsis;
 		white-space: nowrap;
+	}
+
+	#match-brief:not([hidden]) {
+		animation: ps-pop 180ms ease-out;
 	}
 
 	.last {
@@ -863,6 +871,7 @@
 		color: var(--text-3);
 		font: inherit;
 		text-decoration: none;
+		transition: color 150ms ease-out;
 	}
 
 	.tabs [aria-pressed='true'] {

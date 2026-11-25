@@ -2,6 +2,8 @@
 	import { fixed } from '#lib/format/number.ts';
 	import { record } from '#lib/format/record.ts';
 	import type { Ranking } from '#lib/types.ts';
+	import { fade, move } from '#lib/ui/motion.ts';
+	import Ticker from '#lib/ui/Ticker.svelte';
 	import RowFit from './RowFit.svelte';
 	import { isGap, rankWindow } from './view.ts';
 
@@ -30,19 +32,21 @@
 			</thead>
 			<tbody>
 				{#each rankWindow(rankings, team, shown) as row, index (isGap(row) ? `gap-${index}` : row.team)}
-					{#if isGap(row)}
-						<tr class="gap">
+					<tr
+						class={isGap(row) ? 'gap' : { me: row.team === team }}
+						animate:move={{ duration: 360 }}
+						in:fade={{ duration: 300 }}
+					>
+						{#if isGap(row)}
 							<td class="l" colspan="5">{row.hidden} more</td>
-						</tr>
-					{:else}
-						<tr class={{ me: row.team === team }}>
+						{:else}
 							<td class="l">{row.rank}</td>
 							<td class="l">{row.team}</td>
 							<td class="name">{names.get(row.team) ?? ''}</td>
-							<td>{fixed(row.rs, 2)}</td>
+							<td><Ticker value={row.rs} format={(value) => fixed(value, 2)} /></td>
 							<td>{record(row.wins, row.losses, row.ties)}</td>
-						</tr>
-					{/if}
+						{/if}
+					</tr>
 				{/each}
 			</tbody>
 		</table>

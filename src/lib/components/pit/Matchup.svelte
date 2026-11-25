@@ -2,6 +2,7 @@
 	import { fixed } from '#lib/format/number.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { pct } from '#lib/format/pct.ts';
+	import Ticker from '#lib/ui/Ticker.svelte';
 	import type { AllianceColor } from '#lib/types.ts';
 	import TeamTag from './TeamTag.svelte';
 	import type { NextMatch } from './view.ts';
@@ -49,18 +50,20 @@
 					<span class="slot">
 						<TeamTag number={slot.number} alliance={side.alliance} me={slot.me} />
 						<small>
-							{slot.opr !== null
-								? fixed(slot.opr, 1)
-								: slot.rank !== null
-									? ordinal(slot.rank)
-									: ''}
+							{#if slot.opr !== null}
+								<Ticker value={slot.opr} format={(value) => fixed(value, 1)} />
+							{:else}
+								{slot.rank !== null ? ordinal(slot.rank) : ''}
+							{/if}
 						</small>
 					</span>
 				{/each}
 			</div>
 			{#if forecast}
-				<span class={['value', { lean: side.lean }]}>{pct(side.win)}</span>
-				<span class={['value', { lean: side.lean }]}>{fixed(side.score, 0)}</span>
+				<span class={['value', { lean: side.lean }]}><Ticker value={side.win} format={pct} /></span>
+				<span class={['value', { lean: side.lean }]}
+					><Ticker value={side.score} format={(value) => fixed(value, 0)} /></span
+				>
 			{/if}
 		</div>
 	{/each}
@@ -132,6 +135,10 @@
 		font-size: 1.35em;
 		font-weight: 600;
 		font-variant-numeric: tabular-nums;
+	}
+
+	.value {
+		transition: color 300ms ease-out;
 	}
 
 	.value.lean {

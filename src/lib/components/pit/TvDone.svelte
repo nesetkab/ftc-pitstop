@@ -2,6 +2,7 @@
 	import { fixed } from '#lib/format/number.ts';
 	import { ordinal } from '#lib/format/ordinal.ts';
 	import { record } from '#lib/format/record.ts';
+	import { fade } from '#lib/ui/motion.ts';
 	import RankTable from './RankTable.svelte';
 	import RowFit from './RowFit.svelte';
 	import { awardName, playoffResult } from './copy.ts';
@@ -54,7 +55,7 @@
 					{@const cut = shown < view.eventAwards.length}
 					<ul class="awards">
 						{#each view.eventAwards.slice(0, cut ? shown - 1 : shown) as award (`${award.id}-${award.placement}-${award.team}`)}
-							<li class={{ mine: award.team === view.team }}>
+							<li class={{ mine: award.team === view.team }} in:fade={{ duration: 400 }}>
 								<span class="name">{awardName(award.name)}</span>
 								<span class="winner">
 									<b>{award.team}</b>

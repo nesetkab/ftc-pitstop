@@ -261,6 +261,19 @@ kbd {
 	border: 0;
 }
 
+@keyframes ps-pop {
+	from {
+		opacity: 0;
+		translate: 0 -4px;
+	}
+}
+
+@keyframes ps-fade {
+	from {
+		opacity: 0;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,

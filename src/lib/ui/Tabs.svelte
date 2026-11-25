@@ -129,6 +129,9 @@
 		padding: 9px 0 10px;
 		text-decoration: none;
 		white-space: nowrap;
+		transition:
+			color 150ms ease-out,
+			box-shadow 150ms ease-out;
 	}
 
 	a:hover {

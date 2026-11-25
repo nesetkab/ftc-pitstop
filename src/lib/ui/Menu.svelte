@@ -111,6 +111,10 @@
 		box-shadow: var(--shadow-pop);
 	}
 
+	.menu[open] .panel {
+		animation: ps-pop 160ms ease-out;
+	}
+
 	@media (max-width: 760px) {
 		.panel {
 			position: fixed;

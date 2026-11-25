@@ -3,6 +3,7 @@
 	import type { Team } from '#lib/types.ts';
 	import Arrow from '#lib/ui/Arrow.svelte';
 	import FinishSpark from '#lib/ui/FinishSpark.svelte';
+	import { move } from '#lib/ui/motion.ts';
 	import ProbCell from '#lib/ui/ProbCell.svelte';
 	import Table from '#lib/ui/Table.svelte';
 	import TeamCell from '#lib/ui/TeamCell.svelte';
@@ -131,7 +132,7 @@
 	<tbody>
 		{#each rows as row (row.ranking.team)}
 			{@const team = row.ranking.team}
-			<tr class:me={followed.has(team)}>
+			<tr class:me={followed.has(team)} animate:move={{ off: rows.length > 100 }}>
 				<td class="l pin rank">{row.ranking.rank}</td>
 				<td class="pin team">
 					<TeamCell

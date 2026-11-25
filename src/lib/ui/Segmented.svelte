@@ -72,6 +72,9 @@
 		font: 500 13px/1 var(--font);
 		text-decoration: none;
 		white-space: nowrap;
+		transition:
+			background-color 150ms ease-out,
+			color 150ms ease-out;
 	}
 
 	button.icon {

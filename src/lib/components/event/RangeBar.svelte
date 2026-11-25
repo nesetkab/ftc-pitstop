@@ -37,6 +37,9 @@
 		top: 5px;
 		height: 2px;
 		background: var(--line-2);
+		transition:
+			left 250ms ease-out,
+			width 250ms ease-out;
 	}
 
 	u {
@@ -45,5 +48,6 @@
 		width: 2px;
 		height: 10px;
 		background: var(--text);
+		transition: left 250ms ease-out;
 	}
 </style>

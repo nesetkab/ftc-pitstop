@@ -40,6 +40,10 @@
 		margin-top: 6px;
 	}
 
+	.legend[open] .body {
+		animation: ps-pop 160ms ease-out;
+	}
+
 	@media (pointer: coarse) {
 		summary {
 			margin-block: -10px;

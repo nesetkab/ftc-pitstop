@@ -4,6 +4,7 @@
 
 <script lang="ts">
 	import { fixed } from '#lib/format/number.ts';
+	import { reveal } from './motion.ts';
 
 	interface Props {
 		items: Bar[];
@@ -21,7 +22,7 @@
 	}
 </script>
 
-<ul class="bars">
+<ul class="bars" {@attach reveal}>
 	{#each items as item (item.label)}
 		<li>
 			<span class="label">{item.label}</span>
@@ -64,6 +65,18 @@
 		inset: 0 auto 0 0;
 		border-radius: 2px;
 		background: var(--text-2);
+		transform-origin: left;
+		transition: width 250ms ease-out;
+	}
+
+	.bars:global([data-reveal='wait']) .fill {
+		transform: scaleX(0);
+	}
+
+	.bars:global([data-reveal='draw']) .fill {
+		transition:
+			width 250ms ease-out,
+			transform 500ms cubic-bezier(0.33, 1, 0.68, 1);
 	}
 
 	.value {
