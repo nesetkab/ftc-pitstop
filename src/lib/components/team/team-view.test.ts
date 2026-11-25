@@ -153,7 +153,7 @@ describe('buildTeamPage without season ratings', () => {
 		]);
 	});
 
-	it('adds awards from past seasons, newest season first', () => {
+	it('adds awards from past seasons, newest first', () => {
 		const award = (id: number, name: string, placement = 1) => ({
 			id,
 			name,
@@ -205,8 +205,8 @@ describe('buildTeamPage without season ratings', () => {
 			[2023, 'CENTERSTAGE']
 		]);
 		expect(view.awards[1].rows).toEqual([
-			{ code: null, event: 'Utah Qualifier 1', name: 'Inspire Award', win: true },
-			{ code: null, event: 'Utah Qualifier 2', name: 'Design Award 2nd place', win: false }
+			{ code: null, event: 'Utah Qualifier 2', name: 'Design Award 2nd place', win: false },
+			{ code: null, event: 'Utah Qualifier 1', name: 'Inspire Award', win: true }
 		]);
 		expect(view.awards[2].rows[0]).toMatchObject({ name: 'Winning alliance', win: true });
 	});

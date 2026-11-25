@@ -403,7 +403,7 @@ function topAward(award: Award): boolean {
 }
 
 function awardSeasons(season: TeamSeason, history: PastAward[]): TeamAwardSeason[] {
-	const current = season.events.flatMap((entry) =>
+	const current = season.events.toReversed().flatMap((entry) =>
 		entry.awards.map((award) => ({
 			code: entry.event.code,
 			event: entry.event.name,
@@ -421,7 +421,7 @@ function awardSeasons(season: TeamSeason, history: PastAward[]): TeamAwardSeason
 		seasons.push({ season: SEASON, game: SEASON_GAMES[SEASON], rows: current });
 	for (const year of [...past.keys()].sort((a, b) => b - a)) {
 		const rows = [...(past.get(year) ?? [])]
-			.sort((a, b) => a.start.localeCompare(b.start))
+			.sort((a, b) => b.start.localeCompare(a.start))
 			.map((entry) => ({
 				code: null,
 				event: entry.event,
