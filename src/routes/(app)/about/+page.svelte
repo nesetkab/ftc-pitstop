@@ -101,35 +101,44 @@
 				alliance’s score in a typical match. It is the number most of PitStop is built on.
 			</p>
 			<p>
-				FTC only reports scores per alliance, never per robot, so OPR works backwards. Across every
-				match at an event, it finds the set of team numbers that best explains all the alliance
-				scores at once. Each team’s number is its OPR. PitStop leaves penalty points out, so a team
-				gets no credit for fouls the other alliance committed.
+				Most of the score is only reported per alliance, so OPR works backwards. Across every match,
+				it finds the set of team numbers that best explains all the alliance scores at once. PitStop
+				leaves penalty points out, so a team gets no credit for fouls the other alliance committed.
+			</p>
+			<p>
+				Some points are scored by one robot on its own, like leaving and parking, and FIRST records
+				those per robot. Each team gets those points directly. Only the rest of the score is split
+				between partners. A team’s OPR is its own robot points plus its share of the rest.
+			</p>
+			<p>
+				OPR never goes below zero. A team cannot take points away from its own alliance, so a rating
+				that would drift negative is eased back toward zero. That keeps a weak team with strong
+				partners from being blamed for points it never cost them.
 			</p>
 			<p>
 				A handful of matches is not enough to tell teams apart, so each team starts from a guess
-				based on its earlier events this season and how it finished last season. The matches at the
-				current event take over quickly. Older information counts for less, and less again for a
-				team that has been away for weeks, because robots change between events.
+				based on its earlier events this season and its last three seasons, with last season
+				counting most. The matches at the current event take over quickly. Older information counts
+				for less, and less again for a team that has been away for weeks, because robots change
+				between events.
 			</p>
 			<p>
-				That is why PitStop’s OPR will not match FTCScout’s exactly. FTCScout shows the classic
-				version, solved from qualification matches alone with no starting guess. PitStop also counts
-				playoff matches. Both leave penalty points out. Checked on nine finished events in November
-				2026, the two agreed on average, within 3 points either way, but a single team typically
-				differed by 2 to 7 points, and by up to 30 when its starting guess or its playoff matches
-				told a different story than its qualification matches.
+				That is why PitStop’s OPR will not match FTCScout’s. FTCScout shows the classic version,
+				solved from qualification matches alone with no starting guess. PitStop also counts playoff
+				matches, credits robot points directly and starts each team from a guess. Both leave penalty
+				points out.
 			</p>
 			<p>
-				PitStop uses OPR because it tested best. Every traditional FTC event from 2021 to 2026 was
-				replayed, predicting each match from only the matches before it. OPR with these starting
-				guesses beat every alternative tried, including several versions of EPA, in every season.
-				The <a href="/accuracy">accuracy page</a> has the full results.
+				PitStop uses this version because it tested best. Every traditional FTC event from 2021 to
+				2026 was replayed, predicting each match from only the matches before it. It did better than
+				plain OPR with starting guesses, the version PitStop used before, and several versions of
+				EPA, in every season. The <a href="/accuracy">accuracy page</a> has the full results.
 			</p>
 			<p>
 				The same method runs on each part of the score, which gives auto OPR, hive OPR, tips OPR and
-				the rest. Each part is solved on its own, so the parts will not always add up to total OPR
-				exactly. Every variant is listed in the <a href="#glossary">glossary</a>.
+				the rest. The point parts are scaled to add up to total OPR. Tips are a count, not points,
+				so they are left as they are. Every variant is listed in the <a href="#glossary">glossary</a
+				>.
 			</p>
 		</section>
 
@@ -190,8 +199,9 @@
 				That is at most {maxRp} ranking points per match. PitStop predicts each bonus before the match.
 				The Swarm chance combines each robot’s record of leaving and parking with the alliance’s predicted
 				leave and park points. The Pollinator chances treat tips OPR as an expected count and ask how
-				likely the alliance is to reach each threshold. Both were checked against this season’s results,
-				and the <a href="/accuracy">accuracy page</a> shows how close they came.
+				likely the alliance is to reach each threshold. Both were fitted to this season’s results, and
+				the
+				<a href="/accuracy">accuracy page</a> shows how close they come on those same matches.
 			</p>
 		</section>
 
@@ -199,15 +209,19 @@
 			{@render heading('predictions')}
 			<p>
 				For a match that has not been played, each alliance’s predicted score adds up its two teams’
-				OPRs, shifts them up or down for how high-scoring the event has been, and adds the foul
-				points the other alliance tends to give away.
+				OPRs and the foul points the other alliance tends to give away.
+			</p>
+			<p>
+				A strong robot can carry a weaker partner, so an alliance with one much stronger team tends
+				to score more than its two OPRs add up to. PitStop adds a fifth of the gap between the two
+				partners, measured on the points they score together.
 			</p>
 			<p>
 				The win chance comes from the gap between the two alliances’ ratings, turned into a
-				percentage by an S-shaped curve fitted to five past seasons. The curve stays closer to 50/50
-				when the teams have played only a few matches at the event, or when the model is unsure
-				about them for other reasons. An evenly matched game has about a {tieChance}% chance of a
-				tie.
+				percentage by an S-shaped curve fitted to the 2021 to 2025 seasons. The curve stays closer
+				to 50/50 when the model is unsure about the teams, like early in an event, and in
+				high-scoring matches, where the same gap decides less. An evenly matched game has about a
+				{tieChance}% chance of a tie.
 			</p>
 			<p>
 				A 70% win chance means the favorite should lose about 3 times in 10. Upsets are expected,
@@ -339,8 +353,13 @@
 			{@render heading('limits')}
 			<ul>
 				<li>
-					OPR assumes points simply add up. Defense, partners who work especially well or badly
-					together, and one robot carrying an alliance all get spread across the teams involved.
+					OPR mostly assumes points add up. The one exception it handles is a strong robot carrying
+					a weaker partner. Defense, and partners who work especially well or badly together, still
+					get spread across the teams involved.
+				</li>
+				<li>
+					Robot credit only covers points FIRST records per robot, like leaving and parking. Matches
+					without that detail still count, with the whole score split between partners.
 				</li>
 				<li>
 					Early in an event, ratings lean on earlier events and last season. A team that rebuilt its
@@ -350,8 +369,9 @@
 					Win chances ignore fouls. They were tested and turned out too random to predict per team.
 				</li>
 				<li>
-					{GAME_NAME} is new this season, so ranking point chances, the tie rate and the score spread
-					were fitted on this season’s matches alone. They will settle as more matches are played.
+					The ratings and win chances were tuned on 2021 to 2025 only, and this season was held out
+					to test them. {GAME_NAME} is new, so ranking point chances, the tie rate and the score spread
+					had to be fitted on this season’s matches. They will settle as more matches are played.
 				</li>
 				<li>
 					Teams with no history are assumed to be weaker than average. That is usually right, but it

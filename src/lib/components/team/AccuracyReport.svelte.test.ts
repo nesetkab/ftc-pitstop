@@ -40,6 +40,14 @@ describe('accuracy page', () => {
 		expect(within(method).getByText(/predicted using only matches played before it/)).toBeVisible();
 	});
 
+	it('explains robot credit and the zero floor for the robot OPR model', () => {
+		const report = load();
+		show({ ...report, chosen: { id: 'robot-opr', label: 'OPR with robot credit' } });
+		const method = section('Method');
+		expect(within(method).getByText(/go straight to that team/)).toBeInTheDocument();
+		expect(within(method).getByText(/No team is rated below zero/)).toBeInTheDocument();
+	});
+
 	it('uses the model label when it is not the OPR model', () => {
 		const report = load();
 		show({ ...report, chosen: { id: 'epa', label: 'EPA, sequential updates' } });

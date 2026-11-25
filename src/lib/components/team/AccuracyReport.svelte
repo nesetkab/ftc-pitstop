@@ -14,10 +14,16 @@
 
 	let { report, sample = false }: Props = $props();
 
+	const DESCRIPTIONS: Record<string, string> = {
+		'robot-opr':
+			"PitStop predicts matches from OPR, the points a team adds to its alliance's score, without penalty points. Points FIRST records per robot, like leaving and parking, go straight to that team, and the rest is solved from alliance scores. Each team's earlier events and last three seasons give a starting estimate that the matches at the current event soon replace. No team is rated below zero, and an alliance with one much stronger team is expected to score a little more. The win chance comes from the predicted score gap.",
+		'opr-map':
+			"PitStop predicts matches from OPR, the points a team adds to its alliance's score. OPR is solved from the scores of earlier matches, without penalty points. Each team's earlier events and last season give a starting estimate that the matches at the current event soon replace. The win chance comes from the predicted score gap."
+	};
+
 	const description = $derived(
-		report.chosen.id === 'opr-map'
-			? "PitStop predicts matches from OPR, the points a team adds to its alliance's score. OPR is solved from the scores of earlier matches, without penalty points. Each team's earlier events and last season give a starting estimate that the matches at the current event soon replace. The win chance comes from the predicted score gap."
-			: `PitStop predicts matches with this model: ${report.chosen.label}.`
+		DESCRIPTIONS[report.chosen.id] ??
+			`PitStop predicts matches with this model: ${report.chosen.label}.`
 	);
 	const hasCalibration = $derived(
 		Boolean(report.calibration?.validation?.length || report.calibration?.test?.length)
@@ -93,7 +99,8 @@
 		<h2 class="sec-title" id="rp-title">Ranking point chances</h2>
 		<p>
 			Chances that an alliance earns each ranking point, checked against {report.rp.season} qualification
-			results.
+			results. These chances were fitted on the same matches, so this shows how well they fit, not a held-out
+			test.
 		</p>
 		<RpCalibration rp={report.rp} />
 	</section>
