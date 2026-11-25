@@ -71,14 +71,14 @@
 	<span class="teams">
 		{#each row.teams as team (team)}
 			<a href="/teams/{team}"
-				><b>{team}</b>{#if names.teams[team]}{' '}<span class="name">{names.teams[team]}</span
+				><b>{team}</b>{#if names.teams[team]}&nbsp;<span class="name">{names.teams[team]}</span
 					>{/if}</a
 			>
 		{/each}
 	</span>
 	<span class="brief">
 		<a href="/events/{row.event}/matches/{row.key}"
-			><Brand text={names.events[row.event] ?? row.event} />{' '}<span class="at">
+			><Brand text={names.events[row.event] ?? row.event} />&nbsp;<span class="at">
 				{row.label} <span class={row.alliance}>{side(row)}</span></span
 			></a
 		>
