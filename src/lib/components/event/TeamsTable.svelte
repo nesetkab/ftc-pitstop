@@ -177,8 +177,8 @@
 
 <style>
 	@media (max-width: 600px) {
-		:global(.teams-table th.num.pair) {
-			width: 5.5em;
+		:global(.teams-table :is(th, td).num.pair) {
+			width: 4.5rem;
 		}
 	}
 </style>
