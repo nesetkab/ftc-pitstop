@@ -6,11 +6,7 @@
 
 	const missing = $derived(page.status === 404);
 	const title = $derived(missing ? 'Team not found' : 'Team data is unavailable');
-	const meta = $derived(
-		missing
-			? 'No team has this number.'
-			: 'Try again in a moment.'
-	);
+	const meta = $derived(missing ? 'No team has this number.' : 'Try again in a moment.');
 </script>
 
 <svelte:head>

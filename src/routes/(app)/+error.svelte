@@ -6,11 +6,7 @@
 
 	const missing = $derived(page.status === 404);
 	const title = $derived(missing ? 'Page not found' : 'Something went wrong');
-	const meta = $derived(
-		missing
-			? 'There is no page at this address.'
-			: 'Try again in a moment.'
-	);
+	const meta = $derived(missing ? 'There is no page at this address.' : 'Try again in a moment.');
 </script>
 
 <svelte:head>

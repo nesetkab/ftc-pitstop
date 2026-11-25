@@ -142,9 +142,7 @@
 	/>
 {:else}
 	<main class="message">
-		<EmptyState title="Waiting for event data">
-			FTC Events is not responding.
-		</EmptyState>
+		<EmptyState title="Waiting for event data">FTC Events is not responding.</EmptyState>
 	</main>
 {/if}
 

@@ -8,10 +8,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<PageHeader
-	title="Season records are unavailable"
-	meta="Try again in a moment."
->
+<PageHeader title="Season records are unavailable" meta="Try again in a moment.">
 	{#snippet actions()}
 		<Button variant="secondary" icon="refresh" href="/records">Try again</Button>
 	{/snippet}

@@ -8,10 +8,7 @@
 	<meta name="robots" content="noindex" />
 </svelte:head>
 
-<PageHeader
-	title="Leaderboards are unavailable"
-	meta="Try again in a moment."
->
+<PageHeader title="Leaderboards are unavailable" meta="Try again in a moment.">
 	{#snippet actions()}
 		<Button variant="secondary" icon="refresh" href="/leaderboards">Try again</Button>
 	{/snippet}

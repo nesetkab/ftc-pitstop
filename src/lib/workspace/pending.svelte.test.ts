@@ -110,9 +110,7 @@ describe('offline workspace edits', () => {
 		expect(reloaded.docs.picklist.entries.map((entry) => entry.team)).toEqual([2844, 7]);
 		await vi.advanceTimersByTimeAsync(300);
 		expect(reloaded.sync).toBe('retrying');
-		expect(reloaded.message).toBe(
-			'Offline. Changes will save when the connection is back.'
-		);
+		expect(reloaded.message).toBe('Offline. Changes will save when the connection is back.');
 
 		up = true;
 		window.dispatchEvent(new Event('online'));

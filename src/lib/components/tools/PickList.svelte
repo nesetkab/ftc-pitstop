@@ -842,10 +842,6 @@
 		gap: 8px 12px;
 	}
 
-	.event .faint {
-		font-size: 13px;
-	}
-
 	.event-input {
 		width: 160px;
 		text-transform: uppercase;
