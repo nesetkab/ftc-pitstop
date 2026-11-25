@@ -50,8 +50,8 @@
 			nested: true
 		},
 		{ key: 'tips', label: PART_LABELS.tips, term: oprTerm(PART_LABELS.tips), part: 'tips' },
-		{ key: 'np', label: 'Score before penalties' },
-		{ key: 'fouls', label: 'Penalty points drawn' },
+		{ key: 'np', label: 'Score without fouls' },
+		{ key: 'fouls', label: 'Points from fouls' },
 		{ key: 'total', label: 'Predicted score' }
 	];
 
