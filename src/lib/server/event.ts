@@ -695,7 +695,7 @@ export function createLoaders(deps: LoaderDeps) {
 		const seasons = bannerSeasons(rookieYear);
 		if (seasons.length === 0) return [];
 		const value = await cache.get(
-			`scout:${SEASON}:banners:${number}`,
+			`scout:${SEASON}:team-banners:${number}`,
 			{ ttl: 30 * DAY_SECONDS, maxStale: 90 * DAY_SECONDS },
 			async () => ({ status: 'ok', body: await fetchBannerHistory(number, seasons, scout) })
 		);

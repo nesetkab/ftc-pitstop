@@ -3,7 +3,11 @@ import type { Award, EventType } from '#lib/types.ts';
 const INSPIRE = 11;
 const WINNING_ALLIANCE = 13;
 
-const BANNER_EVENTS: ReadonlySet<EventType> = new Set(['Championship', 'FIRSTChampionship']);
+const BANNER_EVENTS: ReadonlySet<EventType> = new Set([
+	'Championship',
+	'FIRSTChampionship',
+	'Premier'
+]);
 
 export function isBanner(award: Pick<Award, 'id' | 'placement'>, type: EventType): boolean {
 	if (!BANNER_EVENTS.has(type)) return false;
