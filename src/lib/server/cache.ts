@@ -140,6 +140,7 @@ export function createCache(options: CacheOptions = {}) {
 	const inflight = new Map<string, Promise<CacheEntry>>();
 	const failures = new LruMap<number>(500);
 	const errors = new LruMap<{ at: number; error: unknown }>(500);
+	const written = new LruMap<number>(1500);
 	const store = options.store ?? null;
 	const now = options.now ?? Date.now;
 	const onError = options.onError ?? logError;
@@ -173,7 +174,16 @@ export function createCache(options: CacheOptions = {}) {
 
 	async function writeStore(key: string, entry: CacheEntry, policy: CachePolicy) {
 		if (!shared(policy)) return;
-		await useStore(key, (store) => store.set(key, entry, Math.ceil(policy.ttl + policy.maxStale)));
+		const saved = await useStore(key, async (store) => {
+			await store.set(key, entry, Math.ceil(policy.ttl + policy.maxStale));
+			return true;
+		});
+		if (saved) written.set(key, entry.fetchedAt);
+	}
+
+	function storedRecently(key: string, policy: CachePolicy): boolean {
+		const at = written.get(key);
+		return at !== undefined && now() - at < (policy.maxStale * 1000) / 2;
 	}
 
 	function prefetch(keys: string[]) {
@@ -210,6 +220,7 @@ export function createCache(options: CacheOptions = {}) {
 				const shared = await readStore(key);
 				if (shared && (!previous || shared.fetchedAt > previous.fetchedAt)) {
 					memory.set(key, shared);
+					written.set(key, shared.fetchedAt);
 					if (age(shared) < choose(shared.body).ttl) return shared;
 					previous = shared;
 				}
@@ -230,7 +241,10 @@ export function createCache(options: CacheOptions = {}) {
 			memory.set(key, entry);
 			failures.delete(key);
 			errors.delete(key);
-			await writeStore(key, entry, choose(entry.body));
+			const policy = choose(entry.body);
+			if (result.status !== 'unchanged' || !previous || !storedRecently(key, policy)) {
+				await writeStore(key, entry, policy);
+			}
 			return entry;
 		})();
 		const tracked = task
@@ -256,7 +270,10 @@ export function createCache(options: CacheOptions = {}) {
 		if (!entry && checkStore) {
 			entry = await (warmRead(key) ?? readStore(key));
 			checkStore = false;
-			if (entry) memory.set(key, entry);
+			if (entry) {
+				memory.set(key, entry);
+				written.set(key, entry.fetchedAt);
+			}
 		}
 		const run = fetcher as Fetcher<unknown>;
 		const policy = choose(entry?.body ?? null);
@@ -310,7 +327,10 @@ export function createCache(options: CacheOptions = {}) {
 				return;
 			}
 			absent.delete(key);
-			if (best === shared) memory.set(key, shared);
+			if (best === shared) {
+				memory.set(key, shared);
+				written.set(key, shared.fetchedAt);
+			}
 			found.set(key, best);
 		});
 		return found;
@@ -328,6 +348,7 @@ export function createCache(options: CacheOptions = {}) {
 			absent.clear();
 			failures.clear();
 			errors.clear();
+			written.clear();
 		},
 		pending: () => inflight.size
 	};

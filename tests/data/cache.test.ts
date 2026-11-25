@@ -295,6 +295,30 @@ describe('cache stores', () => {
 		expect((await second.get('event', shared, fetcher)).body).toBe('v2');
 	});
 
+	it('skips writing to Redis when a refresh finds nothing changed', async () => {
+		const time = clock();
+		const redis = fakeRedis();
+		const cache = createCache({ now: time.now, store: redisStore(redis) });
+		const unchanged: Fetcher<string> = async (previous) =>
+			previous
+				? { status: 'unchanged', lastModified: previous.lastModified }
+				: { status: 'ok', body: 'v1', lastModified: 'Mon' };
+		await cache.get('event', shared, unchanged);
+		const sets = () => redis.calls.filter((call) => call === 'set').length;
+		expect(sets()).toBe(1);
+		for (let round = 0; round < 5; round++) {
+			time.advance(shared.ttl + 1);
+			await cache.get('event', shared, unchanged);
+			await settle(cache);
+		}
+		expect(sets()).toBe(1);
+		time.advance(shared.maxStale / 2);
+		await cache.get('event', shared, unchanged);
+		await settle(cache);
+		expect(sets()).toBe(2);
+		expect((await cache.get('event', shared, unchanged)).body).toBe('v1');
+	});
+
 	it('keeps entries that refresh every few seconds out of Redis', async () => {
 		const time = clock();
 		const redis = fakeRedis();
