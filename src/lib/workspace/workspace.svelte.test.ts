@@ -229,7 +229,9 @@ describe('trouble saving', () => {
 		await vi.advanceTimersByTimeAsync(300);
 		expect(workspace.sync).toBe('retrying');
 		expect(workspace.offline).toBe(true);
-		expect(workspace.message).toBe('Offline. Changes will save when the connection is back.');
+		expect(workspace.message).toBe(
+			"You're offline. Changes will save when the connection is back."
+		);
 		await vi.advanceTimersByTimeAsync(1000);
 		expect(write).toHaveBeenCalledTimes(2);
 		expect(workspace.sync).toBe('saved');
@@ -321,6 +323,20 @@ describe('shared workspaces', () => {
 		expect(offline.status).toBe('ready');
 		expect(offline.offline).toBe(true);
 		expect(offline.docs.picklist.entries[0].team).toBe(2844);
+		const copied = (await cache.load(code))?.docs.picklist?.updatedAt;
+		expect(offline.syncedAt).toBe(copied);
+	});
+
+	it('remembers when it last heard from the store', async () => {
+		vi.setSystemTime(new Date('2026-11-25T15:00:00Z'));
+		const cache = createDeviceStore(storage, { prefix: 'ps-cache' });
+		const workspace = new Workspace(code, { flushDelay: 300 });
+		await workspace.open({ stores: [shared(device)], cache });
+		expect(workspace.syncedAt).toBe(Date.parse('2026-11-25T15:00:00Z'));
+		vi.setSystemTime(new Date('2026-11-25T15:05:00Z'));
+		workspace.update('picklist', (list) => addEntry(list, 7));
+		await vi.advanceTimersByTimeAsync(300);
+		expect(workspace.syncedAt).toBe(Date.parse('2026-11-25T15:05:00.300Z'));
 	});
 
 	it('keeps what it saved in the copy too', async () => {

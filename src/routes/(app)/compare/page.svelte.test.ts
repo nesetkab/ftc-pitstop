@@ -177,7 +177,7 @@ describe('compare page', () => {
 			missing: [404]
 		});
 		expect(screen.getByText('Pick two or more teams to compare.')).toBeInTheDocument();
-		expect(screen.getByRole('status')).toHaveTextContent('No team found for 404.');
+		expect(screen.getByRole('status')).toHaveTextContent('No team has the number 404.');
 		expect(screen.queryByRole('table')).not.toBeInTheDocument();
 	});
 });

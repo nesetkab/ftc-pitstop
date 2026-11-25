@@ -158,6 +158,6 @@ describe('simulate page', () => {
 		expect(
 			screen.getByText('Season ratings are still loading. Try again in a minute.')
 		).toBeInTheDocument();
-		expect(screen.getByRole('status')).toHaveTextContent('No team found for 424242.');
+		expect(screen.getByRole('status')).toHaveTextContent('No team has the number 424242.');
 	});
 });

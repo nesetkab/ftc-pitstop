@@ -73,5 +73,5 @@
 		ondismiss={() => session.dismiss()}
 	/>
 {:else}
-	<TvMessage title="Waiting for event data" detail="FTC Events is not responding." />
+	<TvMessage title="FTC Events isn't responding right now." />
 {/if}

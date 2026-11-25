@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { page } from '$app/state';
 	import Button from '#lib/ui/Button.svelte';
+	import { missingTeam } from '#lib/ui/not-found.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import { searchDialog } from '#lib/ui/search.svelte.ts';
 
 	const missing = $derived(page.status === 404);
 	const title = $derived(missing ? 'Team not found' : 'Team data is unavailable');
-	const meta = $derived(missing ? 'No team has this number.' : 'Try again in a moment.');
+	const meta = $derived(missing ? missingTeam(page.params.number) : 'Try again in a moment.');
 </script>
 
 <svelte:head>

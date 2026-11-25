@@ -164,6 +164,7 @@
 		return { red: side('red'), blue: side('blue') };
 	});
 	const from = $derived(source === 'ftc' ? 'FTC Events' : 'FTCScout');
+	const aged = $derived(stale || connection === 'offline');
 	const result = $derived(playoffResult(view));
 	const qualsDone = $derived(qualsDoneText(view));
 	const firstDay = $derived(
@@ -200,10 +201,10 @@
 
 	<main class="body">
 		<p class="visually-hidden" role="status">{announcement}</p>
-		<p class={['status', { stale }]}>
-			{#if connection === 'offline'}Offline.{/if}
+		<p class={['status', { stale: aged }]}>
+			{#if connection === 'offline'}You're offline.{/if}
 			{#if updated !== null}
-				Updated {updatedClock(updated, now, timeZone)} from {from}{stale
+				Updated {updatedClock(updated, now, timeZone)} from {from}{aged
 					? `, ${relative(updated, now)}`
 					: ''}.
 			{/if}

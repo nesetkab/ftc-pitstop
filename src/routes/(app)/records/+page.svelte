@@ -49,12 +49,10 @@
 	<p class="count" aria-live="polite">
 		{#if data.total > 0}
 			Showing {integer(first)} to {integer(last)} of {integer(data.total)} alliance scores
-		{:else}
-			No alliance scores
 		{/if}
 	</p>
 	<div class="tools">
-		{#if hasRecordFilters(data.filters)}
+		{#if data.total > 0 && hasRecordFilters(data.filters)}
 			<a class="clear" href={clearedRecords(data.filters)}>Clear filters</a>
 		{/if}
 		<RecordMenu

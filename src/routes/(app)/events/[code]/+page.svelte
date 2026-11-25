@@ -21,6 +21,7 @@
 		teams={bundle.teams}
 		matches={bundle.matches}
 		timezone={bundle.event.timezone}
+		phase={bundle.phase}
 		ratings={data.analysis?.ratings ?? null}
 		projections={data.analysis?.projections ?? null}
 		followed={view.followed}

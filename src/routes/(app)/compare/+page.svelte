@@ -9,6 +9,7 @@
 	import { MAX_FIT } from '#lib/components/compare/fit.ts';
 	import { siteTitle } from '#lib/seo.ts';
 	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import { missingTeams } from '#lib/ui/not-found.ts';
 	import PageHeader from '#lib/ui/PageHeader.svelte';
 	import Seo from '#lib/ui/Seo.svelte';
 	import type { PageProps } from './$types';
@@ -44,7 +45,7 @@
 
 {#if data.missing.length > 0}
 	<p class="missing" role="status">
-		No team found for {data.missing.join(', ')}.
+		{missingTeams(data.missing)}
 	</p>
 {/if}
 

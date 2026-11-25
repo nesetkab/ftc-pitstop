@@ -92,6 +92,9 @@ describe('followed teams', () => {
 		expect(
 			await screen.findByRole('searchbox', { name: 'Team number or name' })
 		).toBeInTheDocument();
+		expect(
+			screen.getByText('Teams you follow show here with their next match and rank.')
+		).toBeInTheDocument();
 		expect(requested).toEqual([]);
 	});
 

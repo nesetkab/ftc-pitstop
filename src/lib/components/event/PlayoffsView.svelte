@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { AllianceOdds } from '#lib/analysis/types.ts';
 	import type { EventBundle } from '#lib/types.ts';
-	import EmptyState from '#lib/ui/EmptyState.svelte';
+	import EmptyState, { type EmptyAction } from '#lib/ui/EmptyState.svelte';
 	import AlliancesTable from './AlliancesTable.svelte';
 	import Bracket from './Bracket.svelte';
 	import { allianceStatus, buildBracket, playoffRecords } from './bracket.ts';
@@ -10,9 +10,10 @@
 		bundle: Pick<EventBundle, 'event' | 'teams' | 'matches' | 'alliances'>;
 		odds?: AllianceOdds[] | null;
 		followed?: ReadonlySet<number>;
+		teams?: EmptyAction | null;
 	}
 
-	let { bundle, odds = null, followed = new Set() }: Props = $props();
+	let { bundle, odds = null, followed = new Set(), teams = null }: Props = $props();
 
 	const playoffMatches = $derived(bundle.matches.filter((match) => match.level === 'playoff'));
 	const bracket = $derived(
@@ -33,7 +34,10 @@
 </script>
 
 {#if bundle.alliances.length === 0 && playoffMatches.length === 0}
-	<EmptyState title="Alliances and the bracket show here after alliance selection." />
+	<EmptyState
+		title="Alliances and the bracket show here after alliance selection."
+		action={teams}
+	/>
 {:else}
 	{#if bundle.alliances.length > 0}
 		<section class="panel" aria-labelledby="alliances-title">
