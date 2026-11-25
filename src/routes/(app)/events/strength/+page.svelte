@@ -276,6 +276,10 @@
 		padding-block: 8px;
 	}
 
+	.ranked th {
+		white-space: nowrap;
+	}
+
 	.rank {
 		width: 1%;
 	}

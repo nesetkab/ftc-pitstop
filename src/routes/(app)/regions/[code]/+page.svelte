@@ -109,7 +109,7 @@
 <dl class="stats">
 	<div>
 		<dt>Teams</dt>
-		<dd>{integer(region.teams)}</dd>
+		<dd>{region.teams > 0 ? integer(region.teams) : '—'}</dd>
 	</div>
 	<div>
 		<dt>Events played</dt>
@@ -470,6 +470,7 @@
 
 	.best .name {
 		margin-left: 4px;
+		white-space: nowrap;
 	}
 
 	.best .phone {
