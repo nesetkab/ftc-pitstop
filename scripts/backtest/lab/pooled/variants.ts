@@ -22,6 +22,8 @@ export const TUNED: Partial<PooledParams> = {
 	drift: 0.5
 };
 
+export const SHIPPED_HET: Partial<OprParams> = { q: 0.2 };
+
 export const HET: Partial<PooledParams> = { ...TUNED, qMatch: 0.02, hetero: 0.5, heteroPool: 1 };
 
 const pooled = (name: string, p: Partial<PooledParams>) => (x: Extra) =>
@@ -52,7 +54,15 @@ export const VARIANTS: Record<string, (x: Extra) => Model> = {
 			x.w ?? 0.5
 		),
 	'shipped-shift': (x) => new PlayoffShift('shipped-shift', new KalmanOpr('a', SHIPPED), x.shift ?? 0),
-	'shipped-hetero': (x) => new HeteroOpr('shipped-hetero', { ...SHIPPED, ...x.alt }, x.het ?? 0.5),
+	'shipped-hetero': (x) =>
+		new HeteroOpr('shipped-hetero', { ...SHIPPED, ...SHIPPED_HET, ...(x as Partial<OprParams>) }, x.het ?? 0.75),
+	'blend-het': (x) =>
+		new Blend(
+			'blend-het',
+			new HeteroOpr('a', { ...SHIPPED, ...SHIPPED_HET }, x.het ?? 0.75),
+			new PooledOpr('b', { ...POOLED_BASE, ...HET, ...x }),
+			x.w ?? 0.5
+		),
 	'blend-ctrl': (x) =>
 		new Blend(
 			'blend-ctrl',
