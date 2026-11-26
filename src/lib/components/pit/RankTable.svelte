@@ -2,10 +2,7 @@
 	import { fixed } from '#lib/format/number.ts';
 	import { record } from '#lib/format/record.ts';
 	import type { Ranking } from '#lib/types.ts';
-	import { fade, move } from '#lib/ui/motion.ts';
-	import Ticker from '#lib/ui/Ticker.svelte';
-	import RowFit from './RowFit.svelte';
-	import { isGap, rankWindow } from './view.ts';
+	import { autoScroll } from './auto-scroll.ts';
 
 	interface Props {
 		rankings: Ranking[];
@@ -15,65 +12,113 @@
 	}
 
 	let { rankings, team, names, caption }: Props = $props();
+
+	let looping = $state(false);
 </script>
 
-<RowFit count={rankings.length}>
-	{#snippet children(shown)}
-		<table class="rank">
-			<caption class="visually-hidden">{caption}</caption>
-			<thead>
-				<tr>
-					<th class="l" scope="col">#</th>
-					<th class="l" scope="col">Team</th>
-					<th class="l" scope="col"><span class="visually-hidden">Name</span></th>
-					<th scope="col">RS</th>
-					<th scope="col">Record</th>
+<div class="wrap">
+	<table class="rank" aria-hidden="true">
+		{@render columns()}
+		<thead>
+			<tr>
+				<th class="l">#</th>
+				<th class="l">Team</th>
+				<th></th>
+				<th>RS</th>
+				<th>Record</th>
+			</tr>
+		</thead>
+	</table>
+	<div class="box" {@attach autoScroll((value) => (looping = value))}>
+		{@render table(false)}
+		{#if looping}
+			{@render table(true)}
+		{/if}
+	</div>
+</div>
+
+{#snippet columns()}
+	<colgroup>
+		<col class="place" />
+		<col class="number" />
+		<col />
+		<col class="score" />
+		<col class="wins" />
+	</colgroup>
+{/snippet}
+
+{#snippet table(hidden: boolean)}
+	<table class="rank" aria-hidden={hidden}>
+		<caption class="visually-hidden">{caption}: rank, team, name, RS, record</caption>
+		{@render columns()}
+		<tbody>
+			{#each rankings as row (row.team)}
+				<tr class={{ me: row.team === team }}>
+					<td class="l">{row.rank}</td>
+					<td class="l">{row.team}</td>
+					<td class="name">{names.get(row.team) ?? ''}</td>
+					<td>{fixed(row.rs, 2)}</td>
+					<td>{record(row.wins, row.losses, row.ties)}</td>
 				</tr>
-			</thead>
-			<tbody>
-				{#each rankWindow(rankings, team, shown) as row, index (isGap(row) ? `gap-${index}` : row.team)}
-					<tr
-						class={isGap(row) ? 'gap' : { me: row.team === team }}
-						animate:move={{ duration: 360 }}
-						in:fade={{ duration: 300 }}
-					>
-						{#if isGap(row)}
-							<td class="l" colspan="5">{row.hidden} more</td>
-						{:else}
-							<td class="l">{row.rank}</td>
-							<td class="l">{row.team}</td>
-							<td class="name">{names.get(row.team) ?? ''}</td>
-							<td><Ticker value={row.rs} format={(value) => fixed(value, 2)} /></td>
-							<td>{record(row.wins, row.losses, row.ties)}</td>
-						{/if}
-					</tr>
-				{/each}
-			</tbody>
-		</table>
-	{/snippet}
-</RowFit>
+			{/each}
+		</tbody>
+	</table>
+{/snippet}
 
 <style>
+	.wrap {
+		display: grid;
+		grid-template: auto minmax(0, 1fr) / minmax(0, 1fr);
+		min-height: 0;
+		container-type: inline-size;
+	}
+
+	.box {
+		min-height: 0;
+		overflow: hidden auto;
+	}
+
 	.rank {
 		width: 100%;
+		table-layout: fixed;
+		font-size: min(0.85em, 4.5cqi);
 		border-collapse: collapse;
 		font-variant-numeric: tabular-nums;
 	}
 
-	th {
+	.place {
+		width: 2.8em;
+	}
+
+	.number {
+		width: 4.6em;
+	}
+
+	.score {
+		width: 3.8em;
+	}
+
+	.wins {
+		width: 5.2em;
+	}
+
+	th,
+	td {
+		height: 1.75em;
 		padding-inline: 0.5em;
+		text-align: right;
+		white-space: nowrap;
+	}
+
+	th {
 		box-shadow: inset 0 -1px var(--line-2);
 		color: var(--text-3);
 		font-weight: 500;
-		text-align: right;
 		vertical-align: bottom;
 	}
 
 	td {
-		padding-inline: 0.5em;
 		box-shadow: inset 0 -1px var(--line);
-		text-align: right;
-		white-space: nowrap;
 	}
 
 	.l {
@@ -81,8 +126,6 @@
 	}
 
 	.name {
-		width: 100%;
-		max-width: 0;
 		overflow: hidden;
 		text-overflow: ellipsis;
 		text-align: left;
@@ -94,9 +137,5 @@
 		box-shadow: 1px 0 var(--accent);
 		color: var(--on-accent);
 		font-weight: 600;
-	}
-
-	.gap td {
-		color: var(--text-3);
 	}
 </style>

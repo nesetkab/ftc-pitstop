@@ -6,12 +6,11 @@
 		value?: string;
 		state?: 'done' | 'next' | 'upcoming';
 		href?: string;
+		onpick?: () => void;
 	};
 </script>
 
 <script lang="ts">
-	import { fade, move } from './motion.ts';
-
 	interface Props {
 		items: MatchListItem[];
 	}
@@ -21,10 +20,14 @@
 
 <ol class="ml">
 	{#each items as item (item.label)}
-		<li class={item.state} animate:move={{ duration: 300 }} in:fade={{ duration: 240 }}>
-			<svelte:element this={item.href ? 'a' : 'b'} class="label" href={item.href}>
-				{item.label}
-			</svelte:element>
+		<li class={item.state}>
+			{#if item.href}
+				<a class="label" href={item.href} onclick={item.onpick}>{item.label}</a>
+			{:else if item.onpick}
+				<button type="button" class="label" onclick={item.onpick}>{item.label}</button>
+			{:else}
+				<b class="label">{item.label}</b>
+			{/if}
 			<span class="status">{item.status ?? ''}</span>
 			<span class="detail">{item.detail ?? ''}</span>
 			<span class="value">{item.value ?? ''}</span>
@@ -51,7 +54,6 @@
 		padding: 0.42em 0;
 		border-bottom: 1px solid var(--line);
 		font-variant-numeric: tabular-nums;
-		transition: background-color 300ms ease-out;
 	}
 
 	.label {
@@ -62,6 +64,29 @@
 
 	a.label:hover {
 		text-decoration: underline;
+	}
+
+	button.label {
+		padding: 0;
+		border: 0;
+		background: transparent;
+		color: inherit;
+		font: inherit;
+		font-weight: 600;
+		text-align: left;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	li:has(button.label) {
+		position: relative;
+	}
+
+	/* The whole row opens the match, not just its label. */
+	button.label::after {
+		content: '';
+		position: absolute;
+		inset: 0;
 	}
 
 	@media (pointer: coarse) {

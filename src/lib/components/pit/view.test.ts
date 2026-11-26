@@ -3,12 +3,19 @@ import { retime } from '#lib/analysis/analyze.ts';
 import type { EventAnalysis } from '#lib/analysis/types.ts';
 import { replayBundle, replayStart, selectionWindow } from '#lib/game/replay.ts';
 import { time } from '#lib/format/time.ts';
-import { absentText, heroText, liveText, matchItems, playoffResult, untilText } from './copy.ts';
+import {
+	absentText,
+	delayText,
+	heroText,
+	liveText,
+	matchItems,
+	playoffResult,
+	shortDelay,
+	untilText
+} from './copy.ts';
 import { fixtureBundle } from './fixtures.ts';
 import { queueCall } from './queue.ts';
-import { delayText, shortDelay } from './delay.ts';
-import { bundleSignature } from './progress.ts';
-import { pitView, rankWindow } from './view.ts';
+import { bundleSignature, pitView, rankWindow } from './view.ts';
 
 const TEAM = 14624;
 const ZONE = 'America/Phoenix';
@@ -40,6 +47,21 @@ describe('pitView during quals', () => {
 		expect(current.upNext).toBe('Q23');
 		expect(current.onField).toBeNull();
 		expect(current.delaySeconds).toBe(142);
+	});
+
+	it('lists every posted match, newest first', () => {
+		expect(current.results).toHaveLength(22);
+		expect(current.results[0]).toEqual({
+			key: expect.any(String),
+			label: 'Q22',
+			winner: 'blue',
+			red: [12841, 26635],
+			blue: [26670, 18421],
+			redScore: 45,
+			blueScore: 97
+		});
+		expect(current.results.at(-1)?.label).toBe('Q1');
+		expect(new Set(current.results.map((row) => row.key)).size).toBe(22);
 	});
 
 	it('summarizes our matches and the last result', () => {
@@ -433,12 +455,12 @@ describe('pitView after quals', () => {
 		const meet = fixtureBundle('USMIWMM8');
 		const absent = pitView({ bundle: meet, analysis: null, queue: null, team: 24371 });
 		expect(absent).toMatchObject({ registered: false, ranking: null, matches: [] });
-		expect(absentText(absent).title).toBe("24371 isn't at this meet.");
+		expect(absentText(absent).title).toBe('24371 is not at this meet.');
 		const here = pitView({ bundle: meet, analysis: null, queue: null, team: 10104 });
 		expect(here.registered).toBe(true);
 		expect(
 			absentText(pitView({ bundle: full, analysis: null, queue: null, team: 99999 })).title
-		).toBe("99999 isn't on the team list for this event.");
+		).toBe('99999 is not on the team list for this event.');
 	});
 
 	it('knows when a team is not at the event', () => {

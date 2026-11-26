@@ -109,7 +109,21 @@ describe('TvScreen', () => {
 		const mine = [...container.querySelectorAll('tr.me td')].map((cell) => cell.textContent);
 		expect(mine).toEqual(['8', '14624', 'Cat-Astrophic Byte', '3.33', '3-0-0']);
 		expect(container.querySelectorAll('table tbody tr')).toHaveLength(27);
-		expect(content).toContain('Q22 Blue won 26670, 18421 97–45');
+		expect(content).toContain('Last results · 22');
+		const results = [...container.querySelectorAll('ol[aria-label="All match results"] > li')];
+		expect(results).toHaveLength(22);
+		expect(results[0].querySelector('.label')?.textContent).toBe('Q1');
+		const latest = results.at(-1)!;
+		expect(latest.querySelector('.label')?.textContent).toBe('Q22');
+		expect([...latest.querySelectorAll('.tag')].map((tag) => tag.textContent)).toEqual([
+			'12841',
+			'26635',
+			'26670',
+			'18421'
+		]);
+		expect(latest.querySelector('.score')?.textContent?.replace(/\s+/g, ' ').trim()).toBe(
+			'45 – 97'
+		);
 		expect(content).toContain('Connected');
 		expect(content).toContain('Updated 1:39:30 PM from FTC Events');
 		expect(content).toContain('Q23 is next');
@@ -158,7 +172,7 @@ describe('TvScreen', () => {
 		const content = text(container);
 		expect(container.querySelector('[data-phase="playoffs"]')).not.toBeNull();
 		expect(content).toContain('M3');
-		expect(content).toContain('Next match in upper bracket round 2');
+		expect(content).toContain('Upper bracket round 2');
 		expect(content).toContain('Alliance 5');
 		expect(content).toContain('Playoff record 1-0');
 	});
@@ -202,7 +216,7 @@ describe('TvScreen', () => {
 		const bundle = replayBundle(full, at('Q22'));
 		const view = pitView({ bundle, analysis: null, queue: null, team: 99999 });
 		const { container } = render(TvScreen, { props: { ...props(at('Q22')), view } });
-		expect(text(container)).toContain("99999 isn't on the team list for this event.");
+		expect(text(container)).toContain('99999 is not on the team list for this event.');
 	});
 });
 
@@ -259,23 +273,10 @@ describe('TvScreen rankings fit', () => {
 		expect(ranked(container).at(-1)).toBe('31');
 	});
 
-	it('marks the teams it leaves out below the leaders', () => {
-		measure(27);
-		const { container } = render(TvScreen, { props: done(final.rankings[0].team) });
-		const rows = ranked(container);
-		expect(rows).toHaveLength(27);
-		expect(rows.slice(0, 3)).toEqual(['1', '2', '3']);
-		expect(rows.at(-1)).toBe('5 more');
-		expect(container.querySelector('tr.me td')?.textContent).toBe('1');
-	});
-
-	it('keeps a last place team on screen with the leaders above a gap', () => {
-		measure(27);
+	it('keeps every team in the list when they do not all fit', () => {
+		measure(10);
 		const { container } = render(TvScreen, { props: done(final.rankings.at(-1)!.team) });
-		const rows = ranked(container);
-		expect(rows).toHaveLength(27);
-		expect(rows[0]).toBe('1');
-		expect(rows.slice(-3)).toEqual(['5 more', '30', '31']);
+		expect(ranked(container)).toHaveLength(31);
 		expect(container.querySelector('tr.me td')?.textContent).toBe('31');
 	});
 
@@ -392,6 +393,15 @@ describe('PhoneScreen', () => {
 		expect(text(hero as HTMLElement)).toContain('Queue now');
 		expect(text(hero as HTMLElement)).toContain('Red alliance with 25620.');
 		expect(text(hero as HTMLElement)).toContain("Q25 is on the field. We're up next.");
+	});
+
+	it('describes each alert without guessing at live data', () => {
+		const { container } = phone('default');
+		const details = [...container.querySelectorAll('.alert .detail')].map((node) =>
+			text(node as HTMLElement).trim()
+		);
+		expect(details[0]).toBe('Our alliance, partners and queue time.');
+		expect(details[1]).toBe('Win or loss and the final score.');
 	});
 
 	it('offers vibration and a test alert only where they work', async () => {

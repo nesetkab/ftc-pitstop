@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Brand from '#lib/ui/Brand.svelte';
 	import { time } from '#lib/format/time.ts';
 	import Logo from '#lib/ui/Logo.svelte';
 
@@ -11,6 +10,10 @@
 		timeZone: string;
 		streaming?: boolean | null;
 		onstream?: () => void;
+		footerHidden?: boolean;
+		onfooter?: (hidden: boolean) => void;
+		onreset?: () => void;
+		onhide?: () => void;
 	}
 
 	let {
@@ -20,8 +23,14 @@
 		now,
 		timeZone,
 		streaming = null,
-		onstream = () => {}
+		onstream = () => {},
+		footerHidden = false,
+		onfooter,
+		onreset,
+		onhide
 	}: Props = $props();
+
+	let settings = $state(false);
 
 	let canFullscreen = $state(false);
 	let fullscreen = $state(false);
@@ -45,7 +54,7 @@
 
 <header class="head">
 	<Logo height="0.95em" />
-	<span class="event"><Brand text={eventName} /></span>
+	<span class="event">{eventName}</span>
 	<span class="space"></span>
 	<h1 class="me">
 		{team}{#if teamName}<span class="name">{` ${teamName}`}</span>{/if}
@@ -59,6 +68,30 @@
 	{#if canFullscreen && !fullscreen}
 		<button type="button" onclick={enterFullscreen}>Full screen</button>
 	{/if}
+	<div class="settings">
+		<button type="button" aria-expanded={settings} onclick={() => (settings = !settings)}>
+			Settings
+		</button>
+		{#if settings}
+			<div class="menu">
+				<button
+					type="button"
+					onclick={() => {
+						onreset?.();
+						settings = false;
+					}}>Reset layout</button
+				>
+				<button
+					type="button"
+					onclick={() => {
+						onfooter?.(!footerHidden);
+						settings = false;
+					}}>{footerHidden ? 'Show bottom bar' : 'Hide bottom bar'}</button
+				>
+				<button type="button" onclick={() => onhide?.()}>Hide top bar</button>
+			</div>
+		{/if}
+	</div>
 </header>
 
 <style>
@@ -71,6 +104,24 @@
 		border-bottom: 1px solid var(--line);
 		font-size: 0.9em;
 		white-space: nowrap;
+	}
+
+	.settings {
+		position: relative;
+		z-index: 8;
+		flex-shrink: 0;
+	}
+
+	.menu {
+		position: absolute;
+		top: calc(100% + 0.3em);
+		right: 0;
+		display: grid;
+		gap: 0.3em;
+		padding: 0.4em;
+		border: 1px solid var(--line-2);
+		border-radius: 0.4em;
+		background: var(--bg);
 	}
 
 	.event {
